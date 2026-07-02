@@ -38,6 +38,11 @@
 
 - [testing.md](testing.md) — テスト方針(Vitest・fast-check・Storybook UIカタログ含む)
 
+### 実装管理
+
+- [implementation-plan.md](implementation-plan.md) — 実装フェーズ計画・進捗・運用ループ
+- [decisions.md](decisions.md) — 実装判断記録(未決事項の確定はここに追記)
+
 ### 画面別仕様
 
 - [screen-design/README.md](screen-design/README.md) — 画面設計書 目次・共通仕様(レイアウト/ルーティング/バッジ色/モーダル/確認ダイアログ)
@@ -104,6 +109,6 @@
 
 - 認証・複数端末同期(バックエンド導入)
 - メール実送信(現状はアプリ内通知のみ)
-- 校正値・合格基準の数値記録(※未決 — [domain-model.md §8](domain-model.md))
+- 校正値・合格基準の数値記録(スコープ外で確定 — [decisions.md D-004](decisions.md))
 - 添付ファイル(校正証明書PDF等)
 - バーコード/QRによる機器検索
