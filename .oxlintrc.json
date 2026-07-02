@@ -1,0 +1,188 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  // なぜ: coding-standards.md §10 の通り plugins = typescript/unicorn/oxc/react/jsx-a11y/import を有効化する。
+  // "eslint" は oxlint の基礎ルール群のため常に含める必要がある（省くとcorrectness系の基本チェックが抜ける）。
+  "plugins": ["eslint", "typescript", "unicorn", "oxc", "react", "jsx-a11y", "import"],
+  // なぜ: coding-standards.md §10「categories 全 error」。
+  // 個別ルールのoffは override + 理由コメントで行う方針のため、ここでは全カテゴリを一律 error にする。
+  "categories": {
+    "correctness": "error",
+    "suspicious": "error",
+    "pedantic": "error",
+    "perf": "error",
+    "style": "error",
+    "restriction": "error",
+    "nursery": "error"
+  },
+  // なぜ: ブラウザで動くSPA本体（document/console/HTMLDialogElement等）とNode上で動く設定ファイル
+  // （node:url等）の両方が同居するため、まずbrowserを既定にし、Node専用ファイルはoverrideで個別に足す。
+  "env": {
+    "browser": true
+  },
+  "rules": {
+    // なぜ: React 19 は自動JSXランタイムのため `import React` は不要（react/react-in-jsx-scope は
+    // 旧クラシックランタイム前提のルールでありこのプロジェクトの実態と矛盾する）。
+    "react/react-in-jsx-scope": "off",
+    // なぜ: coding-standards.md §3 で type を使い interface を禁止する方針のため、
+    // interface宣言を禁止するルールを明示的に有効化する。
+    "typescript/consistent-type-definitions": ["error", "type"],
+    // なぜ: coding-standards.md §9「no-inline-comments は意図的に off」
+    // （「なぜ」を日本語コメントで残す文化のため、インラインコメント自体を禁止しない）。
+    "eslint/no-inline-comments": "off",
+    // なぜ: import順序はoxfmtの sortImports（.oxfmtrc.json）が担う方針のため
+    // （coding-standards.md §6）、lintルール側の並び順チェックは二重管理を避けるためoffにする。
+    "eslint/sort-imports": "off",
+    // なぜ: coding-standards.md §8でストア/CSVインポート等が `console.warn` によるサルベージ通知を
+    // 行う方針のため、また ErrorBoundary が `console.error` で例外を可視化する方針のため
+    // （coding-standards.md §9「例外を投げない」の裏側で捕捉した例外自体は可視化する）。
+    "eslint/no-console": "off",
+    // なぜ: Reactのクラスコンポーネントのライフサイクルメソッド（componentDidCatch等）は
+    // 実装上 this を参照しないことが正当にあり得るため（ErrorBoundary参照）。
+    "eslint/class-methods-use-this": "off",
+    // なぜ: VitePWAなどVite系プラグインのファクトリ関数はPascalCase命名だが `new` を使わずに
+    // 呼び出す慣習（Reactコンポーネント命名と同様の慣習）のため誤検知になる。
+    "eslint/new-cap": "off",
+    // なぜ: PWA manifestの記述順をdocs/infra/pwa.md §2の正本と一言一句一致させる必要があるなど、
+    // 意味のある記述順（ドキュメント上の正・可読性）を優先し、アルファベット順は強制しない。
+    "eslint/sort-keys": "off",
+    // なぜ: Viteの標準構成でJSXは `.tsx` 拡張子に書く前提のため
+    // （`.jsx` へのリネームを促すルールは本プロジェクトの規約と矛盾する）。
+    "react/jsx-filename-extension": "off",
+    // なぜ: coding-standards.md §9「UI文言は日本語」の方針上、日本語文言をそのままJSXの
+    // 子要素として書くため、リテラル文字列を禁止するルールは適用しない。
+    "react/jsx-no-literals": "off",
+    // なぜ: HashRouter配下の一般的なコンポーネントツリー（StrictMode>ErrorBoundary>Router>App等）は
+    // 既定の上限(2)を超えるため、実態に合わせて現実的な上限へ緩和する。
+    "react/jsx-max-depth": ["error", { "max": 6 }],
+    // なぜ: Reactの慣習でnullをレンダー結果や初期state（ErrorBoundaryのstate.error等）に使うため。
+    "unicorn/no-null": "off",
+    // なぜ: coding-standards.md §1はコンポーネント/アイコンをPascalCase、ロジック/設定/ストアを
+    // camelCaseとするファイル名規約のため、unicorn既定のkebab-case強制ではなく
+    // 両ケースを許可する設定に変更する。
+    "unicorn/filename-case": ["error", { "cases": { "pascalCase": true, "camelCase": true } }],
+    // なぜ: 本プロジェクトはnamed export原則・default exportはApp.tsxのみという方針
+    // （coding-standards.md §4）であり、「defaultのみ禁止」「namedのみ禁止」「単一exportはdefault化」
+    // という3つの相反するルールをすべて有効化すると必ずどこかで矛盾するため、
+    // このexport形式に関する制約はlintではなくコードレビューで担保する。
+    "import/no-default-export": "off",
+    "import/no-named-export": "off",
+    "import/prefer-default-export": "off",
+    // なぜ: coding-standards.md §3で許容されている「値importとtype importの混在形」
+    // （`import { ITEM_STATUS, type InspectionItem } from ...`）を使う方針のため、
+    // トップレベルでのtype専用import分離を強制するルールは適用しない。
+    "import/consistent-type-specifier-style": "off",
+    // なぜ: coding-standards.md §6「副作用importはallowリスト内に限定（CSS / jest-dom / seed注入）」。
+    // CSSエントリ読み込み・jest-domのmatcher拡張という正当な副作用importのみを許可リスト化する。
+    "import/no-unassigned-import": [
+      "error",
+      { "allow": ["**/*.css", "@testing-library/jest-dom/vitest"] }
+    ],
+    // なぜ: コメント・テスト名・UI文言は日本語（coding-standards.md §9）であり、
+    // 英大文字始まりを強制するルールは日本語コメント（コード識別子から始まる補足を含む）と矛盾する。
+    "eslint/capitalized-comments": "off",
+    // なぜ: coding-standards.md §4 で「短絡 {cond && ...} / 三項を併用」と明示されており、
+    // 三項式の全面禁止は規約と矛盾する。
+    "eslint/no-ternary": "off",
+    // なぜ: オプショナル属性（`?: T`）の存在判定は `=== undefined` 比較が最も型安全であり、
+    // fast-check の `{ nil: undefined }` などライブラリAPIにも undefined を渡す必要がある。
+    "eslint/no-undefined": "off",
+    // なぜ: coding-standards.md §8 の early-return ガード文化のループ版として、
+    // ループ内ガード（該当しない要素のスキップ）に continue を用いる（merge のレコード単位
+    // サルベージ等で必須）。
+    "eslint/no-continue": "off",
+    // なぜ: 1行 early-return ガード（`if (!item) return;`。coding-standards.md §5・§8 の推奨形）を
+    // 許容しつつ、複数行ブロックには波括弧を強制する。
+    "eslint/curly": ["error", "multi-line"],
+    // なぜ: 「なぜ」を綴る日本語JSDoc・コメント文化（coding-standards.md §9）では行数が自然に嵩み、
+    // 行数上限は実態と合わない。複雑度は max-statements（下記）で担保する。
+    "eslint/max-lines-per-function": "off",
+    // なぜ: 既定の10文は通知判定・merge サルベージ等のドメイン手続きに対して過度に厳しい。
+    // 全廃はせず、分割を促す現実的な上限として20に緩和する。
+    "eslint/max-statements": ["error", { "max": 20 }],
+    // なぜ: ストア非依存の純関数は依存（items/orders/vendors/equipment/today 等）をすべて引数で
+    // 受ける設計（domain層の方針）のため、既定の3引数では足りない。
+    "eslint/max-params": ["error", { "max": 5 }],
+    // なぜ: coding-standards.md §8 のフォールバック例（`item.leadTimeDays ?? vendor.standardLeadTimeDays`
+    // を vendor 不在許容で書く形）はオプショナル連鎖が前提であり、禁止すると冗長な存在チェックが増える。
+    "oxc/no-optional-chaining": "off",
+    // なぜ: 「as const オブジェクト + 派生 union 型」イディオム（coding-standards.md §1）は
+    // 定数とその型を定義位置で並べて export する形であり、末尾一括 export への強制と矛盾する。
+    "import/exports-last": "off",
+    "import/group-exports": "off",
+    // なぜ: coding-standards.md §8 の不変スタイル「入力を変更せず `{ ...item, ... }` で新値を返す」は
+    // オブジェクトspreadが前提のイディオムであり、Object.assign への書き換え強制は規約と矛盾する。
+    "oxc/no-rest-spread-properties": "off",
+    // なぜ: ドメイン上意味を持つ既定値は domain/constants.ts へのJSDoc付き集約（coding-standards.md §8）
+    // で担保する。一方で暦計算の「1年=12ヶ月」「月は1始まり」やゼロ埋め桁数のような文脈自明の数まで
+    // 定数化を強制すると、かえって可読性を損なうため機械的な全数検出は行わない。
+    "eslint/no-magic-numbers": "off",
+    // なぜ: fast-check は `fc.integer()` のように名前空間プレフィックス付きで使うのが公式慣習であり、
+    // named import に展開すると `string` / `record` / `boolean` 等の汎用名がスコープを汚染して
+    // かえって可読性を損なうため、ワイルドカード import を許可する。
+    "import/no-namespace": "off",
+    // なぜ: coding-standards.md §5「Immerドラフトを直接破壊的変更する」方針（zustandスライスの
+    // `set((state) => { state.items[id] = item; })` 等）は、引数を書き換え不可のreadonlyにする
+    // このルールと真っ向から矛盾する。またReactのクラスコンポーネントのライフサイクル引数
+    // （componentDidCatchのerrorInfo等）やDOM APIのコールバック引数にreadonly化を強制するのは
+    // 過度に厳格（typescript-eslint本家でも既定オフの意見が強いルール）なため無効化する。
+    "typescript/prefer-readonly-parameter-types": "off"
+  },
+  "overrides": [
+    {
+      // なぜ: `.d.ts` はアンビエント型宣言専用ファイルであり、
+      // トリプルスラッシュ参照のみでimport/export文を持たない構成が正当なため
+      // （src/vite-env.d.ts）、モジュール判定の曖昧さを警告するルールは対象外にする。
+      "files": ["**/*.d.ts"],
+      "rules": {
+        "import/unambiguous": "off"
+      }
+    },
+    {
+      // なぜ: `vite-env.d.ts` はViteの標準テンプレートが定める規約ファイル名であり、
+      // PascalCase/camelCaseどちらにも属さないハイフン区切りのため、この1ファイルに限り除外する。
+      "files": ["src/vite-env.d.ts"],
+      "rules": {
+        "unicorn/filename-case": "off"
+      }
+    },
+    {
+      // なぜ: App.tsx のみ `function` 宣言 + `export default` を許可する
+      // coding-standards.md §4 の例外規定に対応する。
+      "files": ["src/App.tsx"],
+      "rules": {
+        "eslint/func-style": "off"
+      }
+    },
+    {
+      // なぜ: vite.config.ts / vitest.config.ts / vitest.setup.ts はNode環境で実行される
+      // 設定ファイルのため、`node:url` 等のNode組み込みモジュールの利用を許可する
+      // （tsconfig.node.json同様、アプリ本体とは別のNode向けファイル群として扱う）。
+      "files": ["vite.config.ts", "vitest.config.ts", "vitest.setup.ts"],
+      "env": {
+        "node": true
+      },
+      "rules": {
+        "import/no-nodejs-modules": "off"
+      }
+    },
+    {
+      // なぜ: coding-standards.md §10「test override で vitest」。
+      // テストファイルではvitestプラグインの規約チェック(no-disabled-tests等)を有効化し、
+      // vitestのグローバル関数（describe/it/expect等）を認識できるようにする。
+      "files": ["*.test.ts", "*.test.tsx"],
+      "plugins": [
+        "eslint",
+        "typescript",
+        "unicorn",
+        "oxc",
+        "react",
+        "jsx-a11y",
+        "import",
+        "vitest"
+      ],
+      "env": {
+        "vitest": true
+      }
+    }
+  ]
+}

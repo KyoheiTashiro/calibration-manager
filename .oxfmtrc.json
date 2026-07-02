@@ -1,0 +1,12 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  // なぜ: import順序を手動グルーピングに頼らず自動整列するため（coding-standards.md §6）。
+  // internalPattern で "@/" エイリアスを internal グループとして認識させ、
+  // 外部ライブラリ import と自作モジュール import を区別して並べる。
+  "sortImports": {
+    "internalPattern": ["^@/.*"]
+  },
+  // なぜ: Tailwind CSS 4採用のため、className内のユーティリティクラスの並び順を
+  // prettier-plugin-tailwindcss互換のアルゴリズムで自動整列し、レビュー時の差分ノイズを減らす。
+  "sortTailwindcss": true
+}

@@ -1,0 +1,4 @@
+# なぜ: oxfmt(format/format:check)はコードのフォーマットのみを対象範囲とし、
+# 設計の正であるdocs/配下のMarkdownは対象外にする（誤ってレイアウトを変更しないため）。
+# oxfmtはデフォルトで .gitignore と .prettierignore を読むため、本ファイルで明示する。
+docs
