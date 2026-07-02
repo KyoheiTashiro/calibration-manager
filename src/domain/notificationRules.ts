@@ -1,0 +1,181 @@
+/**
+ * 通知5種別の発生条件判定（domain-model.md §3.7）。
+ * ストアに依存しない純粋関数。ストアの `generateNotifications` はこの判定結果と
+ * 既存の通知を突き合わせ、同一（targetType, targetId, type）の未読通知が既に存在する
+ * 場合は生成をスキップする（重複抑止はストア側の責務。store.md「アクション仕様」）。
+ */
+
+import { DELIVERY_DUE_SOON_NOTICE_DAYS } from "@/domain/constants";
+import { recommendedOrderDate } from "@/domain/leadTime";
+import { isActiveOrderStatus } from "@/domain/orderStatus";
+import {
+  type CalibrationOrder,
+  type Equipment,
+  EXECUTION,
+  type InspectionItem,
+  type IsoDateString,
+  NOTIFICATION_TARGET_TYPE,
+  NOTIFICATION_TYPE,
+  type Notification,
+  ORDER_STATUS,
+  type Vendor,
+} from "@/store/types";
+import { recordValue } from "@/utils/record";
+import { addDays } from "@/utils/time";
+
+/**
+ * 生成すべき通知の判定結果。id・createdDate・isRead はストア側が付与する
+ * （純粋関数はID生成・現在時刻という副作用に触れないため）。
+ */
+export type NotificationSeed = Omit<Notification, "id" | "createdDate" | "isRead">;
+
+/**
+ * 通知文の先頭に付ける機器の管理番号プレフィックス（screen-design/10-notifications.md の文例準拠）。
+ * 参照先の機器が見つからない場合（dangling FK）は項目名のみの通知文になる
+ * （例外を投げない。coding-standards.md §8）。
+ */
+const messagePrefix = (item: InspectionItem, equipment: Record<string, Equipment>): string => {
+  const managementNo = recordValue(equipment, item.equipmentId)?.managementNo;
+  return managementNo === undefined ? "" : `${managementNo} `;
+};
+
+/** 1項目に対する item 宛先通知（dueSoon / overdue / orderRecommended）を判定する */
+const itemNotificationSeeds = (
+  item: InspectionItem,
+  orders: readonly CalibrationOrder[],
+  vendors: Record<string, Vendor>,
+  equipment: Record<string, Equipment>,
+  today: IsoDateString,
+): NotificationSeed[] => {
+  const seeds: NotificationSeed[] = [];
+  const prefix = messagePrefix(item, equipment);
+  const baseSeed = {
+    targetType: NOTIFICATION_TARGET_TYPE.ITEM,
+    targetId: item.id,
+    personId: item.personId,
+  } as const;
+
+  if (today > item.nextDueDate) {
+    seeds.push({
+      ...baseSeed,
+      type: NOTIFICATION_TYPE.OVERDUE,
+      message: `${prefix}${item.name}が期限を過ぎています`,
+    });
+  } else {
+    const dueSoonFrom = addDays(item.nextDueDate, -item.noticeDaysBefore);
+    if (dueSoonFrom !== null && today >= dueSoonFrom) {
+      seeds.push({
+        ...baseSeed,
+        type: NOTIFICATION_TYPE.DUE_SOON,
+        message: `${prefix}${item.name}の期限が近づいています`,
+      });
+    }
+  }
+
+  if (item.execution === EXECUTION.EXTERNAL) {
+    const vendor =
+      item.vendorId === undefined ? null : (recordValue(vendors, item.vendorId) ?? null);
+    const orderDate = recommendedOrderDate(item, vendor);
+    const hasActiveOrder = orders.some(
+      (order) => order.itemId === item.id && isActiveOrderStatus(order.status),
+    );
+    if (orderDate !== null && today >= orderDate && !hasActiveOrder) {
+      seeds.push({
+        ...baseSeed,
+        type: NOTIFICATION_TYPE.ORDER_RECOMMENDED,
+        message: `${prefix}${item.name}の発注時期です`,
+      });
+    }
+  }
+
+  return seeds;
+};
+
+/**
+ * 1案件に対する order 宛先通知（deliveryDueSoon / deliveryOverdue）を判定する。
+ * 対象は発注済かつ未返却（ordered / inCalibration）で返却予定日が入力済みの案件のみ。
+ * 宛先: CalibrationOrder は personId を持たないため、itemId から項目を辿って
+ * item.personId を宛先とする（store.md「アクション仕様」）。項目を辿れない案件は対象外。
+ */
+const orderNotificationSeeds = (
+  order: CalibrationOrder,
+  itemById: ReadonlyMap<string, InspectionItem>,
+  equipment: Record<string, Equipment>,
+  today: IsoDateString,
+): NotificationSeed[] => {
+  const isAwaitingReturn =
+    order.status === ORDER_STATUS.ORDERED || order.status === ORDER_STATUS.IN_CALIBRATION;
+  if (!isAwaitingReturn || order.dueDate === undefined) return [];
+  const item = itemById.get(order.itemId);
+  if (!item) return [];
+
+  const prefix = messagePrefix(item, equipment);
+  const baseSeed = {
+    targetType: NOTIFICATION_TARGET_TYPE.ORDER,
+    targetId: order.id,
+    personId: item.personId,
+  } as const;
+
+  if (today > order.dueDate) {
+    return [
+      {
+        ...baseSeed,
+        type: NOTIFICATION_TYPE.DELIVERY_OVERDUE,
+        message: `${prefix}${item.name}の返却予定日を過ぎています`,
+      },
+    ];
+  }
+
+  const noticeFrom = addDays(order.dueDate, -DELIVERY_DUE_SOON_NOTICE_DAYS);
+  if (noticeFrom !== null && today >= noticeFrom) {
+    return [
+      {
+        ...baseSeed,
+        type: NOTIFICATION_TYPE.DELIVERY_DUE_SOON,
+        message: `${prefix}${item.name}の返却予定日が近づいています`,
+      },
+    ];
+  }
+
+  return [];
+};
+
+/**
+ * 今日の時点で発生すべき通知を判定する（domain-model.md §3.7 の5種別）。
+ *
+ * | type | 対象 | 発生条件 |
+ * |---|---|---|
+ * | dueSoon | 内部・外部 | 今日 ≥ 期限 − noticeDaysBefore |
+ * | overdue | 内部・外部 | 今日 > 期限 |
+ * | orderRecommended | 外部のみ | 今日 ≥ 発注推奨日 かつ 未発注（有効な案件なし） |
+ * | deliveryDueSoon | 発注済案件 | 今日 ≥ 返却予定日 − 7日 かつ 未返却 |
+ * | deliveryOverdue | 発注済案件 | 今日 > 返却予定日 かつ 未返却 |
+ *
+ * 実装判断（ドメインモデルの表に対する明確化。テストで固定する）:
+ * - overdue と dueSoon の条件は重なるため、期限超過後はより深刻な overdue のみを生成し
+ *   dueSoon は生成しない（deliveryOverdue / deliveryDueSoon も同様）。同一項目への
+ *   二重通知はノイズになるため。
+ * - 「未発注」は「有効な案件（planned〜returned）が1件もない」と解釈する。planned の
+ *   案件があれば発注準備は着手済みであり、発注推奨の再通知は不要なため
+ *   （§4.3 orderNow の「有効な案件なし」と同じ判定に揃える）。
+ *
+ * @param items 判定対象の項目。休止・廃棄機器の項目や無効項目の除外は呼び出し側
+ *   （ストアの generateNotifications）の責務（store.md）
+ * @param orders 全案件。項目との対応は itemId で内部照合する。items に含まれない項目の
+ *   案件は判定対象外
+ * @param vendors 発注推奨日の納期フォールバック解決に使用
+ * @param equipment 通知文の管理番号表示に使用
+ */
+export const computeExpectedNotifications = (
+  items: readonly InspectionItem[],
+  orders: readonly CalibrationOrder[],
+  vendors: Record<string, Vendor>,
+  equipment: Record<string, Equipment>,
+  today: IsoDateString,
+): NotificationSeed[] => {
+  const itemById = new Map(items.map((item) => [item.id, item]));
+  return [
+    ...items.flatMap((item) => itemNotificationSeeds(item, orders, vendors, equipment, today)),
+    ...orders.flatMap((order) => orderNotificationSeeds(order, itemById, equipment, today)),
+  ];
+};

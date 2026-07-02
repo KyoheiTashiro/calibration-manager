@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "ES2023",
+    "lib": ["ES2023", "DOM"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "skipLibCheck": true,
+
+    "types": ["node"]
+  },
+  // なぜ: vite.config.ts / vitest.config.ts はNode環境で実行される設定ファイルのため
+  // アプリ本体（tsconfig.app.json）とは別tsconfigでtypecheckする（Vite標準テンプレート踏襲）。
+  // vitest.setup.tsもテスト実行前フックというNode/jsdom境界の設定ファイルとしてここに含める。
+  "include": ["vite.config.ts", "vitest.config.ts", "vitest.setup.ts"]
+}

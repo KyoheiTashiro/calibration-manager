@@ -1,0 +1,53 @@
+@import "tailwindcss";
+
+/* なぜ: Google Fonts CDNを使うとPWAオフライン起動時にフォントが読み込めない。
+   node_modules同梱のセルフホストフォントをビルド成果物に含めることで、
+   初回アクセス後は完全オフラインでも標準フォントで表示できるようにする
+   （docs/infra/pwa.md §5「全機能オフライン動作」）。
+   通常ウェイト(400)のみを読み込み、未使用ウェイトの転送量を避ける。 */
+@import "@fontsource/noto-sans-jp/400.css";
+
+/* なぜ: ui-guidelines.md §3・§12 の色トークンをTailwind 4の @theme でユーティリティクラス化する
+   （bg-primary / text-primary / hover:bg-primaryHover 等が生成される）。 */
+@theme {
+  --color-primary: #2563eb;
+  --color-primaryHover: #1d4ed8;
+  --color-danger: #dc2626;
+  --color-line: #e2e8f0;
+  --color-subBg: #f8fafc;
+
+  /* なぜ: テーブル行の高さを画面間で統一するためのトークン（ui-guidelines.md §6・§12）。
+     h-rowSm / h-rowMd ユーティリティとして生成される。 */
+  --height-rowSm: 2.5rem;
+  --height-rowMd: 2.75rem;
+
+  /* なぜ: ui-guidelines.md §2 の書体指定。明朝体を使わず、
+     セルフホストしたNoto Sans JPをアプリ全体の既定書体にする。 */
+  --font-sans: "Noto Sans JP", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+/* なぜ: ui-guidelines.md §12「ベースCSS」参考コードのTailwind4版。
+   Tailwind4では theme() 関数を使わず var(--color-...) 等のCSSカスタムプロパティで参照する。 */
+body {
+  font-family: var(--font-sans);
+  color: #0f172a; /* slate-900。本文テキスト色（ui-guidelines.md §3） */
+  font-variant-numeric: tabular-nums; /* 数値列の桁揃え（ui-guidelines.md §2） */
+}
+
+/* なぜ: キーボード操作時のフォーカス位置を明示し、WCAG 2.1 AAのフォーカス可視性を満たす
+   （ui-guidelines.md §11）。マウス操作時は表示しない `:focus-visible` を使う。 */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* なぜ: 前庭障害等への配慮でアニメーションの低減を希望するユーザー設定を尊重する
+   （ui-guidelines.md §11）。 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
