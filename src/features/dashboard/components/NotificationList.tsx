@@ -36,7 +36,10 @@ export const NotificationList = ({ notifications }: Props): ReactElement => (
           <li key={notification.id} className="flex items-center gap-3 px-3 py-2">
             {/* oxlint-disable-next-line react/forbid-component-props -- Badgeはclassnameで色を渡す設計(Badge.tsx参照) */}
             <Badge className={NOTIFICATION_TYPE_BADGE_CLASSES[notification.type]}>
-              <span aria-hidden="true">{NOTIFICATION_TYPE_ICONS[notification.type]}</span>{" "}
+              {/* Badge は inline-flex のため空白テキストノードが消える。間隔は margin で確保 */}
+              <span aria-hidden="true" className="mr-1">
+                {NOTIFICATION_TYPE_ICONS[notification.type]}
+              </span>
               {NOTIFICATION_TYPE_LABELS[notification.type]}
             </Badge>
             <span className="flex-1 text-sm">{notification.message}</span>

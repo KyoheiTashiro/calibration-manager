@@ -19,6 +19,7 @@ import {
   sortedInspectionItemsOf,
 } from "@/features/equipment/detail/hooks";
 import {
+  CYCLE_LABELS,
   EXECUTION_LABELS,
   INSPECTION_ITEM_TYPE_LABELS,
   RECORD_RESULT_LABELS,
@@ -165,7 +166,7 @@ export const EquipmentDetail = (): ReactElement => {
                     <td className="px-3 py-2">{inspectionItem.name}</td>
                     <td className="px-3 py-2">{INSPECTION_ITEM_TYPE_LABELS[inspectionItem.type]}</td>
                     <td className="px-3 py-2">{EXECUTION_LABELS[inspectionItem.execution]}</td>
-                    <td className="px-3 py-2">{inspectionItem.cycle}</td>
+                    <td className="px-3 py-2">{CYCLE_LABELS[inspectionItem.cycle]}</td>
                     <td className="px-3 py-2">{personLabelOf({ persons }, inspectionItem.personId)}</td>
                     <td className="px-3 py-2">{inspectionItem.nextDueDate}</td>
                     {/* なぜ td 直下に Button を並べるか: equipment/list や VendorList と同様、

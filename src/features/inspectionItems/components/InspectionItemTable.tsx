@@ -7,7 +7,7 @@
 
 import { StatusBadge } from "@/components/domain";
 import { Button, Table, TableBody, TableHead } from "@/components/ui";
-import { EXECUTION_LABELS, INSPECTION_ITEM_TYPE_LABELS } from "@/features/inspectionItems/constants";
+import { CYCLE_LABELS, EXECUTION_LABELS, INSPECTION_ITEM_TYPE_LABELS } from "@/features/inspectionItems/constants";
 import type { InspectionItemRow } from "@/store/selectors";
 import type { ReactElement } from "react";
 
@@ -71,7 +71,7 @@ export const InspectionItemTable = ({ rows, onRecord, onOrder, onEdit }: Props):
           <td className="px-3 py-2">{row.inspectionItem.name}</td>
           <td className="px-3 py-2">{INSPECTION_ITEM_TYPE_LABELS[row.inspectionItem.type]}</td>
           <td className="px-3 py-2">{EXECUTION_LABELS[row.inspectionItem.execution]}</td>
-          <td className="px-3 py-2">{row.inspectionItem.cycle}</td>
+          <td className="px-3 py-2">{CYCLE_LABELS[row.inspectionItem.cycle]}</td>
           <td className="px-3 py-2">{row.personLabel}</td>
           <td className="px-3 py-2">{row.inspectionItem.lastDoneDate ?? "—"}</td>
           <td className="px-3 py-2">{row.inspectionItem.nextDueDate}</td>

@@ -27,9 +27,21 @@ export const EXECUTION_LABELS = {
   [EXECUTION.EXTERNAL]: "外部",
 } as const satisfies Record<Execution, string>;
 
-/** 周期セレクトの選択肢。表示も "1M" 等の周期表記そのまま(screen-design 06 モック準拠) */
+/** 周期 → 日本語ラベル(screen-design 06 周期セレクト) */
+export const CYCLE_LABELS = {
+  [CYCLE.M1]: "1ヶ月",
+  [CYCLE.M3]: "3ヶ月",
+  [CYCLE.M6]: "6ヶ月",
+  [CYCLE.Y1]: "1年",
+  [CYCLE.Y2]: "2年",
+  [CYCLE.Y3]: "3年",
+  [CYCLE.Y5]: "5年",
+  [CYCLE.Y10]: "10年",
+} as const satisfies Record<Cycle, string>;
+
+/** 周期セレクトの選択肢(値は enum のまま、表示のみ日本語) */
 export const CYCLE_OPTIONS: readonly { value: Cycle; label: string }[] = Object.values(CYCLE).map(
-  (cycle) => ({ value: cycle, label: cycle }),
+  (cycle) => ({ value: cycle, label: CYCLE_LABELS[cycle] }),
 );
 
 /** 種別ラジオ(点検/校正)の選択肢(06-inspection-item-modal.md) */
