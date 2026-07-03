@@ -1,0 +1,16 @@
+/**
+ * 汎用UIコンポーネントの集約barrel（directory-structure.md）。
+ * 利用側は `@/components/ui` からimportし、個別サブディレクトリへ直接依存しない。
+ */
+
+export { Badge } from "@/components/ui/Badge";
+export { Button } from "@/components/ui/Button";
+export { ConfirmModal } from "@/components/ui/ConfirmModal";
+export { DateField } from "@/components/ui/DateField";
+export { EmptyState } from "@/components/ui/EmptyState";
+export { Modal } from "@/components/ui/Modal";
+export { Select } from "@/components/ui/Select";
+export { Table, TableBody, TableHead } from "@/components/ui/Table";
+export { Tabs } from "@/components/ui/Tabs";
+export { useDialog } from "@/components/ui/hooks/useDialog";
+export { useOutsideClick } from "@/components/ui/hooks/useOutsideClick";
