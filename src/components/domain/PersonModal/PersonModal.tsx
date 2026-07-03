@@ -71,9 +71,11 @@ export const PersonModal = ({ open, person, onClose }: PersonModalProps): ReactE
 
   // なぜ getState() で件数を都度取得するか: 送信時点でしか使わない値を毎レンダー購読するのを
   // 避けるため（coding-standards.md §5「1値1呼び出しで分割購読」の趣旨に沿ったスナップショット取得）。
-  const onValid = (values: PersonFormValues): void => {
+  const onSubmit = (values: PersonFormValues): void => {
     if (person && person.isActive && !values.isActive) {
-      const assignedInspectionItemCount = Object.values(useAppStore.getState().inspectionItems).filter(
+      const assignedInspectionItemCount = Object.values(
+        useAppStore.getState().inspectionItems,
+      ).filter(
         (inspectionItem) => inspectionItem.personId === person.id && inspectionItem.isActive,
       ).length;
       setPendingDeactivation({ values, assignedInspectionItemCount });
@@ -105,7 +107,7 @@ export const PersonModal = ({ open, person, onClose }: PersonModalProps): ReactE
         onClose={onClose}
         isDirty={isDirty}
         footer={
-          <Button type="button" onClick={handleSubmit(onValid)}>
+          <Button type="button" onClick={handleSubmit(onSubmit)}>
             保存
           </Button>
         }

@@ -60,8 +60,10 @@ export const EquipmentDetail = (): ReactElement => {
     return <Navigate to={ROUTES.EQUIPMENT_LIST} replace />;
   }
 
-  const handleAddInspectionItemClick = (): void => setModalState({ open: true, inspectionItem: undefined });
-  const handleEditInspectionItemClick = (inspectionItem: InspectionItem): void => setModalState({ open: true, inspectionItem });
+  const handleAddInspectionItemClick = (): void =>
+    setModalState({ open: true, inspectionItem: undefined });
+  const handleEditInspectionItemClick = (inspectionItem: InspectionItem): void =>
+    setModalState({ open: true, inspectionItem });
   const handleModalClose = (): void => setModalState({ open: false, inspectionItem: undefined });
 
   const inspectionItemList = sortedInspectionItemsOf(inspectionItems, currentEquipment.id);
@@ -157,17 +159,29 @@ export const EquipmentDetail = (): ReactElement => {
             </TableHead>
             <TableBody>
               {inspectionItemList.map((inspectionItem) => {
-                const status = displayedInspectionItemStatus(inspectionItem, currentEquipment.status, orders, vendors);
+                const status = displayedInspectionItemStatus(
+                  inspectionItem,
+                  currentEquipment.status,
+                  orders,
+                  vendors,
+                );
                 return (
-                  <tr key={inspectionItem.id} className={inspectionItem.isActive ? undefined : "text-slate-400"}>
+                  <tr
+                    key={inspectionItem.id}
+                    className={inspectionItem.isActive ? undefined : "text-slate-400"}
+                  >
                     <td className="px-3 py-2">
                       {status === null ? "—" : <StatusBadge status={status} />}
                     </td>
                     <td className="px-3 py-2">{inspectionItem.name}</td>
-                    <td className="px-3 py-2">{INSPECTION_ITEM_TYPE_LABELS[inspectionItem.type]}</td>
+                    <td className="px-3 py-2">
+                      {INSPECTION_ITEM_TYPE_LABELS[inspectionItem.type]}
+                    </td>
                     <td className="px-3 py-2">{EXECUTION_LABELS[inspectionItem.execution]}</td>
                     <td className="px-3 py-2">{CYCLE_LABELS[inspectionItem.cycle]}</td>
-                    <td className="px-3 py-2">{personLabelOf({ persons }, inspectionItem.personId)}</td>
+                    <td className="px-3 py-2">
+                      {personLabelOf({ persons }, inspectionItem.personId)}
+                    </td>
                     <td className="px-3 py-2">{inspectionItem.nextDueDate}</td>
                     {/* なぜ td 直下に Button を並べるか: equipment/list や VendorList と同様、
                         div でラップするとjsx-a11yのボタンラベル探索深度を超えるためtdをflex化する */}
@@ -175,7 +189,9 @@ export const EquipmentDetail = (): ReactElement => {
                       <Button
                         variant="secondary"
                         size="sm"
-                        onClick={() => setRecordModalState({ open: true, inspectionItemId: inspectionItem.id })}
+                        onClick={() =>
+                          setRecordModalState({ open: true, inspectionItemId: inspectionItem.id })
+                        }
                       >
                         記録
                       </Button>

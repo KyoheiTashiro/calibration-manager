@@ -40,7 +40,9 @@ export const createInspectionRecordSlice: AppSliceCreator<InspectionRecordSlice>
     if (!inspectionItem) return null;
 
     const shouldAdvanceDueDate = input.result !== RECORD_RESULT.FAIL;
-    const nextDueDate = shouldAdvanceDueDate ? addCycle(input.doneDate, inspectionItem.cycle) : null;
+    const nextDueDate = shouldAdvanceDueDate
+      ? addCycle(input.doneDate, inspectionItem.cycle)
+      : null;
     if (shouldAdvanceDueDate && nextDueDate === null) return null;
 
     if (input.orderId !== undefined) {

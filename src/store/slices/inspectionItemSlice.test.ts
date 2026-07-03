@@ -28,12 +28,19 @@ describe("inspectionItemSlice", () => {
 
       expect(typeof id).toBe("string");
       expect(id.length).toBeGreaterThan(0);
-      expect(useAppStore.getState().inspectionItems[id]).toEqual({ ...buildInspectionItemInput(), id });
+      expect(useAppStore.getState().inspectionItems[id]).toEqual({
+        ...buildInspectionItemInput(),
+        id,
+      });
     });
 
     it("複数追加すると異なるidが払い出され、両方とも格納される", () => {
-      const firstId = useAppStore.getState().addInspectionItem(buildInspectionItemInput({ name: "月次点検" }));
-      const secondId = useAppStore.getState().addInspectionItem(buildInspectionItemInput({ name: "半年点検" }));
+      const firstId = useAppStore
+        .getState()
+        .addInspectionItem(buildInspectionItemInput({ name: "月次点検" }));
+      const secondId = useAppStore
+        .getState()
+        .addInspectionItem(buildInspectionItemInput({ name: "半年点検" }));
 
       expect(firstId).not.toBe(secondId);
       expect(Object.keys(useAppStore.getState().inspectionItems)).toHaveLength(2);
@@ -63,7 +70,9 @@ describe("inspectionItemSlice", () => {
 
   describe("setInspectionItemActive", () => {
     it("isActiveをfalseに切り替えられる", () => {
-      const id = useAppStore.getState().addInspectionItem(buildInspectionItemInput({ isActive: true }));
+      const id = useAppStore
+        .getState()
+        .addInspectionItem(buildInspectionItemInput({ isActive: true }));
 
       useAppStore.getState().setInspectionItemActive(id, false);
 
@@ -71,7 +80,9 @@ describe("inspectionItemSlice", () => {
     });
 
     it("isActiveをtrueに切り替えられる", () => {
-      const id = useAppStore.getState().addInspectionItem(buildInspectionItemInput({ isActive: false }));
+      const id = useAppStore
+        .getState()
+        .addInspectionItem(buildInspectionItemInput({ isActive: false }));
 
       useAppStore.getState().setInspectionItemActive(id, true);
 

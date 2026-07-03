@@ -75,4 +75,5 @@ export const makeState = (
 });
 
 /** 行配列から inspectionItem.id 列を取り出す(並び順・絞り込みの検証に使う) */
-export const ids = (rows: readonly InspectionItemRow[]): string[] => rows.map((row) => row.inspectionItem.id);
+export const ids = (rows: readonly InspectionItemRow[]): string[] =>
+  rows.map((row) => row.inspectionItem.id);

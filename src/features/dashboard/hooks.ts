@@ -34,7 +34,9 @@ const ACTION_PRIORITY: readonly InspectionItemStatus[] = [
 export const NOTIFICATION_PREVIEW_LIMIT = 5;
 
 /** 各ステータスの該当行数を集計する(全 status を 0 初期化してから計上する) */
-export const countByStatus = (rows: readonly InspectionItemRow[]): Record<InspectionItemStatus, number> => {
+export const countByStatus = (
+  rows: readonly InspectionItemRow[],
+): Record<InspectionItemStatus, number> => {
   const counts: Record<InspectionItemStatus, number> = {
     [INSPECTION_ITEM_STATUS.OVERDUE]: 0,
     [INSPECTION_ITEM_STATUS.ORDER_NOW]: 0,

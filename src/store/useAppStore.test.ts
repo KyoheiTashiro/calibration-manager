@@ -3,57 +3,25 @@
  * 単純CRUDのスライス単体検証は slices/*.test.ts、読込パイプラインは merge.test.ts が担う。
  */
 
-import type { CalibrationOrder, Equipment, InspectionItem, Person, Vendor } from "@/store/types";
+import type { CalibrationOrder, InspectionItem, Vendor } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
+import {
+  equipment,
+  inspectionItem,
+  returnedOrder,
+  seedBase,
+  vendor,
+} from "@/store/useAppStoreFixtures";
 import { seedStore, setupStoreIsolation } from "@/test/renderWithStore";
 import { beforeEach, describe, expect, it } from "vitest";
 
-const vendor: Vendor = { id: "vendor-1", name: "校正社", isManufacturer: true, isCalibrator: true };
-const person: Person = {
-  id: "person-1",
-  name: "田中",
-  email: "tanaka@example.com",
-  isActive: true,
-};
-const equipment: Equipment = {
-  id: "equipment-1",
-  managementNo: "EQ-001",
-  name: "ノギス",
-  status: "active",
-};
-const inspectionItem: InspectionItem = {
-  id: "item-1",
-  equipmentId: "equipment-1",
-  type: "calibration",
-  name: "年次校正",
-  cycle: "1Y",
-  execution: "external",
-  vendorId: "vendor-1",
-  leadTimeDays: 30,
-  bufferDays: 14,
-  personId: "person-1",
-  noticeDaysBefore: 30,
-  lastDoneDate: "2025-07-15",
-  nextDueDate: "2026-07-15",
-  isActive: true,
-};
-const returnedOrder: CalibrationOrder = {
-  id: "order-1",
-  inspectionItemId: "item-1",
-  vendorId: "vendor-1",
-  status: "returned",
-};
-
-const seedBase = (overrides?: { inspectionItems?: Record<string, InspectionItem> }): void => {
-  seedStore({
-    vendors: { [vendor.id]: vendor },
-    persons: { [person.id]: person },
-    equipment: { [equipment.id]: equipment },
-    inspectionItems: overrides?.inspectionItems ?? { [inspectionItem.id]: inspectionItem },
-  });
-};
-
 beforeEach(setupStoreIsolation);
+
+/** 遷移テーブル検証用: 任意ステータスの案件を1件投入する */
+const seedOrderWith = (status: CalibrationOrder["status"]): void => {
+  seedBase();
+  seedStore({ orders: { [returnedOrder.id]: { ...returnedOrder, status } } });
+};
 
 describe("replaceEntities: CSVインポートの全置換(D-029)", () => {
   it("対象エンティティのみ検証済みデータで置き換え、他エンティティは保持する", () => {
@@ -80,9 +48,12 @@ describe("addRecord: 期限更新カスケード", () => {
     "result=%s で記録を追加し lastDoneDate / nextDueDate を更新する",
     (result) => {
       seedBase();
-      const id = useAppStore
-        .getState()
-        .addRecord({ inspectionItemId: inspectionItem.id, doneDate: "2026-07-10", doneBy: "田中", result });
+      const id = useAppStore.getState().addRecord({
+        inspectionItemId: inspectionItem.id,
+        doneDate: "2026-07-10",
+        doneBy: "田中",
+        result,
+      });
 
       expect(id).not.toBeNull();
       const state = useAppStore.getState();
@@ -99,9 +70,12 @@ describe("addRecord: 期限更新カスケード", () => {
 
   it("result=fail は lastDoneDate を更新し期限のみ据え置く（07-record-modal.md 副作用2・4、D-015）", () => {
     seedBase();
-    const id = useAppStore
-      .getState()
-      .addRecord({ inspectionItemId: inspectionItem.id, doneDate: "2026-07-10", doneBy: "田中", result: "fail" });
+    const id = useAppStore.getState().addRecord({
+      inspectionItemId: inspectionItem.id,
+      doneDate: "2026-07-10",
+      doneBy: "田中",
+      result: "fail",
+    });
 
     expect(id).not.toBeNull();
     const updated = useAppStore.getState().inspectionItems[inspectionItem.id] as InspectionItem;
@@ -111,23 +85,29 @@ describe("addRecord: 期限更新カスケード", () => {
 
   it("存在しない項目には no-op（null）", () => {
     seedBase();
-    const id = useAppStore
-      .getState()
-      .addRecord({ inspectionItemId: "item-gone", doneDate: "2026-07-10", doneBy: "田中", result: "pass" });
+    const id = useAppStore.getState().addRecord({
+      inspectionItemId: "item-gone",
+      doneDate: "2026-07-10",
+      doneBy: "田中",
+      result: "pass",
+    });
     expect(id).toBeNull();
     expect(useAppStore.getState().records).toEqual({});
   });
 
   it("不正な doneDate は全体 no-op（D-005: 記録だけ追加されない）", () => {
     seedBase();
-    const id = useAppStore
-      .getState()
-      .addRecord({ inspectionItemId: inspectionItem.id, doneDate: "2026-02-30", doneBy: "田中", result: "pass" });
+    const id = useAppStore.getState().addRecord({
+      inspectionItemId: inspectionItem.id,
+      doneDate: "2026-02-30",
+      doneBy: "田中",
+      result: "pass",
+    });
     expect(id).toBeNull();
     expect(useAppStore.getState().records).toEqual({});
-    expect((useAppStore.getState().inspectionItems[inspectionItem.id] as InspectionItem).nextDueDate).toBe(
-      "2026-07-15",
-    );
+    expect(
+      (useAppStore.getState().inspectionItems[inspectionItem.id] as InspectionItem).nextDueDate,
+    ).toBe("2026-07-15");
   });
 });
 
@@ -168,7 +148,9 @@ describe("addRecord: 案件完了カスケード", () => {
       const state = useAppStore.getState();
       expect(state.records).toEqual({});
       expect((state.orders[returnedOrder.id] as CalibrationOrder).status).toBe(status);
-      expect((state.inspectionItems[inspectionItem.id] as InspectionItem).nextDueDate).toBe("2026-07-15");
+      expect((state.inspectionItems[inspectionItem.id] as InspectionItem).nextDueDate).toBe(
+        "2026-07-15",
+      );
     },
   );
 
@@ -189,7 +171,9 @@ describe("addRecord: 案件完了カスケード", () => {
 describe("addOrder: 1項目1有効案件（D-006）", () => {
   it("案件を初期状態 planned で追加する", () => {
     seedBase();
-    const id = useAppStore.getState().addOrder({ inspectionItemId: inspectionItem.id, vendorId: vendor.id });
+    const id = useAppStore
+      .getState()
+      .addOrder({ inspectionItemId: inspectionItem.id, vendorId: vendor.id });
     expect(id).not.toBeNull();
     expect(useAppStore.getState().orders[id as string]).toMatchObject({
       inspectionItemId: inspectionItem.id,
@@ -202,7 +186,11 @@ describe("addOrder: 1項目1有効案件（D-006）", () => {
     (status) => {
       seedBase();
       seedStore({ orders: { [returnedOrder.id]: { ...returnedOrder, status } } });
-      expect(useAppStore.getState().addOrder({ inspectionItemId: inspectionItem.id, vendorId: vendor.id })).toBeNull();
+      expect(
+        useAppStore
+          .getState()
+          .addOrder({ inspectionItemId: inspectionItem.id, vendorId: vendor.id }),
+      ).toBeNull();
       expect(Object.keys(useAppStore.getState().orders)).toEqual([returnedOrder.id]);
     },
   );
@@ -213,7 +201,9 @@ describe("addOrder: 1項目1有効案件（D-006）", () => {
       seedBase();
       seedStore({ orders: { [returnedOrder.id]: { ...returnedOrder, status } } });
       expect(
-        useAppStore.getState().addOrder({ inspectionItemId: inspectionItem.id, vendorId: vendor.id }),
+        useAppStore
+          .getState()
+          .addOrder({ inspectionItemId: inspectionItem.id, vendorId: vendor.id }),
       ).not.toBeNull();
     },
   );
@@ -227,11 +217,6 @@ describe("addOrder: 1項目1有効案件（D-006）", () => {
 });
 
 describe("updateOrderStatus: 遷移テーブル検証", () => {
-  const seedOrderWith = (status: CalibrationOrder["status"]): void => {
-    seedBase();
-    seedStore({ orders: { [returnedOrder.id]: { ...returnedOrder, status } } });
-  };
-
   it.each([
     ["planned", "ordered"],
     ["ordered", "inCalibration"],

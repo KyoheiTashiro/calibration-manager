@@ -26,7 +26,8 @@ export const INSPECTION_ITEM_STATUS = {
   DUE_SOON: "dueSoon",
   OK: "ok",
 } as const;
-export type InspectionItemStatus = (typeof INSPECTION_ITEM_STATUS)[keyof typeof INSPECTION_ITEM_STATUS];
+export type InspectionItemStatus =
+  (typeof INSPECTION_ITEM_STATUS)[keyof typeof INSPECTION_ITEM_STATUS];
 
 /**
  * 項目ステータスを優先度順（overdue > orderNow > inProgress > dueSoon > ok）に判定する。
@@ -53,13 +54,17 @@ export const deriveInspectionItemStatus = (
 ): InspectionItemStatus => {
   if (today > inspectionItem.nextDueDate) return INSPECTION_ITEM_STATUS.OVERDUE;
 
-  const inspectionItemOrders = orders.filter((order) => order.inspectionItemId === inspectionItem.id);
+  const inspectionItemOrders = orders.filter(
+    (order) => order.inspectionItemId === inspectionItem.id,
+  );
   const isExternal = inspectionItem.execution === EXECUTION.EXTERNAL;
 
   if (isExternal) {
     const orderDate = recommendedOrderDate(inspectionItem, vendor);
     const hasActiveOrder = inspectionItemOrders.some((order) => isActiveOrderStatus(order.status));
-    if (orderDate !== null && today >= orderDate && !hasActiveOrder) return INSPECTION_ITEM_STATUS.ORDER_NOW;
+    if (orderDate !== null && today >= orderDate && !hasActiveOrder) {
+      return INSPECTION_ITEM_STATUS.ORDER_NOW;
+    }
 
     const hasInProgressOrder = inspectionItemOrders.some(
       (order) =>

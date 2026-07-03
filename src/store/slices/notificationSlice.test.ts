@@ -93,7 +93,11 @@ describe("generateNotifications", () => {
     seedBase({
       inspectionItems: {
         "item-inactive": { ...inspectionItem, id: "item-inactive", isActive: false },
-        "item-suspended": { ...inspectionItem, id: "item-suspended", equipmentId: "equipment-suspended" },
+        "item-suspended": {
+          ...inspectionItem,
+          id: "item-suspended",
+          equipmentId: "equipment-suspended",
+        },
       },
     });
     seedStore({
@@ -108,7 +112,9 @@ describe("generateNotifications", () => {
   });
 
   it("返却予定超過の案件に deliveryOverdue 通知を inspectionItem.personId 宛で生成する", () => {
-    seedBase({ inspectionItems: { [inspectionItem.id]: { ...inspectionItem, nextDueDate: "2099-01-01" } } });
+    seedBase({
+      inspectionItems: { [inspectionItem.id]: { ...inspectionItem, nextDueDate: "2099-01-01" } },
+    });
     seedStore({ orders: { [order.id]: { ...order, dueDate: "2026-07-01" } } });
 
     useAppStore.getState().generateNotifications("2026-08-01");

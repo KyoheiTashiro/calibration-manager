@@ -8,7 +8,11 @@
  */
 
 import { buildSeedEquipment, buildSeedPersons, buildSeedVendors } from "@/dev/seedMasterData";
-import { buildSeedInspectionItems, buildSeedOrders, buildSeedRecords } from "@/dev/seedTransactionData";
+import {
+  buildSeedInspectionItems,
+  buildSeedOrders,
+  buildSeedRecords,
+} from "@/dev/seedTransactionData";
 import type { AppState, IsoDateString } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
 import { todayIsoDate } from "@/utils/time";

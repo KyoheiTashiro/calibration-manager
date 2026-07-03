@@ -27,7 +27,11 @@ export const Dashboard = (): ReactElement => {
   const notifications = useAppStore((state) => state.notifications);
 
   const rows = useMemo(
-    () => inspectionItemRowsOf({ inspectionItems, equipment, orders, vendors, persons }, todayIsoDate()),
+    () =>
+      inspectionItemRowsOf(
+        { inspectionItems, equipment, orders, vendors, persons },
+        todayIsoDate(),
+      ),
     [inspectionItems, equipment, orders, vendors, persons],
   );
   const counts = useMemo(() => countByStatus(rows), [rows]);

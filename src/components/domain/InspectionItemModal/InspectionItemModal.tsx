@@ -3,13 +3,17 @@
  */
 
 import {
-  defaultInspectionItemFormValues,
   inspectionItemFormSchema,
+  toFormValues,
   type InspectionItemFormValues,
 } from "@/components/domain/InspectionItemModal/schema";
 import { Button, Checkbox, DateField, Modal, RadioGroup, Select, TextField } from "@/components/ui";
 import { ROUTES } from "@/constants/routes";
-import { CYCLE_OPTIONS, EXECUTION_OPTIONS, INSPECTION_ITEM_TYPE_OPTIONS } from "@/features/inspectionItems/constants";
+import {
+  CYCLE_OPTIONS,
+  EXECUTION_OPTIONS,
+  INSPECTION_ITEM_TYPE_OPTIONS,
+} from "@/features/inspectionItems/constants";
 import { EXECUTION, type InspectionItem } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -26,25 +30,12 @@ type Props = {
   onClose: () => void;
 };
 
-/** 既存 InspectionItem をフォーム値（すべて string ベース）へ変換する。新規時は既定値 */
-const toFormValues = (inspectionItem: InspectionItem | undefined): InspectionItemFormValues =>
-  inspectionItem
-    ? {
-        name: inspectionItem.name,
-        type: inspectionItem.type,
-        cycle: inspectionItem.cycle,
-        execution: inspectionItem.execution,
-        vendorId: inspectionItem.vendorId ?? "",
-        leadTimeDays: inspectionItem.leadTimeDays?.toString() ?? "",
-        bufferDays: inspectionItem.bufferDays.toString(),
-        personId: inspectionItem.personId,
-        noticeDaysBefore: inspectionItem.noticeDaysBefore.toString(),
-        nextDueDate: inspectionItem.nextDueDate,
-        isActive: inspectionItem.isActive,
-      }
-    : defaultInspectionItemFormValues;
-
-export const InspectionItemModal = ({ open, equipmentId, inspectionItem, onClose }: Props): ReactElement => {
+export const InspectionItemModal = ({
+  open,
+  equipmentId,
+  inspectionItem,
+  onClose,
+}: Props): ReactElement => {
   const equipment = useAppStore((state) => state.equipment[equipmentId]);
   const vendors = useAppStore((state) => state.vendors);
   const persons = useAppStore((state) => state.persons);

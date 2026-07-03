@@ -57,7 +57,9 @@ describe("inspectionItemsOf", () => {
       },
     };
 
-    expect(inspectionItemsOf({ inspectionItems }, "equipment-1")).toEqual([inspectionItems["item-1"]]);
+    expect(inspectionItemsOf({ inspectionItems }, "equipment-1")).toEqual([
+      inspectionItems["item-1"],
+    ]);
   });
 
   it("該当する項目が無ければ空配列を返す", () => {
@@ -289,7 +291,9 @@ describe("inspectionItemRowsOf: personLabel(D-001)", () => {
       makeInspectionItem({ id: "dangling-person", personId: "p-missing" }),
       makeInspectionItem({ id: "inactive-person", personId: inactivePerson.id }),
     ]);
-    const byId = Object.fromEntries(inspectionItemRowsOf(state, TODAY).map((row) => [row.inspectionItem.id, row]));
+    const byId = Object.fromEntries(
+      inspectionItemRowsOf(state, TODAY).map((row) => [row.inspectionItem.id, row]),
+    );
     expect(byId["dangling-person"]?.personLabel).toBe("—");
     expect(byId["inactive-person"]?.personLabel).toBe("鈴木(無効)");
   });

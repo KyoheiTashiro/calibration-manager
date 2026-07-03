@@ -7,7 +7,11 @@
 
 import { StatusBadge } from "@/components/domain";
 import { Button, Table, TableBody, TableHead } from "@/components/ui";
-import { CYCLE_LABELS, EXECUTION_LABELS, INSPECTION_ITEM_TYPE_LABELS } from "@/features/inspectionItems/constants";
+import {
+  CYCLE_LABELS,
+  EXECUTION_LABELS,
+  INSPECTION_ITEM_TYPE_LABELS,
+} from "@/features/inspectionItems/constants";
 import type { InspectionItemRow } from "@/store/selectors";
 import type { ReactElement } from "react";
 

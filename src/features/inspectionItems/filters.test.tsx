@@ -4,7 +4,10 @@
  */
 
 import { InspectionItemList } from "@/features/inspectionItems";
-import { personSuzuki, seedInspectionItemList } from "@/features/inspectionItems/inspectionItemListFixtures";
+import {
+  personSuzuki,
+  seedInspectionItemList,
+} from "@/features/inspectionItems/inspectionItemListFixtures";
 import { renderWithStore, setupStoreIsolation } from "@/test/renderWithStore";
 import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";

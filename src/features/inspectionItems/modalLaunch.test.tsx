@@ -5,7 +5,10 @@
  */
 
 import { InspectionItemList } from "@/features/inspectionItems";
-import { inspectionItemExternalOverdue, seedInspectionItemList } from "@/features/inspectionItems/inspectionItemListFixtures";
+import {
+  inspectionItemExternalOverdue,
+  seedInspectionItemList,
+} from "@/features/inspectionItems/inspectionItemListFixtures";
 import { renderWithStore, setupStoreIsolation } from "@/test/renderWithStore";
 import { screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";

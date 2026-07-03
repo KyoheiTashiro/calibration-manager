@@ -106,7 +106,9 @@ export const Manual = (): ReactElement => (
     </section>
 
     <section className="flex flex-col gap-3 rounded border border-slate-200 p-4">
-      <h2 className="border-b border-slate-200 pb-2 text-lg font-semibold">期限と発注推奨日の計算</h2>
+      <h2 className="border-b border-slate-200 pb-2 text-lg font-semibold">
+        期限と発注推奨日の計算
+      </h2>
       <p>次回期限は「前回実施日 + 周期」で自動計算されます。</p>
       <p>月単位の周期は暦の月で計算します(例: 1/31 の1か月後は 2/28 になります)。</p>
       <p>
@@ -165,7 +167,9 @@ export const Manual = (): ReactElement => (
             校正案件
           </Link>
         </h3>
-        <p>外部校正の発注から返却・記録までの進み具合を、状態ごとのボード(かんばん)で管理します。</p>
+        <p>
+          外部校正の発注から返却・記録までの進み具合を、状態ごとのボード(かんばん)で管理します。
+        </p>
       </div>
 
       <div>
@@ -219,7 +223,6 @@ export const Manual = (): ReactElement => (
         <Link to={ROUTES.SETTINGS} className="text-primary underline">
           設定画面
         </Link>
-
         から、データの種類ごとにCSVファイルとしてエクスポートできます(UTF-8
         BOM付きで、Excelでもそのまま開けます)。同じ画面からCSVインポートによる復元もできます。
       </p>

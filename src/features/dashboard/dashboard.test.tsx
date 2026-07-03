@@ -82,14 +82,22 @@ const makeInspectionItem = (
 });
 
 // 期限切れ(過去日)・正常(遠未来)で今日に依存せず導出ステータスを確定させる
-const overdueInspectionItemA = makeInspectionItem({ id: "item-a", name: "A校正", nextDueDate: "2000-01-01" });
+const overdueInspectionItemA = makeInspectionItem({
+  id: "item-a",
+  name: "A校正",
+  nextDueDate: "2000-01-01",
+});
 const overdueInspectionItemB = makeInspectionItem({
   id: "item-b",
   name: "B点検",
   type: INSPECTION_ITEM_TYPE.INSPECTION,
   nextDueDate: "2000-06-01",
 });
-const okInspectionItem = makeInspectionItem({ id: "item-ok", name: "OK校正", nextDueDate: "2999-12-31" });
+const okInspectionItem = makeInspectionItem({
+  id: "item-ok",
+  name: "OK校正",
+  nextDueDate: "2999-12-31",
+});
 
 const seedActionScenario = (): void => {
   seedStore({

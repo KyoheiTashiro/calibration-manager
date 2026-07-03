@@ -50,11 +50,17 @@ describe("recommendedOrderDate", () => {
   });
 
   it("納期がどこからも解決できない場合は null", () => {
-    expect(recommendedOrderDate({ ...externalInspectionItem, leadTimeDays: undefined }, null)).toBeNull();
-    expect(recommendedOrderDate({ ...externalInspectionItem, leadTimeDays: undefined }, {})).toBeNull();
+    expect(
+      recommendedOrderDate({ ...externalInspectionItem, leadTimeDays: undefined }, null),
+    ).toBeNull();
+    expect(
+      recommendedOrderDate({ ...externalInspectionItem, leadTimeDays: undefined }, {}),
+    ).toBeNull();
   });
 
   it("nextDueDate が不正な日付の場合は null（例外を投げない）", () => {
-    expect(recommendedOrderDate({ ...externalInspectionItem, nextDueDate: "2026-02-30" }, null)).toBeNull();
+    expect(
+      recommendedOrderDate({ ...externalInspectionItem, nextDueDate: "2026-02-30" }, null),
+    ).toBeNull();
   });
 });

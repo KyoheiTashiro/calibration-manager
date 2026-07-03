@@ -6,7 +6,11 @@
  */
 
 import { InspectionItemList } from "@/features/inspectionItems";
-import { personSato, personSuzuki, seedInspectionItemList } from "@/features/inspectionItems/inspectionItemListFixtures";
+import {
+  personSato,
+  personSuzuki,
+  seedInspectionItemList,
+} from "@/features/inspectionItems/inspectionItemListFixtures";
 import { renderWithStore, setupStoreIsolation } from "@/test/renderWithStore";
 import { screen, within } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";

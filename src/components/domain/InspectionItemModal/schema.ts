@@ -10,7 +10,7 @@
  */
 
 import { DEFAULT_BUFFER_DAYS, DEFAULT_NOTICE_DAYS_BEFORE } from "@/domain/constants";
-import { CYCLE, EXECUTION, INSPECTION_ITEM_TYPE } from "@/store/types";
+import { CYCLE, EXECUTION, INSPECTION_ITEM_TYPE, type InspectionItem } from "@/store/types";
 import { isIsoDateString } from "@/utils/time";
 import { z } from "zod";
 
@@ -88,3 +88,23 @@ export const defaultInspectionItemFormValues: InspectionItemFormValues = {
   nextDueDate: "",
   isActive: true,
 };
+
+/** 既存 InspectionItem をフォーム値（すべて string ベース）へ変換する。新規時は既定値 */
+export const toFormValues = (
+  inspectionItem: InspectionItem | undefined,
+): InspectionItemFormValues =>
+  inspectionItem
+    ? {
+        name: inspectionItem.name,
+        type: inspectionItem.type,
+        cycle: inspectionItem.cycle,
+        execution: inspectionItem.execution,
+        vendorId: inspectionItem.vendorId ?? "",
+        leadTimeDays: inspectionItem.leadTimeDays?.toString() ?? "",
+        bufferDays: inspectionItem.bufferDays.toString(),
+        personId: inspectionItem.personId,
+        noticeDaysBefore: inspectionItem.noticeDaysBefore.toString(),
+        nextDueDate: inspectionItem.nextDueDate,
+        isActive: inspectionItem.isActive,
+      }
+    : defaultInspectionItemFormValues;

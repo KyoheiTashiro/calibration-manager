@@ -103,7 +103,9 @@ describe("EquipmentDetail: 項目ステータス(D-014)", () => {
     seedStore({
       equipment: { [equipmentSuspended.id]: equipmentSuspended },
       persons: { [activePerson.id]: activePerson },
-      inspectionItems: { [inspectionItemOfSuspendedEquipment.id]: inspectionItemOfSuspendedEquipment },
+      inspectionItems: {
+        [inspectionItemOfSuspendedEquipment.id]: inspectionItemOfSuspendedEquipment,
+      },
     });
     renderDetail(equipmentSuspended.id);
 
