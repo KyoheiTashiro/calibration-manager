@@ -3,16 +3,12 @@
  * - countByStatus: 全ステータスの件数集計(該当0のステータスも0で埋める)
  * - actionRequiredRows: overdue/orderNow/dueSoon のみを優先度順に、同グループ内は元順(nextDueDate昇順)維持
  * - latestNotifications: 未読優先 → createdDate 降順 → id 昇順で5件
- * 導出ロジックは buildItemRows 側で検証済みのため、ここは合成した ItemRow / Notification で純粋に検証する。
+ * 導出ロジックは itemRowsOf 側で検証済みのため、ここは合成した ItemRow / Notification で純粋に検証する。
  */
 
 import { ITEM_STATUS, type ItemStatus } from "@/domain/itemStatus";
-import {
-  actionRequiredRows,
-  countByStatus,
-  latestNotifications,
-} from "@/features/dashboard/hooks";
-import type { ItemRow } from "@/features/items/hooks";
+import { actionRequiredRows, countByStatus, latestNotifications } from "@/features/dashboard/hooks";
+import type { ItemRow } from "@/store/selectors";
 import {
   CYCLE,
   EQUIPMENT_STATUS,
@@ -33,11 +29,7 @@ const makeEquipment = (id: string): Equipment => ({
   status: EQUIPMENT_STATUS.ACTIVE,
 });
 
-const makeItem = (
-  id: string,
-  equipmentId: string,
-  nextDueDate: string,
-): InspectionItem => ({
+const makeItem = (id: string, equipmentId: string, nextDueDate: string): InspectionItem => ({
   id,
   equipmentId,
   type: ITEM_TYPE.INSPECTION,
@@ -61,7 +53,9 @@ const makeRow = (id: string, status: ItemStatus, nextDueDate: string): ItemRow =
   canCreateOrder: false,
 });
 
-const makeNotification = (overrides: Partial<Notification> & Pick<Notification, "id">): Notification => ({
+const makeNotification = (
+  overrides: Partial<Notification> & Pick<Notification, "id">,
+): Notification => ({
   type: NOTIFICATION_TYPE.OVERDUE,
   targetType: NOTIFICATION_TARGET_TYPE.ITEM,
   targetId: "item-1",
@@ -105,7 +99,7 @@ describe("countByStatus", () => {
 
 describe("actionRequiredRows", () => {
   it("inProgress/ok を除外し、overdue→orderNow→dueSoon の優先度順に並べる", () => {
-    // 入力は nextDueDate 昇順(buildItemRows の保証)を模した順序
+    // 入力は nextDueDate 昇順(itemRowsOf の保証)を模した順序
     const rows: ItemRow[] = [
       makeRow("due", ITEM_STATUS.DUE_SOON, "2026-07-20"),
       makeRow("prog", ITEM_STATUS.IN_PROGRESS, "2026-07-22"),
@@ -162,7 +156,11 @@ describe("latestNotifications", () => {
     const notifications: Record<string, Notification> = {};
     for (let index = 0; index < 8; index += 1) {
       const id = `n${index}`;
-      notifications[id] = makeNotification({ id, createdDate: `2026-07-0${index + 1}`, isRead: false });
+      notifications[id] = makeNotification({
+        id,
+        createdDate: `2026-07-0${index + 1}`,
+        isRead: false,
+      });
     }
 
     expect(latestNotifications(notifications)).toHaveLength(5);

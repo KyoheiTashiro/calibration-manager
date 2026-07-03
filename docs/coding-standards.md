@@ -84,7 +84,7 @@ Lint/Format は **oxlint + oxfmt**（ESLint/Prettier ではない）。多くは
 ## 4. React / コンポーネント
 
 - **アロー関数コンポーネントが原則**（`export const Xxx = (props) => (...)`）。`function` 宣言コンポーネントは使わない（例外: `App.tsx` のみ）。
-- **named export が原則**。`export default` はアプリ全体で `App.tsx` の 1 箇所のみ。
+- **named export が原則**。`export default` はアプリ全体で `App.tsx` の 1 箇所のみ（例外: `*.stories.tsx` の CSF `export default meta` は Storybook の要件のため可。実態10ファイル）。
 - **props はシグネチャで分割代入し、デフォルト値もそこで設定**。残りは `...rest` で DOM へ spread。
 - **event handler 命名**:
   - props で受け取るコールバック → `onXxx`（`onConfirm`, `onClose`）
@@ -130,7 +130,7 @@ Lint/Format は **oxlint + oxfmt**（ESLint/Prettier ではない）。多くは
   - 例: `dateCycle.ts`（`addCycle`: 次回期限計算）、`leadTime.ts`（発注推奨日逆算）、`itemStatus.ts`（`deriveItemStatus`）、`notificationRules.ts`（通知生成判定）、`orderStatus.ts`（状態遷移テーブル）、`statusBadge.ts`（バッジ色マッピング）。
 - **不変スタイル**: 入力を変更せず `{ ...item, ... }` で新値を返す。
 - **マジックナンバーは `src/domain/constants.ts` に JSDoc 付き定数で集約**（`DEFAULT_BUFFER_DAYS`（発注余裕日数デフォルト14）、`DEFAULT_NOTICE_DAYS_BEFORE`（通知開始日数デフォルト30）等）。
-- **例外を投げない**: 失敗・不在は `null` 返却 or early-return ガードで表現。zod は `parse` でなく `safeParse`。store の堅牢化も例外でなく「サルベージ → 空状態フォールバック」+ `console.warn`。CSVインポートも同様に、不正行は例外にせずエラー表示用の結果値として返す。
+- **例外を投げない**: 失敗・不在は `null` 返却 or early-return ガードで表現。zod は `parse` でなく `safeParse`。store の堅牢化も例外でなく「サルベージ → 空状態フォールバック」+ `console.warn`。CSVインポートも同様に、不正行は例外にせずエラー表示用の結果値として返す（例外: `src/main.tsx` のルート要素不在ガードのみ throw 可。復帰不能なブートストラップ失敗の fail-fast のため）。
 
 ## 9. コメント / 言語
 

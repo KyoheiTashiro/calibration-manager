@@ -4,10 +4,7 @@
  * ストア層 addRecord が担う（inspectionRecordSlice.ts）。
  */
 
-import {
-  recordFormSchema,
-  type RecordFormValues,
-} from "@/components/domain/RecordModal/schema";
+import { recordFormSchema, type RecordFormValues } from "@/components/domain/RecordModal/schema";
 import { Button, DateField, Modal, RadioGroup, TextField } from "@/components/ui";
 import { RECORD_RESULT_OPTIONS } from "@/features/items/constants";
 import {
@@ -51,9 +48,7 @@ const resolvePrefillDoneBy = (
 
 export const RecordModal = ({ open, itemId, orderId, onClose }: Props): ReactElement => {
   const item = useAppStore((state) => state.items[itemId]);
-  const equipment = useAppStore((state) =>
-    item ? state.equipment[item.equipmentId] : undefined,
-  );
+  const equipment = useAppStore((state) => (item ? state.equipment[item.equipmentId] : undefined));
   const vendors = useAppStore((state) => state.vendors);
   const order = useAppStore((state) => (orderId ? state.orders[orderId] : undefined));
   const addRecord = useAppStore((state) => state.addRecord);

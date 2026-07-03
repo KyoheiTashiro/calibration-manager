@@ -22,7 +22,7 @@
 
 ## D-003: sanitizeAppState の dangling FK 処理
 
-- ステータス: **確定**(2026-07-03)
+- ステータス: **docs反映済**(2026-07-03)
 - 論点: 参照先エンティティが消えたレコードを (a) merge 時に除去 or (b) 残して表示側で「参照先なし」
 - 判断: **ハイブリッド**
   - ユーザー入力データ(vendors / persons / equipment / items / records / orders)は dangling FK でも**保持**。表示側で「参照先なし」扱い。サルベージでユーザーデータを消さない
@@ -102,7 +102,7 @@
 
 ## D-015: result=fail 時の lastDoneDate 更新(Phase 7 実装判断)
 
-- ステータス: **確定**(2026-07-03)
+- ステータス: **docs反映済**(2026-07-03)
 - 論点: Phase 2 実装の addRecord は fail 時に lastDoneDate も据え置いていたが、07-record-modal.md 副作用は「2. `item.lastDoneDate = doneDate`(無条件)」「4. fail は `nextDueDate` を更新せず」と lastDoneDate と nextDueDate を区別している
 - 判断: 仕様に合わせ実装を是正。**fail でも lastDoneDate = doneDate に更新**し、据え置くのは nextDueDate のみ。既存テストの期待値も仕様準拠へ修正(テストを弱める改変ではなく仕様違反の是正)
 - 根拠: lastDoneDate は「最後に実施した日」であり、不合格でも実施の事実は変わらない。domain-model.md §3.5 も「fail の場合は**次回期限を**更新せず」とのみ規定

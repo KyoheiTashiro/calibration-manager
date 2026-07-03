@@ -10,13 +10,13 @@
 // 対で扱う密結合コンポーネント（同一スキーマ設計・同一 updateOrderStatus→updateOrder パターン）であり、
 // coding-standards.md §2「サブコンポーネントが複数なら…」の範囲内でこの1ファイルに集約する設計判断のため緩和する。
 
+import { Button, DateField, Modal, TextField } from "@/components/ui";
 import {
   orderDialogSchema,
   returnDialogSchema,
   type OrderDialogValues,
   type ReturnDialogValues,
 } from "@/features/orders/schema";
-import { Button, DateField, Modal, TextField } from "@/components/ui";
 import { ORDER_STATUS, type CalibrationOrder } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
 import { isIsoDateString, todayIsoDate } from "@/utils/time";

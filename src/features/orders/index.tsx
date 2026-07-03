@@ -8,12 +8,12 @@
 import { RecordModal } from "@/components/domain";
 import { Button, Checkbox, ConfirmModal, EmptyState } from "@/components/ui";
 import { ROUTES } from "@/constants/routes";
-import { OrderCard } from "@/features/orders/OrderCard";
 import {
   KANBAN_ACTIVE_COLUMNS,
   KANBAN_CLOSED_COLUMNS,
   ORDER_STATUS_LABELS,
 } from "@/features/orders/constants";
+import { OrderCard } from "@/features/orders/OrderCard";
 import { OrderDialog, ReturnDialog } from "@/features/orders/TransitionDialogs";
 import { ORDER_STATUS, type CalibrationOrder, type OrderStatus } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
@@ -86,8 +86,11 @@ export const OrderList = (): ReactElement => {
     return grouped;
   }, [orders]);
 
-  const displayedCardCount = displayedColumns.reduce(
-    (total, status) => total + ordersByStatus[status].length,
+  // 空状態(全列0件)は表示トグルに関わらず「全ステータス合計0件」で判定する。
+  // displayedColumns（表示中の列）だけを対象にすると、例えば completed のみ1件でトグルOFFの場合に
+  // 進行中4列がたまたま0件なだけで「案件はありません」という事実に反する空状態を出してしまう。
+  const totalOrderCount = Object.values(ordersByStatus).reduce(
+    (total, columnOrders) => total + columnOrders.length,
     0,
   );
 
@@ -129,7 +132,7 @@ export const OrderList = (): ReactElement => {
         />
       </div>
 
-      {displayedCardCount === 0 ? (
+      {totalOrderCount === 0 ? (
         <EmptyState
           message="外部校正案件はありません。項目一覧から案件を作成できます"
           action={<Button onClick={() => navigate(ROUTES.ITEM_LIST)}>項目一覧へ</Button>}
@@ -179,7 +182,12 @@ export const OrderList = (): ReactElement => {
         <ReturnDialog order={dialog.order} onClose={closeDialog} />
       ) : null}
       {dialog?.type === DIALOG_TYPE.RECORD ? (
-        <RecordModal open itemId={dialog.order.itemId} orderId={dialog.order.id} onClose={closeDialog} />
+        <RecordModal
+          open
+          itemId={dialog.order.itemId}
+          orderId={dialog.order.id}
+          onClose={closeDialog}
+        />
       ) : null}
       <ConfirmModal
         open={dialog?.type === DIALOG_TYPE.CANCEL}

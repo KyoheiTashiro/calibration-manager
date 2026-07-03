@@ -12,14 +12,13 @@ import { ItemModal, OrderModal, RecordModal } from "@/components/domain";
 import { Button, EmptyState } from "@/components/ui";
 import { FilterBar } from "@/features/items/FilterBar";
 import {
-  buildItemRows,
   FILTER_ALL,
   filterItemRows,
   parseItemListFilters,
   type ItemListFilters,
-  type ItemRow,
 } from "@/features/items/hooks";
 import { ItemTable } from "@/features/items/ItemTable";
+import { itemRowsOf, type ItemRow } from "@/store/selectors";
 import { useAppStore } from "@/store/useAppStore";
 import { todayIsoDate } from "@/utils/time";
 import { useMemo, useState, type ReactElement } from "react";
@@ -47,7 +46,7 @@ export const ItemList = (): ReactElement => {
   const filters = parseItemListFilters(searchParams, persons);
 
   const rows = useMemo(
-    () => buildItemRows({ items, equipment, orders, vendors, persons }, todayIsoDate()),
+    () => itemRowsOf({ items, equipment, orders, vendors, persons }, todayIsoDate()),
     [items, equipment, orders, vendors, persons],
   );
   const filteredRows = filterItemRows(rows, filters);
@@ -63,13 +62,10 @@ export const ItemList = (): ReactElement => {
     setSearchParams(next, { replace: true });
   };
 
-  // クリア: 4フィルタのパラメータのみ除去し、他の未知パラメータは維持する
+  // クリア: URLクエリを全除去する(D-022「『クリア』は全クエリ除去」)。
+  // フィルタ4キーだけでなく未知パラメータも含めて空にする。履歴は汚さない(replace)。
   const handleClear = (): void => {
-    const next = new URLSearchParams(searchParams);
-    for (const key of Object.keys(filters)) {
-      next.delete(key);
-    }
-    setSearchParams(next, { replace: true });
+    setSearchParams(new URLSearchParams(), { replace: true });
   };
 
   const closeModal = (): void => setModal(null);

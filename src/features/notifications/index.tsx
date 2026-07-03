@@ -11,6 +11,7 @@
 import { Badge, Button, EmptyState, Tabs } from "@/components/ui";
 import {
   NOTIFICATION_TYPE_BADGE_CLASSES,
+  NOTIFICATION_TYPE_ICONS,
   NOTIFICATION_TYPE_LABELS,
 } from "@/features/notifications/constants";
 import {
@@ -87,6 +88,7 @@ export const NotificationCenter = (): ReactElement => {
                 <div className="flex items-center gap-2">
                   {/* oxlint-disable-next-line react/forbid-component-props -- BadgeはclassNameで色を渡す設計(Badge.tsx参照) */}
                   <Badge className={NOTIFICATION_TYPE_BADGE_CLASSES[notification.type]}>
+                    <span aria-hidden="true">{NOTIFICATION_TYPE_ICONS[notification.type]}</span>{" "}
                     {NOTIFICATION_TYPE_LABELS[notification.type]}
                   </Badge>
                   <span className="text-sm text-slate-800">{notification.message}</span>

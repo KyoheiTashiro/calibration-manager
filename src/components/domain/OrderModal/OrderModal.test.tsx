@@ -91,9 +91,7 @@ describe("OrderModal", () => {
     seedBaseMasters();
     renderWithStore(<OrderModal open itemId={externalItem.id} onClose={vi.fn()} />);
 
-    expect(
-      screen.getByRole("option", { name: calibratorVendor.name }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: calibratorVendor.name })).toBeInTheDocument();
     expect(
       screen.queryByRole("option", { name: manufacturerOnlyVendor.name }),
     ).not.toBeInTheDocument();
@@ -143,9 +141,7 @@ describe("OrderModal", () => {
 
     await user.click(screen.getByRole("button", { name: "作成" }));
 
-    expect(
-      await screen.findByText("この項目には進行中の案件が既に存在します"),
-    ).toBeInTheDocument();
+    expect(await screen.findByText("この項目には進行中の案件が既に存在します")).toBeInTheDocument();
     expect(onClose).not.toHaveBeenCalled();
     expect(Object.values(useAppStore.getState().orders)).toHaveLength(1);
   });
@@ -196,9 +192,7 @@ describe("OrderModal", () => {
     await user.type(screen.getByLabelText("費用", { exact: false }), "-100");
     await user.click(screen.getByRole("button", { name: "作成" }));
 
-    expect(
-      await screen.findByText("費用は0以上の数値で入力してください"),
-    ).toBeInTheDocument();
+    expect(await screen.findByText("費用は0以上の数値で入力してください")).toBeInTheDocument();
     expect(Object.values(useAppStore.getState().orders)).toHaveLength(0);
   });
 });

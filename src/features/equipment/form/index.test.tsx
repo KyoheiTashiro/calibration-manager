@@ -117,7 +117,11 @@ describe("EquipmentForm: 編集プリフィル・更新", () => {
   // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("値を変更して保存するとストアが更新される", async () => {
     const user = userEvent.setup();
-    seedStore({ equipment: { [existingEquipment.id]: existingEquipment } });
+    // manufacturerId の存在検証(03-equipment-form.md)が保存時に走るため、参照先 Vendor も seed する
+    seedStore({
+      equipment: { [existingEquipment.id]: existingEquipment },
+      vendors: { [mitutoyo.id]: mitutoyo },
+    });
     renderEditForm(existingEquipment.id);
 
     const locationInput = screen.getByLabelText("設置場所");
@@ -156,11 +160,13 @@ describe("EquipmentForm: 管理番号ユニーク検証", () => {
   // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("編集時に自身の管理番号を変更せず再送信してもエラーにならない", async () => {
     const user = userEvent.setup();
+    // manufacturerId の存在検証(03-equipment-form.md)が保存時に走るため、参照先 Vendor も seed する
     seedStore({
       equipment: {
         [existingEquipment.id]: existingEquipment,
         [otherEquipment.id]: otherEquipment,
       },
+      vendors: { [mitutoyo.id]: mitutoyo },
     });
     renderEditForm(existingEquipment.id);
 

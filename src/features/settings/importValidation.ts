@@ -92,7 +92,7 @@ const REFERENCE_CHECKS: {
 } = {
   equipment: (entity, state) =>
     entity.manufacturerId !== undefined &&
-      recordValue(state.vendors, entity.manufacturerId) === undefined
+    recordValue(state.vendors, entity.manufacturerId) === undefined
       ? [`manufacturerId: 参照先が存在しません '${entity.manufacturerId}'`]
       : [],
   items: (entity, state) => {
@@ -100,7 +100,10 @@ const REFERENCE_CHECKS: {
     if (recordValue(state.equipment, entity.equipmentId) === undefined) {
       messages.push(`equipmentId: 参照先が存在しません '${entity.equipmentId}'`);
     }
-    if (entity.vendorId !== undefined && recordValue(state.vendors, entity.vendorId) === undefined) {
+    if (
+      entity.vendorId !== undefined &&
+      recordValue(state.vendors, entity.vendorId) === undefined
+    ) {
       messages.push(`vendorId: 参照先が存在しません '${entity.vendorId}'`);
     }
     if (recordValue(state.persons, entity.personId) === undefined) {
@@ -132,9 +135,10 @@ const REFERENCE_CHECKS: {
   persons: () => [],
   notifications: (entity, state) => {
     const messages: string[] = [];
-    const targetExists = entity.targetType === NOTIFICATION_TARGET_TYPE.ITEM
-      ? recordValue(state.items, entity.targetId) !== undefined
-      : recordValue(state.orders, entity.targetId) !== undefined;
+    const targetExists =
+      entity.targetType === NOTIFICATION_TARGET_TYPE.ITEM
+        ? recordValue(state.items, entity.targetId) !== undefined
+        : recordValue(state.orders, entity.targetId) !== undefined;
     if (!targetExists) {
       messages.push(`targetId: 参照先が存在しません '${entity.targetId}'`);
     }

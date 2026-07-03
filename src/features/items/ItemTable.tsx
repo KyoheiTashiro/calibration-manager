@@ -1,6 +1,6 @@
 /**
  * 項目一覧(screen-design/05-item-list.md)のテーブル。
- * 行データ・並び(nextDueDate 昇順)は hooks.ts の buildItemRows/filterItemRows で確定済みのため、
+ * 行データ・並び(nextDueDate 昇順)は itemRowsOf(store/selectors)/filterItemRows(hooks)で確定済みのため、
  * ここは列描画と行アクション(記録/案件/編集)の起動通知だけを担う薄いビュー。
  * 「案件」は row.canCreateOrder=true(外部かつ有効案件なし)の行のみ表示する(§5)。
  */
@@ -8,7 +8,7 @@
 import { StatusBadge } from "@/components/domain";
 import { Button, Table, TableBody, TableHead } from "@/components/ui";
 import { EXECUTION_LABELS, ITEM_TYPE_LABELS } from "@/features/items/constants";
-import type { ItemRow } from "@/features/items/hooks";
+import type { ItemRow } from "@/store/selectors";
 import type { ReactElement } from "react";
 
 type Props = {

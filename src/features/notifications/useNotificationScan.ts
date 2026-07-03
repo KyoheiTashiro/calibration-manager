@@ -6,8 +6,8 @@
  * generateNotifications(today) を呼ぶ。同日内の再スキャンは無駄な走査を避けるため抑止する。
  */
 
-import { useAppStore } from "@/store/useAppStore";
 import type { IsoDateString } from "@/store/types";
+import { useAppStore } from "@/store/useAppStore";
 import { todayIsoDate } from "@/utils/time";
 import { useEffect, useRef } from "react";
 

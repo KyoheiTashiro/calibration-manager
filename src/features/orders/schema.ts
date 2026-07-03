@@ -16,11 +16,9 @@ export const orderDialogSchema = z.object({
     .string()
     .min(1, "発注日は必須です")
     .refine(isIsoDateString, { message: "発注日の形式が不正です" }),
-  dueDate: z
-    .string()
-    .refine((value) => value === "" || isIsoDateString(value), {
-      message: "返却予定日の形式が不正です",
-    }),
+  dueDate: z.string().refine((value) => value === "" || isIsoDateString(value), {
+    message: "返却予定日の形式が不正です",
+  }),
   // なぜ整数限定か: D-021。OrderModal(案件作成)の費用検証と粒度を統一する。
   cost: z
     .string()

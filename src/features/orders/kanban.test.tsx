@@ -4,12 +4,8 @@
  */
 
 import { OrderList } from "@/features/orders";
-import type {
-  CalibrationOrder,
-  Equipment,
-  InspectionItem,
-  Vendor,
-} from "@/store/types";
+import { KANBAN_ACTIVE_COLUMNS, ORDER_STATUS_LABELS } from "@/features/orders/constants";
+import type { CalibrationOrder, Equipment, InspectionItem, Vendor } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
 import { renderWithStore, seedStore, setupStoreIsolation } from "@/test/renderWithStore";
 import { screen } from "@testing-library/react";
@@ -117,9 +113,17 @@ describe("完了/中止も表示 トグル", () => {
     });
     renderWithStore(<OrderList />);
 
-    // 既定OFF: 完了列は非表示。完了のみのため表示カードは0件でEmptyStateになる
+    // 既定OFF: 完了列は非表示だが、案件自体は存在する（completed 1件）ため空状態にはならず、
+    // 進行中4列は描画され各列に「なし」が出る（空状態は全ステータス合計0件のときのみ）。
     expect(screen.queryByText("記録登録済")).not.toBeInTheDocument();
     expect(screen.queryByText("中止")).not.toBeInTheDocument();
+    expect(
+      screen.queryByText("外部校正案件はありません。項目一覧から案件を作成できます"),
+    ).not.toBeInTheDocument();
+    for (const status of KANBAN_ACTIVE_COLUMNS) {
+      expect(screen.getByText(ORDER_STATUS_LABELS[status])).toBeInTheDocument();
+    }
+    expect(screen.getAllByText("なし")).toHaveLength(KANBAN_ACTIVE_COLUMNS.length);
 
     await user.click(screen.getByLabelText("完了/中止も表示"));
 
@@ -143,9 +147,7 @@ describe("中止フロー", () => {
     // 確認ダイアログ
     await user.click(screen.getByRole("button", { name: "中止する" }));
 
-    expect((useAppStore.getState().orders["order-1"] as CalibrationOrder).status).toBe(
-      "cancelled",
-    );
+    expect((useAppStore.getState().orders["order-1"] as CalibrationOrder).status).toBe("cancelled");
     // cancelled はトグルOFFで非表示
     expect(screen.queryByText("EQ-001")).not.toBeInTheDocument();
   });
@@ -170,6 +172,24 @@ describe("空状態", () => {
 
     // planned 以外の3列（発注済/校正中/返却済）が空 → 「なし」3つ
     expect(screen.getAllByText("なし")).toHaveLength(3);
+  });
+
+  it("completed のみ1件でトグルOFF（既定）でもEmptyStateにならず進行中4列が「なし」で描画される", () => {
+    baseSeed({
+      "order-c": { id: "order-c", itemId: "item-1", vendorId: "vendor-1", status: "completed" },
+    });
+    renderWithStore(<OrderList />);
+
+    // 案件は存在する（completed 1件）ため、全列0件の空状態メッセージは出ない
+    expect(
+      screen.queryByText("外部校正案件はありません。項目一覧から案件を作成できます"),
+    ).not.toBeInTheDocument();
+    // 進行中4列（発注準備/発注済/校正中/返却済）のヘッダーは表示される
+    for (const status of KANBAN_ACTIVE_COLUMNS) {
+      expect(screen.getByText(ORDER_STATUS_LABELS[status])).toBeInTheDocument();
+    }
+    // 4列とも0件のため「なし」が4つ
+    expect(screen.getAllByText("なし")).toHaveLength(4);
   });
 });
 
@@ -237,9 +257,7 @@ describe("列内ソート", () => {
     });
     renderWithStore(<OrderList />);
 
-    const managementNos = screen
-      .getAllByText(/^EQ-[ABC]$/u)
-      .map((element) => element.textContent);
+    const managementNos = screen.getAllByText(/^EQ-[ABC]$/u).map((element) => element.textContent);
     // dueDate 昇順: B(06-01) → A(08-01) → 未設定末尾 C
     expect(managementNos).toEqual(["EQ-B", "EQ-A", "EQ-C"]);
   });

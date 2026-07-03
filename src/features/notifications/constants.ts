@@ -27,3 +27,16 @@ export const NOTIFICATION_TYPE_BADGE_CLASSES = {
   [NOTIFICATION_TYPE.DELIVERY_DUE_SOON]: "bg-purple-100 text-purple-800 border border-purple-300",
   [NOTIFICATION_TYPE.DELIVERY_OVERDUE]: "bg-red-200 text-red-900 border border-red-400",
 } as const satisfies Record<NotificationType, string>;
+
+/**
+ * 通知種別→アイコングリフ（screen-design/10-notifications.md の表と一致させる）。
+ * overdue と deliveryOverdue は色相としては同じ🔴だが、区別は上記バッジの濃淡（-100/-800 と
+ * -200/-900）が担うため、グリフ自体は表の通り両方🔴のままでよい。
+ */
+export const NOTIFICATION_TYPE_ICONS = {
+  [NOTIFICATION_TYPE.DUE_SOON]: "🟡",
+  [NOTIFICATION_TYPE.OVERDUE]: "🔴",
+  [NOTIFICATION_TYPE.ORDER_RECOMMENDED]: "🟠",
+  [NOTIFICATION_TYPE.DELIVERY_DUE_SOON]: "🟣",
+  [NOTIFICATION_TYPE.DELIVERY_OVERDUE]: "🔴",
+} as const satisfies Record<NotificationType, string>;

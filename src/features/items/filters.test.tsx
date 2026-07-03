@@ -88,4 +88,17 @@ describe("ItemList: フィルタ", () => {
     expect(dataRowCount()).toBe(3);
     expect(searchValue()).toBe("");
   });
+
+  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
+  it("クリアはフィルタ以外の未知クエリも含めて全除去する(D-022)", async () => {
+    const user = userEvent.setup();
+    // 未知パラメータ(page)をフィルタと併存させ、クリアが全クエリを消すことを確認する
+    renderList("?status=overdue&page=2");
+    expect(dataRowCount()).toBe(1);
+
+    await user.click(screen.getByRole("button", { name: "クリア" }));
+
+    expect(dataRowCount()).toBe(3);
+    expect(searchValue()).toBe("");
+  });
 });

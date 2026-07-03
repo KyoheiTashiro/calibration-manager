@@ -80,9 +80,7 @@ describe("VendorModal: 新規追加", () => {
   it("メーカー・校正業者ともに未チェックだと警告文が表示される（submitは可能）", () => {
     render(<VendorModal open onClose={vi.fn()} />);
 
-    expect(
-      screen.getByText("メーカー・校正業者のどちらにも該当しません"),
-    ).toBeInTheDocument();
+    expect(screen.getByText("メーカー・校正業者のどちらにも該当しません")).toBeInTheDocument();
   });
 
   it("isCalibrator未チェックの間は標準納期(日)フィールドが表示されない", () => {
