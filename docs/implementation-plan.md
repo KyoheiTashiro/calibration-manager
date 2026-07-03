@@ -142,9 +142,42 @@
 ## Phase 11: 仕上げ
 
 - [ ] PWA 完全オフライン実機検証(precache、autoUpdate、初回のみオンライン)
+  - 済(2026-07-03): 本番ビルドの sw.js precache マニフェスト検証 → 134エントリ 3.3MB、woff2 124件(D-033)・index.html・webmanifest 包含を確認
+  - 残: 実機でのオフライン動作確認(SW登録→機内モード→全画面遷移)
 - [ ] a11y: axe 重大違反0、Lighthouse 95+、dueSoon 黄コントラスト検証
+  - 済(2026-07-03): jsdom + axe-core 4.12 で全12ルートをシードデータ入りでスキャン → critical/serious 違反0(color-contrast はレイアウト非依存のため除外し数値検証で代替)。dueSoon 黄コントラスト = yellow-800 on yellow-100 実測 6.40:1(AA 4.5 クリア、ビルドCSSの oklch 実値から算出)
+  - 残: 実ブラウザでの Lighthouse 95+(サンドボックスでローカルサーバ listen 不可のため未実施)
 - [x] カバレッジラチェット最終確定(D-032: domain 98/100/98/98、store 97/96/92/97、id.ts 100、csv.ts 97/95/90/97。実測を下回らず引き下げなし、`--coverage` exit 0)
 - [x] 利用マニュアル画面(/manual)追加: 静的コンテンツ・store参照なし、サイドバー最下部(docs/screen-design/12-manual.md、decisions.md D-035)
+
+## Phase 12: docs 監査是正(2026-07-03 docs 横断監査で検出) ✅ 完了(2026-07-03)
+
+docs 全ファイル + 実装の突合監査結果。「確定後は該当 docs にも反映してから閉じる」(decisions.md 冒頭)の反映漏れと、D-036 リネームの実装巻き添え1件。
+
+### 実装修正
+
+- [x] `src/components/system/Sidebar.tsx`: `NAV_ITEMS.map((inspectionItem) => ...)` の変数名が誤り。NavItem(ナビ項目)であってドメインの InspectionItem ではない。D-036 が明示的にリネーム対象外とした NavItem 文脈への一括置換の巻き添え。`navItem` へ改名(挙動変更なし)
+
+### docs 是正(確定済み判断の反映漏れ。反映後 decisions.md の該当 D を「docs反映済」へ更新)
+
+- [x] `architecture/store.md` / `architecture/tech-stack.md` / `architecture/directory-structure.md`: 「設計フェーズ・コード未実装」前提の記述、および `STORAGE_VERSION=1`・「migration ステップ未登録」の記述が D-036(v2、`migrateV1ToV2` 登録済み)と矛盾。実装済みの現状 + v2 へ更新(LocalStorage キー `calibration-manager:v1` は実装どおり変更なし。version のみ 2)
+- [x] `screen-design/README.md`: §0.1 サイドバー図(8項目)に「利用マニュアル」追加(D-035、実装は9項目)。画面遷移図に `/manual` 追加。末尾「付記: 未決事項」表の D-001(通知宛先)・D-002(再稼働時リセット)が「※未決」のまま → 確定済みへ更新(domain-model.md §8 は反映済みで、本表とだけ矛盾)
+- [x] `docs/README.md`: 画面別仕様の目次と「画面一覧」表に 12-manual(`/#/manual`)が欠落 → 追加
+- [x] `screen-design/01-dashboard.md`: 要対応行クリック「機器詳細(または点検校正項目一覧の該当行)」→ D-026 で機器詳細に確定済み。択一記述を除去
+- [x] `screen-design/10-notifications.md`: 行クリック遷移「`/inspection-items`(該当項目)または該当機器詳細」→ D-027 の確定内容(order→`/orders`、inspectionItem→機器詳細、dangling は既読化のみ)へ書き換え
+- [x] `screen-design/02-equipment-list.md`: 状態フィルタ「全て/稼働/休止/廃棄」の4択とモック「稼働のみ」が D-010(「稼働+休止」既定の5択)と不一致 → 更新
+- [x] `screen-design/08-orders.md`: 「1つの項目に対し `ordered`/`inCalibration` の有効案件は同時に1件まで」が D-006(planned〜returned の全有効状態で1件まで、ストア層強制)より弱く矛盾 → D-006 準拠へ是正
+- [x] `screen-design/11-settings.md`: 「エラー行はスキップ、または全件中断のいずれか」→ D-030 で中断のみ確定。択一記述を除去
+- [x] `screen-design/09-masters.md`: 無効化警告の「※通知の宛先フォールバック先は未決」→ D-001 で確定済み(フォールバックなし)。注記を更新
+- [x] `design/ui-guidelines.md` §5: サイドバー「ルート一覧(§0.2の8項目)」→ 9項目(マニュアル追加後)
+- [x] `architecture/directory-structure.md`: ツリーに `features/manual/`・`src/dev/`(D-034)欠落、selectors コメントに `personLabelOf`(D-024)/`inspectionItemRowsOf` 欠落 → 現状へ追随
+
+### 対応不要(監査済み・矛盾なしと判定)
+
+- 本ファイル Phase 1〜10 の `STORAGE_VERSION=1`・旧パス表記(`features/inspection-items/` 等)は当時の履歴ログのため原文維持(D-036 の decisions.md 過去エントリと同じ扱い)
+- `domain-model.md` §7「画面構成(案)」にマニュアルなし → 「案」であり規範ではないため許容
+- `vitest.config.ts` の thresholds は D-032 と完全一致を確認
+- コード全域の D-036 リネーム整合を grep 監査: 上記 Sidebar 1件以外の巻き添え・残留(`itemId` 等)なし
 
 ---
 

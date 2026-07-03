@@ -32,6 +32,7 @@
 │ ▸担当者   │                                                │
 │ ▸通知     │                                                │
 │ ▸設定     │                                                │
+│ ▸利用マニュアル│                                          │
 └──────────┴────────────────────────────────────────────────┘
 ```
 
@@ -115,7 +116,7 @@
 flowchart TD
     Dash[ダッシュボード /] -->|サマリーカード| InspectionItems[点検校正項目一覧 /inspection-items]
     Dash -->|通知| Notice[通知センター /notifications]
-    Sidebar((サイドバー)) --> Dash & EqList[機器一覧 /equipment] & InspectionItems & Orders[案件一覧 /orders] & Vendors[メーカー /vendors] & Persons[担当者 /persons] & Notice & Settings[設定 /settings]
+    Sidebar((サイドバー)) --> Dash & EqList[機器一覧 /equipment] & InspectionItems & Orders[案件一覧 /orders] & Vendors[メーカー /vendors] & Persons[担当者 /persons] & Notice & Settings[設定 /settings] & Manual[利用マニュアル /manual]
     EqList -->|行クリック| EqDetail[機器詳細 /equipment/:id]
     EqList -->|追加| EqNew[機器登録 /equipment/new]
     EqDetail -->|編集| EqEdit[機器編集 /equipment/:id/edit]
@@ -136,6 +137,6 @@ flowchart TD
 | 未決事項                                 | 影響画面                                                                            | 現状の扱い                                          |
 | ---------------------------------------- | ----------------------------------------------------------------------------------- | --------------------------------------------------- |
 | 校正値・合格基準の記録                   | [§6 項目編集](./06-inspection-item-modal.md) / [§7 記録登録](./07-record-modal.md)             | result(enum)+ note のみ。数値記録欄は設けない ※未決 |
-| 通知宛先のフォールバック(担当者無効化時) | [§9-B 担当者](./09-masters.md#9-b-担当者マスタ) / [§10 通知](./10-notifications.md) | 警告表示のみ。当面は元 personId で生成 ※未決        |
+| 通知宛先のフォールバック(担当者無効化時) | [§9-B 担当者](./09-masters.md#9-b-担当者マスタ) / [§10 通知](./10-notifications.md) | **確定(D-001)**: フォールバックしない。既存通知・項目の personId は元のまま保持し、無効化後も当該 personId 宛の通知を生成・表示し続ける。UI は担当者名に「(無効)」を注記        |
 | 期限起算(実施日 vs 予定日)               | [§7 記録登録](./07-record-modal.md)                                                 | 実施日基準(doneDate + cycle)※未決                   |
-| 休止機器 再稼働時の期限リセット          | [§3 機器編集](./03-equipment-form.md)                                               | リセットルール未定義。status 変更のみ ※未決         |
+| 休止機器 再稼働時の期限リセット          | [§3 機器編集](./03-equipment-form.md)                                               | **確定(D-002)**: 据え置き(リセットしない)。項目の nextDueDate は機器状態変更で書き換えず、再稼働すれば保存済み期限のまま再計算対象へ戻る         |

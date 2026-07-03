@@ -39,9 +39,10 @@
 ## 操作・アクション
 
 - タブ: `未読`(件数バッジ)/ `既読`。
-- 行クリック → 対象へ遷移し既読化(`isRead=true`):
-  - `targetType=inspectionItem` → `/inspection-items`(該当項目)または該当機器詳細。
-  - `targetType=order` → `/orders`(該当カード)。
+- 行クリック → まず `markAsRead`(`isRead=true`)、次に遷移(D-027):
+  - `targetType=order` → `/orders`(カードのハイライトは不実装)。
+  - `targetType=inspectionItem` → 項目から機器を辿り機器詳細 `/equipment/:id` へ遷移。
+  - 対象が dangling(参照先削除済み)の場合は既読化のみで遷移しない。
 - 「全て既読」→ 未読すべてを `isRead=true`。
 
 ## 通知生成仕様(ドメインモデル §3.7 に準拠)

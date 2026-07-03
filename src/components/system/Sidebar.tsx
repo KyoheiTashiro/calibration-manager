@@ -37,11 +37,11 @@ export const Sidebar = ({ onNavigate }: Props): ReactElement => {
   return (
     <nav aria-label="メインナビゲーション" className="bg-subBg h-full w-60">
       <ul className="flex flex-col gap-1 p-2">
-        {NAV_ITEMS.map((inspectionItem) => (
-          <li key={inspectionItem.path}>
+        {NAV_ITEMS.map((navItem) => (
+          <li key={navItem.path}>
             <NavLink
-              to={inspectionItem.path}
-              end={inspectionItem.end}
+              to={navItem.path}
+              end={navItem.end}
               onClick={handleNavigate}
               // oxlint-disable-next-line react/forbid-component-props -- NavLinkはisActiveでクラス出し分けする関数classNameが公式APIのため、この用途に限り許容する
               className={({ isActive }): string =>
@@ -50,7 +50,7 @@ export const Sidebar = ({ onNavigate }: Props): ReactElement => {
                 }`
               }
             >
-              {inspectionItem.label}
+              {navItem.label}
             </NavLink>
           </li>
         ))}

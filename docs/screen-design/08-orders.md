@@ -54,7 +54,7 @@ planned → ordered → inCalibration → returned → completed
 - `orderedDate`(発注時)/ `returnedDate`(返却時)は必須・`YYYY-MM-DD`。
 - `dueDate`・`returnedDate` が入力されている場合 `orderedDate ≤ dueDate`、`orderedDate ≤ returnedDate` を推奨チェック(整合警告)。
 - `cost`: 任意・0以上の数値。
-- 1つの項目に対し `ordered`/`inCalibration` の有効案件は同時に1件まで(§4.3 inProgress 判定と整合)。
+- 1つの項目に対し有効案件(`planned`〜`returned` の全状態)は同時に1件まで(D-006)。`addOrder` がストア層で強制し、既存の有効案件がある場合は no-op(null 返却)する。
 
 ## 空状態
 

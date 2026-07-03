@@ -2,7 +2,7 @@
 
 関連: [domain-model.md](../domain-model.md)
 
-本書は calibration-manager（機器点検・校正期限管理アプリ）で採用を想定する技術スタックをまとめる。calibration-manager は設計フェーズでありコードは未実装のため、以下は「採用方針」であって実績ではない。calibration-manager 固有の事情（CSVバックアップ、機器点検という利用シーンでのPWA活用など）を踏まえて構成する。
+本書は calibration-manager（機器点検・校正期限管理アプリ）で採用している技術スタックをまとめる。calibration-manager 固有の事情（CSVバックアップ、機器点検という利用シーンでのPWA活用など）を踏まえて構成している。
 
 | 項目            | 採用                                                                                                                                                                   |
 | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -13,7 +13,7 @@
 | フォーム        | React Hook Form + Zod（`@hookform/resolvers/zod`）                                                                                                                     |
 | スタイル        | Tailwind CSS 4                                                                                                                                                         |
 | CSVバックアップ | 追加ライブラリを導入せず、Web標準（Blob/File API）で入出力し、`store/schema.ts` のzodスキーマを再利用して検証する方針。文字コードはUTF-8 BOM付き（domain-model.md §5） |
-| 永続化          | LocalStorage（zustand persist・キー `calibration-manager:v1`・version 1）                                                                                              |
+| 永続化          | LocalStorage（zustand persist・キー `calibration-manager:v1`・version 2）                                                                                              |
 | ホスティング    | GitHub Pages（base path `/calibration-manager/` を想定）                                                                                                               |
 | CI              | GitHub Actions 3ワークフローを想定: test（test/coverage/build）・lint（oxlint typed + oxfmt check）・deploy（GitHub Pages deploy）                                     |
 | PWA             | `vite-plugin-pwa`（Workbox ベース・自動SW生成・manifest生成・`autoUpdate`を想定）                                                                                      |
@@ -27,7 +27,7 @@ GitHub Pagesは任意パスへのフォールバック設定ができない。`B
 
 ## 状態管理・永続化の方針
 
-Zustand を単一ストアとして採用し、`persist(immer(...))` の順でミドルウェアを重ねる想定とする（詳細は [store.md](./store.md) を参照）。`immer` により各スライスの `set` 内でミュータブルな記法を使え、`persist` によりLocalStorageへの永続化を透過的に扱える。calibration-manager は初回スキーマのため `version: 1` からのスタートとなるが、将来のスキーマ変更に備え migrate の仕組みは当初から用意する方針とする。
+Zustand を単一ストアとして採用し、`persist(immer(...))` の順でミドルウェアを重ねている（詳細は [store.md](./store.md) を参照）。`immer` により各スライスの `set` 内でミュータブルな記法を使え、`persist` によりLocalStorageへの永続化を透過的に扱える。calibration-manager は初回スキーマ `version: 1` から `version: 2`（item→inspectionItem 全域リネーム、decisions.md D-036）へ移行済みで、`migrateV1ToV2` が `MIGRATIONS` に登録されている。将来のスキーマ変更でも同じ migrate の仕組みで対応する。
 
 ## CSVバックアップの方針
 
