@@ -1,6 +1,6 @@
 /**
  * EquipmentDetail(/equipment/:id)の検証: 基本情報カード・編集遷移・存在しないid・空状態
- * (screen-design/04-equipment-detail.md)。項目テーブルは itemTable.test.tsx、実施履歴は
+ * (screen-design/04-equipment-detail.md)。項目テーブルは inspectionItemTable.test.tsx、実施履歴は
  * history.test.tsx、モーダル起動は modalLaunch.test.tsx を参照(oxlint max-lines 対応の分割)。
  */
 

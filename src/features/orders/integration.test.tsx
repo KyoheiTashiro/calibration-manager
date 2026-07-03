@@ -45,7 +45,7 @@ const equipment: Equipment = {
   name: "ノギス",
   status: "active",
 };
-const item: InspectionItem = {
+const inspectionItem: InspectionItem = {
   id: "item-1",
   equipmentId: "equipment-1",
   type: "calibration",
@@ -66,14 +66,14 @@ const seedWithOrder = (order: CalibrationOrder): void => {
     vendors: { [vendor.id]: vendor },
     persons: { [person.id]: person },
     equipment: { [equipment.id]: equipment },
-    items: { [item.id]: item },
+    inspectionItems: { [inspectionItem.id]: inspectionItem },
     orders: { [order.id]: order },
   });
 };
 
 const returnedOrder: CalibrationOrder = {
   id: "order-1",
-  itemId: "item-1",
+  inspectionItemId: "item-1",
   vendorId: "vendor-1",
   status: "returned",
   orderedDate: "2026-06-01",
@@ -112,15 +112,15 @@ describe("結合: returned 案件 → 記録登録 → カスケード", () => {
     expect(records).toHaveLength(1);
     // doneBy は案件の依頼先 Vendor.name がプリフィルされ、そのまま登録される(D-017)
     expect(records[0]).toMatchObject({
-      itemId: item.id,
+      inspectionItemId: inspectionItem.id,
       orderId: returnedOrder.id,
       doneDate: "2026-06-20",
       doneBy: vendor.name,
       result: "pass",
     } satisfies Partial<InspectionRecord>);
-    const updatedItem = state.items[item.id] as InspectionItem;
-    expect(updatedItem.lastDoneDate).toBe("2026-06-20");
-    expect(updatedItem.nextDueDate).toBe("2027-06-20"); // 1Y 周期の暦月加算
+    const updatedInspectionItem = state.inspectionItems[inspectionItem.id] as InspectionItem;
+    expect(updatedInspectionItem.lastDoneDate).toBe("2026-06-20");
+    expect(updatedInspectionItem.nextDueDate).toBe("2027-06-20"); // 1Y 周期の暦月加算
     expect((state.orders[returnedOrder.id] as CalibrationOrder).status).toBe("completed");
 
     // completed は既定トグルOFFで非表示 → returned 列からカードが消える(08-orders.md)
@@ -136,9 +136,9 @@ describe("結合: returned 案件 → 記録登録 → カスケード", () => {
     await registerRecordFromReturnedCard(user, "不合格");
 
     const state = useAppStore.getState();
-    const updatedItem = state.items[item.id] as InspectionItem;
-    expect(updatedItem.nextDueDate).toBe("2026-07-10"); // 据え置き
-    expect(updatedItem.lastDoneDate).toBe("2026-06-20"); // 実施の事実は記録(D-015)
+    const updatedInspectionItem = state.inspectionItems[inspectionItem.id] as InspectionItem;
+    expect(updatedInspectionItem.nextDueDate).toBe("2026-07-10"); // 据え置き
+    expect(updatedInspectionItem.lastDoneDate).toBe("2026-06-20"); // 実施の事実は記録(D-015)
     expect((state.orders[returnedOrder.id] as CalibrationOrder).status).toBe("completed");
     expect(Object.values(state.records)[0]?.result).toBe("fail");
   });
@@ -163,7 +163,7 @@ describe("結合: かんばんの隣接遷移チェーン planned → returned",
   // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("発注する(orderedDate 既定=今日)→ 校正中へ → 返却する(returnedDate)で順に遷移する", async () => {
     const user = userEvent.setup();
-    seedWithOrder({ id: "order-1", itemId: "item-1", vendorId: "vendor-1", status: "planned" });
+    seedWithOrder({ id: "order-1", inspectionItemId: "item-1", vendorId: "vendor-1", status: "planned" });
     renderWithStore(<OrderList />);
 
     // planned → ordered: 発注ダイアログ(orderedDate 既定=今日で確定)

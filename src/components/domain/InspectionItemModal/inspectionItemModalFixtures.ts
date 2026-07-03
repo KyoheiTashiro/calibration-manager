@@ -1,5 +1,5 @@
 /**
- * ItemModal.test.tsx / ItemModal.edit.test.tsx で共有するテスト用フィクスチャ。
+ * InspectionItemModal.test.tsx / InspectionItemModal.edit.test.tsx で共有するテスト用フィクスチャ。
  * なぜ分割するか: 全テストケースを1ファイルに収めると eslint(max-lines) の300行上限を
  * 超過するため（テストケース数が仕様上多い）、フィクスチャ部分をこのファイルへ切り出した。
  */
@@ -8,7 +8,7 @@ import {
   CYCLE,
   EQUIPMENT_STATUS,
   EXECUTION,
-  ITEM_TYPE,
+  INSPECTION_ITEM_TYPE,
   type Equipment,
   type InspectionItem,
   type Person,
@@ -59,10 +59,10 @@ export const anotherInactivePerson: Person = {
   isActive: false,
 };
 
-export const existingItem: InspectionItem = {
+export const existingInspectionItem: InspectionItem = {
   id: "item-1",
   equipmentId: equipment.id,
-  type: ITEM_TYPE.CALIBRATION,
+  type: INSPECTION_ITEM_TYPE.CALIBRATION,
   name: "年次校正",
   cycle: CYCLE.Y1,
   execution: EXECUTION.EXTERNAL,

@@ -1,25 +1,25 @@
 /**
- * 点検校正項目の表示定数(screen-design/04-equipment-detail.md / 05-item-list.md /
- * 06-item-modal.md)。種別・実施区分のラベルをここに一元化し、機器詳細・項目一覧・
+ * 点検校正項目の表示定数(screen-design/04-equipment-detail.md / 05-inspection-item-list.md /
+ * 06-inspection-item-modal.md)。種別・実施区分のラベルをここに一元化し、機器詳細・項目一覧・
  * 項目編集モーダルで重複定義しない(features/equipment/constants.ts と同じ運用)。
  */
 
 import {
   CYCLE,
   EXECUTION,
-  ITEM_TYPE,
+  INSPECTION_ITEM_TYPE,
   RECORD_RESULT,
   type Cycle,
   type Execution,
-  type ItemType,
+  type InspectionItemType,
   type RecordResult,
 } from "@/store/types";
 
 /** 項目種別 → 日本語ラベル(domain-model.md §3.4) */
-export const ITEM_TYPE_LABELS = {
-  [ITEM_TYPE.INSPECTION]: "点検",
-  [ITEM_TYPE.CALIBRATION]: "校正",
-} as const satisfies Record<ItemType, string>;
+export const INSPECTION_ITEM_TYPE_LABELS = {
+  [INSPECTION_ITEM_TYPE.INSPECTION]: "点検",
+  [INSPECTION_ITEM_TYPE.CALIBRATION]: "校正",
+} as const satisfies Record<InspectionItemType, string>;
 
 /** 実施区分 → 日本語ラベル(domain-model.md §3.4) */
 export const EXECUTION_LABELS = {
@@ -32,12 +32,12 @@ export const CYCLE_OPTIONS: readonly { value: Cycle; label: string }[] = Object.
   (cycle) => ({ value: cycle, label: cycle }),
 );
 
-/** 種別ラジオ(点検/校正)の選択肢(06-item-modal.md) */
-export const ITEM_TYPE_OPTIONS: readonly { value: ItemType; label: string }[] = Object.entries(
-  ITEM_TYPE_LABELS,
-).map(([value, label]) => ({ value: value as ItemType, label }));
+/** 種別ラジオ(点検/校正)の選択肢(06-inspection-item-modal.md) */
+export const INSPECTION_ITEM_TYPE_OPTIONS: readonly { value: InspectionItemType; label: string }[] = Object.entries(
+  INSPECTION_ITEM_TYPE_LABELS,
+).map(([value, label]) => ({ value: value as InspectionItemType, label }));
 
-/** 実施区分ラジオ(内部/外部)の選択肢(06-item-modal.md) */
+/** 実施区分ラジオ(内部/外部)の選択肢(06-inspection-item-modal.md) */
 export const EXECUTION_OPTIONS: readonly { value: Execution; label: string }[] = Object.entries(
   EXECUTION_LABELS,
 ).map(([value, label]) => ({ value: value as Execution, label }));

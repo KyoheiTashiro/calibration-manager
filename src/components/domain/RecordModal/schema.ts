@@ -6,7 +6,7 @@
  *
  * なぜフォーム値をすべて string ベースに保つか: HTML input/radio の値は本質的に文字列であり、
  * defaultValues/reset に渡す型と register 対象の型を一致させ、preprocess/transform による
- * resolver の入出力型ズレを避ける（ItemModal/schema.ts と同方針）。
+ * resolver の入出力型ズレを避ける（InspectionItemModal/schema.ts と同方針）。
  */
 
 import { RECORD_RESULT } from "@/store/types";

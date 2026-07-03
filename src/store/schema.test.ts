@@ -6,7 +6,7 @@ import {
 } from "@/store/schema";
 import { describe, expect, it } from "vitest";
 
-const validItem = {
+const validInspectionItem = {
   id: "item-1",
   equipmentId: "equipment-1",
   type: "calibration",
@@ -23,16 +23,16 @@ const validItem = {
 
 describe("inspectionItemSchema", () => {
   it("妥当な項目を受理する", () => {
-    expect(inspectionItemSchema.safeParse(validItem).success).toBe(true);
+    expect(inspectionItemSchema.safeParse(validInspectionItem).success).toBe(true);
   });
 
   it("external なのに vendorId が無い項目を拒否する（相関制約）", () => {
-    const { vendorId: _dropped, ...withoutVendor } = validItem;
+    const { vendorId: _dropped, ...withoutVendor } = validInspectionItem;
     expect(inspectionItemSchema.safeParse(withoutVendor).success).toBe(false);
   });
 
   it("internal なら vendorId 無しでも受理する", () => {
-    const { vendorId: _dropped, ...withoutVendor } = validItem;
+    const { vendorId: _dropped, ...withoutVendor } = validInspectionItem;
     expect(
       inspectionItemSchema.safeParse({ ...withoutVendor, execution: "internal" }).success,
     ).toBe(true);
@@ -40,16 +40,16 @@ describe("inspectionItemSchema", () => {
 
   it("暦上あり得ない日付（2026-02-30）を拒否する", () => {
     expect(
-      inspectionItemSchema.safeParse({ ...validItem, nextDueDate: "2026-02-30" }).success,
+      inspectionItemSchema.safeParse({ ...validInspectionItem, nextDueDate: "2026-02-30" }).success,
     ).toBe(false);
   });
 
   it("未知の cycle 値を拒否する", () => {
-    expect(inspectionItemSchema.safeParse({ ...validItem, cycle: "4M" }).success).toBe(false);
+    expect(inspectionItemSchema.safeParse({ ...validInspectionItem, cycle: "4M" }).success).toBe(false);
   });
 
   it("負の日数（bufferDays）を拒否する", () => {
-    expect(inspectionItemSchema.safeParse({ ...validItem, bufferDays: -1 }).success).toBe(false);
+    expect(inspectionItemSchema.safeParse({ ...validInspectionItem, bufferDays: -1 }).success).toBe(false);
   });
 });
 
@@ -72,12 +72,12 @@ describe("vendorSchema", () => {
 
 describe("calibrationOrderSchema", () => {
   it("負の費用を拒否する", () => {
-    const order = { id: "o-1", itemId: "i-1", vendorId: "v-1", status: "planned", cost: -100 };
+    const order = { id: "o-1", inspectionItemId: "i-1", vendorId: "v-1", status: "planned", cost: -100 };
     expect(calibrationOrderSchema.safeParse(order).success).toBe(false);
   });
 
   it("未知の status を拒否する", () => {
-    const order = { id: "o-1", itemId: "i-1", vendorId: "v-1", status: "shipping" };
+    const order = { id: "o-1", inspectionItemId: "i-1", vendorId: "v-1", status: "shipping" };
     expect(calibrationOrderSchema.safeParse(order).success).toBe(false);
   });
 });
@@ -87,7 +87,7 @@ describe("appStateSchema", () => {
     vendors: {},
     persons: {},
     equipment: {},
-    items: {},
+    inspectionItems: {},
     records: {},
     orders: {},
     notifications: {},
@@ -100,7 +100,7 @@ describe("appStateSchema", () => {
   it("1レコードでも不正があれば全体パースは失敗する（merge のレコード単位サルベージが必要な根拠）", () => {
     const broken = {
       ...emptyState,
-      items: { "item-1": { ...validItem, nextDueDate: "破損データ" } },
+      inspectionItems: { "item-1": { ...validInspectionItem, nextDueDate: "破損データ" } },
     };
     expect(appStateSchema.safeParse(broken).success).toBe(false);
   });

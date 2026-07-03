@@ -1,10 +1,10 @@
 /**
- * ItemList: フィルタ(screen-design/05-item-list.md「操作」、D-022)の検証。
+ * InspectionItemList: フィルタ(screen-design/05-inspection-item-list.md「操作」、D-022)の検証。
  * URLクエリが唯一の真実源: 初期化(?status=)・Select 操作による絞り込みと URL 反映・クリアを確認する。
  */
 
-import { ItemList } from "@/features/items";
-import { personSuzuki, seedItemList } from "@/features/items/itemListFixtures";
+import { InspectionItemList } from "@/features/inspectionItems";
+import { personSuzuki, seedInspectionItemList } from "@/features/inspectionItems/inspectionItemListFixtures";
 import { renderWithStore, setupStoreIsolation } from "@/test/renderWithStore";
 import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -22,10 +22,10 @@ const LocationProbe = (): ReactElement => {
 const renderList = (search = ""): ReturnType<typeof renderWithStore> =>
   renderWithStore(
     <>
-      <ItemList />
+      <InspectionItemList />
       <LocationProbe />
     </>,
-    { initialEntries: [`/items${search}`] },
+    { initialEntries: [`/inspection-items${search}`] },
   );
 
 const searchValue = (): string => screen.getByTestId("search").textContent ?? "";
@@ -33,10 +33,10 @@ const dataRowCount = (): number => screen.getAllByRole("row").length - 1;
 
 beforeEach(() => {
   setupStoreIsolation();
-  seedItemList();
+  seedInspectionItemList();
 });
 
-describe("ItemList: フィルタ", () => {
+describe("InspectionItemList: フィルタ", () => {
   it("?status=overdue で初期化すると overdue の行だけを表示する", () => {
     renderList("?status=overdue");
 

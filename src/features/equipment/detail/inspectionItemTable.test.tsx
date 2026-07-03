@@ -11,8 +11,8 @@ import {
   activePerson,
   equipmentFull,
   equipmentSuspended,
-  itemOfSuspendedEquipment,
-  seedEquipmentFullItemsAndRecords,
+  inspectionItemOfSuspendedEquipment,
+  seedEquipmentFullInspectionItemsAndRecords,
   seedEquipmentFullMasters,
 } from "@/features/equipment/detail/detailFixtures";
 import { renderWithStore, seedStore, setupStoreIsolation } from "@/test/renderWithStore";
@@ -34,10 +34,10 @@ const renderDetail = (id: string): ReturnType<typeof renderWithStore> =>
  * 項目テーブル(1つ目のtable)のデータ行を取得する。項目名は実施履歴テーブルの行にも
  * 出現するため、screen 全体ではなく項目テーブル内にスコープして曖昧マッチを避ける。
  */
-const getItemRow = (name: string | RegExp): HTMLElement => {
-  const [itemTable] = screen.getAllByRole("table");
-  if (!itemTable) throw new Error("項目テーブルが見つかりません");
-  return within(itemTable).getByRole("row", { name });
+const getInspectionItemRow = (name: string | RegExp): HTMLElement => {
+  const [inspectionItemTable] = screen.getAllByRole("table");
+  if (!inspectionItemTable) throw new Error("項目テーブルが見つかりません");
+  return within(inspectionItemTable).getByRole("row", { name });
 };
 
 beforeEach(setupStoreIsolation);
@@ -45,69 +45,69 @@ beforeEach(setupStoreIsolation);
 describe("EquipmentDetail: 項目テーブルの列内容", () => {
   it("種別・内外・周期・担当者名・次回期限が表示される", () => {
     seedEquipmentFullMasters();
-    seedEquipmentFullItemsAndRecords();
+    seedEquipmentFullInspectionItemsAndRecords();
     renderDetail(equipmentFull.id);
 
-    const externalRow = getItemRow(/年次校正/u);
+    const externalRow = getInspectionItemRow(/年次校正/u);
     expect(within(externalRow).getByText("校正")).toBeInTheDocument();
     expect(within(externalRow).getByText("外部")).toBeInTheDocument();
     expect(within(externalRow).getByText("1Y")).toBeInTheDocument();
     expect(within(externalRow).getByText("田中")).toBeInTheDocument();
     expect(within(externalRow).getByText("2030-01-01")).toBeInTheDocument();
 
-    const internalRow = getItemRow(/月次点検/u);
+    const internalRow = getInspectionItemRow(/月次点検/u);
     expect(within(internalRow).getByText("点検")).toBeInTheDocument();
     expect(within(internalRow).getByText("内部")).toBeInTheDocument();
   });
 
   it("担当者が無効化済みの項目は「(無効)」を注記して表示する(D-001)", () => {
     seedEquipmentFullMasters();
-    seedEquipmentFullItemsAndRecords();
+    seedEquipmentFullInspectionItemsAndRecords();
     renderDetail(equipmentFull.id);
 
-    expect(within(getItemRow(/外観点検/u)).getByText("鈴木(無効)")).toBeInTheDocument();
+    expect(within(getInspectionItemRow(/外観点検/u)).getByText("鈴木(無効)")).toBeInTheDocument();
   });
 });
 
 describe("EquipmentDetail: 項目テーブルの並び順・淡色表示", () => {
   it("isActive=trueをnextDueDate昇順で先に、isActive=falseは末尾+淡色になる", () => {
     seedEquipmentFullMasters();
-    seedEquipmentFullItemsAndRecords();
+    seedEquipmentFullInspectionItemsAndRecords();
     renderDetail(equipmentFull.id);
 
-    const [itemTable] = screen.getAllByRole("table");
-    if (!itemTable) throw new Error("項目テーブルが見つかりません");
-    const [, ...dataRows] = within(itemTable).getAllByRole("row");
+    const [inspectionItemTable] = screen.getAllByRole("table");
+    if (!inspectionItemTable) throw new Error("項目テーブルが見つかりません");
+    const [, ...dataRows] = within(inspectionItemTable).getAllByRole("row");
     const names = dataRows.map((row) => within(row).getAllByRole("cell")[1]?.textContent ?? "");
 
     // 有効: 月次点検(2000-01-01) → 年次校正(2030-01-01) → 外観点検(2099-01-01)、無効: 廃止予定項目が末尾
     expect(names).toEqual(["月次点検", "年次校正", "外観点検", "廃止予定項目"]);
-    expect(getItemRow(/廃止予定項目/u)).toHaveClass("text-slate-400");
-    expect(getItemRow(/月次点検/u)).not.toHaveClass("text-slate-400");
+    expect(getInspectionItemRow(/廃止予定項目/u)).toHaveClass("text-slate-400");
+    expect(getInspectionItemRow(/月次点検/u)).not.toHaveClass("text-slate-400");
   });
 });
 
 describe("EquipmentDetail: 項目ステータス(D-014)", () => {
   it("稼働機器では導出ステータスをバッジ表示する", () => {
     seedEquipmentFullMasters();
-    seedEquipmentFullItemsAndRecords();
+    seedEquipmentFullInspectionItemsAndRecords();
     renderDetail(equipmentFull.id);
 
     // nextDueDate=2000-01-01(過去) → 期限切れ、2030/2099(遠未来・案件なし) → 正常
-    expect(within(getItemRow(/月次点検/u)).getByText("期限切れ")).toBeInTheDocument();
-    expect(within(getItemRow(/年次校正/u)).getByText("正常")).toBeInTheDocument();
-    expect(within(getItemRow(/外観点検/u)).getByText("正常")).toBeInTheDocument();
+    expect(within(getInspectionItemRow(/月次点検/u)).getByText("期限切れ")).toBeInTheDocument();
+    expect(within(getInspectionItemRow(/年次校正/u)).getByText("正常")).toBeInTheDocument();
+    expect(within(getInspectionItemRow(/外観点検/u)).getByText("正常")).toBeInTheDocument();
   });
 
   it("休止機器では期限切れ相当でもステータス欄が「—」になる", () => {
     seedStore({
       equipment: { [equipmentSuspended.id]: equipmentSuspended },
       persons: { [activePerson.id]: activePerson },
-      items: { [itemOfSuspendedEquipment.id]: itemOfSuspendedEquipment },
+      inspectionItems: { [inspectionItemOfSuspendedEquipment.id]: inspectionItemOfSuspendedEquipment },
     });
     renderDetail(equipmentSuspended.id);
 
-    const row = getItemRow(/定期点検/u);
+    const row = getInspectionItemRow(/定期点検/u);
     const [statusCell] = within(row).getAllByRole("cell");
     expect(statusCell).toHaveTextContent("—");
     expect(within(row).queryByText("期限切れ")).not.toBeInTheDocument();
@@ -120,7 +120,7 @@ describe("EquipmentDetail: 記録ボタン", () => {
   // ため期待値を活性へ是正する(テストを弱める改変ではない)。起動結節点の検証は recordLaunch.test.tsx。
   it("各項目行の記録ボタンが活性で表示される", () => {
     seedEquipmentFullMasters();
-    seedEquipmentFullItemsAndRecords();
+    seedEquipmentFullInspectionItemsAndRecords();
     renderDetail(equipmentFull.id);
 
     const recordButtons = screen.getAllByRole("button", { name: "記録" });

@@ -1,6 +1,6 @@
 /**
  * RecordModal.test.tsx で共有するテスト用フィクスチャ。
- * なぜ分割するか: ItemModal.test.tsx と同じ理由（itemModalFixtures.ts 参照）で、
+ * なぜ分割するか: InspectionItemModal.test.tsx と同じ理由（inspectionItemModalFixtures.ts 参照）で、
  * 全ケースを1ファイルに収めると oxlint(max-lines) の300行上限を超過するため切り出す。
  */
 
@@ -8,7 +8,7 @@ import {
   CYCLE,
   EQUIPMENT_STATUS,
   EXECUTION,
-  ITEM_TYPE,
+  INSPECTION_ITEM_TYPE,
   ORDER_STATUS,
   type CalibrationOrder,
   type Equipment,
@@ -26,7 +26,7 @@ export const equipment: Equipment = {
 };
 
 /** 項目の校正依頼先（external プリフィルの検証用） */
-export const itemVendor: Vendor = {
+export const inspectionItemVendor: Vendor = {
   id: "vendor-item",
   name: "ミツトヨ校正センター",
   isManufacturer: false,
@@ -34,7 +34,7 @@ export const itemVendor: Vendor = {
   standardLeadTimeDays: 20,
 };
 
-/** 案件の依頼先（order 経由プリフィルが item 側でなく order 側の業者名になることの検証用） */
+/** 案件の依頼先（order 経由プリフィルが inspectionItem 側でなく order 側の業者名になることの検証用） */
 export const orderVendor: Vendor = {
   id: "vendor-order",
   name: "校正ラボ東京",
@@ -50,15 +50,15 @@ export const person: Person = {
   isActive: true,
 };
 
-/** 外部項目（doneBy プリフィルが item の業者名になる） */
-export const itemExternal: InspectionItem = {
+/** 外部項目（doneBy プリフィルが inspectionItem の業者名になる） */
+export const inspectionItemExternal: InspectionItem = {
   id: "item-external",
   equipmentId: equipment.id,
-  type: ITEM_TYPE.CALIBRATION,
+  type: INSPECTION_ITEM_TYPE.CALIBRATION,
   name: "年次校正",
   cycle: CYCLE.Y1,
   execution: EXECUTION.EXTERNAL,
-  vendorId: itemVendor.id,
+  vendorId: inspectionItemVendor.id,
   leadTimeDays: 20,
   bufferDays: 10,
   personId: person.id,
@@ -68,10 +68,10 @@ export const itemExternal: InspectionItem = {
 };
 
 /** 内部項目（doneBy プリフィルが空欄になる） */
-export const itemInternal: InspectionItem = {
+export const inspectionItemInternal: InspectionItem = {
   id: "item-internal",
   equipmentId: equipment.id,
-  type: ITEM_TYPE.INSPECTION,
+  type: INSPECTION_ITEM_TYPE.INSPECTION,
   name: "月次点検",
   cycle: CYCLE.M1,
   execution: EXECUTION.INTERNAL,
@@ -85,7 +85,7 @@ export const itemInternal: InspectionItem = {
 /** returned 案件（completed へ遷移可能）。order 経由起動の正常系 */
 export const orderReturned: CalibrationOrder = {
   id: "order-returned",
-  itemId: itemExternal.id,
+  inspectionItemId: inspectionItemExternal.id,
   vendorId: orderVendor.id,
   status: ORDER_STATUS.RETURNED,
 };
@@ -93,7 +93,7 @@ export const orderReturned: CalibrationOrder = {
 /** planned 案件（completed へ遷移不可）。addRecord が null を返す異常系の検証用 */
 export const orderPlanned: CalibrationOrder = {
   id: "order-planned",
-  itemId: itemExternal.id,
+  inspectionItemId: inspectionItemExternal.id,
   vendorId: orderVendor.id,
   status: ORDER_STATUS.PLANNED,
 };
@@ -103,13 +103,13 @@ export const seedRecordModalStore = (): void => {
   seedStore({
     equipment: { [equipment.id]: equipment },
     vendors: {
-      [itemVendor.id]: itemVendor,
+      [inspectionItemVendor.id]: inspectionItemVendor,
       [orderVendor.id]: orderVendor,
     },
     persons: { [person.id]: person },
-    items: {
-      [itemExternal.id]: itemExternal,
-      [itemInternal.id]: itemInternal,
+    inspectionItems: {
+      [inspectionItemExternal.id]: inspectionItemExternal,
+      [inspectionItemInternal.id]: inspectionItemInternal,
     },
     orders: {
       [orderReturned.id]: orderReturned,

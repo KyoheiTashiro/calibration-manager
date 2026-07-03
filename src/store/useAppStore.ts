@@ -25,7 +25,7 @@ const partializeAppState = (state: StoreState): AppState => ({
   vendors: state.vendors,
   persons: state.persons,
   equipment: state.equipment,
-  items: state.items,
+  inspectionItems: state.inspectionItems,
   records: state.records,
   orders: state.orders,
   notifications: state.notifications,

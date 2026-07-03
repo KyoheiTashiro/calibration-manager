@@ -230,3 +230,15 @@
 - ステータス: **確定**(2026-07-03)
 - 判断: 利用マニュアル画面を追加。`/manual`、静的コンテンツ・store参照なし、サイドバー最下部(設定の次)に配置。詳細は [screen-design/12-manual.md](./screen-design/12-manual.md) 参照
 - 根拠: アプリの目的・基本操作の流れ・ステータスの見方・期限計算式・各画面の説明・バックアップ方法を1画面に集約し、初見ユーザーのオンボーディングと既存ユーザーの参照先を兼ねる。store を参照しない静的ページとすることで実装・テストを軽量に保ち、既存のドメイン層・状態管理に一切影響を与えない
+
+## D-036: item → inspectionItem 全域リネーム(スキーマ v2)
+
+- ステータス: **確定**(2026-07-03)
+- 判断: 略記「item」を全域で `inspectionItem` 系へリネーム。エンティティ型 `InspectionItem` は従来どおり、周辺の派生命名を統一
+  - 状態キー `items` → `inspectionItems`、FK `itemId` → `inspectionItemId`(InspectionRecord / CalibrationOrder)、`Notification.targetType` の値 `item` → `inspectionItem`
+  - `STORAGE_VERSION` 1→2。`migrateV1ToV2`(persistence.ts)で v1 の LocalStorage データを無損失変換(MIGRATIONS[1] に登録)
+  - `src/features/items/` → `src/features/inspectionItems/`、`components/domain/ItemModal/` → `InspectionItemModal/`、`domain/itemStatus.ts` → `inspectionItemStatus.ts`(`deriveItemStatus` → `deriveInspectionItemStatus`)
+  - ルート `/items` → `/inspection-items`(`ROUTES.INSPECTION_ITEM_LIST`)、screen-design/05-item-list.md → 05-inspection-item-list.md
+  - 例外(リネーム対象外): 汎用 UI の `NavItem` / `NAV_ITEMS`(Sidebar)、`localStorage.setItem/getItem`、本ファイルの過去エントリ(履歴ログのため原文維持)、テストフィクスチャ ID 文字列 `item-1` 等
+- 根拠: 「item」は一般語として抽象的すぎ、ドメイン用語(domain-model.md §2 の InspectionItem)との対応が読み取りにくい。ユビキタス言語をコード全域に貫徹する。永続化データ・URL はマイグレーション/ルート定数経由の一括変更で互換を確保
+- 注意: v1 で CSV エクスポートしたファイル(`items` エンティティ・`itemId` 列)は新バージョンへそのまま再インポート不可(列名不一致でエラー行になる)。必要なら新バージョンで再エクスポートする

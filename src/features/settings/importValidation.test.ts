@@ -28,7 +28,7 @@ const equipment: Equipment = {
   name: "ノギス",
   status: "active",
 };
-const item: InspectionItem = {
+const inspectionItem: InspectionItem = {
   id: "item-1",
   equipmentId: "equipment-1",
   type: "calibration",
@@ -44,7 +44,7 @@ const item: InspectionItem = {
 };
 const order: CalibrationOrder = {
   id: "order-1",
-  itemId: "item-1",
+  inspectionItemId: "item-1",
   vendorId: "vendor-1",
   status: "ordered",
 };
@@ -55,7 +55,7 @@ const stateWithReferences = (): AppState => ({
   vendors: { [vendor.id]: vendor },
   persons: { [person.id]: person },
   equipment: { [equipment.id]: equipment },
-  items: { [item.id]: item },
+  inspectionItems: { [inspectionItem.id]: inspectionItem },
   orders: { [order.id]: order },
 });
 
@@ -103,12 +103,12 @@ describe("validateEntityCsv: 取り込み成功", () => {
     expect(result).toEqual({ validCount: 0, errorRowCount: 0, errors: [], entities: {} });
   });
 
-  it("数値・boolean のセルをフィールド値へ変換する(items)", () => {
+  it("数値・boolean のセルをフィールド値へ変換する(inspectionItems)", () => {
     const csv = joinCsv(
       ITEMS_HEADER,
       "it-1,equipment-1,inspection,月次点検,1M,internal,,,14,person-1,30,2026-06-01,2026-07-01,true",
     );
-    const result = validateEntityCsv("items", csv, stateWithReferences());
+    const result = validateEntityCsv("inspectionItems", csv, stateWithReferences());
     expect(result.errors).toEqual([]);
     expect(result.entities?.["it-1"]).toEqual({
       id: "it-1",
@@ -171,7 +171,7 @@ describe("validateEntityCsv: 行単位エラー", () => {
       ITEMS_HEADER,
       "it-1,equipment-1,inspection,月次点検,1M,internal,,,14,person-1,30,,2026/07/01,true",
     );
-    const result = validateEntityCsv("items", csv, stateWithReferences());
+    const result = validateEntityCsv("inspectionItems", csv, stateWithReferences());
     expect(result.errors).toEqual([
       { line: 2, message: "nextDueDate: YYYY-MM-DD形式の日付ではありません" },
     ]);
@@ -182,7 +182,7 @@ describe("validateEntityCsv: 行単位エラー", () => {
       ITEMS_HEADER,
       "it-1,equipment-1,inspection,月次点検,1M,internal,,,abc,person-1,30,,2026-07-01,true",
     );
-    const result = validateEntityCsv("items", csv, stateWithReferences());
+    const result = validateEntityCsv("inspectionItems", csv, stateWithReferences());
     expect(result.errors).toEqual([{ line: 2, message: "bufferDays: 数値を指定してください" }]);
   });
 
@@ -191,7 +191,7 @@ describe("validateEntityCsv: 行単位エラー", () => {
       ITEMS_HEADER,
       "it-1,equipment-1,inspection,月次点検,1M,internal,,,14,person-1,30,,2026-07-01,yes",
     );
-    const result = validateEntityCsv("items", csv, stateWithReferences());
+    const result = validateEntityCsv("inspectionItems", csv, stateWithReferences());
     expect(result.errors).toEqual([
       { line: 2, message: "isActive: true/false のいずれかを指定してください" },
     ]);
@@ -202,7 +202,7 @@ describe("validateEntityCsv: 行単位エラー", () => {
       ITEMS_HEADER,
       "it-1,equipment-1,calibration,年次校正,1Y,external,,,14,person-1,30,,2026-07-01,true",
     );
-    const result = validateEntityCsv("items", csv, stateWithReferences());
+    const result = validateEntityCsv("inspectionItems", csv, stateWithReferences());
     expect(result.errors).toEqual([
       { line: 2, message: "vendorId: 外部実施の項目には校正依頼先が必要です" },
     ]);
@@ -242,12 +242,12 @@ describe("validateEntityCsv: 参照整合(D-029: 現在ストアと突合)", () 
     ]);
   });
 
-  it("items の equipmentId / personId の参照先不存在を1行で複数報告する", () => {
+  it("inspectionItems の equipmentId / personId の参照先不存在を1行で複数報告する", () => {
     const csv = joinCsv(
       ITEMS_HEADER,
       "it-1,equipment-9,inspection,月次点検,1M,internal,,,14,person-9,30,,2026-07-01,true",
     );
-    const result = validateEntityCsv("items", csv, stateWithReferences());
+    const result = validateEntityCsv("inspectionItems", csv, stateWithReferences());
     expect(result.errors).toEqual([
       { line: 2, message: "equipmentId: 参照先が存在しません 'equipment-9'" },
       { line: 2, message: "personId: 参照先が存在しません 'person-9'" },
@@ -255,12 +255,12 @@ describe("validateEntityCsv: 参照整合(D-029: 現在ストアと突合)", () 
     expect(result.errorRowCount).toBe(1);
   });
 
-  it("notifications は targetType に応じて items / orders と突合する", () => {
-    // targetType=order だが targetId は item の id → orders に存在しないためエラー
+  it("notifications は targetType に応じて inspectionItems / orders と突合する", () => {
+    // targetType=order だが targetId は inspectionItem の id → orders に存在しないためエラー
     const csv = joinCsv(
       NOTIFICATIONS_HEADER,
       "nt-1,dueSoon,order,item-1,person-1,期限接近,2026-07-01,false",
-      "nt-2,dueSoon,item,item-1,person-1,期限接近,2026-07-01,true",
+      "nt-2,dueSoon,inspectionItem,item-1,person-1,期限接近,2026-07-01,true",
     );
     const result = validateEntityCsv("notifications", csv, stateWithReferences());
     expect(result.errors).toEqual([
@@ -271,7 +271,7 @@ describe("validateEntityCsv: 参照整合(D-029: 現在ストアと突合)", () 
 
   it("records の orderId は指定時のみ突合する", () => {
     const csv = joinCsv(
-      "id,itemId,doneDate,doneBy,result,orderId,note",
+      "id,inspectionItemId,doneDate,doneBy,result,orderId,note",
       "rc-1,item-1,2026-07-01,田中,pass,,",
       "rc-2,item-1,2026-07-01,校正社,pass,order-9,",
     );

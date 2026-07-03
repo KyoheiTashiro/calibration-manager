@@ -4,7 +4,7 @@
  * 警告表示のみでブロックしない（decisions.md D-019）ため zod では扱わずコンポーネント側で判定する。
  *
  * なぜフォーム値を string ベースに保つか: HTML input の値は本質的に文字列であり、number への変換は
- * 検証成功後（submit ハンドラ）に限る。ItemModal / schema.ts と同方針。
+ * 検証成功後（submit ハンドラ）に限る。InspectionItemModal / schema.ts と同方針。
  */
 
 import { isIsoDateString } from "@/utils/time";

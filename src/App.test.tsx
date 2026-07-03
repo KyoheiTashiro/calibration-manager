@@ -11,7 +11,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 const buildNotification = (overrides: Partial<Notification> = {}): Notification => ({
   id: "notification-1",
   type: "dueSoon",
-  targetType: "item",
+  targetType: "inspectionItem",
   targetId: "item-1",
   personId: "person-1",
   message: "テスト通知",
@@ -26,7 +26,7 @@ describe("主要ルートのプレースホルダ表示", () => {
   it.each([
     ["/", "ダッシュボード"],
     ["/equipment", "機器一覧"],
-    ["/items", "点検校正項目一覧"],
+    ["/inspection-items", "点検校正項目一覧"],
     ["/notifications", "通知センター"],
     ["/settings", "設定・バックアップ"],
   ])("%s は見出し「%s」を表示する", (path, heading) => {

@@ -44,7 +44,7 @@ export const OrderDialog = ({ order, onClose }: DialogProps): ReactElement => {
     defaultValues: { orderedDate: todayIsoDate(), dueDate: "", cost: "" },
   });
 
-  // なぜ useWatch か: ItemModal と同じ理由（react-compiler lint 対策で watch() を使わない）。
+  // なぜ useWatch か: InspectionItemModal と同じ理由（react-compiler lint 対策で watch() を使わない）。
   const orderedDate = useWatch({ control, name: "orderedDate" });
   const dueDate = useWatch({ control, name: "dueDate" });
 

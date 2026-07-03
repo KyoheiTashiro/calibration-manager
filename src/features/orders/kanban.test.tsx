@@ -25,7 +25,7 @@ const equipment: Equipment = {
   name: "ノギス",
   status: "active",
 };
-const item: InspectionItem = {
+const inspectionItem: InspectionItem = {
   id: "item-1",
   equipmentId: "equipment-1",
   type: "calibration",
@@ -46,8 +46,8 @@ const makeEquipment = (id: string, managementNo: string): Equipment => ({
   name: "機器",
   status: "active",
 });
-const makeItem = (id: string, equipmentId: string): InspectionItem => ({
-  ...item,
+const makeInspectionItem = (id: string, equipmentId: string): InspectionItem => ({
+  ...inspectionItem,
   id,
   equipmentId,
 });
@@ -56,7 +56,7 @@ const baseSeed = (orders: Record<string, CalibrationOrder>): void => {
   seedStore({
     vendors: { [vendor.id]: vendor },
     equipment: { [equipment.id]: equipment },
-    items: { [item.id]: item },
+    inspectionItems: { [inspectionItem.id]: inspectionItem },
     orders,
   });
 };
@@ -68,7 +68,7 @@ describe("カード表示", () => {
     baseSeed({
       "order-1": {
         id: "order-1",
-        itemId: "item-1",
+        inspectionItemId: "item-1",
         vendorId: "vendor-1",
         status: "ordered",
         orderedDate: "2026-06-01",
@@ -86,12 +86,12 @@ describe("カード表示", () => {
     expect(screen.getByText("—")).toBeInTheDocument();
   });
 
-  it("dangling 参照（item/vendor 不在）でも例外を投げず「(参照先なし)」で表示する", () => {
+  it("dangling 参照（inspectionItem/vendor 不在）でも例外を投げず「(参照先なし)」で表示する", () => {
     seedStore({
       orders: {
         "order-1": {
           id: "order-1",
-          itemId: "missing-item",
+          inspectionItemId: "missing-item",
           vendorId: "missing-vendor",
           status: "planned",
         },
@@ -109,7 +109,7 @@ describe("完了/中止も表示 トグル", () => {
   it("既定OFFでは記録登録済/中止の列は出ず、ONで右側に追加される", async () => {
     const user = userEvent.setup();
     baseSeed({
-      "order-c": { id: "order-c", itemId: "item-1", vendorId: "vendor-1", status: "completed" },
+      "order-c": { id: "order-c", inspectionItemId: "item-1", vendorId: "vendor-1", status: "completed" },
     });
     renderWithStore(<OrderList />);
 
@@ -139,7 +139,7 @@ describe("中止フロー", () => {
   it("中止 → 確認 → cancelled になり、トグルOFFでカードが消える", async () => {
     const user = userEvent.setup();
     baseSeed({
-      "order-1": { id: "order-1", itemId: "item-1", vendorId: "vendor-1", status: "planned" },
+      "order-1": { id: "order-1", inspectionItemId: "item-1", vendorId: "vendor-1", status: "planned" },
     });
     renderWithStore(<OrderList />);
 
@@ -166,7 +166,7 @@ describe("空状態", () => {
 
   it("個別列が0件のとき列内に「なし」プレースホルダを出す", () => {
     baseSeed({
-      "order-1": { id: "order-1", itemId: "item-1", vendorId: "vendor-1", status: "planned" },
+      "order-1": { id: "order-1", inspectionItemId: "item-1", vendorId: "vendor-1", status: "planned" },
     });
     renderWithStore(<OrderList />);
 
@@ -176,7 +176,7 @@ describe("空状態", () => {
 
   it("completed のみ1件でトグルOFF（既定）でもEmptyStateにならず進行中4列が「なし」で描画される", () => {
     baseSeed({
-      "order-c": { id: "order-c", itemId: "item-1", vendorId: "vendor-1", status: "completed" },
+      "order-c": { id: "order-c", inspectionItemId: "item-1", vendorId: "vendor-1", status: "completed" },
     });
     renderWithStore(<OrderList />);
 
@@ -198,7 +198,7 @@ describe("発注ダイアログの整合警告（D-019）", () => {
   it("発注日 > 返却予定日 で警告を出すが登録はブロックしない", async () => {
     const user = userEvent.setup();
     baseSeed({
-      "order-1": { id: "order-1", itemId: "item-1", vendorId: "vendor-1", status: "planned" },
+      "order-1": { id: "order-1", inspectionItemId: "item-1", vendorId: "vendor-1", status: "planned" },
     });
     renderWithStore(<OrderList />);
 
@@ -227,29 +227,29 @@ describe("列内ソート", () => {
         "eq-b": makeEquipment("eq-b", "EQ-B"),
         "eq-c": makeEquipment("eq-c", "EQ-C"),
       },
-      items: {
-        "item-a": makeItem("item-a", "eq-a"),
-        "item-b": makeItem("item-b", "eq-b"),
-        "item-c": makeItem("item-c", "eq-c"),
+      inspectionItems: {
+        "item-a": makeInspectionItem("item-a", "eq-a"),
+        "item-b": makeInspectionItem("item-b", "eq-b"),
+        "item-c": makeInspectionItem("item-c", "eq-c"),
       },
       orders: {
         "order-a": {
           id: "order-a",
-          itemId: "item-a",
+          inspectionItemId: "item-a",
           vendorId: "vendor-1",
           status: "planned",
           dueDate: "2026-08-01",
         },
         "order-b": {
           id: "order-b",
-          itemId: "item-b",
+          inspectionItemId: "item-b",
           vendorId: "vendor-1",
           status: "planned",
           dueDate: "2026-06-01",
         },
         "order-c": {
           id: "order-c",
-          itemId: "item-c",
+          inspectionItemId: "item-c",
           vendorId: "vendor-1",
           status: "planned",
         },

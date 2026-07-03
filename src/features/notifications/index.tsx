@@ -29,7 +29,7 @@ import { useNavigate } from "react-router-dom";
 export const NotificationCenter = (): ReactElement => {
   const navigate = useNavigate();
   const notifications = useAppStore((state) => state.notifications);
-  const items = useAppStore((state) => state.items);
+  const inspectionItems = useAppStore((state) => state.inspectionItems);
   const markAsRead = useAppStore((state) => state.markAsRead);
   const markAllAsRead = useAppStore((state) => state.markAllAsRead);
   const unreadCount = useAppStore((state) => unreadNotificationCount(state));
@@ -38,10 +38,10 @@ export const NotificationCenter = (): ReactElement => {
 
   const rows = selectTabNotifications(Object.values(notifications), activeTab);
 
-  // 行クリック（D-027）: まず既読化、次に遷移先が解決できれば遷移。dangling item は既読化のみ。
+  // 行クリック（D-027）: まず既読化、次に遷移先が解決できれば遷移。dangling inspectionItem は既読化のみ。
   const handleRowClick = (notification: Notification): void => {
     markAsRead(notification.id);
-    const target = resolveNotificationTarget(notification, items);
+    const target = resolveNotificationTarget(notification, inspectionItems);
     if (target !== null) {
       navigate(target);
     }

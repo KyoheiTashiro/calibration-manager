@@ -1,6 +1,6 @@
 /**
  * 外部校正案件かんばんのカード（screen-design/08-orders.md）。
- * item→equipment→managementNo/機器名、item.name、vendor→依頼先名を解決して表示する。
+ * inspectionItem→equipment→managementNo/機器名、inspectionItem.name、vendor→依頼先名を解決して表示する。
  * 参照先エンティティが消えている（dangling）場合は例外を投げず「(参照先なし)」表示（decisions.md D-003）。
  * completed / cancelled はグレー調でアクションボタンなし（D-018）。
  */
@@ -22,7 +22,7 @@ const UNSET_LABEL = "—";
 
 type OrderCardProps = {
   order: CalibrationOrder;
-  items: Record<string, InspectionItem>;
+  inspectionItems: Record<string, InspectionItem>;
   equipment: Record<string, Equipment>;
   vendors: Record<string, Vendor>;
   onOrder: (order: CalibrationOrder) => void;
@@ -34,7 +34,7 @@ type OrderCardProps = {
 
 export const OrderCard = ({
   order,
-  items,
+  inspectionItems,
   equipment,
   vendors,
   onOrder,
@@ -43,13 +43,13 @@ export const OrderCard = ({
   onCancel,
   onRecord,
 }: OrderCardProps): ReactElement => {
-  const item = items[order.itemId];
-  const equipmentEntry = item ? equipment[item.equipmentId] : undefined;
+  const inspectionItem = inspectionItems[order.inspectionItemId];
+  const equipmentEntry = inspectionItem ? equipment[inspectionItem.equipmentId] : undefined;
   const vendor = vendors[order.vendorId];
 
   const managementNo = equipmentEntry?.managementNo ?? NO_REFERENCE_LABEL;
   const equipmentName = equipmentEntry?.name ?? NO_REFERENCE_LABEL;
-  const itemName = item?.name ?? NO_REFERENCE_LABEL;
+  const inspectionItemName = inspectionItem?.name ?? NO_REFERENCE_LABEL;
   const vendorName = vendor?.name ?? NO_REFERENCE_LABEL;
 
   const isClosed =
@@ -115,7 +115,7 @@ export const OrderCard = ({
     >
       <p className="font-semibold">{managementNo}</p>
       <p>{equipmentName}</p>
-      <p className="text-slate-600">{itemName}</p>
+      <p className="text-slate-600">{inspectionItemName}</p>
       <dl className="mt-2 flex flex-col gap-0.5 text-xs text-slate-600">
         <div>
           <dt className="inline text-slate-500">依頼先: </dt>

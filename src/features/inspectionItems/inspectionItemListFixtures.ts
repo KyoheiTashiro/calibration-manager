@@ -1,8 +1,8 @@
 /**
- * 項目一覧(screen-design/05-item-list.md)UIテストの共有フィクスチャ。
+ * 項目一覧(screen-design/05-inspection-item-list.md)UIテストの共有フィクスチャ。
  * filters.test.tsx / table.test.tsx / modalLaunch.test.tsx で使い回す。
  *
- * ステータスは ItemList 内の todayIsoDate()(実クロック)で導出されるため、
+ * ステータスは InspectionItemList 内の todayIsoDate()(実クロック)で導出されるため、
  * nextDueDate を far past(2000)/far future(2098-2099)に振り、実行日に依らず
  * overdue / inProgress / ok が決定的になるよう設計する(equipment/detail の流儀に倣う)。
  */
@@ -11,7 +11,7 @@ import {
   CYCLE,
   EQUIPMENT_STATUS,
   EXECUTION,
-  ITEM_TYPE,
+  INSPECTION_ITEM_TYPE,
   ORDER_STATUS,
   type CalibrationOrder,
   type Equipment,
@@ -59,10 +59,10 @@ export const personSato: Person = { id: "p-sato", name: "佐藤", email: "s@x.jp
 export const personSuzuki: Person = { id: "p-suzuki", name: "鈴木", email: "z@x.jp", isActive: false }; // prettier-ignore
 
 /** 外部・校正・期限切れ。有効案件なし → canCreateOrder=true・overdue。lastDoneDate あり */
-export const itemExternalOverdue: InspectionItem = {
+export const inspectionItemExternalOverdue: InspectionItem = {
   id: "item-ext-overdue",
   equipmentId: eqA.id,
-  type: ITEM_TYPE.CALIBRATION,
+  type: INSPECTION_ITEM_TYPE.CALIBRATION,
   name: "年次校正",
   cycle: CYCLE.Y1,
   execution: EXECUTION.EXTERNAL,
@@ -77,10 +77,10 @@ export const itemExternalOverdue: InspectionItem = {
 };
 
 /** 外部・校正・進行中案件あり → canCreateOrder=false・inProgress。far future で overdue にしない */
-export const itemExternalInProgress: InspectionItem = {
+export const inspectionItemExternalInProgress: InspectionItem = {
   id: "item-ext-inprogress",
   equipmentId: eqA.id,
-  type: ITEM_TYPE.CALIBRATION,
+  type: INSPECTION_ITEM_TYPE.CALIBRATION,
   name: "半期校正",
   cycle: CYCLE.M6,
   execution: EXECUTION.EXTERNAL,
@@ -95,10 +95,10 @@ export const itemExternalInProgress: InspectionItem = {
 };
 
 /** 内部・点検・far future(ok)。lastDoneDate 未設定・発注推奨日なし → 「—」表示2箇所 */
-export const itemInternalOk: InspectionItem = {
+export const inspectionItemInternalOk: InspectionItem = {
   id: "item-int-ok",
   equipmentId: eqB.id,
-  type: ITEM_TYPE.INSPECTION,
+  type: INSPECTION_ITEM_TYPE.INSPECTION,
   name: "月次点検",
   cycle: CYCLE.M1,
   execution: EXECUTION.INTERNAL,
@@ -110,10 +110,10 @@ export const itemInternalOk: InspectionItem = {
 };
 
 /** isActive=false → 表示対象外 */
-export const itemInactive: InspectionItem = {
+export const inspectionItemInactive: InspectionItem = {
   id: "item-inactive",
   equipmentId: eqA.id,
-  type: ITEM_TYPE.INSPECTION,
+  type: INSPECTION_ITEM_TYPE.INSPECTION,
   name: "廃止項目",
   cycle: CYCLE.Y1,
   execution: EXECUTION.INTERNAL,
@@ -125,10 +125,10 @@ export const itemInactive: InspectionItem = {
 };
 
 /** 休止機器配下の有効項目 → 表示対象外 */
-export const itemOnSuspended: InspectionItem = {
+export const inspectionItemOnSuspended: InspectionItem = {
   id: "item-on-susp",
   equipmentId: eqSuspended.id,
-  type: ITEM_TYPE.INSPECTION,
+  type: INSPECTION_ITEM_TYPE.INSPECTION,
   name: "休止機器点検",
   cycle: CYCLE.M6,
   execution: EXECUTION.INTERNAL,
@@ -139,10 +139,10 @@ export const itemOnSuspended: InspectionItem = {
   isActive: true,
 };
 
-/** itemExternalInProgress を inProgress にする進行中(ordered)案件 */
+/** inspectionItemExternalInProgress を inProgress にする進行中(ordered)案件 */
 export const orderInProgress: CalibrationOrder = {
   id: "order-1",
-  itemId: itemExternalInProgress.id,
+  inspectionItemId: inspectionItemExternalInProgress.id,
   vendorId: calibratorVendor.id,
   status: ORDER_STATUS.ORDERED,
   orderedDate: "2025-12-01",
@@ -150,9 +150,9 @@ export const orderInProgress: CalibrationOrder = {
 
 /**
  * 全フィクスチャをストアへ投入する。表示対象は3行:
- * itemExternalOverdue(2000) < itemExternalInProgress(2098) < itemInternalOk(2099) の nextDueDate 昇順。
+ * inspectionItemExternalOverdue(2000) < inspectionItemExternalInProgress(2098) < inspectionItemInternalOk(2099) の nextDueDate 昇順。
  */
-export const seedItemList = (): void => {
+export const seedInspectionItemList = (): void => {
   seedStore({
     equipment: { [eqA.id]: eqA, [eqB.id]: eqB, [eqSuspended.id]: eqSuspended },
     vendors: { [calibratorVendor.id]: calibratorVendor },
@@ -161,12 +161,12 @@ export const seedItemList = (): void => {
       [personSato.id]: personSato,
       [personSuzuki.id]: personSuzuki,
     },
-    items: {
-      [itemExternalOverdue.id]: itemExternalOverdue,
-      [itemExternalInProgress.id]: itemExternalInProgress,
-      [itemInternalOk.id]: itemInternalOk,
-      [itemInactive.id]: itemInactive,
-      [itemOnSuspended.id]: itemOnSuspended,
+    inspectionItems: {
+      [inspectionItemExternalOverdue.id]: inspectionItemExternalOverdue,
+      [inspectionItemExternalInProgress.id]: inspectionItemExternalInProgress,
+      [inspectionItemInternalOk.id]: inspectionItemInternalOk,
+      [inspectionItemInactive.id]: inspectionItemInactive,
+      [inspectionItemOnSuspended.id]: inspectionItemOnSuspended,
     },
     orders: { [orderInProgress.id]: orderInProgress },
   });

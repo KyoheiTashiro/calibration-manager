@@ -1,24 +1,24 @@
 /**
- * 点検校正項目一覧画面(screen-design/05-item-list.md、中核画面)。
+ * 点検校正項目一覧画面(screen-design/05-inspection-item-list.md、中核画面)。
  * 全機器の有効項目を期限順で俯瞰し、フィルタと行アクション(記録/案件/編集)で運用を回す。
  *
- * - フィルタの真実源はURLクエリ(D-022)。useSearchParams で読み、parseItemListFilters で解釈する。
+ * - フィルタの真実源はURLクエリ(D-022)。useSearchParams で読み、parseInspectionItemListFilters で解釈する。
  *   ローカル state に二重管理しない。変更・クリアは setSearchParams(replace) で反映する。
  * - 行導出・並び・フィルタ適用は hooks.ts の純関数に委譲し、本コンポーネントは薄いビューに保つ。
  * - モーダル起動は単一 state で kind を持ち、1度に開くのは1つ。閉じたら state をリセットする。
  */
 
-import { ItemModal, OrderModal, RecordModal } from "@/components/domain";
+import { InspectionItemModal, OrderModal, RecordModal } from "@/components/domain";
 import { Button, EmptyState } from "@/components/ui";
-import { FilterBar } from "@/features/items/FilterBar";
+import { FilterBar } from "@/features/inspectionItems/FilterBar";
 import {
   FILTER_ALL,
-  filterItemRows,
-  parseItemListFilters,
-  type ItemListFilters,
-} from "@/features/items/hooks";
-import { ItemTable } from "@/features/items/ItemTable";
-import { itemRowsOf, type ItemRow } from "@/store/selectors";
+  filterInspectionItemRows,
+  parseInspectionItemListFilters,
+  type InspectionItemListFilters,
+} from "@/features/inspectionItems/hooks";
+import { InspectionItemTable } from "@/features/inspectionItems/InspectionItemTable";
+import { inspectionItemRowsOf, type InspectionItemRow } from "@/store/selectors";
 import { useAppStore } from "@/store/useAppStore";
 import { todayIsoDate } from "@/utils/time";
 import { useMemo, useState, type ReactElement } from "react";
@@ -31,11 +31,11 @@ const MODAL_KIND = {
   EDIT: "edit",
 } as const;
 type ModalKind = (typeof MODAL_KIND)[keyof typeof MODAL_KIND];
-type ModalState = { kind: ModalKind; row: ItemRow };
+type ModalState = { kind: ModalKind; row: InspectionItemRow };
 
-export const ItemList = (): ReactElement => {
+export const InspectionItemList = (): ReactElement => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const items = useAppStore((state) => state.items);
+  const inspectionItems = useAppStore((state) => state.inspectionItems);
   const equipment = useAppStore((state) => state.equipment);
   const orders = useAppStore((state) => state.orders);
   const vendors = useAppStore((state) => state.vendors);
@@ -43,16 +43,16 @@ export const ItemList = (): ReactElement => {
 
   const [modal, setModal] = useState<ModalState | null>(null);
 
-  const filters = parseItemListFilters(searchParams, persons);
+  const filters = parseInspectionItemListFilters(searchParams, persons);
 
   const rows = useMemo(
-    () => itemRowsOf({ items, equipment, orders, vendors, persons }, todayIsoDate()),
-    [items, equipment, orders, vendors, persons],
+    () => inspectionItemRowsOf({ inspectionItems, equipment, orders, vendors, persons }, todayIsoDate()),
+    [inspectionItems, equipment, orders, vendors, persons],
   );
-  const filteredRows = filterItemRows(rows, filters);
+  const filteredRows = filterInspectionItemRows(rows, filters);
 
   // 変更: 値が「全て」なら該当パラメータを除去、それ以外は set。未知パラメータは維持(D-022)
-  const handleFilterChange = (key: keyof ItemListFilters, value: string): void => {
+  const handleFilterChange = (key: keyof InspectionItemListFilters, value: string): void => {
     const next = new URLSearchParams(searchParams);
     if (value === FILTER_ALL) {
       next.delete(key);
@@ -90,7 +90,7 @@ export const ItemList = (): ReactElement => {
               action={<Button onClick={handleClear}>クリア</Button>}
             />
           ) : (
-            <ItemTable
+            <InspectionItemTable
               rows={filteredRows}
               onRecord={(row) => setModal({ kind: MODAL_KIND.RECORD, row })}
               onOrder={(row) => setModal({ kind: MODAL_KIND.ORDER, row })}
@@ -101,16 +101,16 @@ export const ItemList = (): ReactElement => {
       )}
 
       {modal?.kind === MODAL_KIND.RECORD ? (
-        <RecordModal open itemId={modal.row.item.id} onClose={closeModal} />
+        <RecordModal open inspectionItemId={modal.row.inspectionItem.id} onClose={closeModal} />
       ) : null}
       {modal?.kind === MODAL_KIND.ORDER ? (
-        <OrderModal open itemId={modal.row.item.id} onClose={closeModal} />
+        <OrderModal open inspectionItemId={modal.row.inspectionItem.id} onClose={closeModal} />
       ) : null}
       {modal?.kind === MODAL_KIND.EDIT ? (
-        <ItemModal
+        <InspectionItemModal
           open
-          equipmentId={modal.row.item.equipmentId}
-          item={modal.row.item}
+          equipmentId={modal.row.inspectionItem.equipmentId}
+          inspectionItem={modal.row.inspectionItem}
           onClose={closeModal}
         />
       ) : null}

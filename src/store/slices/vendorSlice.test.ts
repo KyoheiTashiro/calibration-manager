@@ -14,7 +14,7 @@ const equipment: Equipment = {
   name: "ノギス",
   status: "active",
 };
-const item: InspectionItem = {
+const inspectionItem: InspectionItem = {
   id: "item-1",
   equipmentId: "equipment-1",
   type: "calibration",
@@ -30,7 +30,7 @@ const item: InspectionItem = {
 };
 const order: CalibrationOrder = {
   id: "order-1",
-  itemId: "item-1",
+  inspectionItemId: "item-1",
   vendorId: "vendor-1",
   status: "returned",
 };
@@ -77,7 +77,7 @@ describe("removeVendor: 参照ガード", () => {
   });
 
   it("InspectionItem.vendorId から参照中は no-op（false）", () => {
-    seedStore({ vendors: { [vendor.id]: vendor }, items: { [item.id]: item } });
+    seedStore({ vendors: { [vendor.id]: vendor }, inspectionItems: { [inspectionItem.id]: inspectionItem } });
     expect(useAppStore.getState().removeVendor(vendor.id)).toBe(false);
   });
 

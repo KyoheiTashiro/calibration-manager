@@ -8,7 +8,7 @@
  */
 
 import { buildSeedEquipment, buildSeedPersons, buildSeedVendors } from "@/dev/seedMasterData";
-import { buildSeedItems, buildSeedOrders, buildSeedRecords } from "@/dev/seedTransactionData";
+import { buildSeedInspectionItems, buildSeedOrders, buildSeedRecords } from "@/dev/seedTransactionData";
 import type { AppState, IsoDateString } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
 import { todayIsoDate } from "@/utils/time";
@@ -17,7 +17,7 @@ export const buildSeedState = (today: IsoDateString): AppState => ({
   vendors: buildSeedVendors(),
   persons: buildSeedPersons(),
   equipment: buildSeedEquipment(),
-  items: buildSeedItems(today),
+  inspectionItems: buildSeedInspectionItems(today),
   records: buildSeedRecords(today),
   orders: buildSeedOrders(today),
   // なぜ空オブジェクトか: notifications は useNotificationScan（D-025）が起動時に
@@ -35,7 +35,7 @@ export const seedIfEmpty = (): boolean => {
     state.vendors,
     state.persons,
     state.equipment,
-    state.items,
+    state.inspectionItems,
     state.records,
     state.orders,
     state.notifications,

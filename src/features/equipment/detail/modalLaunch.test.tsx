@@ -1,8 +1,8 @@
 /**
- * EquipmentDetail: 項目編集モーダル(ItemModal)の起動結節点の検証
+ * EquipmentDetail: 項目編集モーダル(InspectionItemModal)の起動結節点の検証
  * (screen-design/04-equipment-detail.md「操作・アクション」)。
  * 「+ 項目を追加」=新規モード(equipmentIdプリセット)、行「編集」=編集モード(プリフィル)。
- * モーダル自体の入力・検証は ItemModal.test.tsx / ItemModal.edit.test.tsx の責務。
+ * モーダル自体の入力・検証は InspectionItemModal.test.tsx / InspectionItemModal.edit.test.tsx の責務。
  * ファイル分割の理由は index.test.tsx 参照。
  */
 
@@ -10,8 +10,8 @@ import { ROUTES, equipmentDetailPath } from "@/constants/routes";
 import { EquipmentDetail } from "@/features/equipment/detail";
 import {
   equipmentFull,
-  itemExternal,
-  seedEquipmentFullItemsAndRecords,
+  inspectionItemExternal,
+  seedEquipmentFullInspectionItemsAndRecords,
   seedEquipmentFullMasters,
 } from "@/features/equipment/detail/detailFixtures";
 import { renderWithStore, setupStoreIsolation } from "@/test/renderWithStore";
@@ -42,19 +42,19 @@ const getOpenDialog = (title: string): HTMLElement => {
  * 項目テーブル(1つ目のtable)の行を取得する。項目名は実施履歴テーブルの行にも
  * 出現するため、screen 全体ではなく項目テーブル内にスコープして曖昧マッチを避ける。
  */
-const getItemRow = (name: RegExp): HTMLElement => {
-  const [itemTable] = screen.getAllByRole("table");
-  if (!itemTable) throw new Error("項目テーブルが見つかりません");
-  return within(itemTable).getByRole("row", { name });
+const getInspectionItemRow = (name: RegExp): HTMLElement => {
+  const [inspectionItemTable] = screen.getAllByRole("table");
+  if (!inspectionItemTable) throw new Error("項目テーブルが見つかりません");
+  return within(inspectionItemTable).getByRole("row", { name });
 };
 
 beforeEach(() => {
   setupStoreIsolation();
   seedEquipmentFullMasters();
-  seedEquipmentFullItemsAndRecords();
+  seedEquipmentFullInspectionItemsAndRecords();
 });
 
-describe("EquipmentDetail: ItemModal起動", () => {
+describe("EquipmentDetail: InspectionItemModal起動", () => {
   // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("「+ 項目を追加」で新規モードのモーダルが開き、対象機器がプリセットされる", async () => {
     const user = userEvent.setup();
@@ -72,11 +72,11 @@ describe("EquipmentDetail: ItemModal起動", () => {
     const user = userEvent.setup();
     renderDetail();
 
-    await user.click(within(getItemRow(/年次校正/u)).getByRole("button", { name: "編集" }));
+    await user.click(within(getInspectionItemRow(/年次校正/u)).getByRole("button", { name: "編集" }));
 
     const dialogElement = getOpenDialog("点検校正項目を編集");
     expect(within(dialogElement).getByLabelText("項目名", { exact: false })).toHaveValue(
-      itemExternal.name,
+      inspectionItemExternal.name,
     );
     expect(within(dialogElement).getByLabelText("外部")).toBeChecked();
   });
@@ -86,7 +86,7 @@ describe("EquipmentDetail: ItemModal起動", () => {
     const user = userEvent.setup();
     renderDetail();
 
-    await user.click(within(getItemRow(/年次校正/u)).getByRole("button", { name: "編集" }));
+    await user.click(within(getInspectionItemRow(/年次校正/u)).getByRole("button", { name: "編集" }));
     await user.click(screen.getByRole("button", { name: "閉じる" }));
     await user.click(screen.getByRole("button", { name: "+ 項目を追加" }));
 

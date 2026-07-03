@@ -39,7 +39,7 @@
 
 ## 操作・アクション
 
-- サマリーカードクリック → `/items?status=<overdue|orderNow|dueSoon|inProgress>` へ遷移(該当ステータスでプリフィルタ)。
+- サマリーカードクリック → `/inspection-items?status=<overdue|orderNow|dueSoon|inProgress>` へ遷移(該当ステータスでプリフィルタ)。
 - 要対応項目リストの行クリック → 該当機器の詳細 `/equipment/:id`(または項目一覧の該当行)へ遷移。
 - 「通知センターへ」→ `/notifications`。
 

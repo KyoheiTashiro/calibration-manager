@@ -33,7 +33,7 @@ const buildDefaultValues = (person?: Person): PersonFormValues => ({
 /** 無効化確認待ちの状態。確定時に使う保存値と、警告文に埋め込む割り当て件数を保持する */
 type PendingDeactivation = {
   values: PersonFormValues;
-  assignedItemCount: number;
+  assignedInspectionItemCount: number;
 };
 
 export const PersonModal = ({ open, person, onClose }: PersonModalProps): ReactElement => {
@@ -73,10 +73,10 @@ export const PersonModal = ({ open, person, onClose }: PersonModalProps): ReactE
   // 避けるため（coding-standards.md §5「1値1呼び出しで分割購読」の趣旨に沿ったスナップショット取得）。
   const onValid = (values: PersonFormValues): void => {
     if (person && person.isActive && !values.isActive) {
-      const assignedItemCount = Object.values(useAppStore.getState().items).filter(
-        (item) => item.personId === person.id && item.isActive,
+      const assignedInspectionItemCount = Object.values(useAppStore.getState().inspectionItems).filter(
+        (inspectionItem) => inspectionItem.personId === person.id && inspectionItem.isActive,
       ).length;
-      setPendingDeactivation({ values, assignedItemCount });
+      setPendingDeactivation({ values, assignedInspectionItemCount });
       return;
     }
     savePerson(values);
@@ -93,8 +93,8 @@ export const PersonModal = ({ open, person, onClose }: PersonModalProps): ReactE
   };
 
   const confirmMessage =
-    pendingDeactivation && pendingDeactivation.assignedItemCount > 0
-      ? `この担当者は現役の点検校正項目 ${pendingDeactivation.assignedItemCount} 件に割り当てられています。通知が届かなくなる可能性があります。無効化しますか?`
+    pendingDeactivation && pendingDeactivation.assignedInspectionItemCount > 0
+      ? `この担当者は現役の点検校正項目 ${pendingDeactivation.assignedInspectionItemCount} 件に割り当てられています。通知が届かなくなる可能性があります。無効化しますか?`
       : "この担当者を無効化しますか?";
 
   return (

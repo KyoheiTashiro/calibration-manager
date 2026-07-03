@@ -1,5 +1,5 @@
 import { PersonModal } from "@/components/domain/PersonModal";
-import { CYCLE, EXECUTION, ITEM_TYPE, type InspectionItem, type Person } from "@/store/types";
+import { CYCLE, EXECUTION, INSPECTION_ITEM_TYPE, type InspectionItem, type Person } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
 import { renderWithStore, seedStore, setupStoreIsolation } from "@/test/renderWithStore";
 import { screen } from "@testing-library/react";
@@ -19,7 +19,7 @@ const buildPerson = (overrides: Partial<Person> = {}): Person => ({
 const buildInspectionItem = (overrides: Partial<InspectionItem> = {}): InspectionItem => ({
   id: "item-1",
   equipmentId: "equipment-1",
-  type: ITEM_TYPE.INSPECTION,
+  type: INSPECTION_ITEM_TYPE.INSPECTION,
   name: "定期点検",
   cycle: CYCLE.M6,
   execution: EXECUTION.INTERNAL,
@@ -40,7 +40,7 @@ describe("PersonModal", () => {
     const person = buildPerson({ id: "person-1", isActive: true });
     seedStore({
       persons: { "person-1": person },
-      items: { "item-1": buildInspectionItem({ personId: "person-1", isActive: true }) },
+      inspectionItems: { "item-1": buildInspectionItem({ personId: "person-1", isActive: true }) },
     });
     const onClose = vi.fn();
 
@@ -67,7 +67,7 @@ describe("PersonModal", () => {
     const person = buildPerson({ id: "person-1", isActive: true });
     seedStore({
       persons: { "person-1": person },
-      items: {},
+      inspectionItems: {},
     });
     const onClose = vi.fn();
 
@@ -89,7 +89,7 @@ describe("PersonModal", () => {
     const person = buildPerson({ id: "person-1", isActive: true });
     seedStore({
       persons: { "person-1": person },
-      items: {},
+      inspectionItems: {},
     });
     const onClose = vi.fn();
 

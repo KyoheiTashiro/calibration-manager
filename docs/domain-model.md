@@ -107,14 +107,14 @@ erDiagram
 | 属性     | 型            | 必須 | 説明                                                     |
 | -------- | ------------- | ---- | -------------------------------------------------------- |
 | id       | string (uuid) | ○    |                                                          |
-| itemId   | string        | ○    | InspectionItem参照                                       |
+| inspectionItemId   | string        | ○    | InspectionItem参照                                       |
 | doneDate | date          | ○    | 実施日                                                   |
 | doneBy   | string        | ○    | 実施者名(外部の場合は業者名)                             |
 | result   | enum          | ○    | `pass`(合格) / `fail`(不合格) / `adjusted`(調整の上合格) |
 | orderId  | string        |      | 外部校正の場合、元になったCalibrationOrder参照           |
 | note     | string        |      | 備考(校正証明書番号など)                                 |
 
-- 記録登録時に `item.lastDoneDate = doneDate`、`item.nextDueDate = doneDate + cycle` を自動更新。
+- 記録登録時に `inspectionItem.lastDoneDate = doneDate`、`inspectionItem.nextDueDate = doneDate + cycle` を自動更新。
 - `fail` の場合は次回期限を更新せず、要対応状態として扱う。
 
 ### 3.6 CalibrationOrder(外部校正案件)
@@ -124,7 +124,7 @@ erDiagram
 | 属性         | 型            | 必須 | 説明                           |
 | ------------ | ------------- | ---- | ------------------------------ |
 | id           | string (uuid) | ○    |                                |
-| itemId       | string        | ○    | InspectionItem参照             |
+| inspectionItemId       | string        | ○    | InspectionItem参照             |
 | vendorId     | string        | ○    | 依頼先                         |
 | status       | enum          | ○    | 下記の状態遷移参照             |
 | orderedDate  | date          |      | 発注日                         |
@@ -151,7 +151,7 @@ planned(発注準備) → ordered(発注済) → inCalibration(校正中) → re
 | ----------- | ------------- | ---- | ------------------ |
 | id          | string (uuid) | ○    |                    |
 | type        | enum          | ○    | 下記の通知種別参照 |
-| targetType  | enum          | ○    | `item` / `order`   |
+| targetType  | enum          | ○    | `inspectionItem` / `order`   |
 | targetId    | string        | ○    | 対象のID           |
 | personId    | string        | ○    | 宛先担当者         |
 | message     | string        | ○    | 通知文             |
@@ -184,7 +184,7 @@ nextDueDate = lastDoneDate + cycle
 ### 4.2 発注推奨日(外部のみ)
 
 ```
-leadTime = item.leadTimeDays ?? vendor.standardLeadTimeDays
+leadTime = inspectionItem.leadTimeDays ?? vendor.standardLeadTimeDays
 発注推奨日 = nextDueDate − leadTime − bufferDays
 ```
 

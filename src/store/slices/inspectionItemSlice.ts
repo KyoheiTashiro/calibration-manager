@@ -8,37 +8,37 @@ import type { InspectionItem } from "@/store/types";
 import { createId } from "@/utils/id";
 
 export type InspectionItemSlice = {
-  items: Record<string, InspectionItem>;
+  inspectionItems: Record<string, InspectionItem>;
   /** @returns 生成したInspectionItemのid */
-  addItem: (input: Omit<InspectionItem, "id">) => string;
-  updateItem: (id: string, patch: Partial<Omit<InspectionItem, "id">>) => void;
-  setItemActive: (id: string, isActive: boolean) => void;
+  addInspectionItem: (input: Omit<InspectionItem, "id">) => string;
+  updateInspectionItem: (id: string, patch: Partial<Omit<InspectionItem, "id">>) => void;
+  setInspectionItemActive: (id: string, isActive: boolean) => void;
 };
 
 export const createInspectionItemSlice: AppSliceCreator<InspectionItemSlice> = (set) => ({
-  items: {},
+  inspectionItems: {},
 
-  addItem: (input): string => {
+  addInspectionItem: (input): string => {
     const id = createId();
     set((state) => {
-      state.items[id] = { ...input, id };
+      state.inspectionItems[id] = { ...input, id };
     });
     return id;
   },
 
-  updateItem: (id, patch): void => {
+  updateInspectionItem: (id, patch): void => {
     set((state) => {
-      const item = state.items[id];
-      if (!item) return;
-      Object.assign(item, patch);
+      const inspectionItem = state.inspectionItems[id];
+      if (!inspectionItem) return;
+      Object.assign(inspectionItem, patch);
     });
   },
 
-  setItemActive: (id, isActive): void => {
+  setInspectionItemActive: (id, isActive): void => {
     set((state) => {
-      const item = state.items[id];
-      if (!item) return;
-      item.isActive = isActive;
+      const inspectionItem = state.inspectionItems[id];
+      if (!inspectionItem) return;
+      inspectionItem.isActive = isActive;
     });
   },
 });

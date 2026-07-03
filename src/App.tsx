@@ -5,7 +5,7 @@ import { Dashboard } from "@/features/dashboard";
 import { EquipmentDetail } from "@/features/equipment/detail";
 import { EquipmentForm } from "@/features/equipment/form";
 import { EquipmentList } from "@/features/equipment/list";
-import { ItemList } from "@/features/items";
+import { InspectionItemList } from "@/features/inspectionItems";
 import { Manual } from "@/features/manual";
 import { NotificationCenter } from "@/features/notifications";
 import { useNotificationScan } from "@/features/notifications/useNotificationScan";
@@ -36,7 +36,7 @@ function App(): ReactElement {
         <Route path={ROUTES.EQUIPMENT_NEW} element={<EquipmentForm />} />
         <Route path={ROUTES.EQUIPMENT_DETAIL} element={<EquipmentDetail />} />
         <Route path={ROUTES.EQUIPMENT_EDIT} element={<EquipmentForm />} />
-        <Route path={ROUTES.ITEM_LIST} element={<ItemList />} />
+        <Route path={ROUTES.INSPECTION_ITEM_LIST} element={<InspectionItemList />} />
         <Route path={ROUTES.ORDER_LIST} element={<OrderList />} />
         <Route path={ROUTES.VENDOR_LIST} element={<VendorList />} />
         <Route path={ROUTES.PERSON_LIST} element={<PersonList />} />

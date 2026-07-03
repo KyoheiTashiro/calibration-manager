@@ -11,7 +11,7 @@ import {
   CYCLE,
   EQUIPMENT_STATUS,
   EXECUTION,
-  ITEM_TYPE,
+  INSPECTION_ITEM_TYPE,
   NOTIFICATION_TARGET_TYPE,
   NOTIFICATION_TYPE,
   type Equipment,
@@ -28,7 +28,7 @@ import { Route, Routes, useParams, useSearchParams } from "react-router-dom";
 import { beforeEach, describe, expect, it } from "vitest";
 
 /** 遷移先確認用ダミー: 項目一覧(status クエリを表示) */
-const DummyItemList = (): ReactElement => {
+const DummyInspectionItemList = (): ReactElement => {
   const [params] = useSearchParams();
   return <p>項目一覧:{params.get("status")}</p>;
 };
@@ -44,7 +44,7 @@ const renderDashboardWithRoutes = (): void => {
   renderWithStore(
     <Routes>
       <Route path={ROUTES.DASHBOARD} element={<Dashboard />} />
-      <Route path={ROUTES.ITEM_LIST} element={<DummyItemList />} />
+      <Route path={ROUTES.INSPECTION_ITEM_LIST} element={<DummyInspectionItemList />} />
       <Route path={ROUTES.EQUIPMENT_DETAIL} element={<DummyEquipmentDetail />} />
       <Route path={ROUTES.NOTIFICATION_LIST} element={<p>通知センター画面</p>} />
     </Routes>,
@@ -66,11 +66,11 @@ const equipment1: Equipment = {
   status: EQUIPMENT_STATUS.ACTIVE,
 };
 
-const makeItem = (
+const makeInspectionItem = (
   overrides: Partial<InspectionItem> & Pick<InspectionItem, "id" | "nextDueDate">,
 ): InspectionItem => ({
   equipmentId: equipment1.id,
-  type: ITEM_TYPE.CALIBRATION,
+  type: INSPECTION_ITEM_TYPE.CALIBRATION,
   name: "年次校正",
   cycle: CYCLE.Y1,
   execution: EXECUTION.INTERNAL,
@@ -82,23 +82,23 @@ const makeItem = (
 });
 
 // 期限切れ(過去日)・正常(遠未来)で今日に依存せず導出ステータスを確定させる
-const overdueItemA = makeItem({ id: "item-a", name: "A校正", nextDueDate: "2000-01-01" });
-const overdueItemB = makeItem({
+const overdueInspectionItemA = makeInspectionItem({ id: "item-a", name: "A校正", nextDueDate: "2000-01-01" });
+const overdueInspectionItemB = makeInspectionItem({
   id: "item-b",
   name: "B点検",
-  type: ITEM_TYPE.INSPECTION,
+  type: INSPECTION_ITEM_TYPE.INSPECTION,
   nextDueDate: "2000-06-01",
 });
-const okItem = makeItem({ id: "item-ok", name: "OK校正", nextDueDate: "2999-12-31" });
+const okInspectionItem = makeInspectionItem({ id: "item-ok", name: "OK校正", nextDueDate: "2999-12-31" });
 
 const seedActionScenario = (): void => {
   seedStore({
     persons: { [tanaka.id]: tanaka },
     equipment: { [equipment1.id]: equipment1 },
-    items: {
-      [overdueItemA.id]: overdueItemA,
-      [overdueItemB.id]: overdueItemB,
-      [okItem.id]: okItem,
+    inspectionItems: {
+      [overdueInspectionItemA.id]: overdueInspectionItemA,
+      [overdueInspectionItemB.id]: overdueInspectionItemB,
+      [okInspectionItem.id]: okInspectionItem,
     },
   });
 };
@@ -126,7 +126,7 @@ describe("Dashboard: サマリーカード", () => {
   });
 
   // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
-  it("カードクリックで /items?status=<値> へ遷移する", async () => {
+  it("カードクリックで /inspection-items?status=<値> へ遷移する", async () => {
     const user = userEvent.setup();
     seedActionScenario();
     renderDashboardWithRoutes();
@@ -198,8 +198,8 @@ describe("Dashboard: 最新の通知", () => {
   const overdueNotification: Notification = {
     id: "notif-1",
     type: NOTIFICATION_TYPE.OVERDUE,
-    targetType: NOTIFICATION_TARGET_TYPE.ITEM,
-    targetId: overdueItemA.id,
+    targetType: NOTIFICATION_TARGET_TYPE.INSPECTION_ITEM,
+    targetId: overdueInspectionItemA.id,
     personId: tanaka.id,
     message: "EQ-001 年次校正が期限超過",
     createdDate: "2026-07-01",
@@ -242,7 +242,7 @@ describe("Dashboard: 空状態", () => {
     seedStore({
       persons: { [tanaka.id]: tanaka },
       equipment: { [equipment1.id]: equipment1 },
-      items: { [okItem.id]: okItem },
+      inspectionItems: { [okInspectionItem.id]: okInspectionItem },
     });
     renderDashboardWithRoutes();
 

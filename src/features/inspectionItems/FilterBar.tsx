@@ -1,15 +1,15 @@
 /**
- * 項目一覧(screen-design/05-item-list.md)のフィルタ行。
+ * 項目一覧(screen-design/05-inspection-item-list.md)のフィルタ行。
  * 4つのSelect(状態/種別/内外/担当)と「クリア」ボタンからなる薄いビュー。
  * フィルタの真実源はURLクエリ(D-022)であり、値の保持・更新は親(index.tsx)の責務。
  * ここでは選択肢の組み立てと変更イベントの通知のみを行う。
  */
 
 import { Button, Select } from "@/components/ui";
-import { ITEM_STATUS } from "@/domain/itemStatus";
+import { INSPECTION_ITEM_STATUS } from "@/domain/inspectionItemStatus";
 import { statusBadgeLabel } from "@/domain/statusBadge";
-import { EXECUTION_OPTIONS, ITEM_TYPE_OPTIONS } from "@/features/items/constants";
-import { FILTER_ALL, type ItemListFilters } from "@/features/items/hooks";
+import { EXECUTION_OPTIONS, INSPECTION_ITEM_TYPE_OPTIONS } from "@/features/inspectionItems/constants";
+import { FILTER_ALL, type InspectionItemListFilters } from "@/features/inspectionItems/hooks";
 import { personLabelOf } from "@/store/selectors";
 import type { Person } from "@/store/types";
 import type { ReactElement } from "react";
@@ -24,16 +24,16 @@ const withAllOption = (options: readonly SelectOption[]): SelectOption[] => [
 
 /** 状態フィルタ: §0.3の5値を statusBadgeLabel の日本語で(導出結果に適用、§5) */
 const STATUS_OPTIONS: SelectOption[] = withAllOption(
-  Object.values(ITEM_STATUS).map((status) => ({ value: status, label: statusBadgeLabel(status) })),
+  Object.values(INSPECTION_ITEM_STATUS).map((status) => ({ value: status, label: statusBadgeLabel(status) })),
 );
-const TYPE_OPTIONS: SelectOption[] = withAllOption(ITEM_TYPE_OPTIONS);
+const TYPE_OPTIONS: SelectOption[] = withAllOption(INSPECTION_ITEM_TYPE_OPTIONS);
 const EXECUTION_FILTER_OPTIONS: SelectOption[] = withAllOption(EXECUTION_OPTIONS);
 
 type Props = {
-  filters: ItemListFilters;
+  filters: InspectionItemListFilters;
   persons: Record<string, Person>;
   /** キーは query パラメータ名と一対一(status/type/execution/personId)。値が FILTER_ALL なら親が除去する */
-  onFilterChange: (key: keyof ItemListFilters, value: string) => void;
+  onFilterChange: (key: keyof InspectionItemListFilters, value: string) => void;
   onClear: () => void;
 };
 

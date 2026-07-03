@@ -7,18 +7,18 @@
 
 import { StatusBadge } from "@/components/domain";
 import { ROUTES } from "@/constants/routes";
-import { ITEM_STATUS, type ItemStatus } from "@/domain/itemStatus";
+import { INSPECTION_ITEM_STATUS, type InspectionItemStatus } from "@/domain/inspectionItemStatus";
 import type { ReactElement } from "react";
 import { Link } from "react-router-dom";
 
 /** ステータスの意味を平易な日本語で言い換えたもの(domain-model.md §4.3 の条件に対応) */
 const STATUS_DESCRIPTIONS = {
-  [ITEM_STATUS.OVERDUE]: "今日が次回期限を過ぎている",
-  [ITEM_STATUS.ORDER_NOW]: "外部校正で発注推奨日を過ぎており、進行中の案件がない",
-  [ITEM_STATUS.IN_PROGRESS]: "外部校正で発注済み・校正中の案件がある",
-  [ITEM_STATUS.DUE_SOON]: "次回期限が近づいている(通知開始日数に到達)",
-  [ITEM_STATUS.OK]: "上記のいずれにも該当しない",
-} as const satisfies Record<ItemStatus, string>;
+  [INSPECTION_ITEM_STATUS.OVERDUE]: "今日が次回期限を過ぎている",
+  [INSPECTION_ITEM_STATUS.ORDER_NOW]: "外部校正で発注推奨日を過ぎており、進行中の案件がない",
+  [INSPECTION_ITEM_STATUS.IN_PROGRESS]: "外部校正で発注済み・校正中の案件がある",
+  [INSPECTION_ITEM_STATUS.DUE_SOON]: "次回期限が近づいている(通知開始日数に到達)",
+  [INSPECTION_ITEM_STATUS.OK]: "上記のいずれにも該当しない",
+} as const satisfies Record<InspectionItemStatus, string>;
 
 export const Manual = (): ReactElement => (
   <div className="flex flex-col gap-8">
@@ -76,7 +76,7 @@ export const Manual = (): ReactElement => (
         <li>
           点検・校正を実施したら、
           {/* oxlint-disable-next-line react/forbid-component-props -- Linkはclassnameでリンク色を渡す設計(Badgeと同様) */}
-          <Link to={ROUTES.ITEM_LIST} className="text-primary underline">
+          <Link to={ROUTES.INSPECTION_ITEM_LIST} className="text-primary underline">
             項目一覧
           </Link>
           から実施記録を登録します(こちらもモーダルで行い、登録すると次回期限が自動更新されます)。
@@ -95,7 +95,7 @@ export const Manual = (): ReactElement => (
     <section className="flex flex-col gap-2">
       <h2 className="text-lg font-semibold">ステータスの見方</h2>
       <ul className="flex flex-col gap-2">
-        {Object.values(ITEM_STATUS).map((status) => (
+        {Object.values(INSPECTION_ITEM_STATUS).map((status) => (
           <li key={status} className="flex items-center gap-2">
             <StatusBadge status={status} />
             <span>{STATUS_DESCRIPTIONS[status]}</span>
@@ -144,7 +144,7 @@ export const Manual = (): ReactElement => (
       <div>
         <h3 className="font-semibold">
           {/* oxlint-disable-next-line react/forbid-component-props -- Linkはclassnameでリンク色を渡す設計(Badgeと同様) */}
-          <Link to={ROUTES.ITEM_LIST} className="text-primary underline">
+          <Link to={ROUTES.INSPECTION_ITEM_LIST} className="text-primary underline">
             項目一覧
           </Link>
         </h3>

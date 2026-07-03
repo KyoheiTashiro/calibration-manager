@@ -18,7 +18,7 @@ import {
   EXECUTION,
   type InspectionItem,
   type InspectionRecord,
-  ITEM_TYPE,
+  INSPECTION_ITEM_TYPE,
   NOTIFICATION_TARGET_TYPE,
   NOTIFICATION_TYPE,
   type Notification,
@@ -77,7 +77,7 @@ export const inspectionItemSchema = z
   .object({
     id: requiredStringSchema,
     equipmentId: requiredStringSchema,
-    type: z.enum(ITEM_TYPE),
+    type: z.enum(INSPECTION_ITEM_TYPE),
     name: requiredStringSchema,
     cycle: z.enum(CYCLE),
     execution: z.enum(EXECUTION),
@@ -92,8 +92,8 @@ export const inspectionItemSchema = z
   })
   // なぜ superRefine か: 「external の場合 vendorId 必須」（domain-model.md §3.4）は
   // 型では表現していない相関制約のため、スキーマ側で強制する。
-  .superRefine((item, context) => {
-    if (item.execution === EXECUTION.EXTERNAL && (item.vendorId ?? "") === "") {
+  .superRefine((inspectionItem, context) => {
+    if (inspectionItem.execution === EXECUTION.EXTERNAL && (inspectionItem.vendorId ?? "") === "") {
       context.addIssue({
         code: "custom",
         path: ["vendorId"],
@@ -104,7 +104,7 @@ export const inspectionItemSchema = z
 
 export const inspectionRecordSchema = z.object({
   id: requiredStringSchema,
-  itemId: requiredStringSchema,
+  inspectionItemId: requiredStringSchema,
   doneDate: isoDateStringSchema,
   doneBy: requiredStringSchema,
   result: z.enum(RECORD_RESULT),
@@ -114,7 +114,7 @@ export const inspectionRecordSchema = z.object({
 
 export const calibrationOrderSchema = z.object({
   id: requiredStringSchema,
-  itemId: requiredStringSchema,
+  inspectionItemId: requiredStringSchema,
   vendorId: requiredStringSchema,
   status: z.enum(ORDER_STATUS),
   orderedDate: isoDateStringSchema.optional(),
@@ -140,7 +140,7 @@ export const appStateSchema = z.object({
   vendors: z.record(z.string(), vendorSchema),
   persons: z.record(z.string(), personSchema),
   equipment: z.record(z.string(), equipmentSchema),
-  items: z.record(z.string(), inspectionItemSchema),
+  inspectionItems: z.record(z.string(), inspectionItemSchema),
   records: z.record(z.string(), inspectionRecordSchema),
   orders: z.record(z.string(), calibrationOrderSchema),
   notifications: z.record(z.string(), notificationSchema),

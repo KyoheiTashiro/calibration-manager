@@ -9,7 +9,7 @@ export const ROUTES = {
   EQUIPMENT_NEW: "/equipment/new",
   EQUIPMENT_DETAIL: "/equipment/:id",
   EQUIPMENT_EDIT: "/equipment/:id/edit",
-  ITEM_LIST: "/items",
+  INSPECTION_ITEM_LIST: "/inspection-items",
   ORDER_LIST: "/orders",
   VENDOR_LIST: "/vendors",
   PERSON_LIST: "/persons",

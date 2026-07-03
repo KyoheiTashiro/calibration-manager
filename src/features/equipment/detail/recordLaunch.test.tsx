@@ -9,8 +9,8 @@ import { ROUTES, equipmentDetailPath } from "@/constants/routes";
 import { EquipmentDetail } from "@/features/equipment/detail";
 import {
   equipmentFull,
-  itemExternal,
-  seedEquipmentFullItemsAndRecords,
+  inspectionItemExternal,
+  seedEquipmentFullInspectionItemsAndRecords,
   seedEquipmentFullMasters,
 } from "@/features/equipment/detail/detailFixtures";
 import { useAppStore } from "@/store/useAppStore";
@@ -35,16 +35,16 @@ const getOpenDialog = (title: string): HTMLElement => {
 };
 
 /** 項目テーブル(1つ目のtable)の行を取得する。項目名は実施履歴テーブルにも出現するためスコープする */
-const getItemRow = (name: RegExp): HTMLElement => {
-  const [itemTable] = screen.getAllByRole("table");
-  if (!itemTable) throw new Error("項目テーブルが見つかりません");
-  return within(itemTable).getByRole("row", { name });
+const getInspectionItemRow = (name: RegExp): HTMLElement => {
+  const [inspectionItemTable] = screen.getAllByRole("table");
+  if (!inspectionItemTable) throw new Error("項目テーブルが見つかりません");
+  return within(inspectionItemTable).getByRole("row", { name });
 };
 
 beforeEach(() => {
   setupStoreIsolation();
   seedEquipmentFullMasters();
-  seedEquipmentFullItemsAndRecords();
+  seedEquipmentFullInspectionItemsAndRecords();
 });
 
 describe("EquipmentDetail: RecordModal起動", () => {
@@ -53,11 +53,11 @@ describe("EquipmentDetail: RecordModal起動", () => {
     const user = userEvent.setup();
     renderDetail();
 
-    await user.click(within(getItemRow(/年次校正/u)).getByRole("button", { name: "記録" }));
+    await user.click(within(getInspectionItemRow(/年次校正/u)).getByRole("button", { name: "記録" }));
 
     const dialogElement = getOpenDialog("実施記録を登録");
     expect(
-      within(dialogElement).getByText(`対象:EQ-001 ノギス / ${itemExternal.name}`),
+      within(dialogElement).getByText(`対象:EQ-001 ノギス / ${inspectionItemExternal.name}`),
     ).toBeInTheDocument();
   });
 
@@ -68,7 +68,7 @@ describe("EquipmentDetail: RecordModal起動", () => {
 
     const recordsBefore = Object.keys(useAppStore.getState().records).length;
 
-    await user.click(within(getItemRow(/年次校正/u)).getByRole("button", { name: "記録" }));
+    await user.click(within(getInspectionItemRow(/年次校正/u)).getByRole("button", { name: "記録" }));
     const dialogElement = getOpenDialog("実施記録を登録");
     await user.click(within(dialogElement).getByLabelText("合格"));
     await user.click(within(dialogElement).getByRole("button", { name: "登録" }));

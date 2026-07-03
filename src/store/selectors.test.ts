@@ -1,7 +1,7 @@
-import { ITEM_STATUS } from "@/domain/itemStatus";
+import { INSPECTION_ITEM_STATUS } from "@/domain/inspectionItemStatus";
 import {
-  itemRowsOf,
-  itemsOf,
+  inspectionItemRowsOf,
+  inspectionItemsOf,
   ordersOf,
   recordsOf,
   unreadNotificationCount,
@@ -20,15 +20,15 @@ import {
   eqRetired,
   ids,
   inactivePerson,
-  makeItem,
+  makeInspectionItem,
   makeState,
   TODAY,
-} from "@/test/itemRowFixtures";
+} from "@/test/inspectionItemRowFixtures";
 import { describe, expect, it } from "vitest";
 
-describe("itemsOf", () => {
+describe("inspectionItemsOf", () => {
   it("指定equipmentIdに属する項目のみを抽出する", () => {
-    const items: Record<string, InspectionItem> = {
+    const inspectionItems: Record<string, InspectionItem> = {
       "item-1": {
         id: "item-1",
         equipmentId: "equipment-1",
@@ -57,26 +57,26 @@ describe("itemsOf", () => {
       },
     };
 
-    expect(itemsOf({ items }, "equipment-1")).toEqual([items["item-1"]]);
+    expect(inspectionItemsOf({ inspectionItems }, "equipment-1")).toEqual([inspectionItems["item-1"]]);
   });
 
   it("該当する項目が無ければ空配列を返す", () => {
-    expect(itemsOf({ items: {} }, "equipment-1")).toEqual([]);
+    expect(inspectionItemsOf({ inspectionItems: {} }, "equipment-1")).toEqual([]);
   });
 });
 
 describe("ordersOf", () => {
-  it("指定itemIdに属する案件のみを抽出する", () => {
+  it("指定inspectionItemIdに属する案件のみを抽出する", () => {
     const orders: Record<string, CalibrationOrder> = {
       "order-1": {
         id: "order-1",
-        itemId: "item-1",
+        inspectionItemId: "item-1",
         vendorId: "vendor-1",
         status: "planned",
       },
       "order-2": {
         id: "order-2",
-        itemId: "item-2",
+        inspectionItemId: "item-2",
         vendorId: "vendor-1",
         status: "ordered",
       },
@@ -95,28 +95,28 @@ describe("recordsOf", () => {
     const records: Record<string, InspectionRecord> = {
       "record-b": {
         id: "record-b",
-        itemId: "item-1",
+        inspectionItemId: "item-1",
         doneDate: "2026-06-01",
         doneBy: "田中",
         result: "pass",
       },
       "record-a": {
         id: "record-a",
-        itemId: "item-1",
+        inspectionItemId: "item-1",
         doneDate: "2026-06-01",
         doneBy: "鈴木",
         result: "pass",
       },
       "record-newest": {
         id: "record-newest",
-        itemId: "item-1",
+        inspectionItemId: "item-1",
         doneDate: "2026-07-01",
         doneBy: "佐藤",
         result: "pass",
       },
       "record-other-item": {
         id: "record-other-item",
-        itemId: "item-2",
+        inspectionItemId: "item-2",
         doneDate: "2026-07-15",
         doneBy: "高橋",
         result: "pass",
@@ -141,7 +141,7 @@ describe("unreadNotificationCount", () => {
       "notification-1": {
         id: "notification-1",
         type: "dueSoon",
-        targetType: "item",
+        targetType: "inspectionItem",
         targetId: "item-1",
         personId: "person-1",
         message: "期限が近づいています",
@@ -151,7 +151,7 @@ describe("unreadNotificationCount", () => {
       "notification-2": {
         id: "notification-2",
         type: "overdue",
-        targetType: "item",
+        targetType: "inspectionItem",
         targetId: "item-2",
         personId: "person-1",
         message: "期限が過ぎています",
@@ -161,7 +161,7 @@ describe("unreadNotificationCount", () => {
       "notification-3": {
         id: "notification-3",
         type: "orderRecommended",
-        targetType: "item",
+        targetType: "inspectionItem",
         targetId: "item-3",
         personId: "person-2",
         message: "発注を推奨します",
@@ -179,43 +179,43 @@ describe("unreadNotificationCount", () => {
 });
 
 /**
- * itemRowsOf(横断 selector。features/items/hooks.ts から昇格、D-024/coding-standards §5)の検証。
- * 固定データは @/test/itemRowFixtures に集約(項目一覧フィルタのテストと共有)。
+ * inspectionItemRowsOf(横断 selector。features/inspectionItems/hooks.ts から昇格、D-024/coding-standards §5)の検証。
+ * 固定データは @/test/inspectionItemRowFixtures に集約(項目一覧フィルタのテストと共有)。
  * 無効非稼働除外(D-023)・personLabelOf(D-001)・発注推奨日(§4.2)の導出を扱う。
  */
-describe("itemRowsOf: 対象の絞り込み・並び順", () => {
+describe("inspectionItemRowsOf: 対象の絞り込み・並び順", () => {
   it("非稼働機器(休止/廃棄)の項目・isActive=false 項目・dangling機器の項目を除外する", () => {
     const state = makeState([
-      makeItem({ id: "keep" }),
-      makeItem({ id: "on-suspended", equipmentId: eqSuspended.id }),
-      makeItem({ id: "on-retired", equipmentId: eqRetired.id }),
-      makeItem({ id: "inactive", isActive: false }),
-      makeItem({ id: "dangling-eq", equipmentId: "eq-missing" }),
+      makeInspectionItem({ id: "keep" }),
+      makeInspectionItem({ id: "on-suspended", equipmentId: eqSuspended.id }),
+      makeInspectionItem({ id: "on-retired", equipmentId: eqRetired.id }),
+      makeInspectionItem({ id: "inactive", isActive: false }),
+      makeInspectionItem({ id: "dangling-eq", equipmentId: "eq-missing" }),
     ]);
-    expect(ids(itemRowsOf(state, TODAY))).toEqual(["keep"]);
+    expect(ids(inspectionItemRowsOf(state, TODAY))).toEqual(["keep"]);
   });
 
-  it("nextDueDate 昇順、同値は item.id 昇順", () => {
+  it("nextDueDate 昇順、同値は inspectionItem.id 昇順", () => {
     const state = makeState([
-      makeItem({ id: "b", nextDueDate: "2026-05-01" }),
-      makeItem({ id: "a", nextDueDate: "2026-05-01" }),
-      makeItem({ id: "c", nextDueDate: "2026-01-01" }),
+      makeInspectionItem({ id: "b", nextDueDate: "2026-05-01" }),
+      makeInspectionItem({ id: "a", nextDueDate: "2026-05-01" }),
+      makeInspectionItem({ id: "c", nextDueDate: "2026-01-01" }),
     ]);
-    expect(ids(itemRowsOf(state, TODAY))).toEqual(["c", "a", "b"]);
+    expect(ids(inspectionItemRowsOf(state, TODAY))).toEqual(["c", "a", "b"]);
   });
 });
 
-describe("itemRowsOf: status 導出", () => {
+describe("inspectionItemRowsOf: status 導出", () => {
   it("期限超過は overdue", () => {
-    const state = makeState([makeItem({ id: "od", nextDueDate: "2026-01-01" })]);
-    const [row] = itemRowsOf(state, TODAY);
-    expect(row?.status).toBe(ITEM_STATUS.OVERDUE);
+    const state = makeState([makeInspectionItem({ id: "od", nextDueDate: "2026-01-01" })]);
+    const [row] = inspectionItemRowsOf(state, TODAY);
+    expect(row?.status).toBe(INSPECTION_ITEM_STATUS.OVERDUE);
   });
 
   it("外部・leadTimeDays 未設定で vendor.standardLeadTimeDays フォールバック経由の orderNow", () => {
     // 推奨日 = 2026-08-01 − 20(vendor) − 14 = 2026-06-28 ≤ TODAY(2026-07-03) かつ有効案件なし
     const state = makeState([
-      makeItem({
+      makeInspectionItem({
         id: "on",
         execution: EXECUTION.EXTERNAL,
         vendorId: calibrator.id,
@@ -224,21 +224,21 @@ describe("itemRowsOf: status 導出", () => {
         nextDueDate: "2026-08-01",
       }),
     ]);
-    const [row] = itemRowsOf(state, TODAY);
-    expect(row?.status).toBe(ITEM_STATUS.ORDER_NOW);
+    const [row] = inspectionItemRowsOf(state, TODAY);
+    expect(row?.status).toBe(INSPECTION_ITEM_STATUS.ORDER_NOW);
     expect(row?.recommendedOrderDate).toBe("2026-06-28");
   });
 
   it("内部実施は recommendedOrderDate が null(発注の概念がない)", () => {
-    const state = makeState([makeItem({ id: "int", execution: EXECUTION.INTERNAL })]);
-    const [row] = itemRowsOf(state, TODAY);
+    const state = makeState([makeInspectionItem({ id: "int", execution: EXECUTION.INTERNAL })]);
+    const [row] = inspectionItemRowsOf(state, TODAY);
     expect(row?.recommendedOrderDate).toBeNull();
   });
 
   it("外部でも参照先ベンダーが存在しない(dangling)なら納期解決不可で recommendedOrderDate は null", () => {
     // vendorId は設定されているが vendors に該当なし → vendor=null。leadTimeDays 未設定のため解決不可
     const state = makeState([
-      makeItem({
+      makeInspectionItem({
         id: "dangling-vendor",
         execution: EXECUTION.EXTERNAL,
         vendorId: "v-missing",
@@ -246,14 +246,14 @@ describe("itemRowsOf: status 導出", () => {
         nextDueDate: "2027-01-01",
       }),
     ]);
-    const [row] = itemRowsOf(state, TODAY);
-    expect(row?.item.id).toBe("dangling-vendor");
+    const [row] = inspectionItemRowsOf(state, TODAY);
+    expect(row?.inspectionItem.id).toBe("dangling-vendor");
     expect(row?.recommendedOrderDate).toBeNull();
   });
 });
 
-describe("itemRowsOf: canCreateOrder", () => {
-  const externalItem = makeItem({
+describe("inspectionItemRowsOf: canCreateOrder", () => {
+  const externalInspectionItem = makeInspectionItem({
     id: "ext",
     execution: EXECUTION.EXTERNAL,
     vendorId: calibrator.id,
@@ -262,34 +262,34 @@ describe("itemRowsOf: canCreateOrder", () => {
   });
 
   it("外部かつ有効案件なしなら true", () => {
-    const [row] = itemRowsOf(makeState([externalItem]), TODAY);
+    const [row] = inspectionItemRowsOf(makeState([externalInspectionItem]), TODAY);
     expect(row?.canCreateOrder).toBe(true);
   });
 
   it("外部でも有効案件があれば false", () => {
     const order: CalibrationOrder = {
       id: "o-1",
-      itemId: externalItem.id,
+      inspectionItemId: externalInspectionItem.id,
       vendorId: calibrator.id,
       status: ORDER_STATUS.ORDERED,
     };
-    const [row] = itemRowsOf(makeState([externalItem], [order]), TODAY);
+    const [row] = inspectionItemRowsOf(makeState([externalInspectionItem], [order]), TODAY);
     expect(row?.canCreateOrder).toBe(false);
   });
 
   it("内部項目は常に false", () => {
-    const [row] = itemRowsOf(makeState([makeItem({ id: "int" })]), TODAY);
+    const [row] = inspectionItemRowsOf(makeState([makeInspectionItem({ id: "int" })]), TODAY);
     expect(row?.canCreateOrder).toBe(false);
   });
 });
 
-describe("itemRowsOf: personLabel(D-001)", () => {
+describe("inspectionItemRowsOf: personLabel(D-001)", () => {
   it("dangling(参照先なし)は「—」、無効担当者は「(無効)」注記", () => {
     const state = makeState([
-      makeItem({ id: "dangling-person", personId: "p-missing" }),
-      makeItem({ id: "inactive-person", personId: inactivePerson.id }),
+      makeInspectionItem({ id: "dangling-person", personId: "p-missing" }),
+      makeInspectionItem({ id: "inactive-person", personId: inactivePerson.id }),
     ]);
-    const byId = Object.fromEntries(itemRowsOf(state, TODAY).map((row) => [row.item.id, row]));
+    const byId = Object.fromEntries(inspectionItemRowsOf(state, TODAY).map((row) => [row.inspectionItem.id, row]));
     expect(byId["dangling-person"]?.personLabel).toBe("—");
     expect(byId["inactive-person"]?.personLabel).toBe("鈴木(無効)");
   });

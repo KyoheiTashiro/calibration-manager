@@ -18,7 +18,7 @@ import {
   EQUIPMENT_STATUS_BADGE_CLASSES,
   EQUIPMENT_STATUS_LABELS,
 } from "@/features/equipment/constants";
-import { itemsOf } from "@/store/selectors";
+import { inspectionItemsOf } from "@/store/selectors";
 import { EQUIPMENT_STATUS, type Equipment, type EquipmentStatus } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
 import { useMemo, useState, type KeyboardEvent, type ReactElement } from "react";
@@ -83,7 +83,7 @@ export const EquipmentList = (): ReactElement => {
   const navigate = useNavigate();
   const equipment = useAppStore((state) => state.equipment);
   const vendors = useAppStore((state) => state.vendors);
-  const items = useAppStore((state) => state.items);
+  const inspectionItems = useAppStore((state) => state.inspectionItems);
 
   const [searchText, setSearchText] = useState("");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>(
@@ -103,9 +103,9 @@ export const EquipmentList = (): ReactElement => {
   /** 機器の最も近い次回期限（非稼働は無条件で— / 有効項目なしも—。screen-design §2「最も近い次回期限」） */
   const nearestDueDateOf = (target: Equipment): string => {
     if (target.status !== EQUIPMENT_STATUS.ACTIVE) return "—";
-    const dueDates = itemsOf({ items }, target.id)
-      .filter((item) => item.isActive)
-      .map((item) => item.nextDueDate);
+    const dueDates = inspectionItemsOf({ inspectionItems }, target.id)
+      .filter((inspectionItem) => inspectionItem.isActive)
+      .map((inspectionItem) => inspectionItem.nextDueDate);
     if (dueDates.length === 0) return "—";
     return dueDates.toSorted((left, right) => left.localeCompare(right))[0] ?? "—";
   };
@@ -217,7 +217,7 @@ export const EquipmentList = (): ReactElement => {
                       </Badge>
                     </td>
                     <td className="px-3 py-2 text-right tabular-nums">
-                      {itemsOf({ items }, entry.id).length}
+                      {inspectionItemsOf({ inspectionItems }, entry.id).length}
                     </td>
                     <td className="px-3 py-2">{nearestDueDateOf(entry)}</td>
                   </tr>

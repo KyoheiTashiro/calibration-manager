@@ -22,7 +22,7 @@ export const emptyAppState = (): AppState => ({
   vendors: {},
   persons: {},
   equipment: {},
-  items: {},
+  inspectionItems: {},
   records: {},
   orders: {},
   notifications: {},
@@ -31,11 +31,57 @@ export const emptyAppState = (): AppState => ({
 /** version N → N+1 のステップ変換。キーは変換元バージョン N */
 export type MigrationStep = (persisted: unknown) => unknown;
 
+/** v1 各エントリのフィールド名を変更する。非オブジェクトはそのまま残し merge のサルベージに委ねる */
+const renameFieldInRecord = (value: unknown, from: string, to: string): unknown => {
+  if (typeof value !== "object" || value === null) return value;
+  return Object.fromEntries(
+    Object.entries(value).map(([key, entry]) => {
+      if (typeof entry !== "object" || entry === null || !(from in entry)) return [key, entry];
+      const { [from]: renamed, ...rest } = entry as Record<string, unknown>;
+      return [key, { ...rest, [to]: renamed }];
+    }),
+  );
+};
+
+/**
+ * v1→v2: item→inspectionItem リネーム（decisions.md D-036）。
+ * - 状態キー items → inspectionItems
+ * - records / orders の itemId → inspectionItemId
+ * - notifications の targetType "item" → "inspectionItem"
+ * 比較の "item" は v1 の歴史的リテラル値（現行列挙に存在しない）のため直書き。
+ */
+export const migrateV1ToV2: MigrationStep = (persisted) => {
+  if (typeof persisted !== "object" || persisted === null) return persisted;
+  const { items, records, orders, notifications, ...rest } = persisted as Record<string, unknown>;
+  const migratedNotifications =
+    typeof notifications === "object" && notifications !== null
+      ? Object.fromEntries(
+          Object.entries(notifications).map(([key, entry]) => {
+            if (typeof entry !== "object" || entry === null) return [key, entry];
+            const notification = entry as Record<string, unknown>;
+            return [
+              key,
+              notification["targetType"] === "item"
+                ? { ...notification, targetType: NOTIFICATION_TARGET_TYPE.INSPECTION_ITEM }
+                : notification,
+            ];
+          }),
+        )
+      : notifications;
+  return {
+    ...rest,
+    inspectionItems: items,
+    records: renameFieldInRecord(records, "itemId", "inspectionItemId"),
+    orders: renameFieldInRecord(orders, "itemId", "inspectionItemId"),
+    notifications: migratedNotifications,
+  };
+};
+
 /**
  * 将来のスキーマ変更時は migrateVNToVN+1 を追加してここへ登録し、
- * STORAGE_VERSION をインクリメントする（store.md「migrate」）。現状 version=1 のため空。
+ * STORAGE_VERSION をインクリメントする（store.md「migrate」）。
  */
-export const MIGRATIONS: Record<number, MigrationStep> = {};
+export const MIGRATIONS: Record<number, MigrationStep> = { 1: migrateV1ToV2 };
 
 /**
  * fromVersion から STORAGE_VERSION までステップ変換を順に適用する。
@@ -73,7 +119,7 @@ const salvageAppStatePerRecord = (persisted: Record<string, unknown>): AppState 
   vendors: salvageRecords(persisted["vendors"], vendorSchema),
   persons: salvageRecords(persisted["persons"], personSchema),
   equipment: salvageRecords(persisted["equipment"], equipmentSchema),
-  items: salvageRecords(persisted["items"], inspectionItemSchema),
+  inspectionItems: salvageRecords(persisted["inspectionItems"], inspectionItemSchema),
   records: salvageRecords(persisted["records"], inspectionRecordSchema),
   orders: salvageRecords(persisted["orders"], calibrationOrderSchema),
   notifications: salvageRecords(persisted["notifications"], notificationSchema),
@@ -89,8 +135,8 @@ export const sanitizeAppState = (state: AppState): AppState => {
   const notifications = Object.fromEntries(
     Object.entries(state.notifications).filter(([, notification]) => {
       if (recordValue(state.persons, notification.personId) === undefined) return false;
-      return notification.targetType === NOTIFICATION_TARGET_TYPE.ITEM
-        ? recordValue(state.items, notification.targetId) !== undefined
+      return notification.targetType === NOTIFICATION_TARGET_TYPE.INSPECTION_ITEM
+        ? recordValue(state.inspectionItems, notification.targetId) !== undefined
         : recordValue(state.orders, notification.targetId) !== undefined;
     }),
   );

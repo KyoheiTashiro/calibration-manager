@@ -29,11 +29,11 @@ export const EQUIPMENT_STATUS = {
 export type EquipmentStatus = (typeof EQUIPMENT_STATUS)[keyof typeof EQUIPMENT_STATUS];
 
 /** 点検校正項目の種別（domain-model.md §3.4） */
-export const ITEM_TYPE = {
+export const INSPECTION_ITEM_TYPE = {
   INSPECTION: "inspection",
   CALIBRATION: "calibration",
 } as const;
-export type ItemType = (typeof ITEM_TYPE)[keyof typeof ITEM_TYPE];
+export type InspectionItemType = (typeof INSPECTION_ITEM_TYPE)[keyof typeof INSPECTION_ITEM_TYPE];
 
 /** 実施区分（domain-model.md §3.4）。external の場合のみ vendorId が必須 */
 export const EXECUTION = {
@@ -76,7 +76,7 @@ export type NotificationType = (typeof NOTIFICATION_TYPE)[keyof typeof NOTIFICAT
 
 /** 通知の対象種別（domain-model.md §3.7） */
 export const NOTIFICATION_TARGET_TYPE = {
-  ITEM: "item",
+  INSPECTION_ITEM: "inspectionItem",
   ORDER: "order",
 } as const;
 export type NotificationTargetType =
@@ -97,7 +97,7 @@ export type Vendor = {
   contactPerson?: string;
   email?: string;
   phone?: string;
-  /** 標準納期（日数）。校正業者の場合に使用。item.leadTimeDays 未設定時のフォールバック先 */
+  /** 標準納期（日数）。校正業者の場合に使用。inspectionItem.leadTimeDays 未設定時のフォールバック先 */
   standardLeadTimeDays?: number;
   note?: string;
 };
@@ -131,7 +131,7 @@ export type InspectionItem = {
   id: string;
   /** Equipment参照 */
   equipmentId: string;
-  type: ItemType;
+  type: InspectionItemType;
   name: string;
   cycle: Cycle;
   execution: Execution;
@@ -155,7 +155,7 @@ export type InspectionItem = {
 export type InspectionRecord = {
   id: string;
   /** InspectionItem参照 */
-  itemId: string;
+  inspectionItemId: string;
   doneDate: IsoDateString;
   /** 実施者名（外部の場合は業者名） */
   doneBy: string;
@@ -169,7 +169,7 @@ export type InspectionRecord = {
 export type CalibrationOrder = {
   id: string;
   /** InspectionItem参照 */
-  itemId: string;
+  inspectionItemId: string;
   /** 依頼先（Vendor参照） */
   vendorId: string;
   status: OrderStatus;
@@ -186,7 +186,7 @@ export type Notification = {
   id: string;
   type: NotificationType;
   targetType: NotificationTargetType;
-  /** 対象のID（targetType=item なら InspectionItem、order なら CalibrationOrder） */
+  /** 対象のID（targetType=inspectionItem なら InspectionItem、order なら CalibrationOrder） */
   targetId: string;
   /** 宛先担当者（Person参照） */
   personId: string;
@@ -203,7 +203,7 @@ export type AppState = {
   vendors: Record<string, Vendor>;
   persons: Record<string, Person>;
   equipment: Record<string, Equipment>;
-  items: Record<string, InspectionItem>;
+  inspectionItems: Record<string, InspectionItem>;
   records: Record<string, InspectionRecord>;
   orders: Record<string, CalibrationOrder>;
   notifications: Record<string, Notification>;

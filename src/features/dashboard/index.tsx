@@ -2,7 +2,7 @@
  * ダッシュボード画面(screen-design/01-dashboard.md)。表示専用画面。
  * 要対応の全体像(サマリーカード4枚)・要対応項目リスト・最新の通知5件を一望させる。
  *
- * - 集計は itemRowsOf(@/store/selectors。稼働機器×有効項目×導出ステータスを一元化)の
+ * - 集計は inspectionItemRowsOf(@/store/selectors。稼働機器×有効項目×導出ステータスを一元化)の
  *   結果に対し、hooks.ts の純関数(countByStatus / actionRequiredRows / latestNotifications)を適用する。
  * - 遷移(カード→項目一覧プリフィルタ / 行→機器詳細)は useNavigate を子へ渡し、本体は薄いビューに保つ。
  */
@@ -11,7 +11,7 @@ import { ActionRequiredList } from "@/features/dashboard/ActionRequiredList";
 import { actionRequiredRows, countByStatus, latestNotifications } from "@/features/dashboard/hooks";
 import { NotificationList } from "@/features/dashboard/NotificationList";
 import { SummaryCards } from "@/features/dashboard/SummaryCards";
-import { itemRowsOf } from "@/store/selectors";
+import { inspectionItemRowsOf } from "@/store/selectors";
 import { useAppStore } from "@/store/useAppStore";
 import { todayIsoDate } from "@/utils/time";
 import { useMemo, type ReactElement } from "react";
@@ -19,7 +19,7 @@ import { useNavigate } from "react-router-dom";
 
 export const Dashboard = (): ReactElement => {
   const navigate = useNavigate();
-  const items = useAppStore((state) => state.items);
+  const inspectionItems = useAppStore((state) => state.inspectionItems);
   const equipment = useAppStore((state) => state.equipment);
   const orders = useAppStore((state) => state.orders);
   const vendors = useAppStore((state) => state.vendors);
@@ -27,8 +27,8 @@ export const Dashboard = (): ReactElement => {
   const notifications = useAppStore((state) => state.notifications);
 
   const rows = useMemo(
-    () => itemRowsOf({ items, equipment, orders, vendors, persons }, todayIsoDate()),
-    [items, equipment, orders, vendors, persons],
+    () => inspectionItemRowsOf({ inspectionItems, equipment, orders, vendors, persons }, todayIsoDate()),
+    [inspectionItems, equipment, orders, vendors, persons],
   );
   const counts = useMemo(() => countByStatus(rows), [rows]);
   const actionRows = useMemo(() => actionRequiredRows(rows), [rows]);

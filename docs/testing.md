@@ -33,10 +33,10 @@
   - 月単位の加算は暦月ベース。月末日の繰り上がり調整を検証する（例: 1/31 + 1M → 2/28）
   - `cycle` の全パターン（`1M` `3M` `6M` `1Y` `2Y` `3Y` `5Y` `10Y`）を境界値として網羅
 - **`leadTime.ts`（`resolveLeadTime` / `recommendedOrderDate`: 発注推奨日の逆算、ドメインモデル §4.2）**
-  - `leadTime = item.leadTimeDays ?? vendor.standardLeadTimeDays`
+  - `leadTime = inspectionItem.leadTimeDays ?? vendor.standardLeadTimeDays`
   - `発注推奨日 = nextDueDate − leadTime − bufferDays`
-  - `item.leadTimeDays` 未設定時に `vendor.standardLeadTimeDays` へフォールバックするケースを検証
-- **`itemStatus.ts`（`deriveItemStatus`、ドメインモデル §4.3）**
+  - `inspectionItem.leadTimeDays` 未設定時に `vendor.standardLeadTimeDays` へフォールバックするケースを検証
+- **`inspectionItemStatus.ts`（`deriveInspectionItemStatus`、ドメインモデル §4.3）**
   - 優先度順（上が優先。5段階）で判定することを検証:
     1. `overdue`（期限切れ）: 今日 > nextDueDate
     2. `orderNow`（要発注）: 外部 かつ 今日 ≥ 発注推奨日 かつ 有効な案件なし
@@ -64,8 +64,8 @@
 
 - `@testing-library/react` でコンポーネント・feature 単位のテスト
   - 共通 UI（`src/components/ui/<ComponentName>/<ComponentName>.test.tsx`）: Badge / Button / Modal / ConfirmModal / EmptyState / Select / DateField / Table / Tabs
-  - ドメイン固有 UI（`src/components/domain/<ComponentName>/<ComponentName>.test.tsx`）: StatusBadge（`deriveItemStatus` の表示）
-  - feature（`src/features/**/*.test.tsx`）: dashboard / equipment（一覧・詳細・登録編集） / items（項目一覧・項目編集モーダル・実施記録モーダル） / orders（案件一覧） / vendors・persons（メーカー/取引先・担当者マスタ） / notifications（通知センター） / settings（CSVエクスポート/インポート）
+  - ドメイン固有 UI（`src/components/domain/<ComponentName>/<ComponentName>.test.tsx`）: StatusBadge（`deriveInspectionItemStatus` の表示）
+  - feature（`src/features/**/*.test.tsx`）: dashboard / equipment（一覧・詳細・登録編集） / inspectionItems（項目一覧・項目編集モーダル・実施記録モーダル） / orders（案件一覧） / vendors・persons（メーカー/取引先・担当者マスタ） / notifications（通知センター） / settings（CSVエクスポート/インポート）
 - **Storybook** でコンポーネント単位の見た目・状態を確認
   - 起動: `npm run storybook`（dev・ポート6006） / ビルド: `npm run build-storybook`
   - story配置: 各コンポーネント隣に `*.stories.tsx`（`src/**/*.stories.@(tsx|mdx)`）
@@ -79,7 +79,7 @@
 
 以下はdecisions.md D-032で最終確定した値（実測に対し数%の余白を残す）。
 
-- `src/domain/**`（`dateCycle.ts` / `leadTime.ts` / `itemStatus.ts` / `notificationRules.ts` 等）: lines 98 / functions 100 / branches 98 / statements 98
+- `src/domain/**`（`dateCycle.ts` / `leadTime.ts` / `inspectionItemStatus.ts` / `notificationRules.ts` 等）: lines 98 / functions 100 / branches 98 / statements 98
 - `src/store/**`: lines 97 / functions 96 / branches 92 / statements 97
 - `src/utils/id.ts`: 100 / 100 / 100 / 100
 - `src/utils/csv.ts`: lines 97 / functions 95 / branches 90 / statements 97

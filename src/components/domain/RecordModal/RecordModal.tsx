@@ -6,7 +6,7 @@
 
 import { recordFormSchema, type RecordFormValues } from "@/components/domain/RecordModal/schema";
 import { Button, DateField, Modal, RadioGroup, TextField } from "@/components/ui";
-import { RECORD_RESULT_OPTIONS } from "@/features/items/constants";
+import { RECORD_RESULT_OPTIONS } from "@/features/inspectionItems/constants";
 import {
   EXECUTION,
   RECORD_RESULT,
@@ -23,7 +23,7 @@ import { useForm, useWatch, type DefaultValues } from "react-hook-form";
 type Props = {
   open: boolean;
   /** 対象項目。起動元で常に確定した状態で渡す */
-  itemId: string;
+  inspectionItemId: string;
   /** 案件経由起動時のみ指定(returned 案件)。記録に紐付き completed 連鎖する */
   orderId?: string;
   onClose: () => void;
@@ -35,20 +35,20 @@ type Props = {
  * ③internal または Vendor 解決不能 → 空欄。
  */
 const resolvePrefillDoneBy = (
-  item: InspectionItem | undefined,
+  inspectionItem: InspectionItem | undefined,
   order: CalibrationOrder | undefined,
   vendors: Record<string, Vendor>,
 ): string => {
   if (order) return vendors[order.vendorId]?.name ?? "";
-  if (item?.execution === EXECUTION.EXTERNAL && item.vendorId) {
-    return vendors[item.vendorId]?.name ?? "";
+  if (inspectionItem?.execution === EXECUTION.EXTERNAL && inspectionItem.vendorId) {
+    return vendors[inspectionItem.vendorId]?.name ?? "";
   }
   return "";
 };
 
-export const RecordModal = ({ open, itemId, orderId, onClose }: Props): ReactElement => {
-  const item = useAppStore((state) => state.items[itemId]);
-  const equipment = useAppStore((state) => (item ? state.equipment[item.equipmentId] : undefined));
+export const RecordModal = ({ open, inspectionItemId, orderId, onClose }: Props): ReactElement => {
+  const inspectionItem = useAppStore((state) => state.inspectionItems[inspectionItemId]);
+  const equipment = useAppStore((state) => (inspectionItem ? state.equipment[inspectionItem.equipmentId] : undefined));
   const vendors = useAppStore((state) => state.vendors);
   const order = useAppStore((state) => (orderId ? state.orders[orderId] : undefined));
   const addRecord = useAppStore((state) => state.addRecord);
@@ -65,19 +65,19 @@ export const RecordModal = ({ open, itemId, orderId, onClose }: Props): ReactEle
     resolver: zodResolver(recordFormSchema),
   });
 
-  // なぜ: open/対象変更のたびにプリフィルし直す（screen-design/README.md §0.5、ItemModal と同パターン）。
+  // なぜ: open/対象変更のたびにプリフィルし直す（screen-design/README.md §0.5、InspectionItemModal と同パターン）。
   // なぜ result を undefined か: 既定選択なし（未選択で送信すると zod エラー）とするため。
   useEffect(() => {
     const defaults: DefaultValues<RecordFormValues> = {
       doneDate: todayIsoDate(),
-      doneBy: resolvePrefillDoneBy(item, order, vendors),
+      doneBy: resolvePrefillDoneBy(inspectionItem, order, vendors),
       result: undefined,
       note: "",
     };
     reset(defaults);
-  }, [open, itemId, orderId, item, order, vendors, reset]);
+  }, [open, inspectionItemId, orderId, inspectionItem, order, vendors, reset]);
 
-  // なぜ watch() ではなく useWatch か: ItemModal の execution 監視と同じ理由（react-compiler lint対策）。
+  // なぜ watch() ではなく useWatch か: InspectionItemModal の execution 監視と同じ理由（react-compiler lint対策）。
   const result = useWatch({ control, name: "result" });
   const doneDate = useWatch({ control, name: "doneDate" });
 
@@ -85,8 +85,8 @@ export const RecordModal = ({ open, itemId, orderId, onClose }: Props): ReactEle
   const orderVendorName = order ? (vendors[order.vendorId]?.name ?? "") : "";
 
   const targetLabel =
-    item && equipment
-      ? `対象:${equipment.managementNo} ${equipment.name} / ${item.name}`
+    inspectionItem && equipment
+      ? `対象:${equipment.managementNo} ${equipment.name} / ${inspectionItem.name}`
       : "対象:(項目情報が見つかりません)";
 
   // なぜ: submitFailed を閉時にリセットし、同一対象で開き直した際の残留エラー表示を防ぐ
@@ -98,7 +98,7 @@ export const RecordModal = ({ open, itemId, orderId, onClose }: Props): ReactEle
 
   const onSubmit = (values: RecordFormValues): void => {
     const recordId = addRecord({
-      itemId,
+      inspectionItemId,
       doneDate: values.doneDate,
       doneBy: values.doneBy,
       result: values.result,
