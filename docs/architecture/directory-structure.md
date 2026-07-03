@@ -10,12 +10,12 @@ src/
 ├── main.tsx                         // エントリ。HashRouter + ErrorBoundary + SW登録（virtual:pwa-register）
 ├── components/
 │   ├── icons/index.ts              // SVGアイコン群（barrel export）
-│   ├── system/
-│   │   └── ErrorBoundary.tsx       // 例外捕捉境界
-│   ├── layout/                     // 共通レイアウト（screen-design §0.1）
-│   │   ├── AppLayout.tsx           // サイドバー+ヘッダーの外枠。モバイル幅ではハンバーガーに畳む
+│   ├── system/                     // アプリ基盤コンポーネント
+│   │   ├── ErrorBoundary.tsx       // 例外捕捉境界
+│   │   ├── AppLayout.tsx           // 共通レイアウト外枠（screen-design §0.1）。サイドバー+ヘッダー、モバイル幅ではハンバーガーに畳む
 │   │   ├── Sidebar.tsx
-│   │   └── Header.tsx              // 通知ベル + 未読バッジ
+│   │   ├── Header.tsx              // 通知ベル + 未読バッジ
+│   │   └── index.ts                // barrel export（ErrorBoundary / AppLayout）
 │   ├── domain/                     // ドメイン固有の複合UIコンポーネント（各コンポーネントはサブディレクトリ + barrel）
 │   │   ├── StatusBadge/            // deriveInspectionItemStatus + statusBadgeClass によるステータスバッジ（screen-design §0.3）
 │   │   ├── InspectionItemModal/              // 点検校正項目 登録・編集モーダル（screen-design §6）。equipment/detail と inspectionItems 双方から起動するため共通配置

@@ -1,5 +1,5 @@
 // oxlint-disable import/max-dependencies -- 全ルート定義のため依存数上限の対象外とする
-import { AppLayout } from "@/components/layout/AppLayout";
+import { AppLayout } from "@/components/system";
 import { ROUTES } from "@/constants/routes";
 import { Dashboard } from "@/features/dashboard";
 import { EquipmentDetail } from "@/features/equipment/detail";

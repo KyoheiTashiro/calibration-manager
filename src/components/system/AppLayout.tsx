@@ -1,5 +1,5 @@
-import { Header } from "@/components/layout/Header";
-import { Sidebar } from "@/components/layout/Sidebar";
+import { Header } from "@/components/system/Header";
+import { Sidebar } from "@/components/system/Sidebar";
 import { useEffect, useState, type ReactElement } from "react";
 import { Outlet } from "react-router-dom";
 

@@ -1,4 +1,4 @@
-import { AppLayout } from "@/components/layout/AppLayout";
+import { AppLayout } from "@/components/system/AppLayout";
 import { NOTIFICATION_TARGET_TYPE, NOTIFICATION_TYPE, type Notification } from "@/store/types";
 import { renderWithStore, seedStore, setupStoreIsolation } from "@/test/renderWithStore";
 import { screen, within } from "@testing-library/react";
