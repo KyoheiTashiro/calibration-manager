@@ -40,7 +40,7 @@
 ## 操作・アクション
 
 - サマリーカードクリック → `/inspection-items?status=<overdue|orderNow|dueSoon|inProgress>` へ遷移(該当ステータスでプリフィルタ)。
-- 要対応項目リストの行クリック → 該当機器の詳細 `/equipment/:id`(または点検校正項目一覧の該当行)へ遷移。
+- 要対応項目リストの行クリック → 該当機器の詳細 `/equipment/:id` へ遷移(D-026)。
 - 「通知センターへ」→ `/notifications`。
 
 ## 表示ルール・バリデーション

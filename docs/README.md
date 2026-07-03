@@ -57,6 +57,7 @@
 - [screen-design/09-masters.md](screen-design/09-masters.md) — マスタ管理(メーカー/取引先・担当者)
 - [screen-design/10-notifications.md](screen-design/10-notifications.md) — 通知センター
 - [screen-design/11-settings.md](screen-design/11-settings.md) — 設定・バックアップ
+- [screen-design/12-manual.md](screen-design/12-manual.md) — 利用マニュアル
 
 ---
 
@@ -99,6 +100,7 @@
 | 7   | `/#/vendors`・`/#/persons`                  | [マスタ管理](screen-design/09-masters.md)                                                                                                                                                              |
 | 8   | `/#/notifications`                          | [通知センター](screen-design/10-notifications.md)                                                                                                                                                      |
 | 9   | `/#/settings`                               | [設定・バックアップ](screen-design/11-settings.md)                                                                                                                                                     |
+| 10  | `/#/manual`                                 | [利用マニュアル](screen-design/12-manual.md)                                                                                                                                                           |
 | —   | モーダル                                    | [項目編集](screen-design/06-inspection-item-modal.md) / [実施記録](screen-design/07-record-modal.md) / 案件作成・状態更新([08](screen-design/08-orders.md)) / マスタ追加・編集([09](screen-design/09-masters.md)) |
 
 各画面のワイヤーは `screen-design/` 配下参照。

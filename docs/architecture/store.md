@@ -2,7 +2,7 @@
 
 関連: [domain-model.md](../domain-model.md) ／ [tech-stack.md](./tech-stack.md)
 
-アプリ全状態を保持する zustand ストアの設計方針。実装想定パス: `src/store/useAppStore.ts`。calibration-manager は設計フェーズであり、以下はいずれも実装方針・想定であってすでに動作する実績ではない。
+アプリ全状態を保持する zustand ストアの設計。実装パス: `src/store/useAppStore.ts`（7スライス合成・persist設定）。migrate/merge の実処理は `src/store/persistence.ts` に分離実装されている。
 
 ## 全体像
 
@@ -57,14 +57,14 @@ useAppStore = create<StoreState>()(
 
 ## 永続化（zustand persist）
 
-- ストアキー（`name`）: `calibration-manager:v1`
-- スキーマ `version`: `1`。初回スキーマのため、現時点でmigrationステップは未登録とする。将来のスキーマ変更に備え、`migrations: Record<number, Migration>` によるバージョン間ステップ変換の仕組みを最初から用意する方針とする。
+- ストアキー（`name`）: `calibration-manager:v1`（キー文字列中の `v1` は歴史的な識別子でありスキーマ `version` とは独立。リネームしない）
+- スキーマ `version`: `2`。v1→v2 は `migrateV1ToV2`（`persistence.ts`）が item→inspectionItem 全域リネーム（decisions.md D-036）を無損失変換し、`MIGRATIONS[1]` に登録済み。`migrations: Record<number, Migration>` によるバージョン間ステップ変換の仕組みを用意しており、将来のスキーマ変更でも同じ仕組みで対応する。
 - `partialize`: 永続化対象は7エンティティの `Record`（vendors / persons / equipment / inspectionItems / records / orders / notifications）のみとする方針とする。アクション関数・派生値は保存しない。
 - 読込パイプライン: LocalStorage → `migrate`（バージョン変換）→ `merge`（検証・サニタイズ・結合）→ ストア、という流れを採用する。
 
 ### migrate
 
-`migratePersistedState(persisted, fromVersion)` は「version N→N+1」のステップ変換テーブルを順に適用する設計とする。現状は `version = 1` のためテーブルは空とする。将来のスキーマ変更時には `migrateVNToVN+1` を追加してテーブルへ登録し、`STORAGE_VERSION` をインクリメントする運用方針とする。
+`migratePersistedState(persisted, fromVersion)`（`persistence.ts`）は「version N→N+1」のステップ変換テーブル `MIGRATIONS` を順に適用する。現状 `MIGRATIONS = { 1: migrateV1ToV2 }`（v1→v2、D-036の item→inspectionItem リネーム）。将来のスキーマ変更時には `migrateVNToVN+1` を追加してテーブルへ登録し、`STORAGE_VERSION` をインクリメントする運用とする。
 
 ### merge（サルベージ戦略）
 
@@ -91,8 +91,9 @@ useAppStore = create<StoreState>()(
 
 以下のテストファイル構成を想定する。
 
-- `useAppStore.test.ts` — アクション・カスケード・migrate/mergeの検証
-- `merge.test.ts` — merge 3段構えのサルベージ挙動の検証
+- `useAppStore.test.ts` — アクション・カスケードの検証
+- `merge.test.ts` — migrate（`migrateV1ToV2` 含む）/ merge 3段構えのサルベージ挙動の検証
+- `schema.test.ts` — zodスキーマ（`store/schema.ts`）の検証
 - `slices/*.test.ts` — スライス単体の検証
 - `selectors.test.ts` — 導出ロジックの検証
 - `domain/*.test.ts` — 純粋関数群の検証。一部は `*.proptest.test.ts` としてfast-checkによるproperty testを想定する。特に `addCycle` の月末補正や `deriveInspectionItemStatus` の優先度判定は境界値・優先順位が絡むロジックであり、property testと相性が良いと考える。
