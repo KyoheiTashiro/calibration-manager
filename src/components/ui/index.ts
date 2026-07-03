@@ -14,5 +14,6 @@ export { Select } from "@/components/ui/Select";
 export { Table, TableBody, TableHead } from "@/components/ui/Table";
 export { Tabs } from "@/components/ui/Tabs";
 export { TextField } from "@/components/ui/TextField";
+export { Textarea } from "@/components/ui/Textarea";
 export { useDialog } from "@/components/ui/hooks/useDialog";
 export { useOutsideClick } from "@/components/ui/hooks/useOutsideClick";
