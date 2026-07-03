@@ -79,6 +79,7 @@ erDiagram
 
 - `suspended` / `retired` の機器は期限計算・通知の対象外。
 - 機器の削除は論理削除(`retired`)を基本とし、履歴を保持する。
+- 休止 → 稼働の復帰時、配下項目の `nextDueDate` は据え置き(リセットしない)。休止中に期限超過していれば復帰後 overdue として表示される([decisions.md D-002](decisions.md))。
 
 ### 3.4 InspectionItem(点検校正項目)— 中核エンティティ
 
@@ -168,6 +169,7 @@ planned(発注準備) → ordered(発注済) → inCalibration(校正中) → re
 | `deliveryOverdue`  | 発注済案件 | 今日 > 返却予定日 かつ 未返却       |
 
 - 同一対象・同一種別の未読通知は重複生成しない。
+- 担当者(Person)を無効化しても宛先はフォールバックせず元 personId のまま。無効化後も通知は生成・表示し続ける([decisions.md D-001](decisions.md))。
 
 ## 4. 期限計算ロジック
 
@@ -235,7 +237,7 @@ leadTime = item.leadTimeDays ?? vendor.standardLeadTimeDays
 
 ## 8. 未決事項
 
-- [ ] 校正の「合格基準」「校正値の記録」まで持つか(現状は結果enum+備考のみ)
-- [ ] 通知の宛先: 担当者不在(無効化済み)の場合のフォールバック先
+- [x] 校正の「合格基準」「校正値の記録」まで持つか → スコープ外で確定([decisions.md D-004](decisions.md))
+- [x] 通知の宛先: 担当者不在(無効化済み)の場合のフォールバック先 → フォールバックなし・元 personId のまま([decisions.md D-001](decisions.md))
 - [ ] 期限の起算: 実施日基準か、当初予定日基準か(現状: 実施日基準)
-- [ ] 休止機器を再稼働した際の期限リセットルール
+- [x] 休止機器を再稼働した際の期限リセットルール → 据え置き([decisions.md D-002](decisions.md))

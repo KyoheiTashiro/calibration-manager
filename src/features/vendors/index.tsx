@@ -5,7 +5,15 @@
  */
 
 import { VendorModal } from "@/components/domain/VendorModal";
-import { Button, ConfirmModal, EmptyState, Modal, Table, TableBody, TableHead } from "@/components/ui";
+import {
+  Button,
+  ConfirmModal,
+  EmptyState,
+  Modal,
+  Table,
+  TableBody,
+  TableHead,
+} from "@/components/ui";
 import type { Vendor } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
 import { useState, type ReactElement } from "react";
