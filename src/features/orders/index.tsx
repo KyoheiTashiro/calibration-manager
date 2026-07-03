@@ -134,8 +134,10 @@ export const OrderList = (): ReactElement => {
 
       {totalOrderCount === 0 ? (
         <EmptyState
-          message="外部校正案件はありません。項目一覧から案件を作成できます"
-          action={<Button onClick={() => navigate(ROUTES.INSPECTION_ITEM_LIST)}>項目一覧へ</Button>}
+          message="外部校正案件はありません。点検校正項目一覧から案件を作成できます"
+          action={
+            <Button onClick={() => navigate(ROUTES.INSPECTION_ITEM_LIST)}>点検校正項目一覧へ</Button>
+          }
         />
       ) : (
         <div className="flex gap-4 overflow-x-auto pb-2">

@@ -77,7 +77,7 @@ export const Manual = (): ReactElement => (
           点検・校正を実施したら、
           {/* oxlint-disable-next-line react/forbid-component-props -- Linkはclassnameでリンク色を渡す設計(Badgeと同様) */}
           <Link to={ROUTES.INSPECTION_ITEM_LIST} className="text-primary underline">
-            項目一覧
+            点検校正項目一覧
           </Link>
           から実施記録を登録します(こちらもモーダルで行い、登録すると次回期限が自動更新されます)。
         </li>
@@ -145,7 +145,7 @@ export const Manual = (): ReactElement => (
         <h3 className="font-semibold">
           {/* oxlint-disable-next-line react/forbid-component-props -- Linkはclassnameでリンク色を渡す設計(Badgeと同様) */}
           <Link to={ROUTES.INSPECTION_ITEM_LIST} className="text-primary underline">
-            項目一覧
+            点検校正項目一覧
           </Link>
         </h3>
         <p>

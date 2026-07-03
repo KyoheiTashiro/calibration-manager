@@ -2,9 +2,9 @@
 
 [画面設計 共通仕様・全体構成](./README.md) の一部。ステータス色・モーダル共通挙動・確認ダイアログ等の共通仕様は [README(§0 共通仕様)](./README.md#0-共通仕様) を参照。
 
-**目的**: 点検校正項目(InspectionItem)の新規登録・編集。機器詳細・項目一覧から起動。
+**目的**: 点検校正項目(InspectionItem)の新規登録・編集。機器詳細・点検校正項目一覧から起動。
 
-**起動元**: [機器詳細](./04-equipment-detail.md)、[項目一覧](./05-inspection-item-list.md)
+**起動元**: [機器詳細](./04-equipment-detail.md)、[点検校正項目一覧](./05-inspection-item-list.md)
 
 ## 画面レイアウト
 

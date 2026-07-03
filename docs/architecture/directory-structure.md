@@ -86,7 +86,7 @@ src/
 ## 補足
 
 - ルーターは `main.tsx` の `HashRouter`。ルート定義は `App.tsx` に置く想定とする。11画面のルーティング対応表は screen-design/README.md §0.2 を参照し、本書では再掲しない。
-- モーダル群（InspectionItemModal/RecordModal/OrderModal/VendorModal/PersonModal）は特定の1画面に属さず複数画面から起動されるため `components/domain/` に配置する方針とする（screen-design §0.2「モーダルで行う操作」）。pinpon（`domain/` には `WinnerBadge` のみ）と比べて `components/domain/` の役割が広いのは、calibration-managerの画面設計上モーダル起動元が多い（機器詳細・項目一覧・案件一覧など）ことによる calibration-manager 特有の設計判断である。
+- モーダル群（InspectionItemModal/RecordModal/OrderModal/VendorModal/PersonModal）は特定の1画面に属さず複数画面から起動されるため `components/domain/` に配置する方針とする（screen-design §0.2「モーダルで行う操作」）。pinpon（`domain/` には `WinnerBadge` のみ）と比べて `components/domain/` の役割が広いのは、calibration-managerの画面設計上モーダル起動元が多い（機器詳細・点検校正項目一覧・案件一覧など）ことによる calibration-manager 特有の設計判断である。
 - `features/*/schema.ts` はReact Hook Form + Zod用のフォームスキーマを想定する（機器登録編集、Vendor/Person等）。
 - `store/schema.ts` はCSVインポートの行バリデーションにも再利用する方針とする（[tech-stack.md](./tech-stack.md) 参照）。
 - Storybookのstoryはコンポーネント隣に `*.stories.tsx` で配置する（colocation）想定とする。上記ツリーでは省略している。

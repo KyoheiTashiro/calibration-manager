@@ -46,7 +46,9 @@ describe("Manual", () => {
     expect(screen.getByRole("link", { name: "通知" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "設定" })).toBeInTheDocument();
 
-    expect(screen.getAllByRole("link", { name: "項目一覧" }).length).toBeGreaterThanOrEqual(2);
+    expect(screen.getAllByRole("link", { name: "点検校正項目一覧" }).length).toBeGreaterThanOrEqual(
+      2,
+    );
     expect(screen.getAllByRole("link", { name: "校正案件" }).length).toBeGreaterThanOrEqual(2);
     expect(screen.getAllByRole("link", { name: "メーカー・取引先" }).length).toBeGreaterThanOrEqual(
       2,

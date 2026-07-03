@@ -118,7 +118,7 @@ describe("完了/中止も表示 トグル", () => {
     expect(screen.queryByText("記録登録済")).not.toBeInTheDocument();
     expect(screen.queryByText("中止")).not.toBeInTheDocument();
     expect(
-      screen.queryByText("外部校正案件はありません。項目一覧から案件を作成できます"),
+      screen.queryByText("外部校正案件はありません。点検校正項目一覧から案件を作成できます"),
     ).not.toBeInTheDocument();
     for (const status of KANBAN_ACTIVE_COLUMNS) {
       expect(screen.getByText(ORDER_STATUS_LABELS[status])).toBeInTheDocument();
@@ -154,14 +154,14 @@ describe("中止フロー", () => {
 });
 
 describe("空状態", () => {
-  it("表示対象の全列が0件のときEmptyStateと項目一覧導線を出す", () => {
+  it("表示対象の全列が0件のときEmptyStateと点検校正項目一覧導線を出す", () => {
     seedStore({ orders: {} });
     renderWithStore(<OrderList />);
 
     expect(
-      screen.getByText("外部校正案件はありません。項目一覧から案件を作成できます"),
+      screen.getByText("外部校正案件はありません。点検校正項目一覧から案件を作成できます"),
     ).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "項目一覧へ" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "点検校正項目一覧へ" })).toBeInTheDocument();
   });
 
   it("個別列が0件のとき列内に「なし」プレースホルダを出す", () => {
@@ -182,7 +182,7 @@ describe("空状態", () => {
 
     // 案件は存在する（completed 1件）ため、全列0件の空状態メッセージは出ない
     expect(
-      screen.queryByText("外部校正案件はありません。項目一覧から案件を作成できます"),
+      screen.queryByText("外部校正案件はありません。点検校正項目一覧から案件を作成できます"),
     ).not.toBeInTheDocument();
     // 進行中4列（発注準備/発注済/校正中/返却済）のヘッダーは表示される
     for (const status of KANBAN_ACTIVE_COLUMNS) {

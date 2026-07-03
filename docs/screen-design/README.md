@@ -67,7 +67,7 @@
 - [11. 設定・バックアップ](./11-settings.md)
 - [12. 利用マニュアル](./12-manual.md)
 
-**モーダルで行う操作(ページ遷移しない)**: 点検校正項目の登録・編集([§6](./06-inspection-item-modal.md))、実施記録登録([§7](./07-record-modal.md))、外部校正案件の作成・状態更新([§8](./08-orders.md))、Vendor/Person の追加・編集([§9](./09-masters.md))。これらは機器詳細・項目一覧・案件一覧などから起動する。
+**モーダルで行う操作(ページ遷移しない)**: 点検校正項目の登録・編集([§6](./06-inspection-item-modal.md))、実施記録登録([§7](./07-record-modal.md))、外部校正案件の作成・状態更新([§8](./08-orders.md))、Vendor/Person の追加・編集([§9](./09-masters.md))。これらは機器詳細・点検校正項目一覧・案件一覧などから起動する。
 
 ### 0.3 ステータスバッジ色(共通定義)
 
@@ -113,7 +113,7 @@
 
 ```mermaid
 flowchart TD
-    Dash[ダッシュボード /] -->|サマリーカード| InspectionItems[項目一覧 /inspection-items]
+    Dash[ダッシュボード /] -->|サマリーカード| InspectionItems[点検校正項目一覧 /inspection-items]
     Dash -->|通知| Notice[通知センター /notifications]
     Sidebar((サイドバー)) --> Dash & EqList[機器一覧 /equipment] & InspectionItems & Orders[案件一覧 /orders] & Vendors[メーカー /vendors] & Persons[担当者 /persons] & Notice & Settings[設定 /settings]
     EqList -->|行クリック| EqDetail[機器詳細 /equipment/:id]

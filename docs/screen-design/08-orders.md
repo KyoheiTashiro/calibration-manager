@@ -45,7 +45,7 @@ planned → ordered → inCalibration → returned → completed
 
 ## 案件作成モーダル(planned新規作成)
 
-- 起動元: [項目一覧](./05-inspection-item-list.md)の「案件」アクション(外部・有効案件なしの項目)。
+- 起動元: [点検校正項目一覧](./05-inspection-item-list.md)の「案件」アクション(外部・有効案件なしの項目)。
 - 入力: `inspectionItemId`(プリセット)、`vendorId`(既定=inspectionItem.vendorId、`isCalibrator=true`)、任意で dueDate・cost・note。作成時 `status=planned`。
 
 ## 表示ルール・バリデーション(zod)
@@ -58,5 +58,5 @@ planned → ordered → inCalibration → returned → completed
 
 ## 空状態
 
-- 全列0件: 「外部校正案件はありません。項目一覧から案件を作成できます」+ `/inspection-items` 導線。
+- 全列0件: 「外部校正案件はありません。点検校正項目一覧から案件を作成できます」+ `/inspection-items` 導線。
 - 個別列0件: 各列に薄い「なし」プレースホルダ。
