@@ -7,3 +7,6 @@ storybook-static
 *.tsbuildinfo
 
 .DS_Store
+
+# vite-plugin-pwa devOptions が生成する開発用SW（生成物のためコミット対象外）
+dev-dist

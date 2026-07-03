@@ -3,6 +3,9 @@
   // なぜ: coding-standards.md §10 の通り plugins = typescript/unicorn/oxc/react/jsx-a11y/import を有効化する。
   // "eslint" は oxlint の基礎ルール群のため常に含める必要がある（省くとcorrectness系の基本チェックが抜ける）。
   "plugins": ["eslint", "typescript", "unicorn", "oxc", "react", "jsx-a11y", "import"],
+  // なぜ: dev-dist は vite-plugin-pwa の devOptions が生成する開発用 Service Worker 生成物であり、
+  // lint 対象にすると workbox 由来の大量エラーが出るため除外する（.gitignore にも追加済み）。
+  "ignorePatterns": ["dev-dist"],
   // なぜ: coding-standards.md §10「categories 全 error」。
   // 個別ルールのoffは override + 理由コメントで行う方針のため、ここでは全カテゴリを一律 error にする。
   "categories": {
