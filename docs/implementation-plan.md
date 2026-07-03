@@ -144,6 +144,7 @@
 - [ ] PWA 完全オフライン実機検証(precache、autoUpdate、初回のみオンライン)
 - [ ] a11y: axe 重大違反0、Lighthouse 95+、dueSoon 黄コントラスト検証
 - [x] カバレッジラチェット最終確定(D-032: domain 98/100/98/98、store 97/96/92/97、id.ts 100、csv.ts 97/95/90/97。実測を下回らず引き下げなし、`--coverage` exit 0)
+- [x] 利用マニュアル画面(/manual)追加: 静的コンテンツ・store参照なし、サイドバー最下部(docs/screen-design/12-manual.md、decisions.md D-035)
 
 ---
 

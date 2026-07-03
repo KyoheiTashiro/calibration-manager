@@ -15,6 +15,7 @@ export const ROUTES = {
   PERSON_LIST: "/persons",
   NOTIFICATION_LIST: "/notifications",
   SETTINGS: "/settings",
+  MANUAL: "/manual",
 } as const;
 export type Route = (typeof ROUTES)[keyof typeof ROUTES];
 

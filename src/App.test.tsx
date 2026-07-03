@@ -39,11 +39,11 @@ describe("主要ルートのプレースホルダ表示", () => {
 describe("サイドバーのナビゲーション", () => {
   beforeEach(setupStoreIsolation);
 
-  it("メインナビゲーションのリンクが8項目ある", () => {
+  it("メインナビゲーションのリンクが9項目ある", () => {
     renderWithStore(<App />);
 
     const navigation = screen.getByRole("navigation", { name: "メインナビゲーション" });
-    expect(within(navigation).getAllByRole("link")).toHaveLength(8);
+    expect(within(navigation).getAllByRole("link")).toHaveLength(9);
   });
 });
 
