@@ -39,7 +39,7 @@ const getOpenDialog = (title: string): HTMLElement => {
 };
 
 /**
- * 項目テーブル(1つ目のtable)の行を取得する。項目名は実施履歴テーブルの行にも
+ * 項目テーブル(1つ目のtable)の行を取得する。項目名は実施記録テーブルの行にも
  * 出現するため、screen 全体ではなく項目テーブル内にスコープして曖昧マッチを避ける。
  */
 const getInspectionItemRow = (name: RegExp): HTMLElement => {

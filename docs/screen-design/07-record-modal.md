@@ -4,13 +4,13 @@
 
 **目的**: 項目の実施結果(InspectionRecord)を登録し、次回期限を更新する。
 
-**起動元**: [機器詳細](./04-equipment-detail.md)、[点検校正項目一覧](./05-inspection-item-list.md)、[外部校正案件一覧](./08-orders.md)の `returned` カード
+**起動元**: [機器詳細](./04-equipment-detail.md)、[点検校正項目一覧](./05-inspection-item-list.md)、[校正案件一覧](./08-orders.md)の `returned` カード
 
 ## 画面レイアウト
 
 ```
 ┌───────────────────────────────────────┐
-│ 実施記録を登録                     [×]│
+│ 実施記録を追加                     [×]│
 │ 対象:EQ-001 ノギス / 年次校正        │
 │ 実施日*   [2026-06-20]  (既定:今日) │
 │ 実施者*   [ミツトヨ校正センター  ]    │
@@ -40,7 +40,7 @@
 2. `inspectionItem.lastDoneDate = doneDate`。
 3. **`result` が `pass` または `adjusted` のとき**: `inspectionItem.nextDueDate = doneDate + cycle`(暦月ベース [§0.4](./README.md#04-日付表示形式))。
 4. **`result` が `fail` のとき**: `nextDueDate` を更新せず、項目は要対応状態(再実施が必要)として扱う。※期限が過ぎていれば `overdue` のまま表示。
-5. **外部校正案件(status=`returned`)から起動した場合**: `orderId` を記録に紐付け、当該 CalibrationOrder を `completed` へ遷移(§3.6)。
+5. **校正案件(status=`returned`)から起動した場合**: `orderId` を記録に紐付け、当該 CalibrationOrder を `completed` へ遷移(§3.6)。
 
 ## 表示ルール・バリデーション(zod)
 

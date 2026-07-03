@@ -20,7 +20,7 @@ import { todayIsoDate } from "@/utils/time";
 // hooks 経由で供給するため再 export する(index.tsx の依存数も抑える)
 export { personLabelOf } from "@/store/selectors";
 
-/** 実施履歴の1行(項目横断マージ用に項目名を同梱) */
+/** 実施記録の1行(項目横断マージ用に項目名を同梱) */
 export type HistoryRow = { record: InspectionRecord; inspectionItemName: string };
 
 /** 項目一覧の並び順: isActive=true を先頭に、両グループ内は nextDueDate 昇順(同値は id 昇順) */
@@ -30,7 +30,7 @@ const compareInspectionItemRows = (left: InspectionItem, right: InspectionItem):
 };
 
 /**
- * 実施履歴の並び順。recordsOf は項目単位で既にソート済みだが、複数項目を
+ * 実施記録の並び順。recordsOf は項目単位で既にソート済みだが、複数項目を
  * flatMap でマージした配列は全体としてソート済みでなくなるため、同一比較関数で再ソートする。
  */
 const compareHistoryRows = (left: HistoryRow, right: HistoryRow): number =>
@@ -43,7 +43,7 @@ export const sortedInspectionItemsOf = (
   equipmentId: string,
 ): InspectionItem[] => inspectionItemsOf({ inspectionItems }, equipmentId).toSorted(compareInspectionItemRows);
 
-/** この機器の全項目の実施履歴を項目横断でマージし、doneDate降順(同日はid昇順)に並べる */
+/** この機器の全項目の実施記録を項目横断でマージし、doneDate降順(同日はid昇順)に並べる */
 export const historyRowsOf = (
   inspectionItems: Record<string, InspectionItem>,
   records: Record<string, InspectionRecord>,

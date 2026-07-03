@@ -31,7 +31,7 @@ const renderDetail = (id: string): ReturnType<typeof renderWithStore> =>
   });
 
 /**
- * 項目テーブル(1つ目のtable)のデータ行を取得する。項目名は実施履歴テーブルの行にも
+ * 項目テーブル(1つ目のtable)のデータ行を取得する。項目名は実施記録テーブルの行にも
  * 出現するため、screen 全体ではなく項目テーブル内にスコープして曖昧マッチを避ける。
  */
 const getInspectionItemRow = (name: string | RegExp): HTMLElement => {

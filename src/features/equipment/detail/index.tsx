@@ -1,6 +1,6 @@
 /**
  * 機器詳細画面（screen-design/04-equipment-detail.md）。
- * 1機器の基本情報・点検校正項目一覧・実施履歴(項目横断)を集約表示し、
+ * 1機器の基本情報・点検校正項目一覧・実施記録(項目横断)を集約表示し、
  * 項目追加/編集モーダルの起動起点となる。表示専用画面であり、入力検証は各モーダル側の責務。
  * 並び替え・派生ステータスの計算ロジックは hooks.ts に集約する（coding-standards.md §2）。
  */
@@ -195,7 +195,7 @@ export const EquipmentDetail = (): ReactElement => {
       </div>
 
       <div className="flex flex-col gap-2">
-        <h2 className="text-lg font-semibold">実施履歴(全項目横断・新しい順)</h2>
+        <h2 className="text-lg font-semibold">実施記録(全項目横断・新しい順)</h2>
 
         {historyRows.length === 0 ? (
           <EmptyState message="実施記録が未登録です" />

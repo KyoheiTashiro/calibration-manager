@@ -49,7 +49,7 @@ export const Manual = (): ReactElement => (
           はじめに、機器の登録で使う基本情報(
           {/* oxlint-disable-next-line react/forbid-component-props -- Linkはclassnameでリンク色を渡す設計(Badgeと同様) */}
           <Link to={ROUTES.VENDOR_LIST} className="text-primary underline">
-            メーカー・取引先
+            メーカー/取引先
           </Link>
           ・
           {/* oxlint-disable-next-line react/forbid-component-props -- Linkはclassnameでリンク色を渡す設計(Badgeと同様) */}
@@ -114,7 +114,7 @@ export const Manual = (): ReactElement => (
         発注余裕日数」で計算されます。
       </p>
       <p>
-        納期は、項目ごとに個別の設定があればそれを、なければ依頼先(メーカー・取引先)の標準納期を
+        納期は、項目ごとに個別の設定があればそれを、なければ依頼先(メーカー/取引先)の標準納期を
         使います。
       </p>
     </section>
@@ -141,7 +141,7 @@ export const Manual = (): ReactElement => (
         </h3>
         <p>
           登録した機器の一覧表示と検索ができます。機器詳細では、1台の機器の基本情報・点検校正項目・
-          実施履歴をまとめて確認でき、項目の管理や記録の登録もここから行います。
+          実施記録をまとめて確認でき、項目の管理や記録の登録もここから行います。
         </p>
       </div>
 
@@ -172,7 +172,7 @@ export const Manual = (): ReactElement => (
         <h3 className="font-semibold">
           {/* oxlint-disable-next-line react/forbid-component-props -- Linkはclassnameでリンク色を渡す設計(Badgeと同様) */}
           <Link to={ROUTES.VENDOR_LIST} className="text-primary underline">
-            メーカー・取引先
+            メーカー/取引先
           </Link>
         </h3>
         <p>機器のメーカーや、校正の依頼先となる取引先を追加・編集します。</p>
