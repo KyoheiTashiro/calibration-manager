@@ -166,6 +166,21 @@
       }
     },
     {
+      // なぜ: .storybook/main.ts はStorybook CLIがNode環境で読み込む設定ファイルのため、
+      // vite.config.ts等と同様に `node:url` 等のNode組み込みモジュールの利用を許可する必要がある。
+      // .storybook/preview.tsはStorybookのグローバルスタイル読み込みのためsrc配下のCSSを
+      // 相対importする必要があり（`@/`エイリアスはNode向けtsconfig側でパス解決していないため）、
+      // 親ディレクトリへの相対importを禁止するルールをこの2ファイルに限り緩和する。
+      "files": [".storybook/main.ts", ".storybook/preview.ts"],
+      "env": {
+        "node": true
+      },
+      "rules": {
+        "import/no-nodejs-modules": "off",
+        "import/no-relative-parent-imports": "off"
+      }
+    },
+    {
       // なぜ: coding-standards.md §10「test override で vitest」。
       // テストファイルではvitestプラグインの規約チェック(no-disabled-tests等)を有効化し、
       // vitestのグローバル関数（describe/it/expect等）を認識できるようにする。

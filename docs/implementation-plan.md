@@ -49,24 +49,33 @@
 - [x] テストヘルパ(renderWithStore / seedStore / setupStoreIsolation)+ ストアテスト96件(計222件全緑)
 - カバレッジ実測: store 98.8/100/95.7、slices 96.7/93.8/96.2(目標 95/95/88 超過)
 
-## Phase 3: 共通UI + レイアウト
+## Phase 3: 共通UI + レイアウト ✅ 完了(2026-07-03)
 
-担当: 委譲(Sonnet/Opus)、メイン監査
+担当実績: Sonnet 3並列(UI基本部品 / モーダル系 / レイアウト+ルート)+ Storybook 班。メイン = 監査・barrel作成・Modal残留state修正
 
-- [ ] components/ui/: Badge / Button / Modal(Esc・オーバーレイ・編集中破棄確認)/ ConfirmModal(既定フォーカス=キャンセル)/ EmptyState / Select / DateField / Table / Tabs
-- [ ] hooks: useDialog / useOutsideClick
-- [ ] components/domain/StatusBadge(色 + 日本語ラベル併記必須)
-- [ ] components/layout/: AppLayout / Sidebar(w-60、md未満ハンバーガー)/ Header(通知ベル + 未読バッジ)
-- [ ] App.tsx 全ルート + プレースホルダページ
-- [ ] Storybook 起動 + 共通UIストーリー(addon-a11y)
+- [x] components/ui/: Badge / Button / Modal(Esc・オーバーレイ・破棄確認、3経路を attemptClose に一本化)/ ConfirmModal(既定フォーカス=キャンセル)/ EmptyState / Select・DateField(RHF register 素通し + aria-describedby)/ Table / Tabs
+- [x] hooks: useDialog(showModal/close 同期、InvalidStateError回避)/ useOutsideClick
+- [x] components/domain/StatusBadge(statusBadgeClass/Label ヘルパ経由、色+日本語ラベル併記)
+- [x] components/layout/: AppLayout(モバイルオーバーレイ Esc/背景クリック閉)/ Sidebar(w-60、NavLink end)/ Header(通知ベル+未読バッジ、aria-live告知)
+- [x] App.tsx 全11ルート + NotFound + プレースホルダページ(features/ 配置)
+- [x] barrel: components/ui/index.ts / components/domain/index.ts(メイン作成)
+- [x] Storybook 10.4.6 + addon-a11y、ストーリー10本。vite.config 自動検出を viteConfig.stub.ts で遮断(base/PWA干渉回避)
+- [x] 監査修正: Modal の破棄確認オーバーレイ残留 → dialog close イベント購読でリセット
+- ゲート実績: tsc 0 / oxlint 0 / テスト306件全緑(+84件増)/ npm run build / build-storybook 成功
 
 ## Phase 4: マスタ(§9 /vendors, /persons)
 
-担当: 委譲
+担当: 委譲(2並列可: vendors班 / persons班。ファイル非重複)。メイン監査
 
-- [ ] Vendor CRUD、削除ガード(項目参照時)
-- [ ] Person CRUD、無効化(削除でなく inactive)
-- [ ] 他フォームへのセレクト供給元として完成
+**委譲契約(仕様: docs/screen-design/09-masters.md 全文 + README §0.5/§0.6/§0.7)**
+
+- [ ] **vendors班**: `features/vendors/index.tsx`(テーブル: 名称/メーカー✓/校正業者✓/標準納期/窓口/連絡先 + 追加・編集・削除ボタン)+ `features/vendors/schema.ts`(RHF+zod: name必須、email形式、standardLeadTimeDays 0以上、両フラグfalseで警告表示)+ `components/domain/VendorModal/`(追加/編集、standardLeadTimeDays は isCalibrator=true 時のみ表示・切替時クリア)
+- [ ] Vendor削除: `removeVendor` の false 返却で「この取引先は参照されているため削除できません」表示。未参照時は ConfirmModal(危険色)→削除
+- [ ] **persons班**: `features/persons/index.tsx`(テーブル: 氏名/部署/メール/状態バッジ + 編集)+ `features/persons/schema.ts`(name・email必須+email形式)+ `components/domain/PersonModal/`
+- [ ] Person無効化: ConfirmModal 付き。有効項目(isActive=true)に割当中なら「現役の点検校正項目 N 件に割り当てられています。通知が届かなくなる可能性があります」警告(N は items から算出)
+- [ ] 両画面: 空状態(EmptyState + 「+ 追加」CTA)、`@/components/ui` barrel 経由で共通UI使用、モーダルの isDirty 破棄確認接続(RHF formState.isDirty)
+- [ ] `components/domain/index.ts` barrel へ VendorModal / PersonModal 追記(班間衝突回避のためメインが最後に実施でも可)
+- [ ] テスト: 一覧表示・追加・編集プリフィル・削除ガード両分岐・無効化警告両分岐・バリデーションエラー表示
 
 ## Phase 5: 機器(§3 フォーム → §2 一覧)
 

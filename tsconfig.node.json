@@ -21,5 +21,17 @@
   // なぜ: vite.config.ts / vitest.config.ts はNode環境で実行される設定ファイルのため
   // アプリ本体（tsconfig.app.json）とは別tsconfigでtypecheckする（Vite標準テンプレート踏襲）。
   // vitest.setup.tsもテスト実行前フックというNode/jsdom境界の設定ファイルとしてここに含める。
-  "include": ["vite.config.ts", "vitest.config.ts", "vitest.setup.ts"]
+  // .storybook/main.ts・.storybook/preview.tsもStorybook CLIがNode上で読み込む設定ファイルの
+  // ため、同じくアプリ本体とは別のNode向けファイル群としてここに含める。
+  // .storybook/viteConfig.stub.tsはルートvite.config.tsの自動読み込みを避けるための
+  // 空のViteベース設定（main.tsのbuilder.viteConfigPathが参照する）で、
+  // 同じくNode上で読み込まれる設定ファイルとしてここに含める。
+  "include": [
+    "vite.config.ts",
+    "vitest.config.ts",
+    "vitest.setup.ts",
+    ".storybook/main.ts",
+    ".storybook/preview.ts",
+    ".storybook/viteConfig.stub.ts"
+  ]
 }

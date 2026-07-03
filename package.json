@@ -12,7 +12,9 @@
     "lint": "oxlint",
     "lint:typed": "oxlint --type-aware --type-check",
     "format": "oxfmt",
-    "format:check": "oxfmt --check"
+    "format:check": "oxfmt --check",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "dependencies": {
     "@fontsource/noto-sans-jp": "5.2.9",
@@ -26,6 +28,8 @@
     "zustand": "5.0.14"
   },
   "devDependencies": {
+    "@storybook/addon-a11y": "10.4.6",
+    "@storybook/react-vite": "10.4.6",
     "@tailwindcss/vite": "4.3.2",
     "@testing-library/jest-dom": "6.9.1",
     "@testing-library/react": "16.3.2",
@@ -40,6 +44,7 @@
     "oxfmt": "0.57.0",
     "oxlint": "1.72.0",
     "oxlint-tsgolint": "0.24.0",
+    "storybook": "10.4.6",
     "tailwindcss": "4.3.2",
     "typescript": "6.0.3",
     "vite": "8.1.3",
