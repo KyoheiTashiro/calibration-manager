@@ -10,6 +10,7 @@ export { ConfirmModal } from "@/components/ui/ConfirmModal";
 export { DateField } from "@/components/ui/DateField";
 export { EmptyState } from "@/components/ui/EmptyState";
 export { Modal } from "@/components/ui/Modal";
+export { RadioGroup } from "@/components/ui/RadioGroup";
 export { Select } from "@/components/ui/Select";
 export { Table, TableBody, TableHead } from "@/components/ui/Table";
 export { Tabs } from "@/components/ui/Tabs";
