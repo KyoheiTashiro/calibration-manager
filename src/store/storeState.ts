@@ -11,6 +11,7 @@ import type { InspectionRecordSlice } from "@/store/slices/inspectionRecordSlice
 import type { NotificationSlice } from "@/store/slices/notificationSlice";
 import type { PersonSlice } from "@/store/slices/personSlice";
 import type { VendorSlice } from "@/store/slices/vendorSlice";
+import type { AppState } from "@/store/types";
 import type { StateCreator } from "zustand";
 
 export type StoreState = VendorSlice &
@@ -22,6 +23,8 @@ export type StoreState = VendorSlice &
   NotificationSlice & {
     /** 全エンティティを初期状態に戻す（設定画面の全削除・テスト分離用） */
     resetAll: () => void;
+    /** CSVインポート確定: 対象エンティティの Record を検証済みデータで全置換する（D-029） */
+    replaceEntities: <Key extends keyof AppState>(key: Key, entities: AppState[Key]) => void;
   };
 
 /**
