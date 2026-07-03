@@ -29,8 +29,10 @@ export const DangerSection = (): ReactElement => {
   };
 
   return (
-    <section className="flex flex-col gap-3">
-      <h2 className="text-lg font-semibold">危険な操作</h2>
+    <section className="flex flex-col gap-3 rounded border border-red-300 p-4">
+      <h2 className="border-b border-red-200 pb-2 text-lg font-semibold text-red-700">
+        危険な操作
+      </h2>
       <div>
         <Button variant="danger" onClick={() => setOpen(true)}>
           データを全削除

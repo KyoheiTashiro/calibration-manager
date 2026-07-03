@@ -117,7 +117,7 @@ const equipmentCsvFile = (equipment: Equipment): File =>
 describe("インポート(§11、D-029 / D-030)", () => {
   it("未選択時はプレビューに案内文を表示する", () => {
     renderWithStore(<Settings />);
-    expect(screen.getByText("ファイルを選択してください")).toBeInTheDocument();
+    expect(screen.getByText("CSVファイルを選択すると、ここに検証結果が表示されます")).toBeInTheDocument();
   });
 
   // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
@@ -162,7 +162,7 @@ describe("インポート(§11、D-029 / D-030)", () => {
     await screen.findByText("✓ 1行 取り込み可");
 
     await userEvent.click(screen.getByRole("button", { name: "キャンセル" }));
-    expect(screen.getByText("ファイルを選択してください")).toBeInTheDocument();
+    expect(screen.getByText("CSVファイルを選択すると、ここに検証結果が表示されます")).toBeInTheDocument();
   });
 
   // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
@@ -172,7 +172,7 @@ describe("インポート(§11、D-029 / D-030)", () => {
     await screen.findByText("✓ 1行 取り込み可");
 
     await userEvent.selectOptions(screen.getByLabelText("対象"), "vendors");
-    expect(screen.getByText("ファイルを選択してください")).toBeInTheDocument();
+    expect(screen.getByText("CSVファイルを選択すると、ここに検証結果が表示されます")).toBeInTheDocument();
   });
 });
 
