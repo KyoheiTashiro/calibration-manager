@@ -29,8 +29,15 @@ export default defineConfig({
     passWithNoTests: true,
     coverage: {
       provider: "v8",
-      // なぜ: Phase 0では実測値が存在しないため thresholds（カバレッジ閾値）は未設定とする。
-      // 後続フェーズで docs/testing.md のラチェット方式に従い domain/store/utils を対象に導入する。
+      // なぜ: docs/testing.md のラチェット方式に基づく最終確定値（Phase 11）。
+      // 実測（domain/utils 100%、store 99.5/98.7/95.8/99.2）に対し数%の余白を残しつつ、
+      // testing.md の暫定目標値を下回らない値で固定する。引き下げ禁止（CLAUDE.md）。
+      thresholds: {
+        "src/domain/**": { lines: 98, functions: 100, branches: 98, statements: 98 },
+        "src/store/**": { lines: 97, functions: 96, branches: 92, statements: 97 },
+        "src/utils/id.ts": { lines: 100, functions: 100, branches: 100, statements: 100 },
+        "src/utils/csv.ts": { lines: 97, functions: 95, branches: 90, statements: 97 },
+      },
     },
   },
 });

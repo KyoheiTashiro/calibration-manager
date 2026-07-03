@@ -59,7 +59,11 @@ export default defineConfig({
         // なぜ: アプリシェル一式をprecacheし完全オフライン動作を実現する。
         // 外部APIを持たないため（全データLocalStorage）ネットワークキャッシュ戦略は不要
         // （docs/infra/pwa.md §3）。
-        globPatterns: ["**/*.{js,css,html,svg,png,webmanifest}"],
+        // woff2 を含める理由: @fontsource/noto-sans-jp のサブセットフォントは CSS から
+        // 遅延読み込みされるため、precache しないとオフライン時に未取得サブセットが
+        // フォールバック表示になる（D-033）。woff は woff2 対応ブラウザ（=SW対応ブラウザ全て）
+        // では使われないため precache 対象外とし容量を半減する。
+        globPatterns: ["**/*.{js,css,html,svg,png,webmanifest,woff2}"],
       },
     }),
   ],

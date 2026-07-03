@@ -33,8 +33,9 @@
 
 ## 3. Service Worker キャッシュ戦略
 
-- アプリシェル（JS/CSS/HTML/SVG/PNG/webmanifest）: **precache**（Workbox `precacheAndRoute`）→ 完全オフライン動作
-  - `workbox.globPatterns: ["**/*.{js,css,html,svg,png,webmanifest}"]` で対象ファイルを指定
+- アプリシェル（JS/CSS/HTML/SVG/PNG/webmanifest/woff2）: **precache**（Workbox `precacheAndRoute`）→ 完全オフライン動作
+  - `workbox.globPatterns: ["**/*.{js,css,html,svg,png,webmanifest,woff2}"]` で対象ファイルを指定
+  - woff2 は @fontsource/noto-sans-jp のサブセットフォント。precache しないとオフライン時に未取得サブセットがフォールバック表示になるため含める。woff は woff2 対応ブラウザ（=SW対応ブラウザ全て）で使われないため対象外（D-033）
 - 外部API: 無し（全データLocalStorage）→ ネットワークキャッシュ戦略 不要
 
 ## 4. 更新フロー
