@@ -5,9 +5,9 @@
  * (oxlint の依存数上限・max-statements 対策、dashboard と同じ分割イディオム)。
  */
 
-import { DangerSection } from "@/features/settings/DangerSection";
-import { ExportSection } from "@/features/settings/ExportSection";
-import { ImportSection } from "@/features/settings/ImportSection";
+import { DangerSection } from "@/features/settings/components/DangerSection";
+import { ExportSection } from "@/features/settings/components/ExportSection";
+import { ImportSection } from "@/features/settings/components/ImportSection";
 import type { AppState } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
 import type { ReactElement } from "react";

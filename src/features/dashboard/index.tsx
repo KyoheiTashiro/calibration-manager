@@ -7,10 +7,10 @@
  * - 遷移(カード→項目一覧プリフィルタ / 行→機器詳細)は useNavigate を子へ渡し、本体は薄いビューに保つ。
  */
 
-import { ActionRequiredList } from "@/features/dashboard/ActionRequiredList";
+import { ActionRequiredList } from "@/features/dashboard/components/ActionRequiredList";
+import { NotificationList } from "@/features/dashboard/components/NotificationList";
+import { SummaryCards } from "@/features/dashboard/components/SummaryCards";
 import { actionRequiredRows, countByStatus, latestNotifications } from "@/features/dashboard/hooks";
-import { NotificationList } from "@/features/dashboard/NotificationList";
-import { SummaryCards } from "@/features/dashboard/SummaryCards";
 import { inspectionItemRowsOf } from "@/store/selectors";
 import { useAppStore } from "@/store/useAppStore";
 import { todayIsoDate } from "@/utils/time";
