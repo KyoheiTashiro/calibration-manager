@@ -49,7 +49,12 @@ export const calibratorVendor: Vendor = {
   standardLeadTimeDays: 20,
 };
 
-export const personTanaka: Person = { id: "p-tanaka", name: "田中", email: "t@x.jp", isActive: true };
+export const personTanaka: Person = {
+  id: "p-tanaka",
+  name: "田中",
+  email: "t@x.jp",
+  isActive: true,
+};
 export const personSato: Person = { id: "p-sato", name: "佐藤", email: "s@x.jp", isActive: true };
 export const personSuzuki: Person = { id: "p-suzuki", name: "鈴木", email: "z@x.jp", isActive: false }; // prettier-ignore
 

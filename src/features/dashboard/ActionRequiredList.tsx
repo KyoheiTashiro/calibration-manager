@@ -8,7 +8,7 @@ import { StatusBadge } from "@/components/domain";
 import { EmptyState, Table, TableBody, TableHead } from "@/components/ui";
 import { equipmentDetailPath } from "@/constants/routes";
 import { ITEM_TYPE_LABELS } from "@/features/items/constants";
-import type { ItemRow } from "@/features/items/hooks";
+import type { ItemRow } from "@/store/selectors";
 import type { KeyboardEvent, ReactElement } from "react";
 
 type Props = {

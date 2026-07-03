@@ -16,7 +16,12 @@ import type {
 import { describe, expect, it } from "vitest";
 
 const vendor: Vendor = { id: "vendor-1", name: "校正社", isManufacturer: true, isCalibrator: true };
-const person: Person = { id: "person-1", name: "田中", email: "tanaka@example.com", isActive: true };
+const person: Person = {
+  id: "person-1",
+  name: "田中",
+  email: "tanaka@example.com",
+  isActive: true,
+};
 const equipment: Equipment = {
   id: "equipment-1",
   managementNo: "EQ-001",
@@ -57,8 +62,7 @@ const stateWithReferences = (): AppState => ({
 const EQUIPMENT_HEADER = "id,managementNo,name,model,serialNo,manufacturerId,location,status,note";
 const ITEMS_HEADER =
   "id,equipmentId,type,name,cycle,execution,vendorId,leadTimeDays,bufferDays,personId,noticeDaysBefore,lastDoneDate,nextDueDate,isActive";
-const NOTIFICATIONS_HEADER =
-  "id,type,targetType,targetId,personId,message,createdDate,isRead";
+const NOTIFICATIONS_HEADER = "id,type,targetType,targetId,personId,message,createdDate,isRead";
 
 const joinCsv = (...lines: string[]): string => `${lines.join("\r\n")}\r\n`;
 
@@ -213,9 +217,7 @@ describe("validateEntityCsv: ファイル内ユニーク制約", () => {
       "eq-1,EQ-102,ノギスB,,,,,active,",
     );
     const result = validateEntityCsv("equipment", csv, emptyAppState());
-    expect(result.errors).toEqual([
-      { line: 3, message: "id: 重複しています(行2と同じ値)" },
-    ]);
+    expect(result.errors).toEqual([{ line: 3, message: "id: 重複しています(行2と同じ値)" }]);
   });
 
   it("equipment は managementNo の重複も報告する(§11 のプレビュー例)", () => {

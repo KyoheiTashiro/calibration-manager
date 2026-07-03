@@ -10,11 +10,11 @@ import { buildEntityCsv, CSV_ENTITY_KINDS, ENTITY_CSV_SPECS } from "@/features/s
 import { EQUIPMENT_STATUS, type Equipment, type Vendor } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
 import { renderWithStore, seedStore, setupStoreIsolation } from "@/test/renderWithStore";
-import { screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import "@testing-library/jest-dom/vitest";
 import { CSV_BOM } from "@/utils/csv";
 import { todayIsoDate } from "@/utils/time";
+import "@testing-library/jest-dom/vitest";
+import { screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 // なぜ: jsdom は Blob URL API を実装しないことがあるため、未定義時のみ土台を用意し spy で差し替える。
@@ -56,11 +56,11 @@ beforeEach(() => {
     // 破棄呼び出しは副作用不要(捕捉のみ)
   });
   // なぜ: a要素の click は jsdom でナビゲーション未実装警告を出すため、ダウンロード名だけ捕捉して無効化する。
-  vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(function mockClick(
-    this: HTMLAnchorElement,
-  ) {
-    capture.name = this.download;
-  });
+  vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(
+    function mockClick(this: HTMLAnchorElement) {
+      capture.name = this.download;
+    },
+  );
 });
 
 afterEach(() => {
@@ -71,7 +71,9 @@ describe("エクスポート(§11)", () => {
   it("7エンティティ分のダウンロードボタンを表示する", () => {
     renderWithStore(<Settings />);
     for (const kind of CSV_ENTITY_KINDS) {
-      expect(screen.getByRole("button", { name: ENTITY_CSV_SPECS[kind].label })).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: ENTITY_CSV_SPECS[kind].label }),
+      ).toBeInTheDocument();
     }
   });
 
@@ -88,7 +90,9 @@ describe("エクスポート(§11)", () => {
     const buffer = await (capture.blob as Blob).arrayBuffer();
     const text = new TextDecoder("utf-8", { ignoreBOM: true }).decode(buffer);
     expect(text.startsWith(CSV_BOM)).toBe(true);
-    expect(text).toContain("id,managementNo,name,model,serialNo,manufacturerId,location,status,note");
+    expect(text).toContain(
+      "id,managementNo,name,model,serialNo,manufacturerId,location,status,note",
+    );
     expect(text).toContain("M-001");
     expect(capture.name).toBe(`equipment_${todayIsoDate()}.csv`);
   });

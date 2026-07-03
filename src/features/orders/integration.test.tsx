@@ -150,7 +150,9 @@ describe("結合: returned 案件 → 記録登録 → カスケード", () => {
     renderWithStore(<OrderList />);
 
     await user.click(screen.getByRole("button", { name: "記録登録" }));
-    expect(screen.queryByText("次回期限は更新されません", { exact: false })).not.toBeInTheDocument();
+    expect(
+      screen.queryByText("次回期限は更新されません", { exact: false }),
+    ).not.toBeInTheDocument();
     await user.click(screen.getByLabelText("不合格"));
 
     expect(screen.getByText("次回期限は更新されません", { exact: false })).toBeInTheDocument();
@@ -169,9 +171,9 @@ describe("結合: かんばんの隣接遷移チェーン planned → returned",
     expect(screen.getByLabelText("発注日", { exact: false })).toHaveValue(todayIsoDate());
     await user.click(screen.getByRole("button", { name: "確定" }));
     expect((useAppStore.getState().orders["order-1"] as CalibrationOrder).status).toBe("ordered");
-    expect(
-      (useAppStore.getState().orders["order-1"] as CalibrationOrder).orderedDate,
-    ).toBe(todayIsoDate());
+    expect((useAppStore.getState().orders["order-1"] as CalibrationOrder).orderedDate).toBe(
+      todayIsoDate(),
+    );
 
     // ordered → inCalibration: 即時遷移(入力なし)
     await user.click(screen.getByRole("button", { name: "校正中へ" }));

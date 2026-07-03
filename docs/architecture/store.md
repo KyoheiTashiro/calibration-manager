@@ -45,11 +45,11 @@ useAppStore = create<StoreState>()(
 
 - `removeVendor(id)`: Equipment.manufacturerId / InspectionItem.vendorId / CalibrationOrder.vendorId のいずれかから参照されている場合は削除不可とし、no-op（真偽値を返す）とする方針とする。UIは事前に確認ダイアログ（screen-design §0.6）を出し、参照が残っている場合はエラー表示する。
 - `setPersonActive(id, isActive)`: Personは物理削除しない（domain-model.md §3.2）。無効化はscreen-design §0.6の確認ダイアログ対象とする。
-- `setEquipmentStatus(id, status)`: 機器は論理削除のみ（`retired`）とする方針とする。`retired`への変更は確認ダイアログ対象（screen-design §0.6）とする。`suspended`/`retired`は期限計算・通知の対象外とする（domain-model.md §3.3）。休止からの再稼働時の期限リセットは ※未決（domain-model.md §8）。
+- `setEquipmentStatus(id, status)`: 機器は論理削除のみ（`retired`）とする方針とする。`retired`への変更は確認ダイアログ対象（screen-design §0.6）とする。`suspended`/`retired`は期限計算・通知の対象外とする（domain-model.md §3.3）。休止からの再稼働時の期限リセットは据え置き（リセットしない）で確定（decisions.md D-002）。
 - `setItemActive(id, isActive)`: 他エンティティと整合を取り、物理削除は行わずisActiveで無効化する方針とする（実装判断）。
 - `addRecord(itemId, doneDate, doneBy, result, orderId?, note?)`: InspectionRecordを追加した上で、
-  - `result !== 'fail'` の場合: `item.lastDoneDate = doneDate`、`item.nextDueDate = addCycle(doneDate, item.cycle)`（暦月ベース加算。domain-model.md §4.1）に更新する方針とする。
-  - `result === 'fail'` の場合: 次回期限は更新しない（domain-model.md §3.5）。
+  - `item.lastDoneDate = doneDate` は `result` に関わらず無条件で更新する（decisions.md D-015）。
+  - `result !== 'fail'` の場合のみ `item.nextDueDate = addCycle(doneDate, item.cycle)`（暦月ベース加算。domain-model.md §4.1）に更新する方針とする。`result === 'fail'` の場合は次回期限のみ据え置く（domain-model.md §3.5、decisions.md D-015）。
   - `orderId` が指定されている場合: 対象の `CalibrationOrder.status` を `completed` に更新する（domain-model.md §3.6）。
 - `updateOrderStatus(id, nextStatus)`: 状態遷移はdomain-model.md §3.6の状態遷移図に従い、`domain/orderStatus.ts` の許可テーブルで検証する方針とする（許可されない遷移はno-op）。`completed`への遷移は上記`addRecord`のカスケード経由のみとし、本アクションから直接指定はしない方針とする。
 - `generateNotifications(today)`: 全ての有効な項目（`item.isActive` かつ 紐づくEquipmentが `active`）・案件をスキャンし、domain-model.md §3.7の5種別の発生条件を判定する。判定は `domain/notificationRules.ts`（純粋関数。ストアに依存しない）が担う想定とし、本アクションは判定結果と現在の `notifications` を突き合わせて、同一 `(targetType, targetId, type)` の**未読**通知が既に存在する場合は生成をスキップする（domain-model.md §3.7「同一対象・同一種別の未読通知は重複生成しない」）。CalibrationOrder起点の通知（`deliveryDueSoon`/`deliveryOverdue`）はCalibrationOrderにpersonId属性がないため、`order.itemId` からInspectionItemを辿って `item.personId` を宛先とする方針とする。
@@ -74,7 +74,7 @@ pinponの3段構え（ハッピーパス → 部分破損サルベージ → 最
 2. **部分破損**: 全体のパースに失敗した場合、7エンティティそれぞれを1レコードずつ `store/schema.ts` のzodスキーマで `safeParse` し、成功分のみ保持する方針とする。
 3. **最終手段**: 永続化データがオブジェクトですらない場合は初期状態を採用する。
 
-最後に `sanitizeAppState` で参照整合（Equipment/Person/Vendorなどへの dangling FK を持つ InspectionItem/InspectionRecord/CalibrationOrder/Notification の扱い）を行う想定とする。dangling FKを除去するか、参照を保持したまま「参照先なし」として表示側で扱うかは、実装時に確定させる。
+最後に `sanitizeAppState` で参照整合（Equipment/Person/Vendorなどへの dangling FK を持つ InspectionItem/InspectionRecord/CalibrationOrder/Notification の扱い）を行う。ユーザー入力データ（vendors/persons/equipment/items/records/orders）は dangling FK でも保持し、表示側で「参照先なし」として扱う。Notification のみ、targetId（item/order）または personId が dangling のものを除去する（再生成可能な導出データのため。decisions.md D-003）。
 
 ## 派生（永続化しない）
 
@@ -84,7 +84,7 @@ pinponの3段構え（ハッピーパス → 部分破損サルベージ → 最
 - `recommendedOrderDate(item, vendor)` / `resolveLeadTime(item, vendor)`（`domain/leadTime.ts`）— domain-model.md §4.2
 - `addCycle(date, cycle)`（`domain/dateCycle.ts`）— 暦月ベースの次回期限計算（domain-model.md §4.1）
 - `statusBadgeClass(status)`（`domain/statusBadge.ts`）— screen-design §0.3のバッジ色マッピング
-- `computeExpectedNotifications(items, orders, vendors, today)`（`domain/notificationRules.ts`）— 上記`generateNotifications`が使う純粋判定ロジック
+- `computeExpectedNotifications(items, orders, vendors, equipment, today)`（`domain/notificationRules.ts`）— 上記`generateNotifications`が使う純粋判定ロジック。dangling equipment（参照先なし）を許容しつつ機器情報を通知文へ解決するため `equipment` を引数に取る
 - `itemsOf(equipmentId)` / `ordersOf(itemId)` / `recordsOf(itemId)` / `unreadNotificationCount()`（`store/selectors.ts`）
 
 ## テスト

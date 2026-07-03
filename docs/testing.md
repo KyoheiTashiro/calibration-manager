@@ -54,7 +54,7 @@
     | `deliveryDueSoon` | 発注済案件 | 今日 ≥ 返却予定日 − 7日 かつ 未返却 |
     | `deliveryOverdue` | 発注済案件 | 今日 > 返却予定日 かつ 未返却 |
   - **重複抑止**: 同一対象・同一種別の未読通知は重複生成しないことをテストする（既存の未読通知がある状態で再スキャンしても件数が増えない）
-- **CSVインポートのバリデーション**（`src/utils/csv/importCsv.ts`。zodスキーマは `src/store/schema.ts` を再利用）
+- **CSVインポートのバリデーション**（低水準処理は `src/utils/csv.ts`、エンティティ列仕様は `src/features/settings/entityCsv.ts`、インポート検証は `src/features/settings/importValidation.ts`。zodスキーマは `src/store/schema.ts` を再利用）
   - zod スキーマによる行単位バリデーション。不正行はインポートを中断せずエラー表示すること（例外を投げない、[coding-standards.md](coding-standards.md) §8 の方針と一致）
   - 文字コードは UTF-8 BOM付きで読み書きできること（Excel互換）
 
@@ -77,12 +77,12 @@
 
 `@vitest/coverage-v8`（provider `v8`）。`vitest.config.ts` の `thresholds` でロジック層のみ厳格ゲート。component（`.tsx`）は重要部のみ方針のため全体ゲートしない。
 
-実測値がまだ存在しないため、以下は姉妹プロジェクト（pinpon-match-manage）と同水準の目標値を暫定値として据える。実装が進み次第、実測に対し数%の余白を残したラチェット値に後日調整する。
+以下はdecisions.md D-032で最終確定した値（実測に対し数%の余白を残す）。
 
-- `src/domain/**`（`dateCycle.ts` / `leadTime.ts` / `itemStatus.ts` / `notificationRules.ts` 等）: lines 98 / functions 100 / branches 95 / statements 98
-- `src/store/**`: lines 95 / functions 95 / branches 88 / statements 95
+- `src/domain/**`（`dateCycle.ts` / `leadTime.ts` / `itemStatus.ts` / `notificationRules.ts` 等）: lines 98 / functions 100 / branches 98 / statements 98
+- `src/store/**`: lines 97 / functions 96 / branches 92 / statements 97
 - `src/utils/id.ts`: 100 / 100 / 100 / 100
-- `src/utils/csv/**`: lines 95 / functions 90 / branches 75 / statements 95
+- `src/utils/csv.ts`: lines 97 / functions 95 / branches 90 / statements 97
 
 除外: `*.test.{ts,tsx}` / `*.stories.tsx` / `src/test/**` / `src/main.tsx` / `**/types.ts` / `src/components/system/**`（PWA SW連携 glue。`virtual:pwa-register/react` 依存で未カバー走査時に JSX をパースできず除外）
 

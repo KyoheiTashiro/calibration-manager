@@ -11,9 +11,11 @@
  * Equipment.managementNo 一覧はストアの状態（レンダー時点）に依存するため、コンポーネント側で
  * `Object.values(equipment)` から算出し `createEquipmentFormSchema(existingManagementNumbers)` に
  * 渡す。編集モードでは自身の managementNo を除外した一覧を渡すことで自己参照時のエラーを避ける。
+ * manufacturerId の存在チェック（screen-design/03-equipment-form.md）も同じ理由で呼び出し側から
+ * vendors 一覧を渡す形にする: 参照可能な Vendor 一覧もストアの状態に依存するため。
  */
 
-import { EQUIPMENT_STATUS } from "@/store/types";
+import { EQUIPMENT_STATUS, type Vendor } from "@/store/types";
 import { z } from "zod";
 
 // なぜ戻り値の型注釈を付けないか: z.infer<ReturnType<typeof createEquipmentFormSchema>> で
@@ -21,7 +23,7 @@ import { z } from "zod";
 // 具体的なスキーマ形状が失われ z.infer が正しく推論できなくなる。そのため戻り値型は
 // TypeScript の推論に委ね、explicit-function-return-type 系ルールをこの関数に限り無効化する。
 // oxlint-disable-next-line typescript/explicit-function-return-type, typescript/explicit-module-boundary-types -- 上記理由によりzodスキーマの戻り値型は推論に委ねる必要がある
-export const createEquipmentFormSchema = (existingManagementNumbers: string[]) =>
+export const createEquipmentFormSchema = (existingManagementNumbers: string[], vendors: Vendor[]) =>
   z.object({
     managementNo: z
       .string()
@@ -32,7 +34,14 @@ export const createEquipmentFormSchema = (existingManagementNumbers: string[]) =
     name: z.string().min(1, "機器名は必須です"),
     model: z.string().optional(),
     serialNo: z.string().optional(),
-    manufacturerId: z.string().optional(),
+    manufacturerId: z
+      .string()
+      .optional()
+      .refine(
+        (value) =>
+          value === undefined || value === "" || vendors.some((vendor) => vendor.id === value),
+        { message: "存在しないメーカーが指定されています" },
+      ),
     location: z.string().optional(),
     status: z.enum(EQUIPMENT_STATUS),
     note: z.string().optional(),

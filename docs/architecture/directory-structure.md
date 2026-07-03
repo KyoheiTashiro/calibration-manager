@@ -60,7 +60,9 @@ src/
 │   │   ├── index.tsx
 │   │   └── useNotificationScan.ts  // アプリ起動時・タブ復帰時の日付変更検知でgenerateNotificationsを呼ぶフック
 │   └── settings/                   // '/settings'（screen-design §11。CSVエクスポート/インポート・データ全削除）
-│       └── index.tsx
+│       ├── index.tsx
+│       ├── entityCsv.ts            // エンティティ⇔CSV列仕様レジストリ（buildEntityCsv。utils/csv.tsの低水準処理を利用）
+│       └── importValidation.ts     // CSVインポートの行単位検証（schema.tsのzodで行単位バリデーション）
 ├── store/
 │   ├── useAppStore.ts              // Zustand + persist + immer（migrate / merge 含む）
 │   ├── schema.ts                   // zodスキーマ（7エンティティ）。CSVインポート検証にも再利用
@@ -77,9 +79,7 @@ src/
 ├── utils/                          // 汎用ユーティリティ
 │   ├── id.ts                       // UUID生成（crypto.randomUUID ラッパー）
 │   ├── time.ts                     // 日付整形（YYYY-MM-DD固定。screen-design §0.4）
-│   └── csv/
-│       ├── exportCsv.ts            // エンティティ→CSV文字列（UTF-8 BOM付き）
-│       └── importCsv.ts            // CSV→エンティティ（schema.tsのzodで行単位バリデーション）
+│   └── csv.ts                      // CSV低水準処理（RFC4180 serialize/parse、UTF-8 BOM付き）
 └── styles/index.css
 ```
 

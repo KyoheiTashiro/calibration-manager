@@ -83,7 +83,12 @@ const makeItem = (
 
 // 期限切れ(過去日)・正常(遠未来)で今日に依存せず導出ステータスを確定させる
 const overdueItemA = makeItem({ id: "item-a", name: "A校正", nextDueDate: "2000-01-01" });
-const overdueItemB = makeItem({ id: "item-b", name: "B点検", type: ITEM_TYPE.INSPECTION, nextDueDate: "2000-06-01" });
+const overdueItemB = makeItem({
+  id: "item-b",
+  name: "B点検",
+  type: ITEM_TYPE.INSPECTION,
+  nextDueDate: "2000-06-01",
+});
 const okItem = makeItem({ id: "item-ok", name: "OK校正", nextDueDate: "2999-12-31" });
 
 const seedActionScenario = (): void => {
@@ -109,9 +114,15 @@ describe("Dashboard: サマリーカード", () => {
     expect(within(overdueCard).getByText("2")).toBeInTheDocument();
 
     // 要発注・期限接近・校正中は0件
-    expect(within(screen.getByRole("button", { name: /要発注/u })).getByText("0")).toBeInTheDocument();
-    expect(within(screen.getByRole("button", { name: /期限接近/u })).getByText("0")).toBeInTheDocument();
-    expect(within(screen.getByRole("button", { name: /校正中/u })).getByText("0")).toBeInTheDocument();
+    expect(
+      within(screen.getByRole("button", { name: /要発注/u })).getByText("0"),
+    ).toBeInTheDocument();
+    expect(
+      within(screen.getByRole("button", { name: /期限接近/u })).getByText("0"),
+    ).toBeInTheDocument();
+    expect(
+      within(screen.getByRole("button", { name: /校正中/u })).getByText("0"),
+    ).toBeInTheDocument();
   });
 
   // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
@@ -202,6 +213,16 @@ describe("Dashboard: 最新の通知", () => {
     expect(screen.getByText("EQ-001 年次校正が期限超過")).toBeInTheDocument();
     expect(screen.getByText("2026-07-01")).toBeInTheDocument();
     expect(screen.getByText("期限超過")).toBeInTheDocument(); // NOTIFICATION_TYPE_LABELS[overdue]
+  });
+
+  it("アイコングリフを aria-hidden 付きで描画し、ラベルはスクリーンリーダーから読める", () => {
+    seedStore({ notifications: { [overdueNotification.id]: overdueNotification } });
+    renderDashboardWithRoutes();
+
+    // アイコングリフ自体は装飾のためスクリーンリーダーから隠す(overdue = 🔴)
+    expect(screen.getByText("🔴")).toHaveAttribute("aria-hidden", "true");
+    // ラベルは別要素(別テキストノード)であり aria-hidden を持たない
+    expect(screen.getByText("期限超過")).not.toHaveAttribute("aria-hidden");
   });
 
   // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須

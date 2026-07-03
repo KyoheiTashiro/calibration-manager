@@ -41,11 +41,7 @@ export const ExportSection = ({ state }: Props): ReactElement => (
     <h2 className="text-lg font-semibold">エクスポート(CSV / UTF-8 BOM付き)</h2>
     <div className="flex flex-wrap gap-2">
       {CSV_ENTITY_KINDS.map((kind) => (
-        <Button
-          key={kind}
-          variant="secondary"
-          onClick={() => downloadEntityCsv(kind, state)}
-        >
+        <Button key={kind} variant="secondary" onClick={() => downloadEntityCsv(kind, state)}>
           {ENTITY_CSV_SPECS[kind].label}
         </Button>
       ))}

@@ -27,9 +27,7 @@ type Props = {
 
 export const OrderModal = ({ open, itemId, onClose }: Props): ReactElement => {
   const item = useAppStore((state) => state.items[itemId]);
-  const equipment = useAppStore((state) =>
-    item ? state.equipment[item.equipmentId] : undefined,
-  );
+  const equipment = useAppStore((state) => (item ? state.equipment[item.equipmentId] : undefined));
   const vendors = useAppStore((state) => state.vendors);
   const addOrder = useAppStore((state) => state.addOrder);
 

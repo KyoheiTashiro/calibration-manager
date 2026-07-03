@@ -141,6 +141,20 @@ describe("NotificationCenter: 種別バッジ", () => {
     expect(badge.className).toContain("bg-purple-100");
     expect(badge.className).toContain("text-purple-800");
   });
+
+  it("アイコングリフを aria-hidden 付きで描画し、ラベルはスクリーンリーダーから読める", () => {
+    seedStore({
+      notifications: {
+        d1: makeNotif({ id: "d1", type: NOTIFICATION_TYPE.DELIVERY_DUE_SOON }),
+      },
+    });
+    renderCenter();
+
+    // アイコングリフ自体は装飾のためスクリーンリーダーから隠す
+    expect(screen.getByText("🟣")).toHaveAttribute("aria-hidden", "true");
+    // ラベルは別要素(別テキストノード)であり aria-hidden を持たない
+    expect(screen.getByText("納期接近")).not.toHaveAttribute("aria-hidden");
+  });
 });
 
 describe("NotificationCenter: 全て既読", () => {

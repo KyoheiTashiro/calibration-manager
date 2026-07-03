@@ -9,7 +9,7 @@
 - `npx tsc -b --noEmit` エラー0
 - `npm run lint`(oxlint)エラー0
 - `npx vitest run` 全緑
-- カバレッジラチェット維持(domain 98/100/95、store 95/95/88、id.ts 100)
+- カバレッジラチェット維持(domain 98/100/98/98、store 97/96/92/97、id.ts 100/100/100/100、csv.ts 97/95/90/97。decisions.md D-032)
 - メインセッションによる `git diff` 監査通過
 
 ---
