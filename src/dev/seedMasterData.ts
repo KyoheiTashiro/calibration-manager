@@ -1,0 +1,131 @@
+/**
+ * 開発用シードデータ（マスタ系: vendors/persons/equipment）。
+ * 日付を持たないため today に依存しない（src/dev/seed.ts から呼び出される）。
+ */
+
+import { EQUIPMENT_STATUS, type Equipment, type Person, type Vendor } from "@/store/types";
+
+export const buildSeedVendors = (): Record<string, Vendor> => ({
+  "seed-vendor-tokyo": {
+    id: "seed-vendor-tokyo",
+    name: "東京計測サービス",
+    isManufacturer: false,
+    isCalibrator: true,
+    standardLeadTimeDays: 21,
+    contactPerson: "山本 直樹",
+    email: "yamamoto@tokyo-keisoku.example.com",
+  },
+  "seed-vendor-osaka": {
+    id: "seed-vendor-osaka",
+    name: "大阪校正センター",
+    isManufacturer: false,
+    isCalibrator: true,
+    standardLeadTimeDays: 14,
+    contactPerson: "井上 恵子",
+    email: "inoue@osaka-calib.example.com",
+  },
+  "seed-vendor-maker": {
+    id: "seed-vendor-maker",
+    name: "山田計器製作所",
+    isManufacturer: true,
+    isCalibrator: false,
+  },
+  "seed-vendor-both": {
+    id: "seed-vendor-both",
+    name: "共立精機",
+    isManufacturer: true,
+    isCalibrator: true,
+    standardLeadTimeDays: 30,
+  },
+});
+
+export const buildSeedPersons = (): Record<string, Person> => ({
+  "seed-person-sato": {
+    id: "seed-person-sato",
+    name: "佐藤 由紀子",
+    email: "sato@example.com",
+    department: "品質保証部",
+    isActive: true,
+  },
+  "seed-person-suzuki": {
+    id: "seed-person-suzuki",
+    name: "鈴木 健太",
+    email: "suzuki@example.com",
+    department: "製造部",
+    isActive: true,
+  },
+  "seed-person-takahashi": {
+    id: "seed-person-takahashi",
+    name: "高橋 美咲",
+    email: "takahashi@example.com",
+    department: "品質保証部",
+    isActive: true,
+  },
+  "seed-person-tanaka": {
+    id: "seed-person-tanaka",
+    name: "田中 一郎",
+    email: "tanaka@example.com",
+    department: "製造部",
+    isActive: false,
+  },
+});
+
+export const buildSeedEquipment = (): Record<string, Equipment> => ({
+  "seed-equipment-001": {
+    id: "seed-equipment-001",
+    managementNo: "EQ-001",
+    name: "デジタルマルチメータ",
+    model: "DM-100",
+    serialNo: "SN-0001",
+    manufacturerId: "seed-vendor-maker",
+    location: "第一工場 計測室",
+    status: EQUIPMENT_STATUS.ACTIVE,
+  },
+  "seed-equipment-002": {
+    id: "seed-equipment-002",
+    managementNo: "EQ-002",
+    name: "トルクレンチ",
+    model: "TW-200",
+    serialNo: "SN-0002",
+    manufacturerId: "seed-vendor-both",
+    location: "第二工場",
+    status: EQUIPMENT_STATUS.ACTIVE,
+  },
+  "seed-equipment-003": {
+    id: "seed-equipment-003",
+    managementNo: "EQ-003",
+    name: "ノギス",
+    model: "CN-150",
+    serialNo: "SN-0003",
+    manufacturerId: "seed-vendor-maker",
+    location: "第一工場",
+    status: EQUIPMENT_STATUS.ACTIVE,
+  },
+  "seed-equipment-004": {
+    id: "seed-equipment-004",
+    managementNo: "EQ-004",
+    name: "圧力計",
+    model: "PG-300",
+    serialNo: "SN-0004",
+    manufacturerId: "seed-vendor-both",
+    location: "第三工場",
+    status: EQUIPMENT_STATUS.ACTIVE,
+  },
+  "seed-equipment-005": {
+    id: "seed-equipment-005",
+    managementNo: "EQ-005",
+    name: "はかり",
+    model: "SC-500",
+    serialNo: "SN-0005",
+    manufacturerId: "seed-vendor-maker",
+    status: EQUIPMENT_STATUS.SUSPENDED,
+  },
+  "seed-equipment-006": {
+    id: "seed-equipment-006",
+    managementNo: "EQ-006",
+    name: "温湿度計",
+    model: "TH-600",
+    serialNo: "SN-0006",
+    status: EQUIPMENT_STATUS.RETIRED,
+  },
+});

@@ -218,3 +218,9 @@
 - ステータス: **確定**(2026-07-03)
 - 判断: `workbox.globPatterns` に `woff2` を追加(`**/*.{js,css,html,svg,png,webmanifest,woff2}`)。woff は対象外。pwa.md §3 も同期更新
 - 根拠: @fontsource/noto-sans-jp のサブセットフォント(woff2 約120ファイル・計2.9MB)は CSS から遅延読み込みされるため、precache なしではオフライン時に未取得サブセットがフォールバック表示になり、pwa.md §3/§5「アプリシェル一式 precache による完全オフライン動作」の趣旨に反する。woff2 のみで足りる理由: SW 対応ブラウザは全て woff2 対応であり woff は実際に取得されない(容量半減)。初回 precache 増分 2.9MB は現場利用(初回のみオンライン)で許容
+
+## D-034: 開発用シーダー(DEV限定・空ストア時のみ投入)
+
+- ステータス: **確定**(2026-07-03)
+- 判断: `src/dev/seed.ts` に `buildSeedState(today)`(純関数、全日付は today 相対)+ `seedIfEmpty()`(7エンティティ全空のときのみ `setState`、既存データがあれば no-op)を実装。`src/main.tsx` から `import.meta.env.DEV` ガード + 動的 import で起動時に呼ぶ(本番バンドルには Rollup のデッドコード除去でチャンクごと含まれない)。notifications はシードせず空(D-025 の useNotificationScan が起動時に導出・再生成するため)。ID は可読な固定文字列 `seed-*`(schema の id 制約は非空 string のみで uuid 必須ではない)
+- 根拠: 画面確認に5ステータス(overdue/orderNow/inProgress/dueSoon/ok)全網羅のデータが毎回手入力なしで揃う。today 相対日付により何日後に起動してもステータス分布が崩れない。空ストア判定によりユーザー入力データを絶対に上書きしない。データは D-006(1項目1有効案件)を遵守し、seed.test.ts でスキーマ整合・参照整合・5ステータス出現・D-006 を恒常検証

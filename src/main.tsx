@@ -18,6 +18,13 @@ import "@/styles/index.css";
 // フック化はせずエントリポイントで直接 `registerSW` を呼ぶ（docs/infra/pwa.md §1・§4 autoUpdate）。
 registerSW({ immediate: true });
 
+// なぜ動的import + DEVガードか: シードデータを本番バンドルへ含めないため。
+// import.meta.env.DEV が false のときは Rollup がデッドコード除去しチャンク自体を生成しない。
+if (import.meta.env.DEV) {
+  const { seedIfEmpty } = await import("@/dev/seed");
+  seedIfEmpty();
+}
+
 const rootElement = document.querySelector("#root");
 
 if (!rootElement) {
