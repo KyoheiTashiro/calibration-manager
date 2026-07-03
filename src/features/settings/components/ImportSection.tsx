@@ -97,7 +97,9 @@ export const ImportSection = ({ state }: Props): ReactElement => {
       return <output className="text-green-700">{doneMessage}</output>;
     }
     if (result === null) {
-      return <p className="text-slate-500">ファイルを選択してください</p>;
+      return (
+        <p className="text-slate-500">CSVファイルを選択すると、ここに検証結果が表示されます</p>
+      );
     }
     return (
       <div className="flex flex-col gap-1">
@@ -119,22 +121,28 @@ export const ImportSection = ({ state }: Props): ReactElement => {
   };
 
   return (
-    <section className="flex flex-col gap-3">
-      <h2 className="text-lg font-semibold">インポート</h2>
+    <section className="flex flex-col gap-3 rounded border border-slate-200 p-4">
+      <h2 className="border-b border-slate-200 pb-2 text-lg font-semibold">CSVインポート</h2>
       <div className="flex flex-wrap items-end gap-3">
         <div className="w-40">
           <Select label="対象" options={ENTITY_OPTIONS} value={kind} onChange={handleKindChange} />
         </div>
-        <label className="flex flex-col text-sm text-slate-700">
-          ファイル
+        <div className="flex items-center gap-2">
+          {/* なぜ: ネイティブの file input は見た目をボタンに揃えられないため sr-only で隠し、
+              共通 Button から click() で起動する。aria-label はテスト・支援技術向けの参照名。 */}
           <input
             ref={fileInputRef}
             type="file"
             accept=".csv"
+            aria-label="ファイル"
             onChange={handleFileChange}
-            className="mt-1 text-sm"
+            className="sr-only"
           />
-        </label>
+          <Button variant="secondary" onClick={() => fileInputRef.current?.click()}>
+            ファイルを選択
+          </Button>
+          <span className="text-sm text-slate-500">{fileName ?? "未選択"}</span>
+        </div>
       </div>
 
       <div className="border-line rounded border p-3 text-sm">{renderPreview()}</div>

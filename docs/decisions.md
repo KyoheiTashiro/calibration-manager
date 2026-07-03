@@ -242,3 +242,9 @@
   - 例外(リネーム対象外): 汎用 UI の `NavItem` / `NAV_ITEMS`(Sidebar)、`localStorage.setItem/getItem`、本ファイルの過去エントリ(履歴ログのため原文維持)、テストフィクスチャ ID 文字列 `item-1` 等
 - 根拠: 「item」は一般語として抽象的すぎ、ドメイン用語(domain-model.md §2 の InspectionItem)との対応が読み取りにくい。ユビキタス言語をコード全域に貫徹する。永続化データ・URL はマイグレーション/ルート定数経由の一括変更で互換を確保
 - 注意: v1 で CSV エクスポートしたファイル(`items` エンティティ・`itemId` 列)は新バージョンへそのまま再インポート不可(列名不一致でエラー行になる)。必要なら新バージョンで再エクスポートする
+
+## D-037: 設定画面に PWA インストールボタンを追加
+
+- ステータス: **docs反映済**(2026-07-03)
+- 判断: 設定画面(インポートと危険な操作の間)に「アプリのインストール」セクションを追加。`beforeinstallprompt`(非標準・Chromium系のみ)を `usePwaInstall` フックで捕捉・`preventDefault()` し、ボタン押下時に任意タイミングで `prompt()` を表示する。standalone 表示中(`display-mode: standalone`)または `appinstalled` 発火後は「インストール済み」を表示。イベント非対応ブラウザ(iOS Safari / Firefox 等)ではブラウザ標準機能(アドレスバーのアイコン / 共有メニュー「ホーム画面に追加」)からの手順を案内する。`BeforeInstallPromptEvent` は lib.dom 非収録のため `src/types/beforeinstallprompt.d.ts` に型宣言を追加
+- 根拠: 現場利用(オフライン前提)ではブラウザタブよりインストール済みアプリとしての起動が確実で、manifest(docs/infra/pwa.md §2)は整備済みだがインストール導線がブラウザ UI 依存で気づかれにくい。設定画面に明示的な導線を置くことで発見性を上げる。matchMedia は jsdom 未実装のため `typeof` ガードで参照する
