@@ -1,5 +1,5 @@
 import App from "@/App";
-import { ErrorBoundary } from "@/components/system/ErrorBoundary";
+import { ErrorBoundary } from "@/components/system";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { HashRouter } from "react-router-dom";
