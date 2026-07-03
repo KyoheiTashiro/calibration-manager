@@ -46,6 +46,12 @@ export const useAppStore = create<StoreState>()(
           Object.assign(state, emptyAppState());
         });
       },
+      replaceEntities: (key, entities): void => {
+        set((state) => {
+          // 検証済みデータでの全置換（D-029）。キー1つ分のみ更新するため Partial を合成する
+          Object.assign(state, { [key]: entities });
+        });
+      },
     })),
     {
       name: STORAGE_KEY,

@@ -129,13 +129,15 @@
 - [x] Order 宛先は item 経由解決: Phase 1 実装済の notificationRules.orderNotificationSeeds を使用。通知センター(タブ未読/既読・全て既読・行クリック=既読化→D-027 遷移・種別バッジ色+ラベル併記・空状態2種)実装
 - ゲート実績: tsc 0 / oxlint 0 / テスト524件全緑(+35件増)/ カバレッジラチェット維持(domain 100/100/100、store 99.2/95.8/98.7、id.ts 100)
 
-## Phase 10: 設定/CSV(§11)
+## Phase 10: 設定/CSV(§11) ✅ 完了(2026-07-03)
 
-担当: CSV UI = 委譲、インポート検証ロジック = メイン
+担当実績: メイン = 着手前判断 D-028(CSV列=types.ts宣言順・英語キー・RFC4180/CRLF)/ D-029(インポート=対象エンティティ全置換・参照は現在ストアと突合)/ D-030(エラー行スキップ不実装、エラーありは確定不可)/ D-031(全削除=モーダル内チェック→活性化、多重確認なし)+ CSV純関数・検証ロジック・`replaceEntities` 実装・監査是正(検証結果の世代ガード)。委譲 = UI班(Opus)
 
-- [ ] BOM付きエクスポート
-- [ ] 行単位 safeParse 検証 + エラー行プレビュー
-- [ ] 全削除2段階確認
+- [x] BOM付きエクスポート: `utils/csv.ts`(RFC4180 serialize/parse、CSV_BOM)+ `features/settings/entityCsv.ts`(7種別の列仕様レジストリ + `buildEntityCsv`、id昇順安定出力)+ `ExportSection`(7ボタン、`${kind}_YYYY-MM-DD.csv`、0件でもヘッダのみ出力)。ラウンドトリップ proptest 2本(セル二次元配列 / vendors・persons エクスポート→インポート)
+- [x] 行単位 safeParse 検証 + エラー行プレビュー: `features/settings/importValidation.ts`(ヘッダ一致 → 列数 → セル変換 → zod(store/schema.ts流用・issue日本語整形)→ ファイル内ユニーク(id + equipment.managementNo)→ 外向き参照チェック(notifications は targetType 別)。行番号=ファイル行(ヘッダ=1))+ `ImportSection`(対象Select・プレビュー「✓N行 取り込み可/✗N行 エラー」・エラー0件のみ[確定]活性・ConfirmModal→`replaceEntities` 全置換・種別変更/キャンセルでクリア)。ストアへ `replaceEntities` 追加(storeState.ts / useAppStore.ts)
+- [x] 全削除2段階確認: `DangerSection`([データを全削除]→モーダル: 警告文+同意チェックで[削除する]活性→`resetAll()`、閉時チェックリセット)
+- [x] メイン監査是正: file.text() 解決前の種別変更で旧種別の検証結果が混入する競合を世代カウンタ(useRef)で破棄
+- ゲート実績: tsc 0 / oxlint 0 / テスト576件全緑(+52件増)/ カバレッジラチェット維持(--coverage exit 0)
 
 ## Phase 11: 仕上げ
 

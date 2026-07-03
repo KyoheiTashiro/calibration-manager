@@ -55,6 +55,26 @@ const seedBase = (overrides?: { items?: Record<string, InspectionItem> }): void 
 
 beforeEach(setupStoreIsolation);
 
+describe("replaceEntities: CSVインポートの全置換(D-029)", () => {
+  it("対象エンティティのみ検証済みデータで置き換え、他エンティティは保持する", () => {
+    seedBase();
+    const imported: Record<string, Vendor> = {
+      "vendor-9": { id: "vendor-9", name: "新校正社", isManufacturer: false, isCalibrator: true },
+    };
+    useAppStore.getState().replaceEntities("vendors", imported);
+    expect(useAppStore.getState().vendors).toEqual(imported);
+    expect(useAppStore.getState().equipment).toEqual({ [equipment.id]: equipment });
+    expect(useAppStore.getState().items).toEqual({ [item.id]: item });
+  });
+
+  it("空の Record を渡すと対象エンティティを全消去する", () => {
+    seedBase();
+    useAppStore.getState().replaceEntities("items", {});
+    expect(useAppStore.getState().items).toEqual({});
+    expect(useAppStore.getState().equipment).toEqual({ [equipment.id]: equipment });
+  });
+});
+
 describe("addRecord: 期限更新カスケード", () => {
   it.each(["pass", "adjusted"] as const)(
     "result=%s で記録を追加し lastDoneDate / nextDueDate を更新する",
