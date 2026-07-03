@@ -8,7 +8,7 @@ import { KANBAN_ACTIVE_COLUMNS, ORDER_STATUS_LABELS } from "@/features/orders/co
 import type { CalibrationOrder, Equipment, InspectionItem, Vendor } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
 import { renderWithStore, seedStore, setupStoreIsolation } from "@/test/renderWithStore";
-import { screen } from "@testing-library/react";
+import { screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom/vitest";
 import { beforeEach, describe, expect, it } from "vitest";
@@ -116,9 +116,12 @@ describe("完了/中止も表示 トグル", () => {
     // 既定OFF: 完了列は非表示だが、案件自体は存在する（completed 1件）ため空状態にはならず、
     // 進行中4列は描画され各列に「なし」が出る（空状態は全ステータス合計0件のときのみ）。
     expect(screen.queryByText("記録登録済")).not.toBeInTheDocument();
-    expect(screen.queryByText("中止")).not.toBeInTheDocument();
+    // なぜ selector 指定か: ConfirmModal（中止確認ダイアログ）は開閉に関わらず常にDOM上に
+    // マウントされており、確定ボタンのラベルも「中止」に統一されたため、
+    // 列見出し「中止」の有無だけを厳密に判定するには <header> 要素に候補を絞る必要がある。
+    expect(screen.queryByText("中止", { selector: "header" })).not.toBeInTheDocument();
     expect(
-      screen.queryByText("外部校正案件はありません。点検校正項目一覧から案件を作成できます"),
+      screen.queryByText("外部校正案件はありません。点検校正項目一覧から案件を追加できます"),
     ).not.toBeInTheDocument();
     for (const status of KANBAN_ACTIVE_COLUMNS) {
       expect(screen.getByText(ORDER_STATUS_LABELS[status])).toBeInTheDocument();
@@ -128,7 +131,7 @@ describe("完了/中止も表示 トグル", () => {
     await user.click(screen.getByLabelText("完了/中止も表示"));
 
     expect(screen.getByText("記録登録済")).toBeInTheDocument();
-    expect(screen.getByText("中止")).toBeInTheDocument();
+    expect(screen.getByText("中止", { selector: "header" })).toBeInTheDocument();
     // 完了カードにアクションボタンは付かない（D-018）
     expect(screen.queryByRole("button", { name: "記録登録" })).not.toBeInTheDocument();
   });
@@ -145,7 +148,8 @@ describe("中止フロー", () => {
 
     await user.click(screen.getByRole("button", { name: "中止" }));
     // 確認ダイアログ
-    await user.click(screen.getByRole("button", { name: "中止する" }));
+    const dialog = screen.getByRole("dialog");
+    await user.click(within(dialog).getByRole("button", { name: "中止" }));
 
     expect((useAppStore.getState().orders["order-1"] as CalibrationOrder).status).toBe("cancelled");
     // cancelled はトグルOFFで非表示
@@ -159,7 +163,7 @@ describe("空状態", () => {
     renderWithStore(<OrderList />);
 
     expect(
-      screen.getByText("外部校正案件はありません。点検校正項目一覧から案件を作成できます"),
+      screen.getByText("外部校正案件はありません。点検校正項目一覧から案件を追加できます"),
     ).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "点検校正項目一覧へ" })).toBeInTheDocument();
   });
@@ -182,7 +186,7 @@ describe("空状態", () => {
 
     // 案件は存在する（completed 1件）ため、全列0件の空状態メッセージは出ない
     expect(
-      screen.queryByText("外部校正案件はありません。点検校正項目一覧から案件を作成できます"),
+      screen.queryByText("外部校正案件はありません。点検校正項目一覧から案件を追加できます"),
     ).not.toBeInTheDocument();
     // 進行中4列（発注準備/発注済/校正中/返却済）のヘッダーは表示される
     for (const status of KANBAN_ACTIVE_COLUMNS) {

@@ -74,20 +74,20 @@ describe("InspectionItemList: テーブル描画", () => {
     expect(within(okRow).queryByRole("button", { name: "案件" })).not.toBeInTheDocument();
   });
 
-  it("表示対象が0件なら「表示できる項目がありません」を出す", () => {
+  it("表示対象が0件なら「点検校正項目が未登録です」を出す", () => {
     // seed しない = inspectionItems 空
     renderList();
 
-    expect(screen.getByText("表示できる項目がありません")).toBeInTheDocument();
+    expect(screen.getByText("点検校正項目が未登録です")).toBeInTheDocument();
     expect(screen.queryByRole("table")).not.toBeInTheDocument();
   });
 
-  it("対象はあるが絞り込み0件なら「条件に一致する項目がありません」+クリアを出す", () => {
+  it("対象はあるが絞り込み0件なら「条件に一致する項目はありません」+クリアを出す", () => {
     seedInspectionItemList();
     // 鈴木(無効)担当の可視項目は無い → filtered 0
     renderList(`?personId=${personSuzuki.id}`);
 
-    expect(screen.getByText("条件に一致する項目がありません")).toBeInTheDocument();
+    expect(screen.getByText("条件に一致する項目はありません")).toBeInTheDocument();
     // フィルタ行のクリア + 空状態のクリアの2つが並ぶ(§5)
     expect(screen.getAllByRole("button", { name: "クリア" })).toHaveLength(2);
     expect(screen.queryByRole("table")).not.toBeInTheDocument();

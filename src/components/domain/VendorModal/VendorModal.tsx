@@ -106,7 +106,7 @@ export const VendorModal = ({ open, vendor, onClose }: Props): ReactElement => {
   return (
     <Modal
       open={open}
-      title={vendor ? "取引先の編集" : "取引先の追加"}
+      title={vendor ? "取引先を編集" : "取引先を追加"}
       onClose={onClose}
       isDirty={isDirty}
       footer={

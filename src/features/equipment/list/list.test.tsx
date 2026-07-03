@@ -272,7 +272,7 @@ describe("EquipmentList: 空状態", () => {
   it("0件時は検索・フィルタを隠しCTA付きEmptyStateを表示する", () => {
     renderWithStore(<EquipmentList />);
 
-    expect(screen.getByText("機器がまだ登録されていません")).toBeInTheDocument();
+    expect(screen.getByText("機器が未登録です")).toBeInTheDocument();
     expect(screen.getAllByRole("button", { name: "+ 機器を追加" })).toHaveLength(2);
     expect(screen.queryByLabelText("検索")).not.toBeInTheDocument();
     expect(screen.queryByLabelText("状態")).not.toBeInTheDocument();
@@ -286,7 +286,7 @@ describe("EquipmentList: 空状態", () => {
 
     await user.type(screen.getByLabelText("検索"), "該当なし検索語");
 
-    expect(screen.getByText("条件に一致する機器がありません")).toBeInTheDocument();
+    expect(screen.getByText("条件に一致する機器はありません")).toBeInTheDocument();
     expect(screen.getByLabelText("検索")).toBeInTheDocument();
     expect(screen.getByLabelText("状態")).toBeInTheDocument();
     expect(screen.getAllByRole("button", { name: "+ 機器を追加" })).toHaveLength(1);

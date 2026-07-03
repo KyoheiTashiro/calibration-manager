@@ -75,7 +75,7 @@ export const InspectionItemList = (): ReactElement => {
       <h1 className="text-xl font-bold">点検校正項目一覧</h1>
 
       {rows.length === 0 ? (
-        <EmptyState message="表示できる項目がありません" />
+        <EmptyState message="点検校正項目が未登録です" />
       ) : (
         <>
           <FilterBar
@@ -86,7 +86,7 @@ export const InspectionItemList = (): ReactElement => {
           />
           {filteredRows.length === 0 ? (
             <EmptyState
-              message="条件に一致する項目がありません"
+              message="条件に一致する項目はありません"
               action={<Button onClick={handleClear}>クリア</Button>}
             />
           ) : (

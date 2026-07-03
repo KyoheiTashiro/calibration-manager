@@ -34,6 +34,29 @@ body {
   font-variant-numeric: tabular-nums; /* 数値列の桁揃え（ui-guidelines.md §2） */
 }
 
+/* なぜ: Tailwind 4 は button のカーソルを default に変更したため、
+   押下で作用するUI(ボタン・リンク・選択系フォーム)すべてでホバー時にポインターを示す。
+   無効状態は操作不能を伝えるため not-allowed を優先する。 */
+button,
+[role="button"],
+a[href],
+select,
+summary,
+input[type="checkbox"],
+input[type="radio"],
+input[type="file"],
+label:has(> input[type="checkbox"]),
+label:has(> input[type="radio"]) {
+  cursor: pointer;
+}
+
+button:disabled,
+select:disabled,
+input:disabled,
+[aria-disabled="true"] {
+  cursor: not-allowed;
+}
+
 /* なぜ: キーボード操作時のフォーカス位置を明示し、WCAG 2.1 AAのフォーカス可視性を満たす
    （ui-guidelines.md §11）。マウス操作時は表示しない `:focus-visible` を使う。 */
 :focus-visible {

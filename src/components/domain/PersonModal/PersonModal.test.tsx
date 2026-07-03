@@ -55,7 +55,7 @@ describe("PersonModal", () => {
       ),
     ).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: "無効化する" }));
+    await user.click(screen.getByRole("button", { name: "無効化" }));
 
     expect(useAppStore.getState().persons["person-1"]?.isActive).toBe(false);
     expect(onClose).toHaveBeenCalledTimes(1);
@@ -78,7 +78,7 @@ describe("PersonModal", () => {
 
     expect(screen.getByText("この担当者を無効化しますか?")).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: "無効化する" }));
+    await user.click(screen.getByRole("button", { name: "無効化" }));
 
     expect(useAppStore.getState().persons["person-1"]?.isActive).toBe(false);
   });

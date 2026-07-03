@@ -84,7 +84,7 @@ describe("OrderModal", () => {
     seedBaseMasters();
     renderWithStore(<OrderModal open inspectionItemId={externalInspectionItem.id} onClose={vi.fn()} />);
 
-    expect(screen.getByLabelText("依頼先", { exact: false })).toHaveValue(calibratorVendor.id);
+    expect(screen.getByLabelText("校正依頼先", { exact: false })).toHaveValue(calibratorVendor.id);
   });
 
   it("依頼先の選択肢がisCalibrator=trueのVendorのみ", () => {
@@ -98,7 +98,7 @@ describe("OrderModal", () => {
   });
 
   // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
-  it("有効な入力で「作成」を押すとaddOrderが呼ばれstatus=plannedの案件が追加されonCloseが呼ばれる", async () => {
+  it("有効な入力で「保存」を押すとaddOrderが呼ばれstatus=plannedの案件が追加されonCloseが呼ばれる", async () => {
     seedBaseMasters();
     const user = userEvent.setup();
     const onClose = vi.fn();
@@ -107,7 +107,7 @@ describe("OrderModal", () => {
     await user.type(screen.getByLabelText("返却予定日", { exact: false }), "2026-08-10");
     await user.type(screen.getByLabelText("費用", { exact: false }), "5000");
     await user.type(screen.getByLabelText("備考", { exact: false }), "定期校正");
-    await user.click(screen.getByRole("button", { name: "作成" }));
+    await user.click(screen.getByRole("button", { name: "保存" }));
 
     const createdOrders = Object.values(useAppStore.getState().orders);
     expect(createdOrders).toHaveLength(1);
@@ -139,14 +139,14 @@ describe("OrderModal", () => {
     const onClose = vi.fn();
     renderWithStore(<OrderModal open inspectionItemId={externalInspectionItem.id} onClose={onClose} />);
 
-    await user.click(screen.getByRole("button", { name: "作成" }));
+    await user.click(screen.getByRole("button", { name: "保存" }));
 
     expect(await screen.findByText("この項目には進行中の案件が既に存在します")).toBeInTheDocument();
     expect(onClose).not.toHaveBeenCalled();
     expect(Object.values(useAppStore.getState().orders)).toHaveLength(1);
   });
 
-  it("校正業者が0件のとき空状態が表示され依頼先Selectが表示されない", () => {
+  it("校正業者が0件のとき空状態が表示され校正依頼先Selectが表示されない", () => {
     seedStore({
       equipment: { [equipment.id]: equipment },
       vendors: { [manufacturerOnlyVendor.id]: manufacturerOnlyVendor },
@@ -159,11 +159,11 @@ describe("OrderModal", () => {
       "href",
       "/vendors",
     );
-    expect(screen.queryByLabelText("依頼先", { exact: false })).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("校正依頼先", { exact: false })).not.toBeInTheDocument();
   });
 
   // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
-  it("依頼先未選択のまま「作成」を押すとエラー表示されストアが変化しない", async () => {
+  it("校正依頼先未選択のまま「保存」を押すとエラー表示されストアが変化しない", async () => {
     seedStore({
       equipment: { [equipment.id]: equipment },
       vendors: {
@@ -177,9 +177,9 @@ describe("OrderModal", () => {
     const user = userEvent.setup();
     renderWithStore(<OrderModal open inspectionItemId={externalInspectionItem.id} onClose={vi.fn()} />);
 
-    await user.click(screen.getByRole("button", { name: "作成" }));
+    await user.click(screen.getByRole("button", { name: "保存" }));
 
-    expect(await screen.findByText("依頼先を選択してください")).toBeInTheDocument();
+    expect(await screen.findByText("校正依頼先を選択してください")).toBeInTheDocument();
     expect(Object.values(useAppStore.getState().orders)).toHaveLength(0);
   });
 
@@ -190,7 +190,7 @@ describe("OrderModal", () => {
     renderWithStore(<OrderModal open inspectionItemId={externalInspectionItem.id} onClose={vi.fn()} />);
 
     await user.type(screen.getByLabelText("費用", { exact: false }), "-100");
-    await user.click(screen.getByRole("button", { name: "作成" }));
+    await user.click(screen.getByRole("button", { name: "保存" }));
 
     expect(await screen.findByText("費用は0以上の数値で入力してください")).toBeInTheDocument();
     expect(Object.values(useAppStore.getState().orders)).toHaveLength(0);

@@ -85,7 +85,7 @@ describe("VendorList: 追加", () => {
     const [headerAddButton] = screen.getAllByRole("button", { name: "+ 追加" });
     if (!headerAddButton) throw new Error("追加ボタンが見つかりません");
     await user.click(headerAddButton);
-    const modalTitle = screen.getByText("取引先の追加");
+    const modalTitle = screen.getByText("取引先を追加");
     const dialogElement = modalTitle.closest("dialog");
     if (!dialogElement) throw new Error("dialog要素が見つかりません");
     expect(dialogElement).toHaveAttribute("open");

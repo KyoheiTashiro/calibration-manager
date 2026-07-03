@@ -115,12 +115,12 @@ export const RecordModal = ({ open, inspectionItemId, orderId, onClose }: Props)
   return (
     <Modal
       open={open}
-      title="実施記録を登録"
+      title="実施記録を追加"
       onClose={handleClose}
       isDirty={isDirty}
       footer={
         <Button type="button" onClick={handleSubmit(onSubmit)}>
-          登録
+          保存
         </Button>
       }
     >

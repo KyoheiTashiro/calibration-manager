@@ -22,7 +22,7 @@ describe("PwaInstallSection", () => {
     render(<PwaInstallSection />);
 
     expect(
-      screen.getByText(/このブラウザでは自動インストールに対応していません/u),
+      screen.getByText(/このブラウザーでは自動インストールに対応していません/u),
     ).toBeInTheDocument();
     expect(
       screen.queryByRole("button", { name: "アプリとしてインストール" }),
@@ -46,7 +46,7 @@ describe("PwaInstallSection", () => {
 
     expect(mockEvent.prompt).toHaveBeenCalled();
     expect(
-      await screen.findByText(/このブラウザでは自動インストールに対応していません/u),
+      await screen.findByText(/このブラウザーでは自動インストールに対応していません/u),
     ).toBeInTheDocument();
     expect(
       screen.queryByRole("button", { name: "アプリとしてインストール" }),

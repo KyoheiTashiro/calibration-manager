@@ -86,6 +86,26 @@ describe("buildSeedState", () => {
     );
   });
 
+  it("有効な機器かつ有効な項目が 種別×実施区分 の4組合せを全て含む", () => {
+    const state = buildSeedState(TODAY);
+    const combos = new Set<string>();
+
+    for (const inspectionItem of Object.values(state.inspectionItems)) {
+      const equipment = state.equipment[inspectionItem.equipmentId];
+      if (equipment?.status !== EQUIPMENT_STATUS.ACTIVE) continue;
+      if (!inspectionItem.isActive) continue;
+      combos.add(`${inspectionItem.type}/${inspectionItem.execution}`);
+    }
+
+    expect(combos).toEqual(
+      new Set(
+        Object.values(INSPECTION_ITEM_TYPE).flatMap((type) =>
+          Object.values(EXECUTION).map((execution) => `${type}/${execution}`),
+        ),
+      ),
+    );
+  });
+
   it("同一inspectionItemIdに有効案件(isActiveOrderStatus)が2件以上存在しない", () => {
     const state = buildSeedState(TODAY);
     const activeOrderCountByInspectionItemId = new Map<string, number>();

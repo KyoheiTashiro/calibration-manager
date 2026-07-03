@@ -118,7 +118,7 @@ export const OrderCard = ({
       <p className="text-slate-600">{inspectionItemName}</p>
       <dl className="mt-2 flex flex-col gap-0.5 text-xs text-slate-600">
         <div>
-          <dt className="inline text-slate-500">依頼先: </dt>
+          <dt className="inline text-slate-500">校正依頼先: </dt>
           <dd className="inline">{vendorName}</dd>
         </div>
         <div>

@@ -29,11 +29,11 @@ export const Manual = (): ReactElement => (
       <h2 className="border-b border-slate-200 pb-2 text-lg font-semibold">このアプリについて</h2>
       <p>
         このアプリは、計測機器の点検・校正の期限をまとめて管理するツールです。データはお使いの
-        ブラウザ内(LocalStorage)にのみ保存され、外部のサーバには一切送信されません。その代わり、
-        別の端末やブラウザからは同じデータを参照できず、データはそれぞれの環境ごとに別々に保持されます。
+        ブラウザー内(LocalStorage)にのみ保存され、外部のサーバーには一切送信されません。その代わり、
+        別の端末やブラウザーからは同じデータを参照できず、データはそれぞれの環境ごとに別々に保持されます。
       </p>
       <p>
-        端末の故障やブラウザデータの消去でデータが失われる可能性があるため、
+        端末の故障やブラウザーデータの消去でデータが失われる可能性があるため、
         {/* oxlint-disable-next-line react/forbid-component-props -- Linkはclassnameでリンク色を渡す設計(Badgeと同様) */}
         <Link to={ROUTES.SETTINGS} className="text-primary mx-1 underline">
           設定画面
@@ -56,17 +56,17 @@ export const Manual = (): ReactElement => (
           <Link to={ROUTES.PERSON_LIST} className="text-primary underline">
             担当者
           </Link>
-          )を登録します。
+          )を追加します。
         </li>
         <li>
           {/* oxlint-disable-next-line react/forbid-component-props -- Linkはclassnameでリンク色を渡す設計(Badgeと同様) */}
           <Link to={ROUTES.EQUIPMENT_NEW} className="text-primary underline">
-            機器を登録
+            機器を追加
           </Link>
           します。
         </li>
         <li>
-          機器に点検校正項目(周期・内外区分など)を登録します。項目の登録・編集には専用のページは
+          機器に点検校正項目(周期・内外区分など)を追加します。項目の追加・編集には専用のページは
           なく、
           {/* oxlint-disable-next-line react/forbid-component-props -- Linkはclassnameでリンク色を渡す設計(Badgeと同様) */}
           <Link to={ROUTES.EQUIPMENT_LIST} className="text-primary underline">
@@ -80,7 +80,7 @@ export const Manual = (): ReactElement => (
           <Link to={ROUTES.INSPECTION_ITEM_LIST} className="text-primary underline">
             点検校正項目一覧
           </Link>
-          から実施記録を登録します(こちらも入力画面はモーダルで、登録すると次回期限が自動で更新されます)。
+          から実施記録を追加します(こちらも入力画面はモーダルで、追加すると次回期限が自動で更新されます)。
         </li>
         <li>
           外部校正が必要な項目は、
@@ -175,7 +175,7 @@ export const Manual = (): ReactElement => (
             メーカー・取引先
           </Link>
         </h3>
-        <p>機器のメーカーや、校正の依頼先となる取引先を登録・編集します。</p>
+        <p>機器のメーカーや、校正の依頼先となる取引先を追加・編集します。</p>
       </div>
 
       <div>
@@ -185,7 +185,7 @@ export const Manual = (): ReactElement => (
             担当者
           </Link>
         </h3>
-        <p>担当者を登録・編集します。使わなくなった担当者は無効化できます。</p>
+        <p>担当者を追加・編集します。使わなくなった担当者は無効化できます。</p>
       </div>
 
       <div>
@@ -224,7 +224,7 @@ export const Manual = (): ReactElement => (
         BOM付きで、Excelでもそのまま開けます)。同じ画面からCSVインポートによる復元もできます。
       </p>
       <p>
-        端末の変更やブラウザデータの消去でデータが失われる場合に備え、定期的にエクスポートして
+        端末の変更やブラウザーデータの消去でデータが失われる場合に備え、定期的にエクスポートして
         おくことをおすすめします。
       </p>
     </section>

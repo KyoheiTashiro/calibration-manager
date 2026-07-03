@@ -94,7 +94,7 @@ describe("RecordModal", () => {
     expect(screen.getByText("実施日が未来日です")).toBeInTheDocument();
 
     await user.click(screen.getByLabelText("合格"));
-    await user.click(screen.getByRole("button", { name: "登録" }));
+    await user.click(screen.getByRole("button", { name: "保存" }));
 
     expect(Object.values(recordsOf())).toHaveLength(1);
     expect(onClose).toHaveBeenCalledTimes(1);
@@ -108,7 +108,7 @@ describe("RecordModal", () => {
 
     await user.click(screen.getByLabelText("合格"));
     await user.type(screen.getByLabelText("備考", { exact: false }), "証明書#A-102");
-    await user.click(screen.getByRole("button", { name: "登録" }));
+    await user.click(screen.getByRole("button", { name: "保存" }));
 
     const records = Object.values(recordsOf());
     expect(records).toHaveLength(1);
@@ -132,7 +132,7 @@ describe("RecordModal", () => {
     );
 
     await user.click(screen.getByLabelText("合格"));
-    await user.click(screen.getByRole("button", { name: "登録" }));
+    await user.click(screen.getByRole("button", { name: "保存" }));
 
     expect(
       screen.getByText("登録できませんでした。データの状態を確認してください"),
@@ -147,7 +147,7 @@ describe("RecordModal", () => {
     renderWithStore(<RecordModal open inspectionItemId={inspectionItemInternal.id} onClose={vi.fn()} />);
 
     await user.click(screen.getByLabelText("合格"));
-    await user.click(screen.getByRole("button", { name: "登録" }));
+    await user.click(screen.getByRole("button", { name: "保存" }));
 
     expect(await screen.findByText("実施者は必須です")).toBeInTheDocument();
     expect(Object.values(recordsOf())).toHaveLength(0);
@@ -158,7 +158,7 @@ describe("RecordModal", () => {
     const user = userEvent.setup();
     renderWithStore(<RecordModal open inspectionItemId={inspectionItemExternal.id} onClose={vi.fn()} />);
 
-    await user.click(screen.getByRole("button", { name: "登録" }));
+    await user.click(screen.getByRole("button", { name: "保存" }));
 
     expect(await screen.findByText("結果を選択してください")).toBeInTheDocument();
     expect(Object.values(recordsOf())).toHaveLength(0);

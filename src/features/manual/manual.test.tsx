@@ -40,7 +40,7 @@ describe("Manual", () => {
     renderWithStore(<Manual />);
 
     expect(screen.getByRole("link", { name: "ダッシュボード" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "機器を登録" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "機器を追加" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "機器一覧" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "機器一覧・機器詳細" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "通知" })).toBeInTheDocument();

@@ -121,7 +121,7 @@ export const EquipmentDetail = (): ReactElement => {
 
         {inspectionItemList.length === 0 ? (
           <EmptyState
-            message="この機器にはまだ点検校正項目がありません"
+            message="点検校正項目が未登録です"
             action={<Button onClick={handleAddInspectionItemClick}>+ 項目を追加</Button>}
           />
         ) : (
@@ -198,7 +198,7 @@ export const EquipmentDetail = (): ReactElement => {
         <h2 className="text-lg font-semibold">実施履歴(全項目横断・新しい順)</h2>
 
         {historyRows.length === 0 ? (
-          <EmptyState message="実施履歴はまだありません" />
+          <EmptyState message="実施記録が未登録です" />
         ) : (
           <Table>
             <TableHead>

@@ -89,12 +89,12 @@ export const OrderModal = ({ open, inspectionItemId, onClose }: Props): ReactEle
   return (
     <Modal
       open={open}
-      title="外部校正案件を作成"
+      title="外部校正案件を追加"
       onClose={handleClose}
       isDirty={isDirty}
       footer={
         <Button type="button" onClick={handleSubmit(onSubmit)}>
-          作成
+          保存
         </Button>
       }
     >
@@ -106,7 +106,7 @@ export const OrderModal = ({ open, inspectionItemId, onClose }: Props): ReactEle
         {calibratorVendors.length === 0 ? (
           <div>
             <span className="block text-sm text-slate-700">
-              依頼先<span className="text-red-600">*</span>
+              校正依頼先<span className="text-red-600">*</span>
             </span>
             <p className="text-sm text-slate-600">
               校正業者が未登録です
@@ -118,7 +118,7 @@ export const OrderModal = ({ open, inspectionItemId, onClose }: Props): ReactEle
           </div>
         ) : (
           <Select
-            label="依頼先"
+            label="校正依頼先"
             required
             placeholder="選択してください"
             options={vendorOptions}
