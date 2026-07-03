@@ -1,18 +1,23 @@
 /**
- * EquipmentDetail(/equipment/:id)の検証: 基本情報カード・編集遷移・存在しないid・空状態
- * (screen-design/04-equipment-detail.md)。項目テーブルは inspectionItemTable.test.tsx、実施記録は
- * history.test.tsx、モーダル起動は modalLaunch.test.tsx を参照(oxlint max-lines 対応の分割)。
+ * EquipmentDetail(/equipment/:id)の検証(screen-design/04-equipment-detail.md)。
+ * 基本情報カード・編集遷移・存在しないid・空状態、点検校正項目テーブル、実施記録、
+ * 項目編集モーダル・実施記録登録モーダルの起動を扱う。
  */
 
 import { ROUTES, equipmentDetailPath, equipmentEditPath } from "@/constants/routes";
 import { EquipmentDetail } from "@/features/equipment/detail";
 import {
+  activePerson,
   equipmentFull,
   equipmentMinimal,
+  equipmentSuspended,
+  inspectionItemExternal,
+  inspectionItemOfSuspendedEquipment,
+  seedEquipmentFullInspectionItemsAndRecords,
   seedEquipmentFullMasters,
 } from "@/features/equipment/detail/detailFixtures";
 import { renderWithStore, seedStore, setupStoreIsolation } from "@/test/renderWithStore";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 // なぜ: tsc -b はプロジェクト参照ごとに独立したプログラムのため、vitest.setup.ts
 // （tsconfig.node.json側）の副作用importだけではtsconfig.app.json側の型解決に
@@ -38,6 +43,16 @@ const renderDetail = (id: string): ReturnType<typeof renderWithStore> =>
     initialEntries: [equipmentDetailPath(id)],
     routePath: ROUTES.EQUIPMENT_DETAIL,
   });
+
+/**
+ * 項目テーブル(1つ目のtable)のデータ行を取得する。項目名は実施記録テーブルの行にも
+ * 出現するため、screen 全体ではなく項目テーブル内にスコープして曖昧マッチを避ける。
+ */
+const getInspectionItemRow = (name: string | RegExp): HTMLElement => {
+  const [inspectionItemTable] = screen.getAllByRole("table");
+  if (!inspectionItemTable) throw new Error("項目テーブルが見つかりません");
+  return within(inspectionItemTable).getByRole("row", { name });
+};
 
 beforeEach(() => {
   setupStoreIsolation();
@@ -108,5 +123,226 @@ describe("EquipmentDetail: 空状態", () => {
     renderDetail(equipmentFull.id);
 
     expect(screen.getByText("実施記録が未登録です")).toBeInTheDocument();
+  });
+});
+
+/**
+ * EquipmentDetail: 実施記録テーブルの検証(screen-design/04-equipment-detail.md)。
+ * 全項目横断マージ・doneDate降順(同日はid昇順)・結果の日本語ラベル・空備考の「—」を扱う。
+ */
+const getHistoryRows = (): HTMLElement[] => {
+  // なぜ2つ目のtableか: 画面には項目テーブルと実施記録テーブルの2つがある
+  const [, historyTable] = screen.getAllByRole("table");
+  if (!historyTable) throw new Error("実施記録テーブルが見つかりません");
+  const [, ...dataRows] = within(historyTable).getAllByRole("row");
+  return dataRows;
+};
+
+describe("EquipmentDetail: 実施記録", () => {
+  beforeEach(() => {
+    setupStoreIsolation();
+    seedEquipmentFullMasters();
+    seedEquipmentFullInspectionItemsAndRecords();
+  });
+
+  it("全項目横断でdoneDate降順(同日はid昇順)に表示される", () => {
+    renderDetail(equipmentFull.id);
+
+    const rows = getHistoryRows();
+    const summary = rows.map((row) => {
+      const cells = within(row).getAllByRole("cell");
+      return `${cells[0]?.textContent} ${cells[1]?.textContent}`;
+    });
+
+    // record-a(2026-06-25/月次点検) → record-b(同日/年次校正、idタイブレーク) → record-c(2025-06-18)
+    expect(summary).toEqual(["2026-06-25 月次点検", "2026-06-25 年次校正", "2025-06-18 年次校正"]);
+  });
+
+  it("実施者・結果の日本語ラベル・備考(空は「—」)が表示される", () => {
+    renderDetail(equipmentFull.id);
+
+    const [first, second, third] = getHistoryRows();
+    if (!first || !second || !third) throw new Error("実施記録の行が3件表示されていません");
+
+    expect(within(first).getByText("鈴木")).toBeInTheDocument();
+    expect(within(first).getByText("合格")).toBeInTheDocument();
+    expect(within(first).getByText("—")).toBeInTheDocument();
+
+    expect(within(second).getByText("田中")).toBeInTheDocument();
+    expect(within(second).getByText("不合格")).toBeInTheDocument();
+
+    expect(within(third).getByText("ミツトヨ校正センター")).toBeInTheDocument();
+    expect(within(third).getByText("調整合格")).toBeInTheDocument();
+    expect(within(third).getByText("証明書#A-102")).toBeInTheDocument();
+  });
+});
+
+/**
+ * EquipmentDetail: 点検校正項目テーブルの検証(screen-design/04-equipment-detail.md)。
+ * 列内容・並び順(isActive優先→nextDueDate昇順)・淡色表示・ステータスバッジの
+ * D-014両分岐(稼働=導出表示 / 休止=「—」)・担当者の「(無効)」注記(D-001)・
+ * 記録ボタンの活性(Phase 7でRecordModalへ接続)を扱う。
+ */
+describe("EquipmentDetail: 項目テーブルの列内容", () => {
+  beforeEach(setupStoreIsolation);
+
+  it("種別・内外・周期・担当者名・次回期限が表示される", () => {
+    seedEquipmentFullMasters();
+    seedEquipmentFullInspectionItemsAndRecords();
+    renderDetail(equipmentFull.id);
+
+    const externalRow = getInspectionItemRow(/年次校正/u);
+    expect(within(externalRow).getByText("校正")).toBeInTheDocument();
+    expect(within(externalRow).getByText("外部")).toBeInTheDocument();
+    expect(within(externalRow).getByText("1年")).toBeInTheDocument();
+    expect(within(externalRow).getByText("田中")).toBeInTheDocument();
+    expect(within(externalRow).getByText("2030-01-01")).toBeInTheDocument();
+
+    const internalRow = getInspectionItemRow(/月次点検/u);
+    expect(within(internalRow).getByText("点検")).toBeInTheDocument();
+    expect(within(internalRow).getByText("内部")).toBeInTheDocument();
+  });
+
+  it("担当者が無効化済みの項目は「(無効)」を注記して表示する(D-001)", () => {
+    seedEquipmentFullMasters();
+    seedEquipmentFullInspectionItemsAndRecords();
+    renderDetail(equipmentFull.id);
+
+    expect(within(getInspectionItemRow(/外観点検/u)).getByText("鈴木(無効)")).toBeInTheDocument();
+  });
+});
+
+describe("EquipmentDetail: 項目テーブルの並び順・淡色表示", () => {
+  beforeEach(setupStoreIsolation);
+
+  it("isActive=trueをnextDueDate昇順で先に、isActive=falseは末尾+淡色になる", () => {
+    seedEquipmentFullMasters();
+    seedEquipmentFullInspectionItemsAndRecords();
+    renderDetail(equipmentFull.id);
+
+    const [inspectionItemTable] = screen.getAllByRole("table");
+    if (!inspectionItemTable) throw new Error("項目テーブルが見つかりません");
+    const [, ...dataRows] = within(inspectionItemTable).getAllByRole("row");
+    const names = dataRows.map((row) => within(row).getAllByRole("cell")[1]?.textContent ?? "");
+
+    // 有効: 月次点検(2000-01-01) → 年次校正(2030-01-01) → 外観点検(2099-01-01)、無効: 廃止予定項目が末尾
+    expect(names).toEqual(["月次点検", "年次校正", "外観点検", "廃止予定項目"]);
+    expect(getInspectionItemRow(/廃止予定項目/u)).toHaveClass("text-slate-400");
+    expect(getInspectionItemRow(/月次点検/u)).not.toHaveClass("text-slate-400");
+  });
+});
+
+describe("EquipmentDetail: 項目ステータス(D-014)", () => {
+  beforeEach(setupStoreIsolation);
+
+  it("稼働機器では導出ステータスをバッジ表示する", () => {
+    seedEquipmentFullMasters();
+    seedEquipmentFullInspectionItemsAndRecords();
+    renderDetail(equipmentFull.id);
+
+    // nextDueDate=2000-01-01(過去) → 期限切れ、2030/2099(遠未来・案件なし) → 正常
+    expect(within(getInspectionItemRow(/月次点検/u)).getByText("期限切れ")).toBeInTheDocument();
+    expect(within(getInspectionItemRow(/年次校正/u)).getByText("正常")).toBeInTheDocument();
+    expect(within(getInspectionItemRow(/外観点検/u)).getByText("正常")).toBeInTheDocument();
+  });
+
+  it("休止機器では期限切れ相当でもステータス欄が「—」になる", () => {
+    seedStore({
+      equipment: { [equipmentSuspended.id]: equipmentSuspended },
+      persons: { [activePerson.id]: activePerson },
+      inspectionItems: {
+        [inspectionItemOfSuspendedEquipment.id]: inspectionItemOfSuspendedEquipment,
+      },
+    });
+    renderDetail(equipmentSuspended.id);
+
+    const row = getInspectionItemRow(/定期点検/u);
+    const [statusCell] = within(row).getAllByRole("cell");
+    expect(statusCell).toHaveTextContent("—");
+    expect(within(row).queryByText("期限切れ")).not.toBeInTheDocument();
+  });
+});
+
+describe("EquipmentDetail: 記録ボタン", () => {
+  beforeEach(setupStoreIsolation);
+
+  // なぜ変更したか: Phase 7 で実施記録モーダル(RecordModal)を接続し、記録ボタンを活性化した。
+  // 旧テストは接続前の先行設置(常時disabled)を検証していたが、活性化が仕様(07-record-modal.md)の
+  // ため期待値を活性へ是正する(テストを弱める改変ではない)。起動結節点の検証は recordLaunch.test.tsx。
+  it("各項目行の記録ボタンが活性で表示される", () => {
+    seedEquipmentFullMasters();
+    seedEquipmentFullInspectionItemsAndRecords();
+    renderDetail(equipmentFull.id);
+
+    const recordButtons = screen.getAllByRole("button", { name: "記録" });
+    expect(recordButtons).toHaveLength(4);
+    for (const button of recordButtons) {
+      expect(button).toBeEnabled();
+    }
+  });
+});
+
+/**
+ * EquipmentDetail: 項目編集モーダル(InspectionItemModal)の起動結節点の検証
+ * (screen-design/04-equipment-detail.md「操作・アクション」)。
+ * 「+ 項目を追加」=新規モード(equipmentIdプリセット)、行「編集」=編集モード(プリフィル)。
+ * モーダル自体の入力・検証は InspectionItemModal.test.tsx の責務。
+ */
+/** モーダルタイトルからdialog要素を特定し、開いていることを検証して返す */
+const getOpenDialog = (title: string): HTMLElement => {
+  const dialogElement = screen.getByText(title).closest("dialog");
+  if (!dialogElement) throw new Error("dialog要素が見つかりません");
+  expect(dialogElement).toHaveAttribute("open");
+  return dialogElement;
+};
+
+describe("EquipmentDetail: InspectionItemModal起動", () => {
+  beforeEach(() => {
+    setupStoreIsolation();
+    seedEquipmentFullMasters();
+    seedEquipmentFullInspectionItemsAndRecords();
+  });
+
+  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
+  it("「+ 項目を追加」で新規モードのモーダルが開き、対象機器がプリセットされる", async () => {
+    const user = userEvent.setup();
+    renderDetail(equipmentFull.id);
+
+    await user.click(screen.getByRole("button", { name: "+ 項目を追加" }));
+
+    const dialogElement = getOpenDialog("点検校正項目を追加");
+    expect(within(dialogElement).getByText("EQ-001 ノギス")).toBeInTheDocument();
+    expect(within(dialogElement).getByLabelText("項目名", { exact: false })).toHaveValue("");
+  });
+
+  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
+  it("行の「編集」で編集モードのモーダルが開き、既存値がプリフィルされる", async () => {
+    const user = userEvent.setup();
+    renderDetail(equipmentFull.id);
+
+    await user.click(
+      within(getInspectionItemRow(/年次校正/u)).getByRole("button", { name: "編集" }),
+    );
+
+    const dialogElement = getOpenDialog("点検校正項目を編集");
+    expect(within(dialogElement).getByLabelText("項目名", { exact: false })).toHaveValue(
+      inspectionItemExternal.name,
+    );
+    expect(within(dialogElement).getByLabelText("外部")).toBeChecked();
+  });
+
+  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
+  it("モーダルを閉じると再度「+ 項目を追加」で新規モードとして開き直せる", async () => {
+    const user = userEvent.setup();
+    renderDetail(equipmentFull.id);
+
+    await user.click(
+      within(getInspectionItemRow(/年次校正/u)).getByRole("button", { name: "編集" }),
+    );
+    await user.click(screen.getByRole("button", { name: "閉じる" }));
+    await user.click(screen.getByRole("button", { name: "+ 項目を追加" }));
+
+    const dialogElement = getOpenDialog("点検校正項目を追加");
+    expect(within(dialogElement).getByLabelText("項目名", { exact: false })).toHaveValue("");
   });
 });
