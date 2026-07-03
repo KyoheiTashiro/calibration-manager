@@ -43,7 +43,7 @@ describe("InspectionItemModal: 編集", () => {
     expect(screen.getByLabelText("担当者", { exact: false })).toHaveValue(activePerson.id);
     expect(screen.getByLabelText("通知開始日数", { exact: false })).toHaveValue(25);
     expect(screen.getByLabelText("次回期限", { exact: false })).toHaveValue("2026-06-01");
-    expect(screen.getByLabelText("有効")).toBeChecked();
+    expect(screen.getByLabelText("期限管理の対象にする")).toBeChecked();
     expect(
       screen.getByText("※新規のみ手入力。以降は実施記録から自動計算されます"),
     ).toBeInTheDocument();

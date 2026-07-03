@@ -36,7 +36,7 @@ describe("InspectionItemModal: 新規追加", () => {
     expect(screen.getByLabelText("担当者", { exact: false })).toBeInTheDocument();
     expect(screen.getByLabelText("通知開始日数", { exact: false })).toHaveValue(30);
     expect(screen.getByLabelText("次回期限", { exact: false })).toBeInTheDocument();
-    expect(screen.getByLabelText("有効")).toBeChecked();
+    expect(screen.getByLabelText("期限管理の対象にする")).toBeChecked();
   });
 
   // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須

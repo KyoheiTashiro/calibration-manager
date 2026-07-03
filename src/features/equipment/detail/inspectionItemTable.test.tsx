@@ -51,7 +51,7 @@ describe("EquipmentDetail: 項目テーブルの列内容", () => {
     const externalRow = getInspectionItemRow(/年次校正/u);
     expect(within(externalRow).getByText("校正")).toBeInTheDocument();
     expect(within(externalRow).getByText("外部")).toBeInTheDocument();
-    expect(within(externalRow).getByText("1Y")).toBeInTheDocument();
+    expect(within(externalRow).getByText("1年")).toBeInTheDocument();
     expect(within(externalRow).getByText("田中")).toBeInTheDocument();
     expect(within(externalRow).getByText("2030-01-01")).toBeInTheDocument();
 

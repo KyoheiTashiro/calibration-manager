@@ -282,11 +282,16 @@ export const InspectionItemModal = ({ open, equipmentId, inspectionItem, onClose
             ※新規のみ手入力。以降は実施記録から自動計算されます
           </p>
         </div>
-        <Checkbox
-          label="有効"
-          // oxlint-disable-next-line react/jsx-props-no-spreading -- register()のname/onChange/onBlur等を素通しするため必須
-          {...register("isActive")}
-        />
+        <div>
+          <Checkbox
+            label="期限管理の対象にする"
+            // oxlint-disable-next-line react/jsx-props-no-spreading -- register()のname/onChange/onBlur等を素通しするため必須
+            {...register("isActive")}
+          />
+          <p className="text-xs text-slate-500">
+            オフにすると点検校正項目一覧・期限管理・通知の対象外になります(機器詳細では確認できます)
+          </p>
+        </div>
       </div>
     </Modal>
   );

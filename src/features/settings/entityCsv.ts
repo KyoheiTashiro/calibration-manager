@@ -78,7 +78,7 @@ export const ENTITY_CSV_SPECS: { [Kind in CsvEntityKind]: EntityCsvSpec<Kind> } 
     uniqueKeys: ["managementNo"],
   },
   inspectionItems: {
-    label: "項目",
+    label: "点検校正項目",
     columns: [
       { key: "id", kind: CSV_COLUMN_KIND.STRING },
       { key: "equipmentId", kind: CSV_COLUMN_KIND.STRING },
@@ -113,7 +113,7 @@ export const ENTITY_CSV_SPECS: { [Kind in CsvEntityKind]: EntityCsvSpec<Kind> } 
     uniqueKeys: [],
   },
   orders: {
-    label: "案件",
+    label: "校正案件",
     columns: [
       { key: "id", kind: CSV_COLUMN_KIND.STRING },
       { key: "inspectionItemId", kind: CSV_COLUMN_KIND.STRING },
@@ -129,7 +129,7 @@ export const ENTITY_CSV_SPECS: { [Kind in CsvEntityKind]: EntityCsvSpec<Kind> } 
     uniqueKeys: [],
   },
   vendors: {
-    label: "メーカー",
+    label: "メーカー/取引先",
     columns: [
       { key: "id", kind: CSV_COLUMN_KIND.STRING },
       { key: "name", kind: CSV_COLUMN_KIND.STRING },
