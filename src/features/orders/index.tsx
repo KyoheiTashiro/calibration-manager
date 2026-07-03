@@ -134,7 +134,7 @@ export const OrderList = (): ReactElement => {
 
       {totalOrderCount === 0 ? (
         <EmptyState
-          message="外部校正案件はありません。点検校正項目一覧から案件を作成できます"
+          message="外部校正案件はありません。点検校正項目一覧から案件を追加できます"
           action={
             <Button onClick={() => navigate(ROUTES.INSPECTION_ITEM_LIST)}>点検校正項目一覧へ</Button>
           }
@@ -195,7 +195,7 @@ export const OrderList = (): ReactElement => {
         open={dialog?.type === DIALOG_TYPE.CANCEL}
         title="案件を中止しますか?"
         message="この案件を中止して終了します。この操作は取り消せません。"
-        confirmLabel="中止する"
+        confirmLabel="中止"
         danger
         onConfirm={handleConfirmCancel}
         onCancel={closeDialog}

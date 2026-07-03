@@ -49,14 +49,14 @@ export const DangerSection = (): ReactElement => {
               キャンセル
             </Button>
             <Button variant="danger" disabled={!understood} onClick={handleDelete}>
-              削除する
+              削除
             </Button>
           </>
         }
       >
         <div className="flex flex-col gap-4">
           <p className="text-sm text-slate-700">
-            すべてのデータ(機器・項目・実施記録・案件・メーカー・担当者・通知)を完全に削除します。この操作は取り消せません。
+            全てのデータ(機器・項目・実施記録・案件・メーカー・担当者・通知)を完全に削除します。この操作は取り消せません。
           </p>
           <Checkbox
             label="全データを削除することを理解しました"

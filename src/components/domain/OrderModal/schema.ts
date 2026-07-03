@@ -25,7 +25,7 @@ const optionalNonNegativeIntegerString = (invalidMessage: string) =>
     });
 
 export const orderFormSchema = z.object({
-  vendorId: z.string().min(1, "依頼先を選択してください"),
+  vendorId: z.string().min(1, "校正依頼先を選択してください"),
   dueDate: z
     .string()
     .optional()

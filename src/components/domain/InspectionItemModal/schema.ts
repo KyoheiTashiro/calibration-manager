@@ -48,7 +48,7 @@ export const inspectionItemFormSchema = z
       "発注余裕日は必須です",
       "発注余裕日は0以上の整数で入力してください",
     ),
-    personId: z.string().min(1, "担当者は必須です"),
+    personId: z.string().min(1, "担当者を選択してください"),
     noticeDaysBefore: requiredNonNegativeIntegerString(
       "通知開始日数は必須です",
       "通知開始日数は0以上の整数で入力してください",

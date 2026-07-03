@@ -160,7 +160,7 @@ export const ImportSection = ({ state }: Props): ReactElement => {
         open={confirmOpen}
         title={`${label}の取り込み`}
         message={`既存の${label}データは取り込み内容で置き換えられます。よろしいですか?`}
-        confirmLabel="取り込む"
+        confirmLabel="取り込み"
         danger
         onConfirm={handleConfirmImport}
         onCancel={() => setConfirmOpen(false)}

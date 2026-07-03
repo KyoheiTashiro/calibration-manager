@@ -17,22 +17,22 @@ export default meta;
 
 export const Normal: StoryObj<typeof meta> = {
   args: {
-    label: "校正周期",
+    label: "周期",
     options: SAMPLE_OPTIONS,
   },
 };
 
 export const WithError: StoryObj<typeof meta> = {
   args: {
-    label: "校正周期",
+    label: "周期",
     options: SAMPLE_OPTIONS,
-    error: "校正周期を選択してください",
+    error: "周期を選択してください",
   },
 };
 
 export const Required: StoryObj<typeof meta> = {
   args: {
-    label: "校正周期",
+    label: "周期",
     options: SAMPLE_OPTIONS,
     required: true,
   },
@@ -40,7 +40,7 @@ export const Required: StoryObj<typeof meta> = {
 
 export const WithPlaceholder: StoryObj<typeof meta> = {
   args: {
-    label: "校正周期",
+    label: "周期",
     options: SAMPLE_OPTIONS,
     placeholder: "選択してください",
   },

@@ -93,7 +93,7 @@ const registerRecordFromReturnedCard = async (
   await user.clear(doneDateField);
   await user.type(doneDateField, "2026-06-20");
   await user.click(screen.getByLabelText(resultLabel));
-  await user.click(screen.getByRole("button", { name: "登録" }));
+  await user.click(screen.getByRole("button", { name: "保存" }));
 };
 
 beforeEach(setupStoreIsolation);

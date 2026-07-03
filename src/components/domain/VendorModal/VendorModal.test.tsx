@@ -27,10 +27,10 @@ const vendor: Vendor = {
 beforeEach(setupStoreIsolation);
 
 describe("VendorModal: 新規追加", () => {
-  it("タイトルが「取引先の追加」になる", () => {
+  it("タイトルが「取引先を追加」になる", () => {
     render(<VendorModal open onClose={vi.fn()} />);
 
-    expect(screen.getByText("取引先の追加")).toBeInTheDocument();
+    expect(screen.getByText("取引先を追加")).toBeInTheDocument();
   });
 
   // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
@@ -124,7 +124,7 @@ describe("VendorModal: 編集", () => {
   it("既存値がプリフィルされる", () => {
     render(<VendorModal open vendor={vendor} onClose={vi.fn()} />);
 
-    expect(screen.getByText("取引先の編集")).toBeInTheDocument();
+    expect(screen.getByText("取引先を編集")).toBeInTheDocument();
     expect(screen.getByLabelText("名称", { exact: false })).toHaveValue("計測器メーカー");
     expect(screen.getByLabelText("メーカー")).toBeChecked();
     expect(screen.getByLabelText("校正業者")).toBeChecked();

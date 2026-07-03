@@ -101,7 +101,7 @@ export const PersonModal = ({ open, person, onClose }: PersonModalProps): ReactE
     <>
       <Modal
         open={open}
-        title={person ? "担当者の編集" : "担当者の追加"}
+        title={person ? "担当者を編集" : "担当者を追加"}
         onClose={onClose}
         isDirty={isDirty}
         footer={
@@ -144,7 +144,7 @@ export const PersonModal = ({ open, person, onClose }: PersonModalProps): ReactE
           open
           title="担当者の無効化"
           message={confirmMessage}
-          confirmLabel="無効化する"
+          confirmLabel="無効化"
           danger
           onConfirm={handleConfirmDeactivation}
           onCancel={handleCancelDeactivation}

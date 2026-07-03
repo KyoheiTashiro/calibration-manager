@@ -141,7 +141,7 @@ export const EquipmentForm = (): ReactElement => {
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-xl font-bold">{isEditMode ? "機器を編集" : "機器を登録"}</h1>
+      <h1 className="text-xl font-bold">{isEditMode ? "機器を編集" : "機器を追加"}</h1>
 
       {/* なぜ noValidate か: 必須項目は TextField の required 属性経由でネイティブHTML5検証も
           有効になるが、本画面の検証はRHF+zodに一本化し「送信試行でエラー表示」する方針
@@ -177,7 +177,7 @@ export const EquipmentForm = (): ReactElement => {
           <div>
             <span className="block text-sm text-slate-700">メーカー</span>
             <p className="text-sm text-slate-600">
-              メーカーが未登録です。マスタから登録してください
+              メーカーが未登録です。マスタから追加してください
               {/* oxlint-disable-next-line react/forbid-component-props -- Linkはclassnameでリンク色を渡す設計（Badgeと同様） */}
               <Link to={ROUTES.VENDOR_LIST} className="text-primary ml-1 underline">
                 メーカーマスタへ
@@ -236,7 +236,7 @@ export const EquipmentForm = (): ReactElement => {
         open={retireConfirmOpen}
         title="機器の廃棄"
         message="この機器を廃棄にしますか?"
-        confirmLabel="廃棄にする"
+        confirmLabel="廃棄"
         danger
         onConfirm={handleRetireConfirm}
         onCancel={() => setRetireConfirmOpen(false)}

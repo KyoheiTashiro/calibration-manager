@@ -55,7 +55,7 @@ describe("EquipmentDetail: RecordModal起動", () => {
 
     await user.click(within(getInspectionItemRow(/年次校正/u)).getByRole("button", { name: "記録" }));
 
-    const dialogElement = getOpenDialog("実施記録を登録");
+    const dialogElement = getOpenDialog("実施記録を追加");
     expect(
       within(dialogElement).getByText(`対象:EQ-001 ノギス / ${inspectionItemExternal.name}`),
     ).toBeInTheDocument();
@@ -69,9 +69,9 @@ describe("EquipmentDetail: RecordModal起動", () => {
     const recordsBefore = Object.keys(useAppStore.getState().records).length;
 
     await user.click(within(getInspectionItemRow(/年次校正/u)).getByRole("button", { name: "記録" }));
-    const dialogElement = getOpenDialog("実施記録を登録");
+    const dialogElement = getOpenDialog("実施記録を追加");
     await user.click(within(dialogElement).getByLabelText("合格"));
-    await user.click(within(dialogElement).getByRole("button", { name: "登録" }));
+    await user.click(within(dialogElement).getByRole("button", { name: "保存" }));
 
     expect(Object.keys(useAppStore.getState().records)).toHaveLength(recordsBefore + 1);
   });

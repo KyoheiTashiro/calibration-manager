@@ -98,7 +98,7 @@ describe("EquipmentDetail: 空状態", () => {
     seedEquipmentFullMasters();
     renderDetail(equipmentFull.id);
 
-    expect(screen.getByText("この機器にはまだ点検校正項目がありません")).toBeInTheDocument();
+    expect(screen.getByText("点検校正項目が未登録です")).toBeInTheDocument();
     // なぜ2件か: セクション見出し右の「+ 項目を追加」と EmptyState 内の CTA の両方が表示される
     expect(screen.getAllByRole("button", { name: "+ 項目を追加" })).toHaveLength(2);
   });
@@ -107,6 +107,6 @@ describe("EquipmentDetail: 空状態", () => {
     seedEquipmentFullMasters();
     renderDetail(equipmentFull.id);
 
-    expect(screen.getByText("実施履歴はまだありません")).toBeInTheDocument();
+    expect(screen.getByText("実施記録が未登録です")).toBeInTheDocument();
   });
 });

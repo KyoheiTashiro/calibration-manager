@@ -11,13 +11,13 @@ export default meta;
 
 export const Normal: StoryObj<typeof meta> = {
   args: {
-    label: "次回校正日",
+    label: "次回期限",
   },
 };
 
 export const WithError: StoryObj<typeof meta> = {
   args: {
-    label: "次回校正日",
-    error: "次回校正日を入力してください",
+    label: "次回期限",
+    error: "次回期限を入力してください",
   },
 };

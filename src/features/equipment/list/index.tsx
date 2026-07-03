@@ -136,7 +136,7 @@ export const EquipmentList = (): ReactElement => {
 
       {totalCount === 0 ? (
         <EmptyState
-          message="機器がまだ登録されていません"
+          message="機器が未登録です"
           action={<Button onClick={handleAddClick}>+ 機器を追加</Button>}
         />
       ) : (
@@ -161,7 +161,7 @@ export const EquipmentList = (): ReactElement => {
           </div>
 
           {filteredEquipmentList.length === 0 ? (
-            <EmptyState message="条件に一致する機器がありません" />
+            <EmptyState message="条件に一致する機器はありません" />
           ) : (
             <Table>
               <TableHead>

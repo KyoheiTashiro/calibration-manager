@@ -142,14 +142,14 @@ describe("インポート(§11、D-029 / D-030)", () => {
   });
 
   // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
-  it("確定 → 確認 → 取り込むで対象Recordを全置換する", async () => {
+  it("確定 → 確認 → 取り込みで対象Recordを全置換する", async () => {
     seedStore({ equipment: { old: { ...sampleEquipment, id: "old", managementNo: "M-OLD" } } });
     renderWithStore(<Settings />);
     await userEvent.upload(screen.getByLabelText("ファイル"), equipmentCsvFile(sampleEquipment));
     await screen.findByText("✓ 1行 取り込み可");
 
     await userEvent.click(screen.getByRole("button", { name: "確定" }));
-    await userEvent.click(screen.getByRole("button", { name: "取り込む" }));
+    await userEvent.click(screen.getByRole("button", { name: "取り込み" }));
 
     expect(useAppStore.getState().equipment).toEqual({ e1: sampleEquipment });
     expect(await screen.findByText("機器を 1 件取り込みました")).toBeInTheDocument();
@@ -178,17 +178,17 @@ describe("インポート(§11、D-029 / D-030)", () => {
 
 describe("データ全削除(§11、D-031)", () => {
   // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
-  it("同意チェックまで[削除する]は非活性で、実行するとストアが空になる", async () => {
+  it("同意チェックまで[削除]は非活性で、実行するとストアが空になる", async () => {
     seedStore({ equipment: { e1: sampleEquipment }, vendors: { v1: sampleVendor } });
     renderWithStore(<Settings />);
 
     await userEvent.click(screen.getByRole("button", { name: "データを全削除" }));
-    expect(screen.getByRole("button", { name: "削除する" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "削除" })).toBeDisabled();
 
     await userEvent.click(screen.getByLabelText("全データを削除することを理解しました"));
-    expect(screen.getByRole("button", { name: "削除する" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "削除" })).toBeEnabled();
 
-    await userEvent.click(screen.getByRole("button", { name: "削除する" }));
+    await userEvent.click(screen.getByRole("button", { name: "削除" }));
     expect(useAppStore.getState().equipment).toEqual({});
     expect(useAppStore.getState().vendors).toEqual({});
   });

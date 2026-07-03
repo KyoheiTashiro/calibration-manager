@@ -218,7 +218,7 @@ describe("EquipmentForm: メーカーセレクト", () => {
     renderNewForm();
 
     expect(
-      screen.getByText("メーカーが未登録です。マスタから登録してください"),
+      screen.getByText("メーカーが未登録です。マスタから追加してください"),
     ).toBeInTheDocument();
     expect(screen.queryByRole("combobox", { name: "メーカー" })).not.toBeInTheDocument();
     const link = screen.getByRole("link");
@@ -260,7 +260,7 @@ describe("EquipmentForm: 廃棄ボタン", () => {
     const dialog = screen.getByRole("dialog");
     expect(within(dialog).getByText("この機器を廃棄にしますか?")).toBeInTheDocument();
 
-    await user.click(within(dialog).getByRole("button", { name: "廃棄にする" }));
+    await user.click(within(dialog).getByRole("button", { name: "廃棄" }));
 
     expect(useAppStore.getState().equipment[existingEquipment.id]?.status).toBe(
       EQUIPMENT_STATUS.RETIRED,

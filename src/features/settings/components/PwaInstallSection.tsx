@@ -35,7 +35,7 @@ export const PwaInstallSection = (): ReactElement => {
     }
     return (
       <p className="text-sm text-slate-700">
-        このブラウザでは自動インストールに対応していません。Chrome / Edge
+        このブラウザーでは自動インストールに対応していません。Chrome / Edge
         ではアドレスバーのインストールアイコンから、iOS の Safari
         では共有メニューの「ホーム画面に追加」からインストールできます。
       </p>
@@ -47,7 +47,7 @@ export const PwaInstallSection = (): ReactElement => {
       <h2 className="border-b border-slate-200 pb-2 text-lg font-semibold">アプリのインストール</h2>
       <p className="text-sm text-slate-700">
         このアプリは
-        PWA(プログレッシブウェブアプリ)として端末にインストールでき、ホーム画面やデスクトップから単独のアプリとして起動できます。
+        PWA(プログレッシブ ウェブ アプリ)として端末にインストールでき、ホーム画面やデスクトップから単独のアプリとして起動できます。
       </p>
       {renderStatus()}
     </section>
