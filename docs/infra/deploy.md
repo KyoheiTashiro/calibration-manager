@@ -4,7 +4,7 @@
 
 ## GitHub Actions ワークフロー
 
-`.github/workflows/deploy.yml` の構成（設計値。pinpon-match-manage 踏襲。実装後は実装が正）:
+`.github/workflows/deploy.yml` の構成（設計値。実装後は実装が正）:
 
 - **trigger**: `main` ブランチへの push + `workflow_dispatch`（手動実行）
 - **runner**: `ubuntu-slim`

@@ -1,4 +1,4 @@
-# なぜ: docs/infra/deploy.md の設計値（pinpon-match-manage踏襲）をそのまま実装する。
+# なぜ: docs/infra/deploy.md の設計値をそのまま実装する。
 # build/deployをジョブ分離することで、ビルド失敗とデプロイ失敗の原因を切り分けやすくする。
 name: deploy
 

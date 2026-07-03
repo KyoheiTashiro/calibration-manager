@@ -17,10 +17,10 @@ useAppStore = create<StoreState>()(
 )
 ```
 
-- ミドルウェア順は `persist(immer(...))`（pinpon踏襲）。`immer` を内側に置くことで、各スライスの `set` はImmerドラフトを直接変更する記法で書ける想定とする。
+- ミドルウェア順は `persist(immer(...))`。`immer` を内側に置くことで、各スライスの `set` はImmerドラフトを直接変更する記法で書ける想定とする。
 - 単一ストア構成とし、Context Providerは設けない。コンポーネントは `useAppStore(selector)` で購読する方針とする。
 - 永続化はLocalStorageのみとし、サーバ同期は行わない（単一端末ローカル運用）。
-- calibration-managerの7エンティティ（Vendor / Person / Equipment / InspectionItem / InspectionRecord / CalibrationOrder / Notification）にそれぞれ1対1対応する7スライスのみでストアを構成する方針とする。pinponにある画面専用の `uiSlice`（フォントサイズ等）は calibration-manager には設けない。サイドバーの開閉状態など、ドメインに属さないUI状態は各コンポーネントのローカルstateで完結させる方針とし、ストアはドメイン状態のみを保持するという意図的な差別化点とする。
+- calibration-managerの7エンティティ（Vendor / Person / Equipment / InspectionItem / InspectionRecord / CalibrationOrder / Notification）にそれぞれ1対1対応する7スライスのみでストアを構成する方針とする。画面専用の `uiSlice`（フォントサイズ等）は設けない。サイドバーの開閉状態など、ドメインに属さないUI状態は各コンポーネントのローカルstateで完結させる方針とし、ストアはドメイン状態のみを保持する。
 
 ## スライス構成
 
@@ -53,22 +53,22 @@ useAppStore = create<StoreState>()(
   - `orderId` が指定されている場合: 対象の `CalibrationOrder.status` を `completed` に更新する（domain-model.md §3.6）。
 - `updateOrderStatus(id, nextStatus)`: 状態遷移はdomain-model.md §3.6の状態遷移図に従い、`domain/orderStatus.ts` の許可テーブルで検証する方針とする（許可されない遷移はno-op）。`completed`への遷移は上記`addRecord`のカスケード経由のみとし、本アクションから直接指定はしない方針とする。
 - `generateNotifications(today)`: 全ての有効な項目（`inspectionItem.isActive` かつ 紐づくEquipmentが `active`）・案件をスキャンし、domain-model.md §3.7の5種別の発生条件を判定する。判定は `domain/notificationRules.ts`（純粋関数。ストアに依存しない）が担う想定とし、本アクションは判定結果と現在の `notifications` を突き合わせて、同一 `(targetType, targetId, type)` の**未読**通知が既に存在する場合は生成をスキップする（domain-model.md §3.7「同一対象・同一種別の未読通知は重複生成しない」）。CalibrationOrder起点の通知（`deliveryDueSoon`/`deliveryOverdue`）はCalibrationOrderにpersonId属性がないため、`order.inspectionItemId` からInspectionItemを辿って `inspectionItem.personId` を宛先とする方針とする。
-- `markAsRead(id)` / `markAllAsRead()`: 対象が無ければno-opとする（pinpon踏襲）。
+- `markAsRead(id)` / `markAllAsRead()`: 対象が無ければno-opとする。
 
 ## 永続化（zustand persist）
 
 - ストアキー（`name`）: `calibration-manager:v1`
-- スキーマ `version`: `1`。初回スキーマのため、現時点でmigrationステップは未登録とする。将来のスキーマ変更に備え、pinpon同様の `migrations: Record<number, Migration>` によるバージョン間ステップ変換の仕組みを最初から用意する方針とする。
+- スキーマ `version`: `1`。初回スキーマのため、現時点でmigrationステップは未登録とする。将来のスキーマ変更に備え、`migrations: Record<number, Migration>` によるバージョン間ステップ変換の仕組みを最初から用意する方針とする。
 - `partialize`: 永続化対象は7エンティティの `Record`（vendors / persons / equipment / inspectionItems / records / orders / notifications）のみとする方針とする。アクション関数・派生値は保存しない。
-- 読込パイプライン: LocalStorage → `migrate`（バージョン変換）→ `merge`（検証・サニタイズ・結合）→ ストア、という流れをpinpon踏襲で採用する。
+- 読込パイプライン: LocalStorage → `migrate`（バージョン変換）→ `merge`（検証・サニタイズ・結合）→ ストア、という流れを採用する。
 
 ### migrate
 
-`migratePersistedState(persisted, fromVersion)` は「version N→N+1」のステップ変換テーブルを順に適用する、というpinponと同じ設計思想を流用する方針とする。現状は `version = 1` のためテーブルは空とする。将来のスキーマ変更時には `migrateVNToVN+1` を追加してテーブルへ登録し、`STORAGE_VERSION` をインクリメントする運用方針とする。
+`migratePersistedState(persisted, fromVersion)` は「version N→N+1」のステップ変換テーブルを順に適用する設計とする。現状は `version = 1` のためテーブルは空とする。将来のスキーマ変更時には `migrateVNToVN+1` を追加してテーブルへ登録し、`STORAGE_VERSION` をインクリメントする運用方針とする。
 
 ### merge（サルベージ戦略）
 
-pinponの3段構え（ハッピーパス → 部分破損サルベージ → 最終手段）をcalibration-manager向けに踏襲する方針とする。
+3段構え（ハッピーパス → 部分破損サルベージ → 最終手段）で復元する方針とする。
 
 1. **ハッピーパス**: 永続化データ全体をスキーマで `safeParse` し、成功すれば参照整合修復を経てストアへ結合する。
 2. **部分破損**: 全体のパースに失敗した場合、7エンティティそれぞれを1レコードずつ `store/schema.ts` のzodスキーマで `safeParse` し、成功分のみ保持する方針とする。
@@ -89,7 +89,7 @@ pinponの3段構え（ハッピーパス → 部分破損サルベージ → 最
 
 ## テスト
 
-pinpon踏襲で以下のテストファイル構成を想定する。
+以下のテストファイル構成を想定する。
 
 - `useAppStore.test.ts` — アクション・カスケード・migrate/mergeの検証
 - `merge.test.ts` — merge 3段構えのサルベージ挙動の検証

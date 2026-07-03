@@ -208,7 +208,7 @@ leadTime = inspectionItem.leadTimeDays ?? vendor.standardLeadTimeDays
   - インポート: CSVから復元。zodでバリデーションし、不正行はエラー表示。
   - 文字コードはUTF-8(BOM付き。Excel互換のため)。
 
-## 6. 技術スタック(pinpon-match-manage 踏襲)
+## 6. 技術スタック
 
 | 分類                   | 技術                                  |
 | ---------------------- | ------------------------------------- |

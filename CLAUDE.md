@@ -15,7 +15,7 @@
 
 - `src/domain/` 配下と `src/store/types.ts` / `src/store/schema.ts` — 変更が必要と思ったら報告のみ
 - 既存テストの改変・削除・skip — テストを通すためにテストを弱めるの禁止
-- `vite.config.ts` の base / PWA 設定(`/natsu/` 三者一致は確定済み)
+- `vite.config.ts` の base / PWA 設定
 - カバレッジ閾値の引き下げ
 
 ## 完了条件(全タスク共通)
