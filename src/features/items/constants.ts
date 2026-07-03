@@ -48,3 +48,10 @@ export const RECORD_RESULT_LABELS = {
   [RECORD_RESULT.FAIL]: "不合格",
   [RECORD_RESULT.ADJUSTED]: "調整合格",
 } as const satisfies Record<RecordResult, string>;
+
+/** 結果ラジオ(合格/不合格/調整合格)の選択肢(07-record-modal.md モック準拠の並び) */
+export const RECORD_RESULT_OPTIONS: readonly { value: RecordResult; label: string }[] =
+  Object.entries(RECORD_RESULT_LABELS).map(([value, label]) => ({
+    value: value as RecordResult,
+    label,
+  }));

@@ -1,0 +1,78 @@
+/**
+ * EquipmentDetail: 実施記録登録モーダル(RecordModal)の起動結節点の検証
+ * (screen-design/04-equipment-detail.md「操作・アクション」/ 07-record-modal.md)。
+ * 行「記録」ボタンで対象項目がプリセットされたモーダルが開き、登録で実施履歴が増えることを扱う。
+ * モーダル自体の入力・検証は RecordModal.test.tsx の責務。
+ */
+
+import { ROUTES, equipmentDetailPath } from "@/constants/routes";
+import { EquipmentDetail } from "@/features/equipment/detail";
+import {
+  equipmentFull,
+  itemExternal,
+  seedEquipmentFullItemsAndRecords,
+  seedEquipmentFullMasters,
+} from "@/features/equipment/detail/detailFixtures";
+import { useAppStore } from "@/store/useAppStore";
+import { renderWithStore, setupStoreIsolation } from "@/test/renderWithStore";
+import { screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import "@testing-library/jest-dom/vitest";
+import { beforeEach, describe, expect, it } from "vitest";
+
+const renderDetail = (): ReturnType<typeof renderWithStore> =>
+  renderWithStore(<EquipmentDetail />, {
+    initialEntries: [equipmentDetailPath(equipmentFull.id)],
+    routePath: ROUTES.EQUIPMENT_DETAIL,
+  });
+
+/** モーダルタイトルからdialog要素を特定し、開いていることを検証して返す */
+const getOpenDialog = (title: string): HTMLElement => {
+  const dialogElement = screen.getByText(title).closest("dialog");
+  if (!dialogElement) throw new Error("dialog要素が見つかりません");
+  expect(dialogElement).toHaveAttribute("open");
+  return dialogElement;
+};
+
+/** 項目テーブル(1つ目のtable)の行を取得する。項目名は実施履歴テーブルにも出現するためスコープする */
+const getItemRow = (name: RegExp): HTMLElement => {
+  const [itemTable] = screen.getAllByRole("table");
+  if (!itemTable) throw new Error("項目テーブルが見つかりません");
+  return within(itemTable).getByRole("row", { name });
+};
+
+beforeEach(() => {
+  setupStoreIsolation();
+  seedEquipmentFullMasters();
+  seedEquipmentFullItemsAndRecords();
+});
+
+describe("EquipmentDetail: RecordModal起動", () => {
+  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
+  it("行の「記録」で対象項目がプリセットされたモーダルが開く", async () => {
+    const user = userEvent.setup();
+    renderDetail();
+
+    await user.click(within(getItemRow(/年次校正/u)).getByRole("button", { name: "記録" }));
+
+    const dialogElement = getOpenDialog("実施記録を登録");
+    expect(
+      within(dialogElement).getByText(`対象:EQ-001 ノギス / ${itemExternal.name}`),
+    ).toBeInTheDocument();
+  });
+
+  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
+  it("登録すると実施履歴テーブルへ行が増える", async () => {
+    const user = userEvent.setup();
+    renderDetail();
+
+    const recordsBefore = Object.keys(useAppStore.getState().records).length;
+
+    await user.click(within(getItemRow(/年次校正/u)).getByRole("button", { name: "記録" }));
+    const dialogElement = getOpenDialog("実施記録を登録");
+    await user.click(within(dialogElement).getByLabelText("合格"));
+    await user.click(within(dialogElement).getByRole("button", { name: "登録" }));
+
+    expect(Object.keys(useAppStore.getState().records)).toHaveLength(recordsBefore + 1);
+  });
+});
