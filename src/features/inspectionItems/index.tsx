@@ -10,14 +10,14 @@
 
 import { InspectionItemModal, OrderModal, RecordModal } from "@/components/domain";
 import { Button, EmptyState } from "@/components/ui";
-import { FilterBar } from "@/features/inspectionItems/FilterBar";
+import { FilterBar } from "@/features/inspectionItems/components/FilterBar";
+import { InspectionItemTable } from "@/features/inspectionItems/components/InspectionItemTable";
 import {
   FILTER_ALL,
   filterInspectionItemRows,
   parseInspectionItemListFilters,
   type InspectionItemListFilters,
 } from "@/features/inspectionItems/hooks";
-import { InspectionItemTable } from "@/features/inspectionItems/InspectionItemTable";
 import { inspectionItemRowsOf, type InspectionItemRow } from "@/store/selectors";
 import { useAppStore } from "@/store/useAppStore";
 import { todayIsoDate } from "@/utils/time";
