@@ -28,7 +28,7 @@ export const Manual = (): ReactElement => (
     <section className="flex flex-col gap-3 rounded border border-slate-200 p-4">
       <h2 className="border-b border-slate-200 pb-2 text-lg font-semibold">このアプリについて</h2>
       <p>
-        このアプリは、計測機器の点検・校正の期限をまとめて管理するツールです。データはお使いの
+        このアプリは、機器の点検・校正の期限をまとめて管理するツールです。データはお使いの
         ブラウザー内(LocalStorage)にのみ保存され、外部のサーバーには一切送信されません。その代わり、
         別の端末やブラウザーからは同じデータを参照できず、データはそれぞれの環境ごとに別々に保持されます。
       </p>
