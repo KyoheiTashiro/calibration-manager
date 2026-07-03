@@ -1,7 +1,97 @@
-import type { ReactElement } from "react";
+import { PersonModal } from "@/components/domain/PersonModal";
+import { Badge, Button, EmptyState, Table, TableBody, TableHead } from "@/components/ui";
+import type { Person } from "@/store/types";
+import { useAppStore } from "@/store/useAppStore";
+import { useState, type ReactElement } from "react";
+
+/** 状態バッジの色classNameマッピング（screen-design/09-masters.md §9-B、StatusBadgeと同じ配色パターン） */
+const ACTIVE_BADGE_CLASS_NAME = "bg-green-100 text-green-800";
+const INACTIVE_BADGE_CLASS_NAME = "bg-slate-100 text-slate-600";
 
 /**
- * 担当者画面。
- * 現時点ではルーティング疎通確認用のプレースホルダで、後続フェーズで実装する。
+ * 担当者マスタ画面（screen-design/09-masters.md §9-B）。
+ * 物理削除は行わず、モーダル内の「有効」チェックボックストグルで無効化する。
  */
-export const PersonList = (): ReactElement => <h1 className="text-xl font-bold">担当者</h1>;
+export const PersonList = (): ReactElement => {
+  const persons = useAppStore((state) => state.persons);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editingPerson, setEditingPerson] = useState<Person | undefined>();
+
+  const sortedPersons = Object.values(persons).toSorted((first, second) =>
+    first.name.localeCompare(second.name, "ja"),
+  );
+
+  const handleAddClick = (): void => {
+    setEditingPerson(undefined);
+    setModalOpen(true);
+  };
+
+  const handleEditClick = (person: Person): void => {
+    setEditingPerson(person);
+    setModalOpen(true);
+  };
+
+  const handleModalClose = (): void => {
+    setModalOpen(false);
+  };
+
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="flex items-center justify-between">
+        <h1 className="text-xl font-bold">担当者</h1>
+        <Button variant="primary" onClick={handleAddClick}>
+          + 追加
+        </Button>
+      </div>
+
+      {sortedPersons.length === 0 ? (
+        <EmptyState
+          message="担当者が未登録です"
+          action={
+            <Button variant="primary" onClick={handleAddClick}>
+              + 追加
+            </Button>
+          }
+        />
+      ) : (
+        <Table>
+          <TableHead>
+            <tr>
+              <th className="px-3 py-2 text-left">氏名</th>
+              <th className="px-3 py-2 text-left">部署</th>
+              <th className="px-3 py-2 text-left">メール</th>
+              <th className="px-3 py-2 text-left">状態</th>
+              <th className="px-3 py-2 text-left">操作</th>
+            </tr>
+          </TableHead>
+          <TableBody>
+            {sortedPersons.map((person) => (
+              <tr key={person.id}>
+                <td className="px-3 py-2">{person.name}</td>
+                <td className="px-3 py-2">{person.department || "—"}</td>
+                <td className="px-3 py-2">{person.email}</td>
+                <td className="px-3 py-2">
+                  <Badge
+                    // oxlint-disable-next-line react/forbid-component-props -- Badgeはclassnameで色を渡す設計（Badge.tsx参照）
+                    className={
+                      person.isActive ? ACTIVE_BADGE_CLASS_NAME : INACTIVE_BADGE_CLASS_NAME
+                    }
+                  >
+                    {person.isActive ? "有効" : "無効"}
+                  </Badge>
+                </td>
+                <td className="px-3 py-2">
+                  <Button size="sm" variant="secondary" onClick={() => handleEditClick(person)}>
+                    編集
+                  </Button>
+                </td>
+              </tr>
+            ))}
+          </TableBody>
+        </Table>
+      )}
+
+      <PersonModal open={modalOpen} person={editingPerson} onClose={handleModalClose} />
+    </div>
+  );
+};

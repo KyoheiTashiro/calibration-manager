@@ -63,19 +63,19 @@
 - [x] 監査修正: Modal の破棄確認オーバーレイ残留 → dialog close イベント購読でリセット
 - ゲート実績: tsc 0 / oxlint 0 / テスト306件全緑(+84件増)/ npm run build / build-storybook 成功
 
-## Phase 4: マスタ(§9 /vendors, /persons)
+## Phase 4: マスタ(§9 /vendors, /persons) ✅ 完了(2026-07-03)
 
-担当: 委譲(2並列可: vendors班 / persons班。ファイル非重複)。メイン監査
+担当実績: Sonnet 2並列(vendors班 / persons班)。メイン = TextField/Checkbox 先行追加(D-009)・vendors班残作業引き継ぎ(テスト曖昧クエリ修正・列挙リテラル修正)・監査・barrel追記
 
-**委譲契約(仕様: docs/screen-design/09-masters.md 全文 + README §0.5/§0.6/§0.7)**
-
-- [ ] **vendors班**: `features/vendors/index.tsx`(テーブル: 名称/メーカー✓/校正業者✓/標準納期/窓口/連絡先 + 追加・編集・削除ボタン)+ `features/vendors/schema.ts`(RHF+zod: name必須、email形式、standardLeadTimeDays 0以上、両フラグfalseで警告表示)+ `components/domain/VendorModal/`(追加/編集、standardLeadTimeDays は isCalibrator=true 時のみ表示・切替時クリア)
-- [ ] Vendor削除: `removeVendor` の false 返却で「この取引先は参照されているため削除できません」表示。未参照時は ConfirmModal(危険色)→削除
-- [ ] **persons班**: `features/persons/index.tsx`(テーブル: 氏名/部署/メール/状態バッジ + 編集)+ `features/persons/schema.ts`(name・email必須+email形式)+ `components/domain/PersonModal/`
-- [ ] Person無効化: ConfirmModal 付き。有効項目(isActive=true)に割当中なら「現役の点検校正項目 N 件に割り当てられています。通知が届かなくなる可能性があります」警告(N は items から算出)
-- [ ] 両画面: 空状態(EmptyState + 「+ 追加」CTA)、`@/components/ui` barrel 経由で共通UI使用、モーダルの isDirty 破棄確認接続(RHF formState.isDirty)
-- [ ] `components/domain/index.ts` barrel へ VendorModal / PersonModal 追記(班間衝突回避のためメインが最後に実施でも可)
-- [ ] テスト: 一覧表示・追加・編集プリフィル・削除ガード両分岐・無効化警告両分岐・バリデーションエラー表示
+- [x] **vendors班**: `features/vendors/index.tsx`(テーブル: 名称/メーカー✓/校正業者✓/標準納期/窓口/連絡先 + 追加・編集・削除ボタン)+ `features/vendors/schema.ts`(RHF+zod: name必須、email形式、standardLeadTimeDays 0以上、両フラグfalseで警告表示)+ `components/domain/VendorModal/`(追加/編集、standardLeadTimeDays は isCalibrator=true 時のみ表示・切替時クリア)
+- [x] Vendor削除: 押下時に UI 側参照判定 + `removeVendor` false フォールバックで「この取引先は参照されているため削除できません」表示(D-008)。未参照時は ConfirmModal(危険色)→削除
+- [x] **persons班**: `features/persons/index.tsx`(テーブル: 氏名/部署/メール/状態バッジ + 編集)+ `features/persons/schema.ts`(name・email必須+email形式)+ `components/domain/PersonModal/`(新規時 isActive=true 既定、D-007)
+- [x] Person無効化: ConfirmModal 付き。有効項目(isActive=true)に割当中なら「現役の点検校正項目 N 件に割り当てられています。通知が届かなくなる可能性があります」警告(N は items から算出)
+- [x] 両画面: 空状態(EmptyState + 「+ 追加」CTA)、`@/components/ui` barrel 経由で共通UI使用、モーダルの isDirty 破棄確認接続(RHF formState.isDirty)
+- [x] `components/domain/index.ts` barrel へ VendorModal / PersonModal 追記(メイン実施)
+- [x] テスト: 一覧表示・追加・編集プリフィル・削除ガード両分岐・無効化警告両分岐・バリデーションエラー表示
+- [x] メイン追加: `components/ui/TextField` / `components/ui/Checkbox`(+テスト12件、D-009)
+- ゲート実績: tsc 0 / oxlint 0 / テスト342件全緑(+36件増)/ カバレッジ閾値維持
 
 ## Phase 5: 機器(§3 フォーム → §2 一覧)
 
