@@ -17,8 +17,9 @@ export type InspectionRecordSlice = {
   records: Record<string, InspectionRecord>;
   /**
    * 実施記録を追加し、以下をカスケードする（store.md「アクション仕様」）:
-   * - result !== 'fail': item.lastDoneDate = doneDate、nextDueDate = addCycle(doneDate, cycle)
-   * - result === 'fail': 次回期限は据え置き（domain-model.md §3.5）
+   * - 常に item.lastDoneDate = doneDate（screen-design/07-record-modal.md 副作用2。decisions.md D-015）
+   * - result !== 'fail': nextDueDate = addCycle(doneDate, cycle)
+   * - result === 'fail': 次回期限のみ据え置き（domain-model.md §3.5）
    * - orderId 指定時: 対象 CalibrationOrder を completed に遷移（domain-model.md §3.6）
    *
    * 原子性優先で、以下は記録追加ごと no-op（decisions.md D-005）:
@@ -51,9 +52,9 @@ export const createInspectionRecordSlice: AppSliceCreator<InspectionRecordSlice>
     set((state) => {
       state.records[id] = { ...input, id };
       const draftItem = state.items[input.itemId];
-      if (draftItem && nextDueDate !== null) {
+      if (draftItem) {
         draftItem.lastDoneDate = input.doneDate;
-        draftItem.nextDueDate = nextDueDate;
+        if (nextDueDate !== null) draftItem.nextDueDate = nextDueDate;
       }
       if (input.orderId !== undefined) {
         const draftOrder = state.orders[input.orderId];

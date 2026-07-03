@@ -77,7 +77,7 @@ describe("addRecord: 期限更新カスケード", () => {
     },
   );
 
-  it("result=fail は記録のみ追加し期限を据え置く（domain-model.md §3.5）", () => {
+  it("result=fail は lastDoneDate を更新し期限のみ据え置く（07-record-modal.md 副作用2・4、D-015）", () => {
     seedBase();
     const id = useAppStore
       .getState()
@@ -85,7 +85,7 @@ describe("addRecord: 期限更新カスケード", () => {
 
     expect(id).not.toBeNull();
     const updated = useAppStore.getState().items[item.id] as InspectionItem;
-    expect(updated.lastDoneDate).toBe("2025-07-15");
+    expect(updated.lastDoneDate).toBe("2026-07-10");
     expect(updated.nextDueDate).toBe("2026-07-15");
   });
 

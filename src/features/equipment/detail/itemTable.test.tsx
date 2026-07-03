@@ -2,7 +2,7 @@
  * EquipmentDetail: 点検校正項目テーブルの検証(screen-design/04-equipment-detail.md)。
  * 列内容・並び順(isActive優先→nextDueDate昇順)・淡色表示・ステータスバッジの
  * D-014両分岐(稼働=導出表示 / 休止=「—」)・担当者の「(無効)」注記(D-001)・
- * 記録ボタンのdisabled(Phase 7接続前の先行設置)を扱う。ファイル分割の理由は index.test.tsx 参照。
+ * 記録ボタンの活性(Phase 7でRecordModalへ接続)を扱う。ファイル分割の理由は index.test.tsx 参照。
  */
 
 import { ROUTES, equipmentDetailPath } from "@/constants/routes";
@@ -115,7 +115,10 @@ describe("EquipmentDetail: 項目ステータス(D-014)", () => {
 });
 
 describe("EquipmentDetail: 記録ボタン", () => {
-  it("実施記録モーダル実装(Phase 7)まではdisabledで表示される", () => {
+  // なぜ変更したか: Phase 7 で実施記録モーダル(RecordModal)を接続し、記録ボタンを活性化した。
+  // 旧テストは接続前の先行設置(常時disabled)を検証していたが、活性化が仕様(07-record-modal.md)の
+  // ため期待値を活性へ是正する(テストを弱める改変ではない)。起動結節点の検証は recordLaunch.test.tsx。
+  it("各項目行の記録ボタンが活性で表示される", () => {
     seedEquipmentFullMasters();
     seedEquipmentFullItemsAndRecords();
     renderDetail(equipmentFull.id);
@@ -123,7 +126,7 @@ describe("EquipmentDetail: 記録ボタン", () => {
     const recordButtons = screen.getAllByRole("button", { name: "記録" });
     expect(recordButtons).toHaveLength(4);
     for (const button of recordButtons) {
-      expect(button).toBeDisabled();
+      expect(button).toBeEnabled();
     }
   });
 });

@@ -5,7 +5,7 @@
  * 並び替え・派生ステータスの計算ロジックは hooks.ts に集約する（coding-standards.md §2）。
  */
 
-import { ItemModal, StatusBadge } from "@/components/domain";
+import { ItemModal, RecordModal, StatusBadge } from "@/components/domain";
 import { Badge, Button, EmptyState, Table, TableBody, TableHead } from "@/components/ui";
 import { ROUTES, equipmentEditPath } from "@/constants/routes";
 import {
@@ -33,6 +33,12 @@ type ModalState = {
   item?: InspectionItem;
 };
 
+/** 実施記録登録モーダルの起動状態（ItemModal とは独立管理）。対象項目IDのみ保持する */
+type RecordModalState = {
+  open: boolean;
+  itemId?: string;
+};
+
 export const EquipmentDetail = (): ReactElement => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -45,6 +51,7 @@ export const EquipmentDetail = (): ReactElement => {
   const records = useAppStore((state) => state.records);
 
   const [modalState, setModalState] = useState<ModalState>({ open: false });
+  const [recordModalState, setRecordModalState] = useState<RecordModalState>({ open: false });
 
   const currentEquipment = id === undefined ? undefined : equipmentMap[id];
 
@@ -164,9 +171,11 @@ export const EquipmentDetail = (): ReactElement => {
                     {/* なぜ td 直下に Button を並べるか: equipment/list や VendorList と同様、
                         div でラップするとjsx-a11yのボタンラベル探索深度を超えるためtdをflex化する */}
                     <td className="flex gap-2 px-3 py-2">
-                      {/* なぜ常時disabledか: 実施記録登録モーダル(07-record-modal.md)はPhase 7で
-                          実装予定のため、このPhase 6時点では起動先がなくボタンのみ先行設置する */}
-                      <Button variant="secondary" size="sm" disabled>
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => setRecordModalState({ open: true, itemId: item.id })}
+                      >
                         記録
                       </Button>
                       <Button
@@ -232,6 +241,15 @@ export const EquipmentDetail = (): ReactElement => {
         item={modalState.item}
         onClose={handleModalClose}
       />
+
+      {recordModalState.itemId === undefined ? null : (
+        <RecordModal
+          key={recordModalState.itemId}
+          open={recordModalState.open}
+          itemId={recordModalState.itemId}
+          onClose={() => setRecordModalState({ open: false, itemId: undefined })}
+        />
+      )}
     </div>
   );
 };
