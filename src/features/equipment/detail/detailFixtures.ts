@@ -122,7 +122,7 @@ export const inspectionItemDeactivated: InspectionItem = {
   isActive: false,
 };
 
-/** 外部・校正の項目(種別/内外ラベル、実施履歴の項目横断マージ検証用) */
+/** 外部・校正の項目(種別/内外ラベル、実施記録の項目横断マージ検証用) */
 export const inspectionItemExternal: InspectionItem = {
   id: "item-external",
   equipmentId: equipmentFull.id,
@@ -195,7 +195,7 @@ export const seedEquipmentFullMasters = (): void => {
   });
 };
 
-/** equipmentFull配下の全項目・全実施履歴をストアへ投入する */
+/** equipmentFull配下の全項目・全実施記録をストアへ投入する */
 export const seedEquipmentFullInspectionItemsAndRecords = (): void => {
   seedStore({
     inspectionItems: {

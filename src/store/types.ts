@@ -51,7 +51,7 @@ export const RECORD_RESULT = {
 export type RecordResult = (typeof RECORD_RESULT)[keyof typeof RECORD_RESULT];
 
 /**
- * 外部校正案件の状態（domain-model.md §3.6）。
+ * 校正案件の状態（domain-model.md §3.6）。
  * 遷移の許可判定は {@link ../domain/orderStatus.ts} の遷移テーブルが正。
  */
 export const ORDER_STATUS = {
@@ -165,7 +165,7 @@ export type InspectionRecord = {
   note?: string;
 };
 
-/** 外部校正案件（domain-model.md §3.6）。発注1回分の進捗と納期を追跡する */
+/** 校正案件（domain-model.md §3.6）。発注1回分の進捗と納期を追跡する */
 export type CalibrationOrder = {
   id: string;
   /** InspectionItem参照 */

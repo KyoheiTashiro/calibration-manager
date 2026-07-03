@@ -1,7 +1,7 @@
 /**
  * EquipmentDetail: 実施記録登録モーダル(RecordModal)の起動結節点の検証
  * (screen-design/04-equipment-detail.md「操作・アクション」/ 07-record-modal.md)。
- * 行「記録」ボタンで対象項目がプリセットされたモーダルが開き、登録で実施履歴が増えることを扱う。
+ * 行「記録」ボタンで対象項目がプリセットされたモーダルが開き、登録で実施記録が増えることを扱う。
  * モーダル自体の入力・検証は RecordModal.test.tsx の責務。
  */
 
@@ -34,7 +34,7 @@ const getOpenDialog = (title: string): HTMLElement => {
   return dialogElement;
 };
 
-/** 項目テーブル(1つ目のtable)の行を取得する。項目名は実施履歴テーブルにも出現するためスコープする */
+/** 項目テーブル(1つ目のtable)の行を取得する。項目名は実施記録テーブルにも出現するためスコープする */
 const getInspectionItemRow = (name: RegExp): HTMLElement => {
   const [inspectionItemTable] = screen.getAllByRole("table");
   if (!inspectionItemTable) throw new Error("項目テーブルが見つかりません");
@@ -62,7 +62,7 @@ describe("EquipmentDetail: RecordModal起動", () => {
   });
 
   // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
-  it("登録すると実施履歴テーブルへ行が増える", async () => {
+  it("登録すると実施記録テーブルへ行が増える", async () => {
     const user = userEvent.setup();
     renderDetail();
 

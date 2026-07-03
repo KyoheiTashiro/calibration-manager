@@ -235,7 +235,7 @@ describe("inspectionItemRowsOf: status 導出", () => {
     expect(row?.recommendedOrderDate).toBeNull();
   });
 
-  it("外部でも参照先ベンダーが存在しない(dangling)なら納期解決不可で recommendedOrderDate は null", () => {
+  it("外部でも参照先 Vendor が存在しない(dangling)なら納期解決不可で recommendedOrderDate は null", () => {
     // vendorId は設定されているが vendors に該当なし → vendor=null。leadTimeDays 未設定のため解決不可
     const state = makeState([
       makeInspectionItem({

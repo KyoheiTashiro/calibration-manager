@@ -42,7 +42,7 @@ export const EXECUTION_OPTIONS: readonly { value: Execution; label: string }[] =
   EXECUTION_LABELS,
 ).map(([value, label]) => ({ value: value as Execution, label }));
 
-/** 実施記録の結果 → 日本語ラベル(domain-model.md §3.5、04-equipment-detail.md 実施履歴) */
+/** 実施記録の結果 → 日本語ラベル(domain-model.md §3.5、04-equipment-detail.md 実施記録) */
 export const RECORD_RESULT_LABELS = {
   [RECORD_RESULT.PASS]: "合格",
   [RECORD_RESULT.FAIL]: "不合格",

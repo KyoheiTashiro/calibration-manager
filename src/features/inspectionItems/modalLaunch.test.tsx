@@ -51,7 +51,7 @@ describe("InspectionItemList: モーダル起動", () => {
     renderList();
     await clickRowAction("案件");
 
-    const dialogElement = getOpenDialog("外部校正案件を追加");
+    const dialogElement = getOpenDialog("校正案件を追加");
     expect(within(dialogElement).getByText(/年次校正/u)).toBeInTheDocument();
   });
 

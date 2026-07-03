@@ -1,5 +1,5 @@
 /**
- * EquipmentDetail: 実施履歴テーブルの検証(screen-design/04-equipment-detail.md)。
+ * EquipmentDetail: 実施記録テーブルの検証(screen-design/04-equipment-detail.md)。
  * 全項目横断マージ・doneDate降順(同日はid昇順)・結果の日本語ラベル・空備考の「—」を扱う。
  * ファイル分割の理由は index.test.tsx 参照。
  */
@@ -27,9 +27,9 @@ const renderDetail = (): ReturnType<typeof renderWithStore> =>
   });
 
 const getHistoryRows = (): HTMLElement[] => {
-  // なぜ2つ目のtableか: 画面には項目テーブルと実施履歴テーブルの2つがある
+  // なぜ2つ目のtableか: 画面には項目テーブルと実施記録テーブルの2つがある
   const [, historyTable] = screen.getAllByRole("table");
-  if (!historyTable) throw new Error("実施履歴テーブルが見つかりません");
+  if (!historyTable) throw new Error("実施記録テーブルが見つかりません");
   const [, ...dataRows] = within(historyTable).getAllByRole("row");
   return dataRows;
 };
@@ -40,7 +40,7 @@ beforeEach(() => {
   seedEquipmentFullInspectionItemsAndRecords();
 });
 
-describe("EquipmentDetail: 実施履歴", () => {
+describe("EquipmentDetail: 実施記録", () => {
   it("全項目横断でdoneDate降順(同日はid昇順)に表示される", () => {
     renderDetail();
 
@@ -58,7 +58,7 @@ describe("EquipmentDetail: 実施履歴", () => {
     renderDetail();
 
     const [first, second, third] = getHistoryRows();
-    if (!first || !second || !third) throw new Error("実施履歴の行が3件表示されていません");
+    if (!first || !second || !third) throw new Error("実施記録の行が3件表示されていません");
 
     expect(within(first).getByText("鈴木")).toBeInTheDocument();
     expect(within(first).getByText("合格")).toBeInTheDocument();

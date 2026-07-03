@@ -43,10 +43,10 @@
 | `/`                   | ダッシュボード             | [§1](./01-dashboard.md)        |                                    |
 | `/equipment`          | 機器一覧                   | [§2](./02-equipment-list.md)   |                                    |
 | `/equipment/new`      | 機器登録                   | [§3](./03-equipment-form.md)   | フォーム画面                       |
-| `/equipment/:id`      | 機器詳細(項目・履歴含む)   | [§4](./04-equipment-detail.md) |                                    |
+| `/equipment/:id`      | 機器詳細(項目・記録含む)   | [§4](./04-equipment-detail.md) |                                    |
 | `/equipment/:id/edit` | 機器編集                   | [§3](./03-equipment-form.md)   | フォーム画面                       |
 | `/inspection-items`              | 点検校正項目一覧(中核)     | [§5](./05-inspection-item-list.md)        | クエリでステータスフィルタ受け取り |
-| `/orders`             | 外部校正案件一覧(かんばん) | [§8](./08-orders.md)           |                                    |
+| `/orders`             | 校正案件一覧(かんばん) | [§8](./08-orders.md)           |                                    |
 | `/vendors`            | メーカー/取引先マスタ      | [§9](./09-masters.md)          |                                    |
 | `/persons`            | 担当者マスタ               | [§9](./09-masters.md)          |                                    |
 | `/notifications`      | 通知センター               | [§10](./10-notifications.md)   |                                    |
@@ -62,13 +62,13 @@
 - [5. 点検校正項目一覧(中核画面)](./05-inspection-item-list.md)
 - [6. 項目編集モーダル](./06-inspection-item-modal.md)
 - [7. 実施記録登録モーダル](./07-record-modal.md)
-- [8. 外部校正案件一覧](./08-orders.md)
+- [8. 校正案件一覧](./08-orders.md)
 - [9. マスタ管理(メーカー/取引先・担当者)](./09-masters.md)
 - [10. 通知センター](./10-notifications.md)
 - [11. 設定・バックアップ](./11-settings.md)
 - [12. 利用マニュアル](./12-manual.md)
 
-**モーダルで行う操作(ページ遷移しない)**: 点検校正項目の登録・編集([§6](./06-inspection-item-modal.md))、実施記録登録([§7](./07-record-modal.md))、外部校正案件の作成・状態更新([§8](./08-orders.md))、Vendor/Person の追加・編集([§9](./09-masters.md))。これらは機器詳細・点検校正項目一覧・案件一覧などから起動する。
+**モーダルで行う操作(ページ遷移しない)**: 点検校正項目の登録・編集([§6](./06-inspection-item-modal.md))、実施記録登録([§7](./07-record-modal.md))、校正案件の作成・状態更新([§8](./08-orders.md))、Vendor/Person の追加・編集([§9](./09-masters.md))。これらは機器詳細・点検校正項目一覧・案件一覧などから起動する。
 
 ### 0.3 ステータスバッジ色(共通定義)
 

@@ -1,5 +1,5 @@
 /**
- * 外部校正案件かんばんのカード（screen-design/08-orders.md）。
+ * 校正案件かんばんのカード（screen-design/08-orders.md）。
  * inspectionItem→equipment→managementNo/機器名、inspectionItem.name、vendor→依頼先名を解決して表示する。
  * 参照先エンティティが消えている（dangling）場合は例外を投げず「(参照先なし)」表示（decisions.md D-003）。
  * completed / cancelled はグレー調でアクションボタンなし（D-018）。

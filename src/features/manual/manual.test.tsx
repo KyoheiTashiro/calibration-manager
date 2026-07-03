@@ -50,7 +50,7 @@ describe("Manual", () => {
       2,
     );
     expect(screen.getAllByRole("link", { name: "校正案件" }).length).toBeGreaterThanOrEqual(2);
-    expect(screen.getAllByRole("link", { name: "メーカー・取引先" }).length).toBeGreaterThanOrEqual(
+    expect(screen.getAllByRole("link", { name: "メーカー/取引先" }).length).toBeGreaterThanOrEqual(
       2,
     );
     expect(screen.getAllByRole("link", { name: "担当者" }).length).toBeGreaterThanOrEqual(2);

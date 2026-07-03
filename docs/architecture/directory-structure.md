@@ -20,7 +20,7 @@ src/
 │   │   ├── StatusBadge/            // deriveInspectionItemStatus + statusBadgeClass によるステータスバッジ（screen-design §0.3）
 │   │   ├── InspectionItemModal/              // 点検校正項目 登録・編集モーダル（screen-design §6）。equipment/detail と inspectionItems 双方から起動するため共通配置
 │   │   ├── RecordModal/            // 実施記録登録モーダル（screen-design §7）。equipment/detail・inspectionItems・orders から起動
-│   │   ├── OrderModal/             // 外部校正案件 作成・状態更新モーダル（screen-design §8）
+│   │   ├── OrderModal/             // 校正案件 作成・状態更新モーダル（screen-design §8）
 │   │   ├── VendorModal/            // メーカー/取引先 追加・編集モーダル（screen-design §9）
 │   │   ├── PersonModal/            // 担当者 追加・編集モーダル（screen-design §9）
 │   │   └── index.ts

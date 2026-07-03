@@ -1,5 +1,5 @@
 /**
- * 外部校正案件一覧（かんばん、screen-design/08-orders.md）。
+ * 校正案件一覧（かんばん、screen-design/08-orders.md）。
  * 状態別の4列（発注準備/発注済/校正中/返却済）でカードを表示し、隣接遷移のみをアクションで提供する。
  * トグル「完了/中止も表示」ON で記録登録済/中止の2列を右側に追加（D-018）。案件作成の導線は本画面には持たず、
  * 起動元は項目一覧（Phase 8）。状態遷移・属性更新はストア（updateOrderStatus / updateOrder）が最終検証する。
@@ -124,7 +124,7 @@ export const OrderList = (): ReactElement => {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold">外部校正案件</h1>
+        <h1 className="text-xl font-bold">校正案件</h1>
         <Checkbox
           label="完了/中止も表示"
           checked={showClosed}
@@ -134,7 +134,7 @@ export const OrderList = (): ReactElement => {
 
       {totalOrderCount === 0 ? (
         <EmptyState
-          message="外部校正案件はありません。点検校正項目一覧から案件を追加できます"
+          message="校正案件はありません。点検校正項目一覧から案件を追加できます"
           action={
             <Button onClick={() => navigate(ROUTES.INSPECTION_ITEM_LIST)}>点検校正項目一覧へ</Button>
           }

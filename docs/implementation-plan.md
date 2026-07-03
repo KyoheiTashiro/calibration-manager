@@ -93,7 +93,7 @@
 
 - [x] 着手前ゲート: D-001(通知宛先フォールバックなし・元 personId 保持)/ D-002(再稼働時 nextDueDate 据え置き)確定、domain-model.md へ反映済
 - [x] **InspectionItemModal班**: `components/domain/InspectionItemModal/`(InspectionItemModal.tsx / schema.ts / index.ts + テスト16件)。external 時のみ条件表示(校正依頼先/納期/発注余裕日ブロック)、internal 切替で vendorId・leadTimeDays クリア(bufferDays は必須属性のため保持)。vendorId は external 時必須(superRefine)。数値系はフォーム上 string(vendors/schema.ts 方針)。既定値 bufferDays=14 / noticeDaysBefore=30(domain/constants.ts 参照)。担当者セレクトは isActive=true + 編集時のみ現担当の無効者を「(無効)」付きで含める(D-012)。空状態2種(校正業者0件 / 有効担当者0件 + マスタ導線)
-- [x] **機器詳細班**: `features/equipment/detail/`(index.tsx + hooks.ts + テスト17件を4ファイル分割)。基本情報カード(メーカー名解決・状態バッジ)、項目一覧(isActive 優先→nextDueDate 昇順、無効項目は末尾+淡色)、実施履歴(項目横断 doneDate 降順・同日 id 昇順)、InspectionItemModal 起動(追加/編集)、存在しない id →一覧へ Navigate replace、空状態2種。項目ステータスバッジは機器 active 時のみ導出、非稼働は「—」(D-014)。担当者無効は「(無効)」注記(D-001)
+- [x] **機器詳細班**: `features/equipment/detail/`(index.tsx + hooks.ts + テスト17件を4ファイル分割)。基本情報カード(メーカー名解決・状態バッジ)、項目一覧(isActive 優先→nextDueDate 昇順、無効項目は末尾+淡色)、実施記録(項目横断 doneDate 降順・同日 id 昇順)、InspectionItemModal 起動(追加/編集)、存在しない id →一覧へ Navigate replace、空状態2種。項目ステータスバッジは機器 active 時のみ導出、非稼働は「—」(D-014)。担当者無効は「(無効)」注記(D-001)
 - [x] 各項目行の[記録]ボタンは disabled で先行設置(実施記録モーダルは Phase 7 で接続)
 - [x] メイン追加: `components/ui/RadioGroup`(fieldset/legend + register 素通し、+テスト5件、D-013)+ barrel 追記、`features/inspection-items/constants.ts`(INSPECTION_ITEM_TYPE/EXECUTION/RECORD_RESULT の LABELS・OPTIONS、CYCLE_OPTIONS)
 - ゲート実績: tsc 0 / oxlint 0 / テスト408件全緑(+38件増)/ カバレッジ閾値維持
