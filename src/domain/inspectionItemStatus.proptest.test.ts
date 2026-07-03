@@ -33,7 +33,9 @@ describe("deriveInspectionItemStatus（property）", () => {
         isoDateArb,
         (inspectionItem, orders, vendor, today) => {
           fc.pre(today > inspectionItem.nextDueDate);
-          expect(deriveInspectionItemStatus(inspectionItem, orders, vendor, today)).toBe(INSPECTION_ITEM_STATUS.OVERDUE);
+          expect(deriveInspectionItemStatus(inspectionItem, orders, vendor, today)).toBe(
+            INSPECTION_ITEM_STATUS.OVERDUE,
+          );
         },
       ),
     );
@@ -61,9 +63,14 @@ describe("deriveInspectionItemStatus（property）", () => {
       fc.property(inspectionItemArb, isoDateArb, (inspectionItem, today) => {
         const internalInspectionItem = { ...inspectionItem, execution: EXECUTION.INTERNAL };
         fc.pre(today <= internalInspectionItem.nextDueDate);
-        const windowStart = addDays(internalInspectionItem.nextDueDate, -internalInspectionItem.noticeDaysBefore);
+        const windowStart = addDays(
+          internalInspectionItem.nextDueDate,
+          -internalInspectionItem.noticeDaysBefore,
+        );
         const expected =
-          windowStart !== null && today >= windowStart ? INSPECTION_ITEM_STATUS.DUE_SOON : INSPECTION_ITEM_STATUS.OK;
+          windowStart !== null && today >= windowStart
+            ? INSPECTION_ITEM_STATUS.DUE_SOON
+            : INSPECTION_ITEM_STATUS.OK;
         expect(deriveInspectionItemStatus(internalInspectionItem, [], null, today)).toBe(expected);
       }),
     );

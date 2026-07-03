@@ -46,8 +46,8 @@ export const PwaInstallSection = (): ReactElement => {
     <section className="flex flex-col gap-3 rounded border border-slate-200 p-4">
       <h2 className="border-b border-slate-200 pb-2 text-lg font-semibold">アプリのインストール</h2>
       <p className="text-sm text-slate-700">
-        このアプリは
-        PWA(プログレッシブ ウェブ アプリ)として端末にインストールでき、ホーム画面やデスクトップから単独のアプリとして起動できます。
+        このアプリは PWA(プログレッシブ ウェブ
+        アプリ)として端末にインストールでき、ホーム画面やデスクトップから単独のアプリとして起動できます。
       </p>
       {renderStatus()}
     </section>

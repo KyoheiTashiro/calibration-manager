@@ -30,7 +30,12 @@ describe("InspectionItemModal: 編集", () => {
     seedBaseMasters();
     seedStore({ inspectionItems: { [existingInspectionItem.id]: existingInspectionItem } });
     renderWithStore(
-      <InspectionItemModal open equipmentId={equipment.id} inspectionItem={existingInspectionItem} onClose={vi.fn()} />,
+      <InspectionItemModal
+        open
+        equipmentId={equipment.id}
+        inspectionItem={existingInspectionItem}
+        onClose={vi.fn()}
+      />,
     );
 
     expect(screen.getByText("点検校正項目を編集")).toBeInTheDocument();
@@ -56,7 +61,12 @@ describe("InspectionItemModal: 編集", () => {
     const user = userEvent.setup();
     const onClose = vi.fn();
     renderWithStore(
-      <InspectionItemModal open equipmentId={equipment.id} inspectionItem={existingInspectionItem} onClose={onClose} />,
+      <InspectionItemModal
+        open
+        equipmentId={equipment.id}
+        inspectionItem={existingInspectionItem}
+        onClose={onClose}
+      />,
     );
 
     const nameField = screen.getByLabelText("項目名", { exact: false });
@@ -77,7 +87,12 @@ describe("InspectionItemModal: 編集", () => {
     seedStore({ inspectionItems: { [existingInspectionItem.id]: existingInspectionItem } });
     const user = userEvent.setup();
     renderWithStore(
-      <InspectionItemModal open equipmentId={equipment.id} inspectionItem={existingInspectionItem} onClose={vi.fn()} />,
+      <InspectionItemModal
+        open
+        equipmentId={equipment.id}
+        inspectionItem={existingInspectionItem}
+        onClose={vi.fn()}
+      />,
     );
 
     await user.click(screen.getByLabelText("内部"));
@@ -99,11 +114,21 @@ describe("InspectionItemModal: 編集", () => {
         [anotherInactivePerson.id]: anotherInactivePerson,
       },
     });
-    const inspectionItemWithInactivePerson: InspectionItem = { ...existingInspectionItem, personId: inactivePerson.id };
-    seedStore({ inspectionItems: { [inspectionItemWithInactivePerson.id]: inspectionItemWithInactivePerson } });
+    const inspectionItemWithInactivePerson: InspectionItem = {
+      ...existingInspectionItem,
+      personId: inactivePerson.id,
+    };
+    seedStore({
+      inspectionItems: { [inspectionItemWithInactivePerson.id]: inspectionItemWithInactivePerson },
+    });
 
     renderWithStore(
-      <InspectionItemModal open equipmentId={equipment.id} inspectionItem={inspectionItemWithInactivePerson} onClose={vi.fn()} />,
+      <InspectionItemModal
+        open
+        equipmentId={equipment.id}
+        inspectionItem={inspectionItemWithInactivePerson}
+        onClose={vi.fn()}
+      />,
     );
 
     const personSelect = screen.getByLabelText("担当者", { exact: false });

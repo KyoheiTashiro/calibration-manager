@@ -89,6 +89,7 @@ Lint/Format は **oxlint + oxfmt**（ESLint/Prettier ではない）。多くは
 - **event handler 命名**:
   - props で受け取るコールバック → `onXxx`（`onConfirm`, `onClose`）
   - コンポーネント内部で定義 → `handleXxx`（`handleClick`）
+  - **例外**: react-hook-form の `handleSubmit` に渡す検証成功時コールバックは、内部定義でも `onSubmit` と命名する（`handleSubmit(onSubmit)`。RHF 公式ドキュメントの慣習名に合わせ、`handleSubmit` との対応を読み取りやすくするため）
   - ロジックを hooks に寄せる feature では hooks が動詞アクション（`registerRecord`, `createOrder`）を返し、JSX が `onClick={() => registerRecord(...)}` で繋ぐ
 - **条件レンダリング**: 短絡 `{cond && ...}` / 三項を併用。早期 return（`if (!equipmentId) return null;`）を多用。
 - **key**: エンティティは `key={entity.id}`。index key は append-only な時系列など正当な箇所に限り、`.oxlintrc.json` の override で off にしたファイル内のみ + 理由コメント必須。

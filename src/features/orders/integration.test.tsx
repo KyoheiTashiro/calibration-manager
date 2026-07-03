@@ -163,7 +163,12 @@ describe("結合: かんばんの隣接遷移チェーン planned → returned",
   // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("発注する(orderedDate 既定=今日)→ 校正中へ → 返却する(returnedDate)で順に遷移する", async () => {
     const user = userEvent.setup();
-    seedWithOrder({ id: "order-1", inspectionItemId: "item-1", vendorId: "vendor-1", status: "planned" });
+    seedWithOrder({
+      id: "order-1",
+      inspectionItemId: "item-1",
+      vendorId: "vendor-1",
+      status: "planned",
+    });
     renderWithStore(<OrderList />);
 
     // planned → ordered: 発注ダイアログ(orderedDate 既定=今日で確定)

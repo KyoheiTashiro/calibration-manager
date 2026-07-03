@@ -34,7 +34,10 @@ export type NotificationSeed = Omit<Notification, "id" | "createdDate" | "isRead
  * 参照先の機器が見つからない場合（dangling FK）は項目名のみの通知文になる
  * （例外を投げない。coding-standards.md §8）。
  */
-const messagePrefix = (inspectionItem: InspectionItem, equipment: Record<string, Equipment>): string => {
+const messagePrefix = (
+  inspectionItem: InspectionItem,
+  equipment: Record<string, Equipment>,
+): string => {
   const managementNo = recordValue(equipment, inspectionItem.equipmentId)?.managementNo;
   return managementNo === undefined ? "" : `${managementNo} `;
 };
@@ -74,7 +77,9 @@ const inspectionItemNotificationSeeds = (
 
   if (inspectionItem.execution === EXECUTION.EXTERNAL) {
     const vendor =
-      inspectionItem.vendorId === undefined ? null : (recordValue(vendors, inspectionItem.vendorId) ?? null);
+      inspectionItem.vendorId === undefined
+        ? null
+        : (recordValue(vendors, inspectionItem.vendorId) ?? null);
     const orderDate = recommendedOrderDate(inspectionItem, vendor);
     const hasActiveOrder = orders.some(
       (order) => order.inspectionItemId === inspectionItem.id && isActiveOrderStatus(order.status),
@@ -173,9 +178,15 @@ export const computeExpectedNotifications = (
   equipment: Record<string, Equipment>,
   today: IsoDateString,
 ): NotificationSeed[] => {
-  const inspectionItemById = new Map(inspectionItems.map((inspectionItem) => [inspectionItem.id, inspectionItem]));
+  const inspectionItemById = new Map(
+    inspectionItems.map((inspectionItem) => [inspectionItem.id, inspectionItem]),
+  );
   return [
-    ...inspectionItems.flatMap((inspectionItem) => inspectionItemNotificationSeeds(inspectionItem, orders, vendors, equipment, today)),
-    ...orders.flatMap((order) => orderNotificationSeeds(order, inspectionItemById, equipment, today)),
+    ...inspectionItems.flatMap((inspectionItem) =>
+      inspectionItemNotificationSeeds(inspectionItem, orders, vendors, equipment, today),
+    ),
+    ...orders.flatMap((order) =>
+      orderNotificationSeeds(order, inspectionItemById, equipment, today),
+    ),
   ];
 };

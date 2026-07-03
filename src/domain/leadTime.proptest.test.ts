@@ -18,7 +18,10 @@ describe("recommendedOrderDate（property）", () => {
     fc.assert(
       fc.property(externalInspectionItemArb, (inspectionItem) => {
         expect(recommendedOrderDate(inspectionItem, null)).toBe(
-          addDays(inspectionItem.nextDueDate, -(inspectionItem.leadTimeDays + inspectionItem.bufferDays)),
+          addDays(
+            inspectionItem.nextDueDate,
+            -(inspectionItem.leadTimeDays + inspectionItem.bufferDays),
+          ),
         );
       }),
     );

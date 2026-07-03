@@ -10,7 +10,13 @@
 
 import { INSPECTION_ITEM_STATUS, type InspectionItemStatus } from "@/domain/inspectionItemStatus";
 import type { InspectionItemRow } from "@/store/selectors";
-import { EXECUTION, INSPECTION_ITEM_TYPE, type Execution, type InspectionItemType, type Person } from "@/store/types";
+import {
+  EXECUTION,
+  INSPECTION_ITEM_TYPE,
+  type Execution,
+  type InspectionItemType,
+  type Person,
+} from "@/store/types";
 
 /** フィルタ「全て」のセンチネル値 */
 export const FILTER_ALL = "all" as const;
@@ -42,7 +48,10 @@ export const parseInspectionItemListFilters = (
 ): InspectionItemListFilters => {
   const personId = params.get("personId");
   return {
-    status: readEnumParam<InspectionItemStatus>(params.get("status"), INSPECTION_ITEM_STATUS_VALUES),
+    status: readEnumParam<InspectionItemStatus>(
+      params.get("status"),
+      INSPECTION_ITEM_STATUS_VALUES,
+    ),
     type: readEnumParam<InspectionItemType>(params.get("type"), INSPECTION_ITEM_TYPE_VALUES),
     execution: readEnumParam<Execution>(params.get("execution"), EXECUTION_VALUES),
     personId: personId !== null && personId in persons ? personId : FILTER_ALL,
@@ -60,7 +69,10 @@ export const hasActiveFilter = (filters: InspectionItemListFilters): boolean =>
  * フィルタ適用。status フィルタは導出済み row.status に対して適用(§5 表示ルール)。
  * 行導出(inspectionItemRowsOf)はダッシュボードと共有するため store/selectors.ts に置く(D-024)。
  */
-export const filterInspectionItemRows = (rows: readonly InspectionItemRow[], filters: InspectionItemListFilters): InspectionItemRow[] =>
+export const filterInspectionItemRows = (
+  rows: readonly InspectionItemRow[],
+  filters: InspectionItemListFilters,
+): InspectionItemRow[] =>
   rows.filter(
     (row) =>
       (filters.status === FILTER_ALL || row.status === filters.status) &&

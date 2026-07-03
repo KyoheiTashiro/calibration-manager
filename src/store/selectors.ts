@@ -4,7 +4,10 @@
  * （coding-standards.md §5、store.md「派生」）。
  */
 
-import { deriveInspectionItemStatus, type InspectionItemStatus } from "@/domain/inspectionItemStatus";
+import {
+  deriveInspectionItemStatus,
+  type InspectionItemStatus,
+} from "@/domain/inspectionItemStatus";
 import { recommendedOrderDate } from "@/domain/leadTime";
 import { isActiveOrderStatus } from "@/domain/orderStatus";
 import {
@@ -19,15 +22,26 @@ import {
 } from "@/store/types";
 
 /** 機器に属する項目の一覧 */
-export const inspectionItemsOf = (state: Pick<AppState, "inspectionItems">, equipmentId: string): InspectionItem[] =>
-  Object.values(state.inspectionItems).filter((inspectionItem) => inspectionItem.equipmentId === equipmentId);
+export const inspectionItemsOf = (
+  state: Pick<AppState, "inspectionItems">,
+  equipmentId: string,
+): InspectionItem[] =>
+  Object.values(state.inspectionItems).filter(
+    (inspectionItem) => inspectionItem.equipmentId === equipmentId,
+  );
 
 /** 項目に紐づく案件の一覧 */
-export const ordersOf = (state: Pick<AppState, "orders">, inspectionItemId: string): CalibrationOrder[] =>
+export const ordersOf = (
+  state: Pick<AppState, "orders">,
+  inspectionItemId: string,
+): CalibrationOrder[] =>
   Object.values(state.orders).filter((order) => order.inspectionItemId === inspectionItemId);
 
 /** 項目に紐づく実施記録の一覧（実施日の新しい順。同日はid辞書順で決定的に） */
-export const recordsOf = (state: Pick<AppState, "records">, inspectionItemId: string): InspectionRecord[] =>
+export const recordsOf = (
+  state: Pick<AppState, "records">,
+  inspectionItemId: string,
+): InspectionRecord[] =>
   Object.values(state.records)
     .filter((record) => record.inspectionItemId === inspectionItemId)
     .toSorted(
@@ -82,8 +96,13 @@ export const inspectionItemRowsOf = (
     if (equipment === undefined) continue; // dangling: 参照先機器なし
     if (equipment.status !== EQUIPMENT_STATUS.ACTIVE) continue;
 
-    const vendor = inspectionItem.vendorId ? (state.vendors[inspectionItem.vendorId] ?? null) : null;
-    const inspectionItemOrders: CalibrationOrder[] = ordersOf({ orders: state.orders }, inspectionItem.id);
+    const vendor = inspectionItem.vendorId
+      ? (state.vendors[inspectionItem.vendorId] ?? null)
+      : null;
+    const inspectionItemOrders: CalibrationOrder[] = ordersOf(
+      { orders: state.orders },
+      inspectionItem.id,
+    );
     const isExternal = inspectionItem.execution === EXECUTION.EXTERNAL;
 
     rows.push({
@@ -92,7 +111,8 @@ export const inspectionItemRowsOf = (
       status: deriveInspectionItemStatus(inspectionItem, inspectionItemOrders, vendor, today),
       personLabel: personLabelOf({ persons: state.persons }, inspectionItem.personId),
       recommendedOrderDate: recommendedOrderDate(inspectionItem, vendor),
-      canCreateOrder: isExternal && !inspectionItemOrders.some((order) => isActiveOrderStatus(order.status)),
+      canCreateOrder:
+        isExternal && !inspectionItemOrders.some((order) => isActiveOrderStatus(order.status)),
     });
   }
   return rows.toSorted(compareInspectionItemRows);

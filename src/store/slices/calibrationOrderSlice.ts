@@ -37,7 +37,8 @@ export const createCalibrationOrderSlice: AppSliceCreator<CalibrationOrderSlice>
     const { inspectionItems, orders } = get();
     if (recordValue(inspectionItems, input.inspectionItemId) === undefined) return null;
     const hasActiveOrder = Object.values(orders).some(
-      (order) => order.inspectionItemId === input.inspectionItemId && isActiveOrderStatus(order.status),
+      (order) =>
+        order.inspectionItemId === input.inspectionItemId && isActiveOrderStatus(order.status),
     );
     if (hasActiveOrder) return null;
 

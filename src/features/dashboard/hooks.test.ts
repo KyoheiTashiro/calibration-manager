@@ -29,7 +29,11 @@ const makeEquipment = (id: string): Equipment => ({
   status: EQUIPMENT_STATUS.ACTIVE,
 });
 
-const makeInspectionItem = (id: string, equipmentId: string, nextDueDate: string): InspectionItem => ({
+const makeInspectionItem = (
+  id: string,
+  equipmentId: string,
+  nextDueDate: string,
+): InspectionItem => ({
   id,
   equipmentId,
   type: INSPECTION_ITEM_TYPE.INSPECTION,
@@ -44,7 +48,11 @@ const makeInspectionItem = (id: string, equipmentId: string, nextDueDate: string
 });
 
 /** テスト用の合成 InspectionItemRow(status を直接指定。nextDueDate 昇順で並んだ入力を模す) */
-const makeRow = (id: string, status: InspectionItemStatus, nextDueDate: string): InspectionItemRow => ({
+const makeRow = (
+  id: string,
+  status: InspectionItemStatus,
+  nextDueDate: string,
+): InspectionItemRow => ({
   inspectionItem: makeInspectionItem(id, `eq-${id}`, nextDueDate),
   equipment: makeEquipment(id),
   status,
@@ -123,7 +131,12 @@ describe("actionRequiredRows", () => {
 
     const result = actionRequiredRows(rows);
 
-    expect(result.map((row) => row.inspectionItem.id)).toEqual(["over-a", "over-b", "due-a", "due-b"]);
+    expect(result.map((row) => row.inspectionItem.id)).toEqual([
+      "over-a",
+      "over-b",
+      "due-a",
+      "due-b",
+    ]);
   });
 
   it("要対応が0件なら空配列", () => {

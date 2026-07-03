@@ -45,9 +45,11 @@ export const CYCLE_OPTIONS: readonly { value: Cycle; label: string }[] = Object.
 );
 
 /** 種別ラジオ(点検/校正)の選択肢(06-inspection-item-modal.md) */
-export const INSPECTION_ITEM_TYPE_OPTIONS: readonly { value: InspectionItemType; label: string }[] = Object.entries(
-  INSPECTION_ITEM_TYPE_LABELS,
-).map(([value, label]) => ({ value: value as InspectionItemType, label }));
+export const INSPECTION_ITEM_TYPE_OPTIONS: readonly { value: InspectionItemType; label: string }[] =
+  Object.entries(INSPECTION_ITEM_TYPE_LABELS).map(([value, label]) => ({
+    value: value as InspectionItemType,
+    label,
+  }));
 
 /** 実施区分ラジオ(内部/外部)の選択肢(06-inspection-item-modal.md) */
 export const EXECUTION_OPTIONS: readonly { value: Execution; label: string }[] = Object.entries(

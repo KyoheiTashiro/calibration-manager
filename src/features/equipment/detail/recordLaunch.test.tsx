@@ -53,7 +53,9 @@ describe("EquipmentDetail: RecordModal起動", () => {
     const user = userEvent.setup();
     renderDetail();
 
-    await user.click(within(getInspectionItemRow(/年次校正/u)).getByRole("button", { name: "記録" }));
+    await user.click(
+      within(getInspectionItemRow(/年次校正/u)).getByRole("button", { name: "記録" }),
+    );
 
     const dialogElement = getOpenDialog("実施記録を追加");
     expect(
@@ -68,7 +70,9 @@ describe("EquipmentDetail: RecordModal起動", () => {
 
     const recordsBefore = Object.keys(useAppStore.getState().records).length;
 
-    await user.click(within(getInspectionItemRow(/年次校正/u)).getByRole("button", { name: "記録" }));
+    await user.click(
+      within(getInspectionItemRow(/年次校正/u)).getByRole("button", { name: "記録" }),
+    );
     const dialogElement = getOpenDialog("実施記録を追加");
     await user.click(within(dialogElement).getByLabelText("合格"));
     await user.click(within(dialogElement).getByRole("button", { name: "保存" }));

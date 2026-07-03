@@ -109,7 +109,12 @@ describe("完了/中止も表示 トグル", () => {
   it("既定OFFでは記録登録済/中止の列は出ず、ONで右側に追加される", async () => {
     const user = userEvent.setup();
     baseSeed({
-      "order-c": { id: "order-c", inspectionItemId: "item-1", vendorId: "vendor-1", status: "completed" },
+      "order-c": {
+        id: "order-c",
+        inspectionItemId: "item-1",
+        vendorId: "vendor-1",
+        status: "completed",
+      },
     });
     renderWithStore(<OrderList />);
 
@@ -142,7 +147,12 @@ describe("中止フロー", () => {
   it("中止 → 確認 → cancelled になり、トグルOFFでカードが消える", async () => {
     const user = userEvent.setup();
     baseSeed({
-      "order-1": { id: "order-1", inspectionItemId: "item-1", vendorId: "vendor-1", status: "planned" },
+      "order-1": {
+        id: "order-1",
+        inspectionItemId: "item-1",
+        vendorId: "vendor-1",
+        status: "planned",
+      },
     });
     renderWithStore(<OrderList />);
 
@@ -170,7 +180,12 @@ describe("空状態", () => {
 
   it("個別列が0件のとき列内に「なし」プレースホルダを出す", () => {
     baseSeed({
-      "order-1": { id: "order-1", inspectionItemId: "item-1", vendorId: "vendor-1", status: "planned" },
+      "order-1": {
+        id: "order-1",
+        inspectionItemId: "item-1",
+        vendorId: "vendor-1",
+        status: "planned",
+      },
     });
     renderWithStore(<OrderList />);
 
@@ -180,7 +195,12 @@ describe("空状態", () => {
 
   it("completed のみ1件でトグルOFF（既定）でもEmptyStateにならず進行中4列が「なし」で描画される", () => {
     baseSeed({
-      "order-c": { id: "order-c", inspectionItemId: "item-1", vendorId: "vendor-1", status: "completed" },
+      "order-c": {
+        id: "order-c",
+        inspectionItemId: "item-1",
+        vendorId: "vendor-1",
+        status: "completed",
+      },
     });
     renderWithStore(<OrderList />);
 
@@ -202,7 +222,12 @@ describe("発注ダイアログの整合警告（D-019）", () => {
   it("発注日 > 返却予定日 で警告を出すが登録はブロックしない", async () => {
     const user = userEvent.setup();
     baseSeed({
-      "order-1": { id: "order-1", inspectionItemId: "item-1", vendorId: "vendor-1", status: "planned" },
+      "order-1": {
+        id: "order-1",
+        inspectionItemId: "item-1",
+        vendorId: "vendor-1",
+        status: "planned",
+      },
     });
     renderWithStore(<OrderList />);
 

@@ -60,7 +60,8 @@ const compute = (
   inspectionItems: InspectionItem[],
   orders: CalibrationOrder[],
   today: string,
-): NotificationSeed[] => computeExpectedNotifications(inspectionItems, orders, {}, equipmentRecord, today);
+): NotificationSeed[] =>
+  computeExpectedNotifications(inspectionItems, orders, {}, equipmentRecord, today);
 
 describe("computeExpectedNotifications: dueSoon / overdue", () => {
   it("今日 ≥ 期限 − noticeDaysBefore なら dueSoon（境界: 開始日当日）", () => {
@@ -106,7 +107,10 @@ describe("computeExpectedNotifications: dueSoon / overdue", () => {
   });
 
   it("内部実施の項目にも dueSoon / overdue は発生する（対象: 内部・外部）", () => {
-    const internalInspectionItem = buildInspectionItem({ execution: EXECUTION.INTERNAL, vendorId: undefined });
+    const internalInspectionItem = buildInspectionItem({
+      execution: EXECUTION.INTERNAL,
+      vendorId: undefined,
+    });
     expect(compute([internalInspectionItem], [], "2026-08-01").map((seed) => seed.type)).toEqual([
       NOTIFICATION_TYPE.OVERDUE,
     ]);
@@ -137,9 +141,11 @@ describe("computeExpectedNotifications: orderRecommended", () => {
   });
 
   it("有効な案件（planned 含む）があれば生成しない（「未発注」の解釈）", () => {
-    const types = compute([buildInspectionItem()], [buildOrder(ORDER_STATUS.PLANNED)], "2026-07-07").map(
-      (seed) => seed.type,
-    );
+    const types = compute(
+      [buildInspectionItem()],
+      [buildOrder(ORDER_STATUS.PLANNED)],
+      "2026-07-07",
+    ).map((seed) => seed.type);
     expect(types).not.toContain(NOTIFICATION_TYPE.ORDER_RECOMMENDED);
   });
 
@@ -153,7 +159,10 @@ describe("computeExpectedNotifications: orderRecommended", () => {
   });
 
   it("内部実施の項目には生成しない（対象: 外部のみ）", () => {
-    const internalInspectionItem = buildInspectionItem({ execution: EXECUTION.INTERNAL, vendorId: undefined });
+    const internalInspectionItem = buildInspectionItem({
+      execution: EXECUTION.INTERNAL,
+      vendorId: undefined,
+    });
     const types = compute([internalInspectionItem], [], "2026-07-07").map((seed) => seed.type);
     expect(types).not.toContain(NOTIFICATION_TYPE.ORDER_RECOMMENDED);
   });
@@ -169,7 +178,13 @@ describe("computeExpectedNotifications: orderRecommended", () => {
         standardLeadTimeDays: 10,
       },
     };
-    const seeds = computeExpectedNotifications([inspectionItem], [], vendors, equipmentRecord, "2026-07-07");
+    const seeds = computeExpectedNotifications(
+      [inspectionItem],
+      [],
+      vendors,
+      equipmentRecord,
+      "2026-07-07",
+    );
     expect(seeds.map((seed) => seed.type)).toContain(NOTIFICATION_TYPE.ORDER_RECOMMENDED);
   });
 
@@ -225,7 +240,9 @@ describe("computeExpectedNotifications: deliveryDueSoon / deliveryOverdue", () =
 
   it("inCalibration の案件も対象（発注済・未返却）", () => {
     const inCalibration = buildOrder(ORDER_STATUS.IN_CALIBRATION, { dueDate: "2026-07-10" });
-    const types = compute([buildInspectionItem()], [inCalibration], "2026-07-11").map((seed) => seed.type);
+    const types = compute([buildInspectionItem()], [inCalibration], "2026-07-11").map(
+      (seed) => seed.type,
+    );
     expect(types).toContain(NOTIFICATION_TYPE.DELIVERY_OVERDUE);
   });
 

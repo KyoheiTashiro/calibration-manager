@@ -45,11 +45,15 @@ describe("inspectionItemSchema", () => {
   });
 
   it("未知の cycle 値を拒否する", () => {
-    expect(inspectionItemSchema.safeParse({ ...validInspectionItem, cycle: "4M" }).success).toBe(false);
+    expect(inspectionItemSchema.safeParse({ ...validInspectionItem, cycle: "4M" }).success).toBe(
+      false,
+    );
   });
 
   it("負の日数（bufferDays）を拒否する", () => {
-    expect(inspectionItemSchema.safeParse({ ...validInspectionItem, bufferDays: -1 }).success).toBe(false);
+    expect(inspectionItemSchema.safeParse({ ...validInspectionItem, bufferDays: -1 }).success).toBe(
+      false,
+    );
   });
 });
 
@@ -72,7 +76,13 @@ describe("vendorSchema", () => {
 
 describe("calibrationOrderSchema", () => {
   it("負の費用を拒否する", () => {
-    const order = { id: "o-1", inspectionItemId: "i-1", vendorId: "v-1", status: "planned", cost: -100 };
+    const order = {
+      id: "o-1",
+      inspectionItemId: "i-1",
+      vendorId: "v-1",
+      status: "planned",
+      cost: -100,
+    };
     expect(calibrationOrderSchema.safeParse(order).success).toBe(false);
   });
 

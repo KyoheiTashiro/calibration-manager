@@ -48,7 +48,9 @@ const resolvePrefillDoneBy = (
 
 export const RecordModal = ({ open, inspectionItemId, orderId, onClose }: Props): ReactElement => {
   const inspectionItem = useAppStore((state) => state.inspectionItems[inspectionItemId]);
-  const equipment = useAppStore((state) => (inspectionItem ? state.equipment[inspectionItem.equipmentId] : undefined));
+  const equipment = useAppStore((state) =>
+    inspectionItem ? state.equipment[inspectionItem.equipmentId] : undefined,
+  );
   const vendors = useAppStore((state) => state.vendors);
   const order = useAppStore((state) => (orderId ? state.orders[orderId] : undefined));
   const addRecord = useAppStore((state) => state.addRecord);

@@ -8,13 +8,13 @@
 import { RecordModal } from "@/components/domain";
 import { Button, Checkbox, ConfirmModal, EmptyState } from "@/components/ui";
 import { ROUTES } from "@/constants/routes";
+import { OrderCard } from "@/features/orders/components/OrderCard";
+import { OrderDialog, ReturnDialog } from "@/features/orders/components/TransitionDialogs";
 import {
   KANBAN_ACTIVE_COLUMNS,
   KANBAN_CLOSED_COLUMNS,
   ORDER_STATUS_LABELS,
 } from "@/features/orders/constants";
-import { OrderCard } from "@/features/orders/components/OrderCard";
-import { OrderDialog, ReturnDialog } from "@/features/orders/components/TransitionDialogs";
 import { ORDER_STATUS, type CalibrationOrder, type OrderStatus } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
 import { useMemo, useState, type ReactElement } from "react";
@@ -136,7 +136,9 @@ export const OrderList = (): ReactElement => {
         <EmptyState
           message="校正案件はありません。点検校正項目一覧から案件を追加できます"
           action={
-            <Button onClick={() => navigate(ROUTES.INSPECTION_ITEM_LIST)}>点検校正項目一覧へ</Button>
+            <Button onClick={() => navigate(ROUTES.INSPECTION_ITEM_LIST)}>
+              点検校正項目一覧へ
+            </Button>
           }
         />
       ) : (

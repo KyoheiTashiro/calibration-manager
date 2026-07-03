@@ -8,7 +8,10 @@
 import { Button, Select } from "@/components/ui";
 import { INSPECTION_ITEM_STATUS } from "@/domain/inspectionItemStatus";
 import { statusBadgeLabel } from "@/domain/statusBadge";
-import { EXECUTION_OPTIONS, INSPECTION_ITEM_TYPE_OPTIONS } from "@/features/inspectionItems/constants";
+import {
+  EXECUTION_OPTIONS,
+  INSPECTION_ITEM_TYPE_OPTIONS,
+} from "@/features/inspectionItems/constants";
 import { FILTER_ALL, type InspectionItemListFilters } from "@/features/inspectionItems/hooks";
 import { personLabelOf } from "@/store/selectors";
 import type { Person } from "@/store/types";
@@ -24,7 +27,10 @@ const withAllOption = (options: readonly SelectOption[]): SelectOption[] => [
 
 /** 状態フィルタ: §0.3の5値を statusBadgeLabel の日本語で(導出結果に適用、§5) */
 const STATUS_OPTIONS: SelectOption[] = withAllOption(
-  Object.values(INSPECTION_ITEM_STATUS).map((status) => ({ value: status, label: statusBadgeLabel(status) })),
+  Object.values(INSPECTION_ITEM_STATUS).map((status) => ({
+    value: status,
+    label: statusBadgeLabel(status),
+  })),
 );
 const TYPE_OPTIONS: SelectOption[] = withAllOption(INSPECTION_ITEM_TYPE_OPTIONS);
 const EXECUTION_FILTER_OPTIONS: SelectOption[] = withAllOption(EXECUTION_OPTIONS);

@@ -4,7 +4,10 @@
  * D-014: 項目ステータスは機器が稼働(active)のときのみ導出し、それ以外は null（「—」表示）とする。
  */
 
-import { deriveInspectionItemStatus, type InspectionItemStatus } from "@/domain/inspectionItemStatus";
+import {
+  deriveInspectionItemStatus,
+  type InspectionItemStatus,
+} from "@/domain/inspectionItemStatus";
 import { inspectionItemsOf, ordersOf, recordsOf } from "@/store/selectors";
 import {
   EQUIPMENT_STATUS,
@@ -41,7 +44,8 @@ const compareHistoryRows = (left: HistoryRow, right: HistoryRow): number =>
 export const sortedInspectionItemsOf = (
   inspectionItems: Record<string, InspectionItem>,
   equipmentId: string,
-): InspectionItem[] => inspectionItemsOf({ inspectionItems }, equipmentId).toSorted(compareInspectionItemRows);
+): InspectionItem[] =>
+  inspectionItemsOf({ inspectionItems }, equipmentId).toSorted(compareInspectionItemRows);
 
 /** この機器の全項目の実施記録を項目横断でマージし、doneDate降順(同日はid昇順)に並べる */
 export const historyRowsOf = (
@@ -51,7 +55,10 @@ export const historyRowsOf = (
 ): HistoryRow[] =>
   inspectionItemsOf({ inspectionItems }, equipmentId)
     .flatMap((inspectionItem) =>
-      recordsOf({ records }, inspectionItem.id).map((record) => ({ record, inspectionItemName: inspectionItem.name })),
+      recordsOf({ records }, inspectionItem.id).map((record) => ({
+        record,
+        inspectionItemName: inspectionItem.name,
+      })),
     )
     .toSorted(compareHistoryRows);
 
@@ -67,5 +74,10 @@ export const displayedInspectionItemStatus = (
 ): InspectionItemStatus | null => {
   if (equipmentStatus !== EQUIPMENT_STATUS.ACTIVE) return null;
   const vendor = inspectionItem.vendorId ? (vendors[inspectionItem.vendorId] ?? null) : null;
-  return deriveInspectionItemStatus(inspectionItem, ordersOf({ orders }, inspectionItem.id), vendor, todayIsoDate());
+  return deriveInspectionItemStatus(
+    inspectionItem,
+    ordersOf({ orders }, inspectionItem.id),
+    vendor,
+    todayIsoDate(),
+  );
 };

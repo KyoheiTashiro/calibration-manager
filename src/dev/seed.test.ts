@@ -4,7 +4,10 @@
  */
 
 import { buildSeedState, seedIfEmpty } from "@/dev/seed";
-import { deriveInspectionItemStatus, type InspectionItemStatus } from "@/domain/inspectionItemStatus";
+import {
+  deriveInspectionItemStatus,
+  type InspectionItemStatus,
+} from "@/domain/inspectionItemStatus";
 import { isActiveOrderStatus } from "@/domain/orderStatus";
 import { appStateSchema } from "@/store/schema";
 import { CYCLE, EQUIPMENT_STATUS, EXECUTION, INSPECTION_ITEM_TYPE } from "@/store/types";
@@ -77,7 +80,10 @@ describe("buildSeedState", () => {
       const equipment = state.equipment[inspectionItem.equipmentId];
       if (equipment?.status !== EQUIPMENT_STATUS.ACTIVE) continue;
       if (!inspectionItem.isActive) continue;
-      const vendor = inspectionItem.vendorId === undefined ? null : (state.vendors[inspectionItem.vendorId] ?? null);
+      const vendor =
+        inspectionItem.vendorId === undefined
+          ? null
+          : (state.vendors[inspectionItem.vendorId] ?? null);
       statuses.add(deriveInspectionItemStatus(inspectionItem, orders, vendor, TODAY));
     }
 

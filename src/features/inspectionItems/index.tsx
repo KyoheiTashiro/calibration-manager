@@ -46,7 +46,11 @@ export const InspectionItemList = (): ReactElement => {
   const filters = parseInspectionItemListFilters(searchParams, persons);
 
   const rows = useMemo(
-    () => inspectionItemRowsOf({ inspectionItems, equipment, orders, vendors, persons }, todayIsoDate()),
+    () =>
+      inspectionItemRowsOf(
+        { inspectionItems, equipment, orders, vendors, persons },
+        todayIsoDate(),
+      ),
     [inspectionItems, equipment, orders, vendors, persons],
   );
   const filteredRows = filterInspectionItemRows(rows, filters);

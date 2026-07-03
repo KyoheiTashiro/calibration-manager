@@ -81,7 +81,11 @@ describe("filterInspectionItemRows", () => {
   // i-ext(nextDueDate 2027) が i-int(2099) より先に並ぶ。両者とも status=ok。
   const rows: InspectionItemRow[] = inspectionItemRowsOf(
     makeState([
-      makeInspectionItem({ id: "i-int", type: INSPECTION_ITEM_TYPE.INSPECTION, execution: EXECUTION.INTERNAL }),
+      makeInspectionItem({
+        id: "i-int",
+        type: INSPECTION_ITEM_TYPE.INSPECTION,
+        execution: EXECUTION.INTERNAL,
+      }),
       makeInspectionItem({
         id: "i-ext",
         type: INSPECTION_ITEM_TYPE.CALIBRATION,
@@ -100,29 +104,32 @@ describe("filterInspectionItemRows", () => {
   });
 
   it("type 単独", () => {
-    expect(ids(filterInspectionItemRows(rows, { ...ALL_FILTERS, type: INSPECTION_ITEM_TYPE.CALIBRATION }))).toEqual([
-      "i-ext",
-    ]);
+    expect(
+      ids(
+        filterInspectionItemRows(rows, { ...ALL_FILTERS, type: INSPECTION_ITEM_TYPE.CALIBRATION }),
+      ),
+    ).toEqual(["i-ext"]);
   });
 
   it("execution 単独", () => {
-    expect(ids(filterInspectionItemRows(rows, { ...ALL_FILTERS, execution: EXECUTION.INTERNAL }))).toEqual([
-      "i-int",
-    ]);
+    expect(
+      ids(filterInspectionItemRows(rows, { ...ALL_FILTERS, execution: EXECUTION.INTERNAL })),
+    ).toEqual(["i-int"]);
   });
 
   it("personId 単独", () => {
-    expect(ids(filterInspectionItemRows(rows, { ...ALL_FILTERS, personId: inactivePerson.id }))).toEqual([
-      "i-ext",
-    ]);
+    expect(
+      ids(filterInspectionItemRows(rows, { ...ALL_FILTERS, personId: inactivePerson.id })),
+    ).toEqual(["i-ext"]);
   });
 
   it("status は導出済み row.status に適用", () => {
-    expect(ids(filterInspectionItemRows(rows, { ...ALL_FILTERS, status: INSPECTION_ITEM_STATUS.OK }))).toEqual([
-      "i-ext",
-      "i-int",
-    ]);
-    expect(filterInspectionItemRows(rows, { ...ALL_FILTERS, status: INSPECTION_ITEM_STATUS.OVERDUE })).toHaveLength(0);
+    expect(
+      ids(filterInspectionItemRows(rows, { ...ALL_FILTERS, status: INSPECTION_ITEM_STATUS.OK })),
+    ).toEqual(["i-ext", "i-int"]);
+    expect(
+      filterInspectionItemRows(rows, { ...ALL_FILTERS, status: INSPECTION_ITEM_STATUS.OVERDUE }),
+    ).toHaveLength(0);
   });
 
   it("複合(AND): 全条件を満たす行のみ", () => {
