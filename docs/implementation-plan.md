@@ -77,12 +77,15 @@
 - [x] メイン追加: `components/ui/TextField` / `components/ui/Checkbox`(+テスト12件、D-009)
 - ゲート実績: tsc 0 / oxlint 0 / テスト342件全緑(+36件増)/ カバレッジ閾値維持
 
-## Phase 5: 機器(§3 フォーム → §2 一覧)
+## Phase 5: 機器(§3 フォーム → §2 一覧) ✅ 完了(2026-07-03)
 
-担当: 委譲
+担当実績: Sonnet 2並列(一覧班 / フォーム班)。メイン = `features/equipment/constants.ts` 先行作成(状態ラベル・バッジクラス一元化)・監査・ゲート再実行
 
-- [ ] 機器フォーム: 管理番号ユニーク検証、メーカーセレクト
-- [ ] 機器一覧: 廃棄確認(2段階)
+- [x] **一覧班**: `features/equipment/list/index.tsx`(8列: 管理番号/機器名/型式/メーカー名解決/設置場所/状態バッジ/項目数/最寄り期限)+ テスト10件。検索(managementNo/name/model 部分一致・大文字小文字無視)、状態フィルタ(既定「稼働+休止」= retired 非表示、D-010)、managementNo 昇順、行クリック+Enter/Space で詳細遷移、空状態2種。非稼働機器・項目0件の期限は「—」。期限セルのバッジ色(仕様「任意」)は不実装
+- [x] **フォーム班**: `features/equipment/form/index.tsx` + `schema.ts`(`createEquipmentFormSchema(existingManagementNumbers)` ファクトリ、自身除外ユニーク検証「この管理番号は既に使用されています」)+ テスト12件。useParams id 有無でモード判定、保存→詳細遷移、キャンセル→`navigate(-1)`、存在しない id →一覧へ Navigate replace。メーカーセレクトは isManufacturer=true のみ、0件時「メーカーが未登録です。マスタから登録してください」+ /vendors リンク
+- [x] 廃棄: 編集時のみ「廃棄にする」→ ConfirmModal(危険色、§0.6)→ `setEquipmentStatus(retired)`(物理削除なし、D-011)
+- [x] メイン追加: `components/ui/Textarea`(TextField と同パターン、+テスト6件)+ barrel 追記、`features/equipment/constants.ts`(EQUIPMENT_STATUS_LABELS / BADGE_CLASSES)
+- ゲート実績: tsc 0 / oxlint 0 / テスト370件全緑(+28件増)/ カバレッジ閾値維持(--coverage exit 0)
 
 ## Phase 6: 項目編集モーダル(§6)+ 機器詳細(§4)
 
