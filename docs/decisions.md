@@ -47,3 +47,21 @@
 
 - ステータス: **確定**(2026-07-03)
 - 判断: スコープ外。記録は result(pass/adjusted/fail)+ メモのみ。数値入力・判定機能は実装しない
+
+## D-007: Person 新規追加時の isActive 既定値(Phase 4 実装判断)
+
+- ステータス: **確定**(2026-07-03)
+- 判断: PersonModal の新規追加フォームは `isActive=true` を既定値とする
+- 根拠: 仕様書(screen-design/09-masters.md §9-B)に明記なし。無効な担当者を新規作成する運用は不自然で、有効が既定の一覧運用と整合
+
+## D-008: Vendor 削除ガードの判定タイミング(Phase 4 実装判断)
+
+- ステータス: **確定**(2026-07-03)
+- 判断: 削除ボタン押下時に UI 側で参照有無(Equipment.manufacturerId / InspectionItem.vendorId / CalibrationOrder.vendorId)を判定し、参照ありなら確認ダイアログを出さず即「削除できません」表示。未参照時のみ ConfirmModal → `removeVendor`。`removeVendor` が false を返した場合(確認中の競合等)も同メッセージへフォールバック
+- 根拠: 09-masters.md §9-A「削除ボタン押下時に表示。未参照時のみ確認ダイアログ後に削除」と、ストア層ガード(最終防衛線)の二重化を両立
+
+## D-009: 汎用フォーム部品 TextField / Checkbox の追加(Phase 4 実装判断)
+
+- ステータス: **確定**(2026-07-03)
+- 判断: `components/ui/` に TextField(type 素通し、既定 text)と Checkbox(ラベル右横)を追加。Select / DateField と同じラベル・必須マーク・aria-describedby エラー表示パターン
+- 根拠: Phase 4 の両マスタフォームで必要。班委譲前にメインが追加し barrel 経由供給(班間の重複実装・ファイル衝突回避)

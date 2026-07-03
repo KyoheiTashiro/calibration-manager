@@ -1,6 +1,8 @@
 /**
  * ドメイン固有複合UIコンポーネントの集約barrel（directory-structure.md）。
- * ItemModal / RecordModal / OrderModal / VendorModal / PersonModal は後続フェーズで追加する。
+ * ItemModal / RecordModal / OrderModal は後続フェーズで追加する。
  */
 
+export { PersonModal } from "@/components/domain/PersonModal";
 export { StatusBadge } from "@/components/domain/StatusBadge";
+export { VendorModal } from "@/components/domain/VendorModal";
