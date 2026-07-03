@@ -160,3 +160,21 @@
 - ステータス: **確定**(2026-07-03)
 - 判断: 担当者表示名解決(dangling「—」/ 無効「(無効)」注記、D-001)を `features/equipment/detail/hooks.ts` から `store/selectors.ts` へ移動し、シグネチャを selector 規約(`(state: Pick<AppState, "persons">, personId)`)に統一
 - 根拠: 項目一覧(§5)も同一規則で担当者名を表示するため。feature 間 import を避け、横断導出は selectors.ts に置く規約(coding-standards.md §5)に従う
+
+## D-025: 通知スキャンの起動方式と前回スキャン日の保持(Phase 9 実装判断)
+
+- ステータス: **確定**(2026-07-03)
+- 判断: `useNotificationScan`(App.tsx でマウント)は (1)マウント時に即スキャン (2)60秒間隔のポーリング (3)`visibilitychange` で可視復帰時、の3経路で `todayIsoDate()` を前回スキャン日(useRef、**非永続**)と比較し、異なる場合のみ `generateNotifications(today)` を呼ぶ
+- 根拠: 10-notifications.md「起動時 + 日付変更検知時」。起動時に必ずスキャンするため前回スキャン日の永続化は不要(persist の partialize=エンティティのみ、の方針も維持)。日跨ぎ放置タブはポーリングで、スリープ復帰はvisibilitychangeで拾う。同日内の再スキャンは重複抑止がストア側にあるため無害だが、無駄な走査を避けるため ref 比較で抑止
+
+## D-026: ダッシュボード要対応リストの行クリック遷移先(Phase 9 実装判断)
+
+- ステータス: **確定**(2026-07-03)
+- 判断: 行クリックは**機器詳細 `/equipment/:id`** へ遷移(01-dashboard.md の「または項目一覧の該当行」は採らない)
+- 根拠: 項目一覧はフィルタ画面であり「該当行」への位置指定手段(行アンカー)を持たない。機器詳細なら当該項目の編集・記録へ直接到達でき、機器一覧(§2)の行クリックとも挙動が揃う
+
+## D-027: 通知行クリックの遷移先解決(Phase 9 実装判断)
+
+- ステータス: **確定**(2026-07-03)
+- 判断: 行クリックはまず `markAsRead`、次に遷移: `targetType=order` → `/orders`(カードのハイライトは不実装)。`targetType=item` → 項目から機器を辿り機器詳細 `/equipment/:id`。項目が dangling(削除済み)の場合は**既読化のみで遷移しない**
+- 根拠: 10-notifications.md は item の遷移先を「`/items`(該当項目)または該当機器詳細」と許容しており、D-026 と同じ理由で機器詳細に統一。dangling 通知は sanitize(D-003)で起動時に除去されるが、セッション中の削除で発生し得るため例外を投げず既読化のみとする

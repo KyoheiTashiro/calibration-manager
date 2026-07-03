@@ -7,6 +7,7 @@ import { EquipmentForm } from "@/features/equipment/form";
 import { EquipmentList } from "@/features/equipment/list";
 import { ItemList } from "@/features/items";
 import { NotificationCenter } from "@/features/notifications";
+import { useNotificationScan } from "@/features/notifications/useNotificationScan";
 import { OrderList } from "@/features/orders";
 import { PersonList } from "@/features/persons";
 import { Settings } from "@/features/settings";
@@ -19,6 +20,9 @@ import { Route, Routes } from "react-router-dom";
 // `function` 宣言 + `export default` が慣習として許容されている
 // （姉妹プロジェクト pinpon-match-manage 踏襲・directory-structure.mdの想定通りルート定義をここに置く）。
 function App(): ReactElement {
+  // 通知スキャンの起動（D-025）。アプリ全体で1度だけマウントする。
+  useNotificationScan();
+
   return (
     <Routes>
       {/* 共通レイアウト（サイドバー+ヘッダー+Outlet）配下に全11ルートを定義する

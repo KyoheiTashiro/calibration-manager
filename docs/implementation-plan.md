@@ -119,14 +119,15 @@
 - [x] 3モーダル起動結節点: UI 3分割(index.tsx / FilterBar.tsx / ItemTable.tsx、依存数上限対策)。[記録]→RecordModal、[案件]→OrderModal(canCreateOrder=true の行のみ表示 = 外部かつ有効案件なし)、[編集]→ItemModal。単一 modal state(kind)で同時1つ。空状態2種(対象0件 / 絞り込み0件+クリア)
 - ゲート実績: tsc 0 / oxlint 0 / テスト489件全緑(+37件増)/ カバレッジ閾値維持(items/hooks.ts 100/97/100)
 
-## Phase 9: ダッシュボード(§1)+ 通知(§10)
+## Phase 9: ダッシュボード(§1)+ 通知(§10) ✅ 完了(2026-07-03)
 
-担当: 委譲、useNotificationScan はメイン監査重点
+担当実績: メイン = 着手前判断 D-025(スキャン3経路・前回スキャン日は非永続)/ D-026(要対応行クリック→機器詳細)/ D-027(通知行クリック遷移解決・dangling は既読化のみ)+ 共有定数 `features/notifications/constants.ts`(通知5種別ラベル・バッジ色、deliveryOverdue のみ濃赤)先行作成・監査・キーボード遷移テスト補完。委譲 = 通知班(Opus)∥ ダッシュボード班(Opus)並列
 
-- [ ] サマリーカード → `/items?status=` 導線
-- [ ] useNotificationScan: 起動時 + 日付変更検知
-- [ ] 未読同一(targetType, targetId, type)重複抑止
-- [ ] Order 宛先は item 経由解決
+- [x] サマリーカード → `/items?status=` 導線: `features/dashboard/`(index.tsx + hooks.ts + SummaryCards / ActionRequiredList / NotificationList の3分割、依存数上限対策)。カード4枚(overdue/orderNow/dueSoon/inProgress、色・ラベルは statusBadge ヘルパ)、要対応リスト(buildItemRows 再利用・優先度 overdue→orderNow→dueSoon の安定ソート・行クリック+Enter/Space→機器詳細 D-026)、最新の通知5件(未読優先→createdDate降順→id昇順)、空状態2種
+- [x] useNotificationScan: 起動時 + 日付変更検知: `features/notifications/useNotificationScan.ts`(D-025: マウント時即時+60秒ポーリング+visibilitychange 可視復帰、useRef 比較で同日抑止、App.tsx で1箇所マウント)。fake timers テスト5件
+- [x] 未読同一(targetType, targetId, type)重複抑止: Phase 2 実装済の notificationSlice.generateNotifications を変更なしで使用(スライス・domain 無変更)
+- [x] Order 宛先は item 経由解決: Phase 1 実装済の notificationRules.orderNotificationSeeds を使用。通知センター(タブ未読/既読・全て既読・行クリック=既読化→D-027 遷移・種別バッジ色+ラベル併記・空状態2種)実装
+- ゲート実績: tsc 0 / oxlint 0 / テスト524件全緑(+35件増)/ カバレッジラチェット維持(domain 100/100/100、store 99.2/95.8/98.7、id.ts 100)
 
 ## Phase 10: 設定/CSV(§11)
 
