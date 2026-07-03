@@ -41,7 +41,7 @@ const equipment: Equipment = {
 beforeEach(setupStoreIsolation);
 
 describe("VendorList: 一覧表示", () => {
-  it("複数Vendorの行内容・チェック有無を表示する", () => {
+  it("複数Vendorの行内容・種別バッジを表示する", () => {
     seedStore({
       vendors: {
         [manufacturerVendor.id]: manufacturerVendor,
@@ -51,15 +51,17 @@ describe("VendorList: 一覧表示", () => {
     renderWithStore(<VendorList />);
 
     const mitutoyoRow = screen.getByRole("row", { name: /ミツトヨ/u });
-    expect(within(mitutoyoRow).getAllByText("✓")).toHaveLength(2);
+    expect(within(mitutoyoRow).getByText("メーカー")).toBeInTheDocument();
+    expect(within(mitutoyoRow).getByText("校正業者")).toBeInTheDocument();
     expect(within(mitutoyoRow).getByText("30日")).toBeInTheDocument();
     expect(within(mitutoyoRow).getByText("山田")).toBeInTheDocument();
     expect(within(mitutoyoRow).getByText("03-1111-2222")).toBeInTheDocument();
 
-    // なぜ4件か: メーカー(false)・標準納期(未設定)・窓口(未設定)・連絡先(未設定)の4列が「—」になる
+    // なぜ3件か: 標準納期(未設定)・窓口(未設定)・連絡先(未設定)の3列が「—」になる
     const nihonSokkiRow = screen.getByRole("row", { name: /日本測器/u });
-    expect(within(nihonSokkiRow).getByText("✓")).toBeInTheDocument();
-    expect(within(nihonSokkiRow).getAllByText("—")).toHaveLength(4);
+    expect(within(nihonSokkiRow).getByText("校正業者")).toBeInTheDocument();
+    expect(within(nihonSokkiRow).queryByText("メーカー")).not.toBeInTheDocument();
+    expect(within(nihonSokkiRow).getAllByText("—")).toHaveLength(3);
   });
 });
 

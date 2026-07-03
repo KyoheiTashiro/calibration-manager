@@ -6,6 +6,7 @@
 
 import { VendorModal } from "@/components/domain/VendorModal";
 import {
+  Badge,
   Button,
   ConfirmModal,
   EmptyState,
@@ -17,6 +18,10 @@ import {
 import type { Vendor } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
 import { useState, type ReactElement } from "react";
+
+// 種別バッジ: -100 背景 × -800 文字 × -300 枠線の組は statusBadge.ts と同じ WCAG AA 設計値
+const MANUFACTURER_BADGE_CLASS_NAME = "bg-blue-100 text-blue-800 border border-blue-300";
+const CALIBRATOR_BADGE_CLASS_NAME = "bg-emerald-100 text-emerald-800 border border-emerald-300";
 
 /** 参照されている Vendor は削除ガード対象（store の removeVendor と同じ判定条件） */
 const isVendorReferenced = (vendorId: string): boolean => {
@@ -90,10 +95,7 @@ export const VendorList = (): ReactElement => {
                 名称
               </th>
               <th scope="col" className="px-3 py-2 text-left">
-                メーカー
-              </th>
-              <th scope="col" className="px-3 py-2 text-left">
-                校正業者
+                種別
               </th>
               <th scope="col" className="px-3 py-2 text-right">
                 標準納期
@@ -113,8 +115,22 @@ export const VendorList = (): ReactElement => {
             {vendorList.map((vendor) => (
               <tr key={vendor.id} className="h-10 hover:bg-slate-50">
                 <td className="px-3 py-2">{vendor.name}</td>
-                <td className="px-3 py-2">{vendor.isManufacturer ? "✓" : "—"}</td>
-                <td className="px-3 py-2">{vendor.isCalibrator ? "✓" : "—"}</td>
+                <td className="px-3 py-2">
+                  {!vendor.isManufacturer && !vendor.isCalibrator ? (
+                    "—"
+                  ) : (
+                    <span className="inline-flex gap-1">
+                      {vendor.isManufacturer && (
+                        // oxlint-disable-next-line react/forbid-component-props -- Badgeはclassnameで色を渡す設計（Badge.tsx参照）
+                        <Badge className={MANUFACTURER_BADGE_CLASS_NAME}>メーカー</Badge>
+                      )}
+                      {vendor.isCalibrator && (
+                        // oxlint-disable-next-line react/forbid-component-props -- Badgeはclassnameで色を渡す設計（Badge.tsx参照）
+                        <Badge className={CALIBRATOR_BADGE_CLASS_NAME}>校正業者</Badge>
+                      )}
+                    </span>
+                  )}
+                </td>
                 <td className="px-3 py-2 text-right tabular-nums">
                   {vendor.standardLeadTimeDays === undefined
                     ? "—"

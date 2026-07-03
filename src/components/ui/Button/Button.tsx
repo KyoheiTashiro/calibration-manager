@@ -34,7 +34,7 @@ export const Button = ({
   children,
 }: Props): ReactElement => {
   const baseClassName =
-    "inline-flex items-center justify-center rounded font-medium transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-50";
+    "inline-flex cursor-pointer items-center justify-center rounded font-medium transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-50";
   const mergedClassName = [
     baseClassName,
     SIZE_CLASS_NAME[size],
