@@ -110,13 +110,14 @@
 - [x] メイン監査是正: 両モーダルの submitFailed を閉時リセット(残留エラー防止)、発注ダイアログ cost を整数粒度へ統一(D-021)+ schema.test.ts 追加
 - ゲート実績: tsc 0 / oxlint 0 / テスト452件全緑(+44件増)/ カバレッジ閾値維持
 
-## Phase 8: 項目一覧(§5、中核・最大工数)
+## Phase 8: 項目一覧(§5、中核・最大工数) ✅ 完了(2026-07-03)
 
-担当: フィルタロジック(純関数+テスト)= メイン監査重点、UI = 委譲。分割委譲
+担当実績: メイン = 着手前判断 D-022(URLクエリ=フィルタ真実源)/ D-023(無効・非稼働トグル不実装)/ D-024(personLabelOf を selectors へ昇格。リファクタもメイン実施)+ hooks 契約明文化・監査・lint 是正(D-024 起因の依存数超過を detail/hooks 再export で解消)。委譲 = ロジック班(Opus)→ UI班(Opus)直列
 
-- [ ] クエリ受付(`?status=&type=&execution=&personId=`)
-- [ ] 4フィルタ
-- [ ] 3モーダル(項目編集・記録・案件)起動結節点
+- [x] クエリ受付(`?status=&type=&execution=&personId=`): `features/items/hooks.ts` の `parseItemListFilters`(不正・未知値・存在しない personId は「全て」扱い、D-022)。フィルタ状態は useSearchParams のみで管理(ローカル state 二重管理なし)、変更・クリアは `setSearchParams(replace: true)`
+- [x] 4フィルタ: 状態(§0.3 の5値、導出済み row.status に適用)/ 種別 / 内外 / 担当(name 昇順、無効者「(無効)」注記)。「クリア」は4パラメータのみ除去。`buildItemRows`(active機器×isActive項目のみ、dangling 機器除外、nextDueDate 昇順→id 昇順)+ `filterItemRows`(AND)を純関数で分離しテスト22件
+- [x] 3モーダル起動結節点: UI 3分割(index.tsx / FilterBar.tsx / ItemTable.tsx、依存数上限対策)。[記録]→RecordModal、[案件]→OrderModal(canCreateOrder=true の行のみ表示 = 外部かつ有効案件なし)、[編集]→ItemModal。単一 modal state(kind)で同時1つ。空状態2種(対象0件 / 絞り込み0件+クリア)
+- ゲート実績: tsc 0 / oxlint 0 / テスト489件全緑(+37件増)/ カバレッジ閾値維持(items/hooks.ts 100/97/100)
 
 ## Phase 9: ダッシュボード(§1)+ 通知(§10)
 
