@@ -41,8 +41,8 @@ describe("addVendor / updateVendor", () => {
   it("追加した Vendor を返却された id で参照できる", () => {
     const id = useAppStore
       .getState()
-      .addVendor({ name: "計測器メーカー", isManufacturer: true, isCalibrator: false });
-    expect(useAppStore.getState().vendors[id]).toMatchObject({ id, name: "計測器メーカー" });
+      .addVendor({ name: "機器メーカー", isManufacturer: true, isCalibrator: false });
+    expect(useAppStore.getState().vendors[id]).toMatchObject({ id, name: "機器メーカー" });
   });
 
   it("部分更新できる（他フィールドは維持）", () => {

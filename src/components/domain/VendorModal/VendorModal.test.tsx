@@ -14,7 +14,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const vendor: Vendor = {
   id: "vendor-1",
-  name: "計測器メーカー",
+  name: "機器メーカー",
   isManufacturer: true,
   isCalibrator: true,
   contactPerson: "山田",
@@ -39,14 +39,14 @@ describe("VendorModal: 新規追加", () => {
     const onClose = vi.fn();
     render(<VendorModal open onClose={onClose} />);
 
-    await user.type(screen.getByLabelText("名称", { exact: false }), "新規計測器メーカー");
+    await user.type(screen.getByLabelText("名称", { exact: false }), "新規機器メーカー");
     await user.click(screen.getByLabelText("メーカー"));
     await user.click(screen.getByRole("button", { name: "保存" }));
 
     const createdVendors = Object.values(useAppStore.getState().vendors);
     expect(createdVendors).toHaveLength(1);
     expect(createdVendors[0]).toMatchObject({
-      name: "新規計測器メーカー",
+      name: "新規機器メーカー",
       isManufacturer: true,
       isCalibrator: false,
     });
@@ -125,7 +125,7 @@ describe("VendorModal: 編集", () => {
     render(<VendorModal open vendor={vendor} onClose={vi.fn()} />);
 
     expect(screen.getByText("取引先を編集")).toBeInTheDocument();
-    expect(screen.getByLabelText("名称", { exact: false })).toHaveValue("計測器メーカー");
+    expect(screen.getByLabelText("名称", { exact: false })).toHaveValue("機器メーカー");
     expect(screen.getByLabelText("メーカー")).toBeChecked();
     expect(screen.getByLabelText("校正業者")).toBeChecked();
     expect(screen.getByLabelText("窓口担当者")).toHaveValue("山田");

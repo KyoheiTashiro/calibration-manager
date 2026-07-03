@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 
 const vendorA: Vendor = {
   id: "vendor-a",
-  name: "計測器サービス",
+  name: "機器サービス",
   isManufacturer: true,
   isCalibrator: false,
   standardLeadTimeDays: 21,
@@ -30,7 +30,7 @@ describe("buildEntityCsv", () => {
 
   it("カンマを含む値は引用して出力する", () => {
     const csv = buildEntityCsv("vendors", { [vendorA.id]: vendorA });
-    expect(csv.split("\r\n")[1]).toBe('vendor-a,計測器サービス,true,false,,,,21,"毎年,一括発注"');
+    expect(csv.split("\r\n")[1]).toBe('vendor-a,機器サービス,true,false,,,,21,"毎年,一括発注"');
   });
 
   it("データ行は id 昇順で安定出力する", () => {

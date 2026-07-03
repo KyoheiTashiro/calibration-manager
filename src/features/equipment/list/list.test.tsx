@@ -71,7 +71,7 @@ const suspendedEquipment: Equipment = {
 const retiredEquipment: Equipment = {
   id: "equipment-4",
   managementNo: "EQ-004",
-  name: "廃棄済み測定器",
+  name: "廃棄済み機器",
   status: EQUIPMENT_STATUS.RETIRED,
 };
 
