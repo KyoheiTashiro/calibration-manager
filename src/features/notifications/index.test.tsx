@@ -1,7 +1,7 @@
 /**
  * NotificationCenter（/notifications、screen-design/10-notifications.md）の検証。
  * タブ切替・並び順（createdDate 降順/同日 id 昇順）・種別バッジ・全て既読・
- * 行クリック遷移（order/item/dangling, D-027）・空状態2種を扱う。
+ * 行クリック遷移（order/inspectionItem/dangling, D-027）・空状態2種を扱う。
  */
 
 import { ROUTES } from "@/constants/routes";
@@ -50,7 +50,7 @@ const item1: InspectionItem = {
 
 const makeNotif = (overrides: Partial<Notification> & Pick<Notification, "id">): Notification => ({
   type: NOTIFICATION_TYPE.OVERDUE,
-  targetType: NOTIFICATION_TARGET_TYPE.ITEM,
+  targetType: NOTIFICATION_TARGET_TYPE.INSPECTION_ITEM,
   targetId: "item-1",
   personId: "person-1",
   message: "通知メッセージ",
@@ -73,7 +73,7 @@ const renderCenter = (): void => {
 const rowMessages = (): string[] =>
   within(screen.getByRole("list"))
     .getAllByRole("listitem")
-    .map((item) => item.textContent ?? "");
+    .map((inspectionItem) => inspectionItem.textContent ?? "");
 
 describe("NotificationCenter: タブと並び順", () => {
   beforeEach(setupStoreIsolation);
@@ -211,11 +211,11 @@ describe("NotificationCenter: 行クリック遷移（D-027）", () => {
   });
 
   // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
-  it("targetType=item の行クリックで機器詳細へ遷移する", async () => {
+  it("targetType=inspectionItem の行クリックで機器詳細へ遷移する", async () => {
     const user = userEvent.setup();
     seedStore({
       equipment: { [equipment1.id]: equipment1 },
-      items: { [item1.id]: item1 },
+      inspectionItems: { [item1.id]: item1 },
       notifications: {
         i1: makeNotif({ id: "i1", targetId: "item-1", message: "項目通知" }),
       },
@@ -228,7 +228,7 @@ describe("NotificationCenter: 行クリック遷移（D-027）", () => {
   });
 
   // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
-  it("dangling item（項目削除済み）の行クリックは既読化のみで遷移しない", async () => {
+  it("dangling inspectionItem（項目削除済み）の行クリックは既読化のみで遷移しない", async () => {
     const user = userEvent.setup();
     seedStore({
       notifications: {

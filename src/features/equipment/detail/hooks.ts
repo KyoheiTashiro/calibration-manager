@@ -4,8 +4,8 @@
  * D-014: 項目ステータスは機器が稼働(active)のときのみ導出し、それ以外は null（「—」表示）とする。
  */
 
-import { deriveItemStatus, type ItemStatus } from "@/domain/itemStatus";
-import { itemsOf, ordersOf, recordsOf } from "@/store/selectors";
+import { deriveInspectionItemStatus, type InspectionItemStatus } from "@/domain/inspectionItemStatus";
+import { inspectionItemsOf, ordersOf, recordsOf } from "@/store/selectors";
 import {
   EQUIPMENT_STATUS,
   type CalibrationOrder,
@@ -21,10 +21,10 @@ import { todayIsoDate } from "@/utils/time";
 export { personLabelOf } from "@/store/selectors";
 
 /** 実施履歴の1行(項目横断マージ用に項目名を同梱) */
-export type HistoryRow = { record: InspectionRecord; itemName: string };
+export type HistoryRow = { record: InspectionRecord; inspectionItemName: string };
 
 /** 項目一覧の並び順: isActive=true を先頭に、両グループ内は nextDueDate 昇順(同値は id 昇順) */
-const compareItemRows = (left: InspectionItem, right: InspectionItem): number => {
+const compareInspectionItemRows = (left: InspectionItem, right: InspectionItem): number => {
   if (left.isActive !== right.isActive) return left.isActive ? -1 : 1;
   return left.nextDueDate.localeCompare(right.nextDueDate) || left.id.localeCompare(right.id);
 };
@@ -38,20 +38,20 @@ const compareHistoryRows = (left: HistoryRow, right: HistoryRow): number =>
   left.record.id.localeCompare(right.record.id);
 
 /** この機器に属する項目一覧を表示順(isActive優先→nextDueDate昇順→id昇順)へ並べ替える */
-export const sortedItemsOf = (
-  items: Record<string, InspectionItem>,
+export const sortedInspectionItemsOf = (
+  inspectionItems: Record<string, InspectionItem>,
   equipmentId: string,
-): InspectionItem[] => itemsOf({ items }, equipmentId).toSorted(compareItemRows);
+): InspectionItem[] => inspectionItemsOf({ inspectionItems }, equipmentId).toSorted(compareInspectionItemRows);
 
 /** この機器の全項目の実施履歴を項目横断でマージし、doneDate降順(同日はid昇順)に並べる */
 export const historyRowsOf = (
-  items: Record<string, InspectionItem>,
+  inspectionItems: Record<string, InspectionItem>,
   records: Record<string, InspectionRecord>,
   equipmentId: string,
 ): HistoryRow[] =>
-  itemsOf({ items }, equipmentId)
-    .flatMap((item) =>
-      recordsOf({ records }, item.id).map((record) => ({ record, itemName: item.name })),
+  inspectionItemsOf({ inspectionItems }, equipmentId)
+    .flatMap((inspectionItem) =>
+      recordsOf({ records }, inspectionItem.id).map((record) => ({ record, inspectionItemName: inspectionItem.name })),
     )
     .toSorted(compareHistoryRows);
 
@@ -59,13 +59,13 @@ export const historyRowsOf = (
  * 項目一覧行に表示するステータス。D-014により機器が稼働(active)でなければ
  * null を返す。呼び出し側は null のとき「—」を表示する。
  */
-export const displayedItemStatus = (
-  item: InspectionItem,
+export const displayedInspectionItemStatus = (
+  inspectionItem: InspectionItem,
   equipmentStatus: EquipmentStatus,
   orders: Record<string, CalibrationOrder>,
   vendors: Record<string, Vendor>,
-): ItemStatus | null => {
+): InspectionItemStatus | null => {
   if (equipmentStatus !== EQUIPMENT_STATUS.ACTIVE) return null;
-  const vendor = item.vendorId ? (vendors[item.vendorId] ?? null) : null;
-  return deriveItemStatus(item, ordersOf({ orders }, item.id), vendor, todayIsoDate());
+  const vendor = inspectionItem.vendorId ? (vendors[inspectionItem.vendorId] ?? null) : null;
+  return deriveInspectionItemStatus(inspectionItem, ordersOf({ orders }, inspectionItem.id), vendor, todayIsoDate());
 };

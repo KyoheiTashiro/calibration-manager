@@ -41,11 +41,11 @@ export const createVendorSlice: AppSliceCreator<VendorSlice> = (set, get) => ({
   },
 
   removeVendor: (id): boolean => {
-    const { vendors, equipment, items, orders } = get();
+    const { vendors, equipment, inspectionItems, orders } = get();
     if (recordValue(vendors, id) === undefined) return false;
     const isReferenced =
       Object.values(equipment).some((entry) => entry.manufacturerId === id) ||
-      Object.values(items).some((entry) => entry.vendorId === id) ||
+      Object.values(inspectionItems).some((entry) => entry.vendorId === id) ||
       Object.values(orders).some((entry) => entry.vendorId === id);
     if (isReferenced) return false;
     set((state) => {

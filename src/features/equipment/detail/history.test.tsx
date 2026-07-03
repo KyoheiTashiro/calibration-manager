@@ -8,7 +8,7 @@ import { ROUTES, equipmentDetailPath } from "@/constants/routes";
 import { EquipmentDetail } from "@/features/equipment/detail";
 import {
   equipmentFull,
-  seedEquipmentFullItemsAndRecords,
+  seedEquipmentFullInspectionItemsAndRecords,
   seedEquipmentFullMasters,
 } from "@/features/equipment/detail/detailFixtures";
 import { renderWithStore, setupStoreIsolation } from "@/test/renderWithStore";
@@ -37,7 +37,7 @@ const getHistoryRows = (): HTMLElement[] => {
 beforeEach(() => {
   setupStoreIsolation();
   seedEquipmentFullMasters();
-  seedEquipmentFullItemsAndRecords();
+  seedEquipmentFullInspectionItemsAndRecords();
 });
 
 describe("EquipmentDetail: 実施履歴", () => {

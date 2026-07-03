@@ -21,7 +21,7 @@ const equipment: Equipment = {
   name: "ノギス",
   status: "active",
 };
-const item: InspectionItem = {
+const inspectionItem: InspectionItem = {
   id: "item-1",
   equipmentId: "equipment-1",
   type: "calibration",
@@ -38,23 +38,23 @@ const item: InspectionItem = {
 };
 const order: CalibrationOrder = {
   id: "order-1",
-  itemId: "item-1",
+  inspectionItemId: "item-1",
   vendorId: "vendor-1",
   status: "ordered",
 };
 
-const seedBase = (overrides?: { items?: Record<string, InspectionItem> }): void => {
+const seedBase = (overrides?: { inspectionItems?: Record<string, InspectionItem> }): void => {
   seedStore({
     persons: { [person.id]: person },
     equipment: { [equipment.id]: equipment },
-    items: overrides?.items ?? { [item.id]: item },
+    inspectionItems: overrides?.inspectionItems ?? { [inspectionItem.id]: inspectionItem },
   });
 };
 
 beforeEach(setupStoreIsolation);
 
 describe("generateNotifications", () => {
-  it("期限超過の項目に overdue 通知を生成する（宛先は item.personId）", () => {
+  it("期限超過の項目に overdue 通知を生成する（宛先は inspectionItem.personId）", () => {
     seedBase();
     useAppStore.getState().generateNotifications("2026-08-01");
 
@@ -62,8 +62,8 @@ describe("generateNotifications", () => {
     expect(notifications).toHaveLength(2); // overdue + 発注推奨（有効案件なしの外部項目）
     const overdue = notifications.find((entry) => entry.type === "overdue");
     expect(overdue).toMatchObject({
-      targetType: "item",
-      targetId: item.id,
+      targetType: "inspectionItem",
+      targetId: inspectionItem.id,
       personId: person.id,
       createdDate: "2026-08-01",
       isRead: false,
@@ -91,9 +91,9 @@ describe("generateNotifications", () => {
 
   it("無効な項目・稼働中でない機器の項目は対象外", () => {
     seedBase({
-      items: {
-        "item-inactive": { ...item, id: "item-inactive", isActive: false },
-        "item-suspended": { ...item, id: "item-suspended", equipmentId: "equipment-suspended" },
+      inspectionItems: {
+        "item-inactive": { ...inspectionItem, id: "item-inactive", isActive: false },
+        "item-suspended": { ...inspectionItem, id: "item-suspended", equipmentId: "equipment-suspended" },
       },
     });
     seedStore({
@@ -107,8 +107,8 @@ describe("generateNotifications", () => {
     expect(useAppStore.getState().notifications).toEqual({});
   });
 
-  it("返却予定超過の案件に deliveryOverdue 通知を item.personId 宛で生成する", () => {
-    seedBase({ items: { [item.id]: { ...item, nextDueDate: "2099-01-01" } } });
+  it("返却予定超過の案件に deliveryOverdue 通知を inspectionItem.personId 宛で生成する", () => {
+    seedBase({ inspectionItems: { [inspectionItem.id]: { ...inspectionItem, nextDueDate: "2099-01-01" } } });
     seedStore({ orders: { [order.id]: { ...order, dueDate: "2026-07-01" } } });
 
     useAppStore.getState().generateNotifications("2026-08-01");

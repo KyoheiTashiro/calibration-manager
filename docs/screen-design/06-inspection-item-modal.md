@@ -4,7 +4,7 @@
 
 **目的**: 点検校正項目(InspectionItem)の新規登録・編集。機器詳細・項目一覧から起動。
 
-**起動元**: [機器詳細](./04-equipment-detail.md)、[項目一覧](./05-item-list.md)
+**起動元**: [機器詳細](./04-equipment-detail.md)、[項目一覧](./05-inspection-item-list.md)
 
 ## 画面レイアウト
 

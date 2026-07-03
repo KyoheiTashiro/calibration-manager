@@ -7,6 +7,7 @@ import { STORAGE_KEY, STORAGE_VERSION } from "@/constants/storage";
 import {
   emptyAppState,
   migratePersistedState,
+  migrateV1ToV2,
   salvagePersistedState,
   sanitizeAppState,
 } from "@/store/persistence";
@@ -41,7 +42,7 @@ const equipment: Equipment = {
   name: "ノギス",
   status: "active",
 };
-const item: InspectionItem = {
+const inspectionItem: InspectionItem = {
   id: "item-1",
   equipmentId: "equipment-1",
   type: "calibration",
@@ -57,14 +58,14 @@ const item: InspectionItem = {
 };
 const order: CalibrationOrder = {
   id: "order-1",
-  itemId: "item-1",
+  inspectionItemId: "item-1",
   vendorId: "vendor-1",
   status: "ordered",
 };
-const itemNotification: Notification = {
+const inspectionItemNotification: Notification = {
   id: "notification-1",
   type: "dueSoon",
-  targetType: "item",
+  targetType: "inspectionItem",
   targetId: "item-1",
   personId: "person-1",
   message: "EQ-001 年次校正の期限が近づいています",
@@ -76,10 +77,10 @@ const validState = (): AppState => ({
   vendors: { [vendor.id]: vendor },
   persons: { [person.id]: person },
   equipment: { [equipment.id]: equipment },
-  items: { [item.id]: item },
+  inspectionItems: { [inspectionItem.id]: inspectionItem },
   records: {},
   orders: { [order.id]: order },
-  notifications: { [itemNotification.id]: itemNotification },
+  notifications: { [inspectionItemNotification.id]: inspectionItemNotification },
 });
 
 describe("migratePersistedState", () => {
@@ -106,6 +107,71 @@ describe("migratePersistedState", () => {
   });
 });
 
+describe("migrateV1ToV2: item→inspectionItem リネーム（decisions.md D-036）", () => {
+  /** v1 形式の永続化データ（items キー / itemId / targetType "item"） */
+  const v1State = (): Record<string, unknown> => ({
+    vendors: { [vendor.id]: vendor },
+    persons: { [person.id]: person },
+    equipment: { [equipment.id]: equipment },
+    items: { [inspectionItem.id]: inspectionItem },
+    records: {
+      "record-1": {
+        id: "record-1",
+        itemId: "item-1",
+        doneDate: "2026-06-01",
+        doneBy: "田中",
+        result: "pass",
+      },
+    },
+    orders: {
+      "order-1": { id: "order-1", itemId: "item-1", vendorId: "vendor-1", status: "ordered" },
+    },
+    notifications: {
+      [inspectionItemNotification.id]: {
+        ...inspectionItemNotification,
+        targetType: "item",
+      },
+    },
+  });
+
+  it("v1 データを v2 スキーマへ変換し、全体パースが成功する", () => {
+    const migrated = migrateV1ToV2(v1State());
+    const salvaged = salvagePersistedState(migrated);
+    expect(Object.keys(salvaged.inspectionItems)).toEqual(["item-1"]);
+    expect(salvaged.records["record-1"]?.inspectionItemId).toBe("item-1");
+    expect(salvaged.orders["order-1"]?.inspectionItemId).toBe("item-1");
+    expect(salvaged.notifications["notification-1"]?.targetType).toBe("inspectionItem");
+  });
+
+  it("MIGRATIONS[1] として登録されており、v1→現行版のパイプラインで適用される", () => {
+    const result = migratePersistedState(v1State(), 1) as Record<string, unknown>;
+    expect(result["inspectionItems"]).toBeDefined();
+    expect(result["items"]).toBeUndefined();
+  });
+
+  it("targetType が order の通知は変換しない", () => {
+    const orderNotification = {
+      ...inspectionItemNotification,
+      id: "notification-2",
+      targetType: "order",
+      targetId: "order-1",
+    };
+    const migrated = migrateV1ToV2({
+      ...v1State(),
+      notifications: { "notification-2": orderNotification },
+    }) as { notifications: Record<string, { targetType: string }> };
+    expect(migrated.notifications["notification-2"]?.targetType).toBe("order");
+  });
+
+  it("非オブジェクトや欠損キーは例外を投げず通す（後段サルベージに委ねる）", () => {
+    expect(migrateV1ToV2(null)).toBeNull();
+    expect(migrateV1ToV2("broken")).toBe("broken");
+    const migrated = migrateV1ToV2({ vendors: 42, records: "broken" }) as Record<string, unknown>;
+    expect(migrated["records"]).toBe("broken");
+    expect(salvagePersistedState(migrated)).toEqual(emptyAppState());
+  });
+});
+
 describe("salvagePersistedState: 3段サルベージ", () => {
   it("段階1: 全体パース成功ならそのまま採用する", () => {
     expect(salvagePersistedState(validState())).toEqual(validState());
@@ -118,14 +184,14 @@ describe("salvagePersistedState: 3段サルベージ", () => {
         [vendor.id]: vendor,
         "vendor-broken": { id: "vendor-broken", name: "" }, // name 空 + 必須boolean欠落
       },
-      items: {
-        [item.id]: item,
-        "item-broken": { ...item, id: "item-broken", cycle: "13M" }, // 列挙外の周期
+      inspectionItems: {
+        [inspectionItem.id]: inspectionItem,
+        "item-broken": { ...inspectionItem, id: "item-broken", cycle: "13M" }, // 列挙外の周期
       },
     };
     const salvaged = salvagePersistedState(corrupted);
     expect(Object.keys(salvaged.vendors)).toEqual([vendor.id]);
-    expect(Object.keys(salvaged.items)).toEqual([item.id]);
+    expect(Object.keys(salvaged.inspectionItems)).toEqual([inspectionItem.id]);
     expect(salvaged.persons).toEqual(validState().persons);
   });
 
@@ -150,13 +216,13 @@ describe("sanitizeAppState: 参照整合（D-003）", () => {
   });
 
   it("target の項目を失った通知を除去する", () => {
-    const state = { ...validState(), items: {} };
+    const state = { ...validState(), inspectionItems: {} };
     expect(sanitizeAppState(state).notifications).toEqual({});
   });
 
   it("target の案件を失った order 宛通知を除去する", () => {
     const orderNotification: Notification = {
-      ...itemNotification,
+      ...inspectionItemNotification,
       id: "notification-2",
       targetType: "order",
       targetId: "order-gone",
@@ -176,7 +242,7 @@ describe("sanitizeAppState: 参照整合（D-003）", () => {
   it("ユーザー入力データは dangling FK があっても保持する", () => {
     const state = { ...validState(), equipment: {}, vendors: {} };
     const sanitized = sanitizeAppState(state);
-    expect(sanitized.items).toEqual(validState().items); // equipmentId/vendorId が dangling でも残す
+    expect(sanitized.inspectionItems).toEqual(validState().inspectionItems); // equipmentId/vendorId が dangling でも残す
     expect(sanitized.orders).toEqual(validState().orders);
   });
 });
@@ -201,7 +267,7 @@ describe("persist 統合（LocalStorage → rehydrate）", () => {
     return Promise.resolve(useAppStore.persist.rehydrate()).then(() => {
       const state = useAppStore.getState();
       expect(Object.keys(state.persons)).toEqual([person.id]);
-      expect(state.items[item.id]).toEqual(item);
+      expect(state.inspectionItems[inspectionItem.id]).toEqual(inspectionItem);
       // アクションは merge 後も失われない
       expect(typeof state.addRecord).toBe("function");
     });
@@ -215,7 +281,7 @@ describe("persist 統合（LocalStorage → rehydrate）", () => {
     const persisted = JSON.parse(raw as string) as { state: Record<string, unknown> };
     expect(Object.keys(persisted.state).toSorted()).toEqual([
       "equipment",
-      "items",
+      "inspectionItems",
       "notifications",
       "orders",
       "persons",

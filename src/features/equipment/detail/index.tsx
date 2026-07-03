@@ -5,7 +5,7 @@
  * 並び替え・派生ステータスの計算ロジックは hooks.ts に集約する（coding-standards.md §2）。
  */
 
-import { ItemModal, RecordModal, StatusBadge } from "@/components/domain";
+import { InspectionItemModal, RecordModal, StatusBadge } from "@/components/domain";
 import { Badge, Button, EmptyState, Table, TableBody, TableHead } from "@/components/ui";
 import { ROUTES, equipmentEditPath } from "@/constants/routes";
 import {
@@ -13,16 +13,16 @@ import {
   EQUIPMENT_STATUS_LABELS,
 } from "@/features/equipment/constants";
 import {
-  displayedItemStatus,
+  displayedInspectionItemStatus,
   historyRowsOf,
   personLabelOf,
-  sortedItemsOf,
+  sortedInspectionItemsOf,
 } from "@/features/equipment/detail/hooks";
 import {
   EXECUTION_LABELS,
-  ITEM_TYPE_LABELS,
+  INSPECTION_ITEM_TYPE_LABELS,
   RECORD_RESULT_LABELS,
-} from "@/features/items/constants";
+} from "@/features/inspectionItems/constants";
 import type { InspectionItem } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
 import { useState, type ReactElement } from "react";
@@ -30,13 +30,13 @@ import { Navigate, useNavigate, useParams } from "react-router-dom";
 
 type ModalState = {
   open: boolean;
-  item?: InspectionItem;
+  inspectionItem?: InspectionItem;
 };
 
-/** 実施記録登録モーダルの起動状態（ItemModal とは独立管理）。対象項目IDのみ保持する */
+/** 実施記録登録モーダルの起動状態（InspectionItemModal とは独立管理）。対象項目IDのみ保持する */
 type RecordModalState = {
   open: boolean;
-  itemId?: string;
+  inspectionItemId?: string;
 };
 
 export const EquipmentDetail = (): ReactElement => {
@@ -46,7 +46,7 @@ export const EquipmentDetail = (): ReactElement => {
   const equipmentMap = useAppStore((state) => state.equipment);
   const vendors = useAppStore((state) => state.vendors);
   const persons = useAppStore((state) => state.persons);
-  const items = useAppStore((state) => state.items);
+  const inspectionItems = useAppStore((state) => state.inspectionItems);
   const orders = useAppStore((state) => state.orders);
   const records = useAppStore((state) => state.records);
 
@@ -59,12 +59,12 @@ export const EquipmentDetail = (): ReactElement => {
     return <Navigate to={ROUTES.EQUIPMENT_LIST} replace />;
   }
 
-  const handleAddItemClick = (): void => setModalState({ open: true, item: undefined });
-  const handleEditItemClick = (item: InspectionItem): void => setModalState({ open: true, item });
-  const handleModalClose = (): void => setModalState({ open: false, item: undefined });
+  const handleAddInspectionItemClick = (): void => setModalState({ open: true, inspectionItem: undefined });
+  const handleEditInspectionItemClick = (inspectionItem: InspectionItem): void => setModalState({ open: true, inspectionItem });
+  const handleModalClose = (): void => setModalState({ open: false, inspectionItem: undefined });
 
-  const itemList = sortedItemsOf(items, currentEquipment.id);
-  const historyRows = historyRowsOf(items, records, currentEquipment.id);
+  const inspectionItemList = sortedInspectionItemsOf(inspectionItems, currentEquipment.id);
+  const historyRows = historyRowsOf(inspectionItems, records, currentEquipment.id);
 
   return (
     <div className="flex flex-col gap-6">
@@ -116,13 +116,13 @@ export const EquipmentDetail = (): ReactElement => {
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold">点検校正項目</h2>
-          <Button onClick={handleAddItemClick}>+ 項目を追加</Button>
+          <Button onClick={handleAddInspectionItemClick}>+ 項目を追加</Button>
         </div>
 
-        {itemList.length === 0 ? (
+        {inspectionItemList.length === 0 ? (
           <EmptyState
             message="この機器にはまだ点検校正項目がありません"
-            action={<Button onClick={handleAddItemClick}>+ 項目を追加</Button>}
+            action={<Button onClick={handleAddInspectionItemClick}>+ 項目を追加</Button>}
           />
         ) : (
           <Table>
@@ -155,33 +155,33 @@ export const EquipmentDetail = (): ReactElement => {
               </tr>
             </TableHead>
             <TableBody>
-              {itemList.map((item) => {
-                const status = displayedItemStatus(item, currentEquipment.status, orders, vendors);
+              {inspectionItemList.map((inspectionItem) => {
+                const status = displayedInspectionItemStatus(inspectionItem, currentEquipment.status, orders, vendors);
                 return (
-                  <tr key={item.id} className={item.isActive ? undefined : "text-slate-400"}>
+                  <tr key={inspectionItem.id} className={inspectionItem.isActive ? undefined : "text-slate-400"}>
                     <td className="px-3 py-2">
                       {status === null ? "—" : <StatusBadge status={status} />}
                     </td>
-                    <td className="px-3 py-2">{item.name}</td>
-                    <td className="px-3 py-2">{ITEM_TYPE_LABELS[item.type]}</td>
-                    <td className="px-3 py-2">{EXECUTION_LABELS[item.execution]}</td>
-                    <td className="px-3 py-2">{item.cycle}</td>
-                    <td className="px-3 py-2">{personLabelOf({ persons }, item.personId)}</td>
-                    <td className="px-3 py-2">{item.nextDueDate}</td>
+                    <td className="px-3 py-2">{inspectionItem.name}</td>
+                    <td className="px-3 py-2">{INSPECTION_ITEM_TYPE_LABELS[inspectionItem.type]}</td>
+                    <td className="px-3 py-2">{EXECUTION_LABELS[inspectionItem.execution]}</td>
+                    <td className="px-3 py-2">{inspectionItem.cycle}</td>
+                    <td className="px-3 py-2">{personLabelOf({ persons }, inspectionItem.personId)}</td>
+                    <td className="px-3 py-2">{inspectionItem.nextDueDate}</td>
                     {/* なぜ td 直下に Button を並べるか: equipment/list や VendorList と同様、
                         div でラップするとjsx-a11yのボタンラベル探索深度を超えるためtdをflex化する */}
                     <td className="flex gap-2 px-3 py-2">
                       <Button
                         variant="secondary"
                         size="sm"
-                        onClick={() => setRecordModalState({ open: true, itemId: item.id })}
+                        onClick={() => setRecordModalState({ open: true, inspectionItemId: inspectionItem.id })}
                       >
                         記録
                       </Button>
                       <Button
                         variant="secondary"
                         size="sm"
-                        onClick={() => handleEditItemClick(item)}
+                        onClick={() => handleEditInspectionItemClick(inspectionItem)}
                       >
                         編集
                       </Button>
@@ -221,10 +221,10 @@ export const EquipmentDetail = (): ReactElement => {
               </tr>
             </TableHead>
             <TableBody>
-              {historyRows.map(({ record, itemName }) => (
+              {historyRows.map(({ record, inspectionItemName }) => (
                 <tr key={record.id}>
                   <td className="px-3 py-2">{record.doneDate}</td>
-                  <td className="px-3 py-2">{itemName}</td>
+                  <td className="px-3 py-2">{inspectionItemName}</td>
                   <td className="px-3 py-2">{record.doneBy}</td>
                   <td className="px-3 py-2">{RECORD_RESULT_LABELS[record.result]}</td>
                   <td className="px-3 py-2">{record.note || "—"}</td>
@@ -235,19 +235,19 @@ export const EquipmentDetail = (): ReactElement => {
         )}
       </div>
 
-      <ItemModal
+      <InspectionItemModal
         open={modalState.open}
         equipmentId={currentEquipment.id}
-        item={modalState.item}
+        inspectionItem={modalState.inspectionItem}
         onClose={handleModalClose}
       />
 
-      {recordModalState.itemId === undefined ? null : (
+      {recordModalState.inspectionItemId === undefined ? null : (
         <RecordModal
-          key={recordModalState.itemId}
+          key={recordModalState.inspectionItemId}
           open={recordModalState.open}
-          itemId={recordModalState.itemId}
-          onClose={() => setRecordModalState({ open: false, itemId: undefined })}
+          inspectionItemId={recordModalState.inspectionItemId}
+          onClose={() => setRecordModalState({ open: false, inspectionItemId: undefined })}
         />
       )}
     </div>

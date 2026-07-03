@@ -17,13 +17,13 @@ export type InspectionRecordSlice = {
   records: Record<string, InspectionRecord>;
   /**
    * 実施記録を追加し、以下をカスケードする（store.md「アクション仕様」）:
-   * - 常に item.lastDoneDate = doneDate（screen-design/07-record-modal.md 副作用2。decisions.md D-015）
+   * - 常に inspectionItem.lastDoneDate = doneDate（screen-design/07-record-modal.md 副作用2。decisions.md D-015）
    * - result !== 'fail': nextDueDate = addCycle(doneDate, cycle)
    * - result === 'fail': 次回期限のみ据え置き（domain-model.md §3.5）
    * - orderId 指定時: 対象 CalibrationOrder を completed に遷移（domain-model.md §3.6）
    *
    * 原子性優先で、以下は記録追加ごと no-op（decisions.md D-005）:
-   * - itemId が存在しない / doneDate から次回期限を計算できない
+   * - inspectionItemId が存在しない / doneDate から次回期限を計算できない
    * - orderId の案件が存在しない、または completed へ遷移不可（returned 以外）
    *
    * @returns 生成した記録のid。no-op 時は null
@@ -35,12 +35,12 @@ export const createInspectionRecordSlice: AppSliceCreator<InspectionRecordSlice>
   records: {},
 
   addRecord: (input): string | null => {
-    const { items, orders } = get();
-    const item = recordValue(items, input.itemId);
-    if (!item) return null;
+    const { inspectionItems, orders } = get();
+    const inspectionItem = recordValue(inspectionItems, input.inspectionItemId);
+    if (!inspectionItem) return null;
 
     const shouldAdvanceDueDate = input.result !== RECORD_RESULT.FAIL;
-    const nextDueDate = shouldAdvanceDueDate ? addCycle(input.doneDate, item.cycle) : null;
+    const nextDueDate = shouldAdvanceDueDate ? addCycle(input.doneDate, inspectionItem.cycle) : null;
     if (shouldAdvanceDueDate && nextDueDate === null) return null;
 
     if (input.orderId !== undefined) {
@@ -51,10 +51,10 @@ export const createInspectionRecordSlice: AppSliceCreator<InspectionRecordSlice>
     const id = createId();
     set((state) => {
       state.records[id] = { ...input, id };
-      const draftItem = state.items[input.itemId];
-      if (draftItem) {
-        draftItem.lastDoneDate = input.doneDate;
-        if (nextDueDate !== null) draftItem.nextDueDate = nextDueDate;
+      const draftInspectionItem = state.inspectionItems[input.inspectionItemId];
+      if (draftInspectionItem) {
+        draftInspectionItem.lastDoneDate = input.doneDate;
+        if (nextDueDate !== null) draftInspectionItem.nextDueDate = nextDueDate;
       }
       if (input.orderId !== undefined) {
         const draftOrder = state.orders[input.orderId];

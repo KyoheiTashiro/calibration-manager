@@ -1,11 +1,11 @@
 /**
- * ItemList: 行アクションからのモーダル起動結節点の検証(screen-design/05-item-list.md「操作」)。
- * [記録]→RecordModal / [案件]→OrderModal / [編集]→ItemModal が正しい対象で開くことを確認する。
+ * InspectionItemList: 行アクションからのモーダル起動結節点の検証(screen-design/05-inspection-item-list.md「操作」)。
+ * [記録]→RecordModal / [案件]→OrderModal / [編集]→InspectionItemModal が正しい対象で開くことを確認する。
  * モーダル内部の入力・検証は各モーダルの単体テストの責務。
  */
 
-import { ItemList } from "@/features/items";
-import { itemExternalOverdue, seedItemList } from "@/features/items/itemListFixtures";
+import { InspectionItemList } from "@/features/inspectionItems";
+import { inspectionItemExternalOverdue, seedInspectionItemList } from "@/features/inspectionItems/inspectionItemListFixtures";
 import { renderWithStore, setupStoreIsolation } from "@/test/renderWithStore";
 import { screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -13,7 +13,7 @@ import "@testing-library/jest-dom/vitest";
 import { beforeEach, describe, expect, it } from "vitest";
 
 const renderList = (): ReturnType<typeof renderWithStore> =>
-  renderWithStore(<ItemList />, { initialEntries: ["/items"] });
+  renderWithStore(<InspectionItemList />, { initialEntries: ["/inspection-items"] });
 
 /** モーダルタイトルから dialog を特定し、開いていることを検証して返す */
 const getOpenDialog = (title: string): HTMLElement => {
@@ -33,10 +33,10 @@ const clickRowAction = async (buttonName: string): Promise<void> => {
 
 beforeEach(() => {
   setupStoreIsolation();
-  seedItemList();
+  seedInspectionItemList();
 });
 
-describe("ItemList: モーダル起動", () => {
+describe("InspectionItemList: モーダル起動", () => {
   // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("[記録]で対象項目の RecordModal が開く", async () => {
     renderList();
@@ -56,13 +56,13 @@ describe("ItemList: モーダル起動", () => {
   });
 
   // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
-  it("[編集]で対象項目がプリフィルされた ItemModal が開く", async () => {
+  it("[編集]で対象項目がプリフィルされた InspectionItemModal が開く", async () => {
     renderList();
     await clickRowAction("編集");
 
     const dialogElement = getOpenDialog("点検校正項目を編集");
     expect(within(dialogElement).getByLabelText("項目名", { exact: false })).toHaveValue(
-      itemExternalOverdue.name,
+      inspectionItemExternalOverdue.name,
     );
   });
 

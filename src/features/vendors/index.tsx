@@ -25,10 +25,10 @@ const CALIBRATOR_BADGE_CLASS_NAME = "bg-emerald-100 text-emerald-800 border bord
 
 /** 参照されている Vendor は削除ガード対象（store の removeVendor と同じ判定条件） */
 const isVendorReferenced = (vendorId: string): boolean => {
-  const { equipment, items, orders } = useAppStore.getState();
+  const { equipment, inspectionItems, orders } = useAppStore.getState();
   return (
     Object.values(equipment).some((entry) => entry.manufacturerId === vendorId) ||
-    Object.values(items).some((entry) => entry.vendorId === vendorId) ||
+    Object.values(inspectionItems).some((entry) => entry.vendorId === vendorId) ||
     Object.values(orders).some((entry) => entry.vendorId === vendorId)
   );
 };

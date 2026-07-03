@@ -1,5 +1,5 @@
 /**
- * 開発用シードデータ（トランザクション系: items/records/orders）。
+ * 開発用シードデータ（トランザクション系: inspectionItems/records/orders）。
  * today からの相対日付で構成するため、today を引数に取る関数として提供する
  * （src/dev/seed.ts から呼び出される）。
  */
@@ -12,17 +12,17 @@ import {
   type InspectionItem,
   type InspectionRecord,
   type IsoDateString,
-  ITEM_TYPE,
+  INSPECTION_ITEM_TYPE,
   ORDER_STATUS,
   RECORD_RESULT,
 } from "@/store/types";
 import { addDays } from "@/utils/time";
 
-export const buildSeedItems = (today: IsoDateString): Record<string, InspectionItem> => ({
+export const buildSeedInspectionItems = (today: IsoDateString): Record<string, InspectionItem> => ({
   "seed-item-overdue": {
     id: "seed-item-overdue",
     equipmentId: "seed-equipment-001",
-    type: ITEM_TYPE.INSPECTION,
+    type: INSPECTION_ITEM_TYPE.INSPECTION,
     execution: EXECUTION.INTERNAL,
     name: "絶縁抵抗点検",
     cycle: CYCLE.Y1,
@@ -36,7 +36,7 @@ export const buildSeedItems = (today: IsoDateString): Record<string, InspectionI
   "seed-item-order-now": {
     id: "seed-item-order-now",
     equipmentId: "seed-equipment-002",
-    type: ITEM_TYPE.CALIBRATION,
+    type: INSPECTION_ITEM_TYPE.CALIBRATION,
     execution: EXECUTION.EXTERNAL,
     name: "トルク校正",
     cycle: CYCLE.Y1,
@@ -53,7 +53,7 @@ export const buildSeedItems = (today: IsoDateString): Record<string, InspectionI
   "seed-item-in-progress": {
     id: "seed-item-in-progress",
     equipmentId: "seed-equipment-003",
-    type: ITEM_TYPE.CALIBRATION,
+    type: INSPECTION_ITEM_TYPE.CALIBRATION,
     execution: EXECUTION.EXTERNAL,
     name: "寸法校正",
     cycle: CYCLE.Y1,
@@ -67,7 +67,7 @@ export const buildSeedItems = (today: IsoDateString): Record<string, InspectionI
   "seed-item-due-soon": {
     id: "seed-item-due-soon",
     equipmentId: "seed-equipment-001",
-    type: ITEM_TYPE.INSPECTION,
+    type: INSPECTION_ITEM_TYPE.INSPECTION,
     execution: EXECUTION.INTERNAL,
     name: "動作点検",
     cycle: CYCLE.M6,
@@ -81,7 +81,7 @@ export const buildSeedItems = (today: IsoDateString): Record<string, InspectionI
   "seed-item-ok": {
     id: "seed-item-ok",
     equipmentId: "seed-equipment-004",
-    type: ITEM_TYPE.INSPECTION,
+    type: INSPECTION_ITEM_TYPE.INSPECTION,
     execution: EXECUTION.INTERNAL,
     name: "定期点検",
     cycle: CYCLE.Y1,
@@ -95,7 +95,7 @@ export const buildSeedItems = (today: IsoDateString): Record<string, InspectionI
   "seed-item-ok-external": {
     id: "seed-item-ok-external",
     equipmentId: "seed-equipment-004",
-    type: ITEM_TYPE.CALIBRATION,
+    type: INSPECTION_ITEM_TYPE.CALIBRATION,
     execution: EXECUTION.EXTERNAL,
     name: "圧力校正",
     cycle: CYCLE.Y1,
@@ -110,7 +110,7 @@ export const buildSeedItems = (today: IsoDateString): Record<string, InspectionI
   "seed-item-inactive": {
     id: "seed-item-inactive",
     equipmentId: "seed-equipment-002",
-    type: ITEM_TYPE.INSPECTION,
+    type: INSPECTION_ITEM_TYPE.INSPECTION,
     execution: EXECUTION.INTERNAL,
     name: "旧点検項目",
     cycle: CYCLE.M6,
@@ -123,7 +123,7 @@ export const buildSeedItems = (today: IsoDateString): Record<string, InspectionI
   "seed-item-suspended-eq": {
     id: "seed-item-suspended-eq",
     equipmentId: "seed-equipment-005",
-    type: ITEM_TYPE.CALIBRATION,
+    type: INSPECTION_ITEM_TYPE.CALIBRATION,
     execution: EXECUTION.EXTERNAL,
     name: "秤量校正",
     cycle: CYCLE.Y1,
@@ -139,7 +139,7 @@ export const buildSeedItems = (today: IsoDateString): Record<string, InspectionI
 export const buildSeedRecords = (today: IsoDateString): Record<string, InspectionRecord> => ({
   "seed-record-overdue-pass": {
     id: "seed-record-overdue-pass",
-    itemId: "seed-item-overdue",
+    inspectionItemId: "seed-item-overdue",
     doneDate: addDays(today, -375) ?? today,
     doneBy: "佐藤 由紀子",
     result: RECORD_RESULT.PASS,
@@ -147,7 +147,7 @@ export const buildSeedRecords = (today: IsoDateString): Record<string, Inspectio
   },
   "seed-record-overdue-fail": {
     id: "seed-record-overdue-fail",
-    itemId: "seed-item-overdue",
+    inspectionItemId: "seed-item-overdue",
     doneDate: addDays(today, -740) ?? today,
     doneBy: "佐藤 由紀子",
     result: RECORD_RESULT.FAIL,
@@ -155,14 +155,14 @@ export const buildSeedRecords = (today: IsoDateString): Record<string, Inspectio
   },
   "seed-record-due-soon": {
     id: "seed-record-due-soon",
-    itemId: "seed-item-due-soon",
+    inspectionItemId: "seed-item-due-soon",
     doneDate: addDays(today, -173) ?? today,
     doneBy: "佐藤 由紀子",
     result: RECORD_RESULT.PASS,
   },
   "seed-record-ok": {
     id: "seed-record-ok",
-    itemId: "seed-item-ok",
+    inspectionItemId: "seed-item-ok",
     doneDate: addDays(today, -185) ?? today,
     doneBy: "鈴木 健太",
     result: RECORD_RESULT.ADJUSTED,
@@ -170,7 +170,7 @@ export const buildSeedRecords = (today: IsoDateString): Record<string, Inspectio
   },
   "seed-record-order-now-completed": {
     id: "seed-record-order-now-completed",
-    itemId: "seed-item-order-now",
+    inspectionItemId: "seed-item-order-now",
     doneDate: addDays(today, -345) ?? today,
     doneBy: "東京計測サービス",
     result: RECORD_RESULT.PASS,
@@ -181,7 +181,7 @@ export const buildSeedRecords = (today: IsoDateString): Record<string, Inspectio
 export const buildSeedOrders = (today: IsoDateString): Record<string, CalibrationOrder> => ({
   "seed-order-in-calib": {
     id: "seed-order-in-calib",
-    itemId: "seed-item-in-progress",
+    inspectionItemId: "seed-item-in-progress",
     vendorId: "seed-vendor-osaka",
     status: ORDER_STATUS.IN_CALIBRATION,
     orderedDate: addDays(today, -5) ?? today,
@@ -189,13 +189,13 @@ export const buildSeedOrders = (today: IsoDateString): Record<string, Calibratio
   },
   "seed-order-planned": {
     id: "seed-order-planned",
-    itemId: "seed-item-ok-external",
+    inspectionItemId: "seed-item-ok-external",
     vendorId: "seed-vendor-both",
     status: ORDER_STATUS.PLANNED,
   },
   "seed-order-returned": {
     id: "seed-order-returned",
-    itemId: "seed-item-suspended-eq",
+    inspectionItemId: "seed-item-suspended-eq",
     vendorId: "seed-vendor-tokyo",
     status: ORDER_STATUS.RETURNED,
     orderedDate: addDays(today, -20) ?? today,
@@ -204,7 +204,7 @@ export const buildSeedOrders = (today: IsoDateString): Record<string, Calibratio
   },
   "seed-order-completed": {
     id: "seed-order-completed",
-    itemId: "seed-item-order-now",
+    inspectionItemId: "seed-item-order-now",
     vendorId: "seed-vendor-tokyo",
     status: ORDER_STATUS.COMPLETED,
     orderedDate: addDays(today, -380) ?? today,
@@ -214,7 +214,7 @@ export const buildSeedOrders = (today: IsoDateString): Record<string, Calibratio
   },
   "seed-order-cancelled": {
     id: "seed-order-cancelled",
-    itemId: "seed-item-in-progress",
+    inspectionItemId: "seed-item-in-progress",
     vendorId: "seed-vendor-osaka",
     status: ORDER_STATUS.CANCELLED,
     orderedDate: addDays(today, -40) ?? today,

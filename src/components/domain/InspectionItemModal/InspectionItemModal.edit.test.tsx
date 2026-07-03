@@ -1,20 +1,20 @@
 /**
- * ItemModal: 編集モード・D-012（無効担当者の扱い）・空状態の検証（screen-design/06-item-modal.md）。
- * 新規追加モードは ItemModal.test.tsx を参照（ファイル分割は eslint(max-lines) の300行上限に
+ * InspectionItemModal: 編集モード・D-012（無効担当者の扱い）・空状態の検証（screen-design/06-inspection-item-modal.md）。
+ * 新規追加モードは InspectionItemModal.test.tsx を参照（ファイル分割は eslint(max-lines) の300行上限に
  * 収めるための実装判断。テストケース数が仕様上多いため）。
  */
 
-import { ItemModal } from "@/components/domain/ItemModal";
+import { InspectionItemModal } from "@/components/domain/InspectionItemModal";
 import {
   activePerson,
   anotherInactivePerson,
   calibratorVendor,
   equipment,
-  existingItem,
+  existingInspectionItem,
   inactivePerson,
   manufacturerOnlyVendor,
   seedBaseMasters,
-} from "@/components/domain/ItemModal/itemModalFixtures";
+} from "@/components/domain/InspectionItemModal/inspectionItemModalFixtures";
 import { EXECUTION, type InspectionItem } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
 import { renderWithStore, seedStore, setupStoreIsolation } from "@/test/renderWithStore";
@@ -25,12 +25,12 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 beforeEach(setupStoreIsolation);
 
-describe("ItemModal: 編集", () => {
+describe("InspectionItemModal: 編集", () => {
   it("既存値がプリフィルされる", () => {
     seedBaseMasters();
-    seedStore({ items: { [existingItem.id]: existingItem } });
+    seedStore({ inspectionItems: { [existingInspectionItem.id]: existingInspectionItem } });
     renderWithStore(
-      <ItemModal open equipmentId={equipment.id} item={existingItem} onClose={vi.fn()} />,
+      <InspectionItemModal open equipmentId={equipment.id} inspectionItem={existingInspectionItem} onClose={vi.fn()} />,
     );
 
     expect(screen.getByText("点検校正項目を編集")).toBeInTheDocument();
@@ -50,13 +50,13 @@ describe("ItemModal: 編集", () => {
   });
 
   // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
-  it("変更して保存するとupdateItemが反映され、lastDoneDateは据え置かれる", async () => {
+  it("変更して保存するとupdateInspectionItemが反映され、lastDoneDateは据え置かれる", async () => {
     seedBaseMasters();
-    seedStore({ items: { [existingItem.id]: existingItem } });
+    seedStore({ inspectionItems: { [existingInspectionItem.id]: existingInspectionItem } });
     const user = userEvent.setup();
     const onClose = vi.fn();
     renderWithStore(
-      <ItemModal open equipmentId={equipment.id} item={existingItem} onClose={onClose} />,
+      <InspectionItemModal open equipmentId={equipment.id} inspectionItem={existingInspectionItem} onClose={onClose} />,
     );
 
     const nameField = screen.getByLabelText("項目名", { exact: false });
@@ -64,7 +64,7 @@ describe("ItemModal: 編集", () => {
     await user.type(nameField, "更新後の項目名");
     await user.click(screen.getByRole("button", { name: "保存" }));
 
-    expect(useAppStore.getState().items[existingItem.id]).toMatchObject({
+    expect(useAppStore.getState().inspectionItems[existingInspectionItem.id]).toMatchObject({
       name: "更新後の項目名",
       lastDoneDate: "2025-06-01",
     });
@@ -74,16 +74,16 @@ describe("ItemModal: 編集", () => {
   // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("外部から内部へ切り替えて保存するとvendorId/leadTimeDaysが明示的にundefinedへ更新される", async () => {
     seedBaseMasters();
-    seedStore({ items: { [existingItem.id]: existingItem } });
+    seedStore({ inspectionItems: { [existingInspectionItem.id]: existingInspectionItem } });
     const user = userEvent.setup();
     renderWithStore(
-      <ItemModal open equipmentId={equipment.id} item={existingItem} onClose={vi.fn()} />,
+      <InspectionItemModal open equipmentId={equipment.id} inspectionItem={existingInspectionItem} onClose={vi.fn()} />,
     );
 
     await user.click(screen.getByLabelText("内部"));
     await user.click(screen.getByRole("button", { name: "保存" }));
 
-    expect(useAppStore.getState().items[existingItem.id]).toMatchObject({
+    expect(useAppStore.getState().inspectionItems[existingInspectionItem.id]).toMatchObject({
       execution: EXECUTION.INTERNAL,
       vendorId: undefined,
       leadTimeDays: undefined,
@@ -99,11 +99,11 @@ describe("ItemModal: 編集", () => {
         [anotherInactivePerson.id]: anotherInactivePerson,
       },
     });
-    const itemWithInactivePerson: InspectionItem = { ...existingItem, personId: inactivePerson.id };
-    seedStore({ items: { [itemWithInactivePerson.id]: itemWithInactivePerson } });
+    const inspectionItemWithInactivePerson: InspectionItem = { ...existingInspectionItem, personId: inactivePerson.id };
+    seedStore({ inspectionItems: { [inspectionItemWithInactivePerson.id]: inspectionItemWithInactivePerson } });
 
     renderWithStore(
-      <ItemModal open equipmentId={equipment.id} item={itemWithInactivePerson} onClose={vi.fn()} />,
+      <InspectionItemModal open equipmentId={equipment.id} inspectionItem={inspectionItemWithInactivePerson} onClose={vi.fn()} />,
     );
 
     const personSelect = screen.getByLabelText("担当者", { exact: false });
@@ -114,7 +114,7 @@ describe("ItemModal: 編集", () => {
   });
 });
 
-describe("ItemModal: 空状態", () => {
+describe("InspectionItemModal: 空状態", () => {
   // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("外部選択時にisCalibrator=trueのVendorが0件だと文言とVendorList導線が表示される", async () => {
     seedStore({
@@ -123,7 +123,7 @@ describe("ItemModal: 空状態", () => {
       persons: { [activePerson.id]: activePerson },
     });
     const user = userEvent.setup();
-    renderWithStore(<ItemModal open equipmentId={equipment.id} onClose={vi.fn()} />);
+    renderWithStore(<InspectionItemModal open equipmentId={equipment.id} onClose={vi.fn()} />);
 
     await user.click(screen.getByLabelText("外部"));
 
@@ -138,7 +138,7 @@ describe("ItemModal: 空状態", () => {
       vendors: { [calibratorVendor.id]: calibratorVendor },
       persons: {},
     });
-    renderWithStore(<ItemModal open equipmentId={equipment.id} onClose={vi.fn()} />);
+    renderWithStore(<InspectionItemModal open equipmentId={equipment.id} onClose={vi.fn()} />);
 
     expect(screen.getByText("有効な担当者がいません")).toBeInTheDocument();
     const personLink = screen.getByRole("link", { name: "担当者マスタへ" });

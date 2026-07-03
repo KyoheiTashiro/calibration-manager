@@ -21,13 +21,13 @@ import { Link } from "react-router-dom";
 type Props = {
   open: boolean;
   /** 対象項目。起動元で常に確定した状態で渡す（外部項目のみが起動対象） */
-  itemId: string;
+  inspectionItemId: string;
   onClose: () => void;
 };
 
-export const OrderModal = ({ open, itemId, onClose }: Props): ReactElement => {
-  const item = useAppStore((state) => state.items[itemId]);
-  const equipment = useAppStore((state) => (item ? state.equipment[item.equipmentId] : undefined));
+export const OrderModal = ({ open, inspectionItemId, onClose }: Props): ReactElement => {
+  const inspectionItem = useAppStore((state) => state.inspectionItems[inspectionItemId]);
+  const equipment = useAppStore((state) => (inspectionItem ? state.equipment[inspectionItem.equipmentId] : undefined));
   const vendors = useAppStore((state) => state.vendors);
   const addOrder = useAppStore((state) => state.addOrder);
 
@@ -43,17 +43,17 @@ export const OrderModal = ({ open, itemId, onClose }: Props): ReactElement => {
     defaultValues: defaultOrderFormValues,
   });
 
-  const presetVendorId = item?.vendorId;
+  const presetVendorId = inspectionItem?.vendorId;
   const defaultVendorId =
     presetVendorId !== undefined && vendors[presetVendorId]?.isCalibrator ? presetVendorId : "";
 
-  // なぜ: open/itemId変更のたびに既定値をプリフィルする（screen-design/README.md §0.5、ItemModal と同パターン）。
+  // なぜ: open/inspectionItemId変更のたびに既定値をプリフィルする（screen-design/README.md §0.5、InspectionItemModal と同パターン）。
   // なぜ submitFailed をここでリセットしないか: react-compiler(EffectSetState)がeffect内での
   // 同期setStateを禁則とするため、RecordModal.tsxと同じ方針でイベントハンドラ側（onSubmit）に
   // 一本化し、再送信のたびに最新の結果へ更新する。
   useEffect(() => {
     reset({ ...defaultOrderFormValues, vendorId: defaultVendorId });
-  }, [open, itemId, defaultVendorId, reset]);
+  }, [open, inspectionItemId, defaultVendorId, reset]);
 
   const calibratorVendors = Object.values(vendors).filter((vendor) => vendor.isCalibrator);
   const vendorOptions = calibratorVendors.map((vendor) => ({
@@ -62,8 +62,8 @@ export const OrderModal = ({ open, itemId, onClose }: Props): ReactElement => {
   }));
 
   const targetLabel =
-    item && equipment
-      ? `対象:${equipment.managementNo} ${equipment.name} / ${item.name}`
+    inspectionItem && equipment
+      ? `対象:${equipment.managementNo} ${equipment.name} / ${inspectionItem.name}`
       : "対象:(項目情報が見つかりません)";
 
   // なぜ: submitFailed を閉時にリセットし、同一対象で開き直した際の残留エラー表示を防ぐ
@@ -75,7 +75,7 @@ export const OrderModal = ({ open, itemId, onClose }: Props): ReactElement => {
 
   const onSubmit = (values: OrderFormValues): void => {
     const orderId = addOrder({
-      itemId,
+      inspectionItemId,
       vendorId: values.vendorId,
       dueDate: values.dueDate || undefined,
       cost: values.cost ? Number(values.cost) : undefined,
@@ -110,7 +110,7 @@ export const OrderModal = ({ open, itemId, onClose }: Props): ReactElement => {
             </span>
             <p className="text-sm text-slate-600">
               校正業者が未登録です
-              {/* oxlint-disable-next-line react/forbid-component-props -- Linkはclassnameでリンク色を渡す設計（ItemModal.tsxと同様） */}
+              {/* oxlint-disable-next-line react/forbid-component-props -- Linkはclassnameでリンク色を渡す設計（InspectionItemModal.tsxと同様） */}
               <Link to={ROUTES.VENDOR_LIST} className="text-primary ml-1 underline">
                 メーカー/取引先マスタへ
               </Link>

@@ -1,5 +1,5 @@
 /**
- * ItemModal のフォームスキーマ（RHF + zodResolver 用、screen-design/06-item-modal.md）。
+ * InspectionItemModal のフォームスキーマ（RHF + zodResolver 用、screen-design/06-inspection-item-modal.md）。
  * 入力体験向けの厳密検証（0以上の整数・日付形式等）はここで担う。
  * 永続化データの構造検証は `src/store/schema.ts` の inspectionItemSchema が別途担う（coding-standards.md §3）。
  *
@@ -10,7 +10,7 @@
  */
 
 import { DEFAULT_BUFFER_DAYS, DEFAULT_NOTICE_DAYS_BEFORE } from "@/domain/constants";
-import { CYCLE, EXECUTION, ITEM_TYPE } from "@/store/types";
+import { CYCLE, EXECUTION, INSPECTION_ITEM_TYPE } from "@/store/types";
 import { isIsoDateString } from "@/utils/time";
 import { z } from "zod";
 
@@ -36,10 +36,10 @@ const optionalNonNegativeIntegerString = (invalidMessage: string) =>
       message: invalidMessage,
     });
 
-export const itemFormSchema = z
+export const inspectionItemFormSchema = z
   .object({
     name: z.string().min(1, "項目名は必須です"),
-    type: z.enum(ITEM_TYPE),
+    type: z.enum(INSPECTION_ITEM_TYPE),
     cycle: z.enum(CYCLE),
     execution: z.enum(EXECUTION),
     vendorId: z.string().optional(),
@@ -59,7 +59,7 @@ export const itemFormSchema = z
       .refine(isIsoDateString, { message: "次回期限の形式が不正です" }),
     isActive: z.boolean(),
   })
-  // なぜ superRefine か: 「external の場合 vendorId 必須」（06-item-modal.md）は
+  // なぜ superRefine か: 「external の場合 vendorId 必須」（06-inspection-item-modal.md）は
   // 型では表現していない相関制約のため、スキーマ側で強制する（store/schema.ts の
   // inspectionItemSchema と同方針）。
   .superRefine((values, context) => {
@@ -72,12 +72,12 @@ export const itemFormSchema = z
     }
   });
 
-export type ItemFormValues = z.infer<typeof itemFormSchema>;
+export type InspectionItemFormValues = z.infer<typeof inspectionItemFormSchema>;
 
-/** 新規追加時の既定フォーム値（06-item-modal.md「新規フォーム既定値」） */
-export const defaultItemFormValues: ItemFormValues = {
+/** 新規追加時の既定フォーム値（06-inspection-item-modal.md「新規フォーム既定値」） */
+export const defaultInspectionItemFormValues: InspectionItemFormValues = {
   name: "",
-  type: ITEM_TYPE.INSPECTION,
+  type: INSPECTION_ITEM_TYPE.INSPECTION,
   cycle: CYCLE.Y1,
   execution: EXECUTION.INTERNAL,
   vendorId: "",

@@ -1,19 +1,19 @@
 /**
- * ItemList: テーブル描画の検証(screen-design/05-item-list.md「表示項目」)。
+ * InspectionItemList: テーブル描画の検証(screen-design/05-inspection-item-list.md「表示項目」)。
  * 列内容・nextDueDate 昇順・「—」表示・対象除外(非稼働機器/無効項目)・
  * 「案件」ボタンの出し分け(canCreateOrder)・空状態を確認する。
  * ステータス導出は todayIsoDate() 依存だが、フィクスチャの nextDueDate を極端値にして決定的にする。
  */
 
-import { ItemList } from "@/features/items";
-import { personSato, personSuzuki, seedItemList } from "@/features/items/itemListFixtures";
+import { InspectionItemList } from "@/features/inspectionItems";
+import { personSato, personSuzuki, seedInspectionItemList } from "@/features/inspectionItems/inspectionItemListFixtures";
 import { renderWithStore, setupStoreIsolation } from "@/test/renderWithStore";
 import { screen, within } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
 import { beforeEach, describe, expect, it } from "vitest";
 
 const renderList = (search = ""): ReturnType<typeof renderWithStore> =>
-  renderWithStore(<ItemList />, { initialEntries: [`/items${search}`] });
+  renderWithStore(<InspectionItemList />, { initialEntries: [`/inspection-items${search}`] });
 
 /** ヘッダ行を除いたデータ行(tbody)を返す */
 const getBodyRows = (): HTMLElement[] => screen.getAllByRole("row").slice(1);
@@ -22,9 +22,9 @@ beforeEach(() => {
   setupStoreIsolation();
 });
 
-describe("ItemList: テーブル描画", () => {
+describe("InspectionItemList: テーブル描画", () => {
   it("対象項目を nextDueDate 昇順で表示し、管理番号・機器名・担当ラベルを描画する", () => {
-    seedItemList();
+    seedInspectionItemList();
     renderList();
 
     const rows = getBodyRows();
@@ -41,7 +41,7 @@ describe("ItemList: テーブル描画", () => {
   });
 
   it("lastDoneDate 未設定・内部項目の発注推奨日は「—」を表示する(1行に2箇所)", () => {
-    seedItemList();
+    seedInspectionItemList();
     renderList();
 
     const okRow = screen.getByRole("row", { name: /月次点検/u });
@@ -50,7 +50,7 @@ describe("ItemList: テーブル描画", () => {
   });
 
   it("非稼働機器の項目・isActive=false の項目は表示しない", () => {
-    seedItemList();
+    seedInspectionItemList();
     renderList();
 
     expect(screen.queryByText("廃止項目")).not.toBeInTheDocument();
@@ -58,7 +58,7 @@ describe("ItemList: テーブル描画", () => {
   });
 
   it("「案件」ボタンは canCreateOrder=true の行だけに出す", () => {
-    seedItemList();
+    seedInspectionItemList();
     renderList();
 
     // 外部・有効案件なし → 表示
@@ -75,7 +75,7 @@ describe("ItemList: テーブル描画", () => {
   });
 
   it("表示対象が0件なら「表示できる項目がありません」を出す", () => {
-    // seed しない = items 空
+    // seed しない = inspectionItems 空
     renderList();
 
     expect(screen.getByText("表示できる項目がありません")).toBeInTheDocument();
@@ -83,7 +83,7 @@ describe("ItemList: テーブル描画", () => {
   });
 
   it("対象はあるが絞り込み0件なら「条件に一致する項目がありません」+クリアを出す", () => {
-    seedItemList();
+    seedInspectionItemList();
     // 鈴木(無効)担当の可視項目は無い → filtered 0
     renderList(`?personId=${personSuzuki.id}`);
 

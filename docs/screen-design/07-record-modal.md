@@ -4,7 +4,7 @@
 
 **目的**: 項目の実施結果(InspectionRecord)を登録し、次回期限を更新する。
 
-**起動元**: [機器詳細](./04-equipment-detail.md)、[項目一覧](./05-item-list.md)、[外部校正案件一覧](./08-orders.md)の `returned` カード
+**起動元**: [機器詳細](./04-equipment-detail.md)、[項目一覧](./05-inspection-item-list.md)、[外部校正案件一覧](./08-orders.md)の `returned` カード
 
 ## 画面レイアウト
 
@@ -25,7 +25,7 @@
 
 | フィールド | 属性     | 必須 | 形式                                                      |
 | ---------- | -------- | ---- | --------------------------------------------------------- |
-| 対象項目   | itemId   | ○    | 起動元からプリセット・固定表示                            |
+| 対象項目   | inspectionItemId   | ○    | 起動元からプリセット・固定表示                            |
 | 実施日     | doneDate | ○    | 日付。既定=今日                                           |
 | 実施者     | doneBy   | ○    | テキスト(外部は業者名。可能なら Vendor.name をプリフィル) |
 | 結果       | result   | ○    | pass/fail/adjusted                                        |
@@ -37,8 +37,8 @@
 登録時の副作用を以下に明記する(ドメインモデル §3.5 / §4.1):
 
 1. InspectionRecord を新規作成。
-2. `item.lastDoneDate = doneDate`。
-3. **`result` が `pass` または `adjusted` のとき**: `item.nextDueDate = doneDate + cycle`(暦月ベース [§0.4](./README.md#04-日付表示形式))。
+2. `inspectionItem.lastDoneDate = doneDate`。
+3. **`result` が `pass` または `adjusted` のとき**: `inspectionItem.nextDueDate = doneDate + cycle`(暦月ベース [§0.4](./README.md#04-日付表示形式))。
 4. **`result` が `fail` のとき**: `nextDueDate` を更新せず、項目は要対応状態(再実施が必要)として扱う。※期限が過ぎていれば `overdue` のまま表示。
 5. **外部校正案件(status=`returned`)から起動した場合**: `orderId` を記録に紐付け、当該 CalibrationOrder を `completed` へ遷移(§3.6)。
 

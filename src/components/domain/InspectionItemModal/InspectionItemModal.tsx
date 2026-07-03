@@ -1,15 +1,15 @@
 /**
- * 点検校正項目（InspectionItem）の追加・編集モーダル（screen-design/06-item-modal.md）。RHF + zodResolver。
+ * 点検校正項目（InspectionItem）の追加・編集モーダル（screen-design/06-inspection-item-modal.md）。RHF + zodResolver。
  */
 
 import {
-  defaultItemFormValues,
-  itemFormSchema,
-  type ItemFormValues,
-} from "@/components/domain/ItemModal/schema";
+  defaultInspectionItemFormValues,
+  inspectionItemFormSchema,
+  type InspectionItemFormValues,
+} from "@/components/domain/InspectionItemModal/schema";
 import { Button, Checkbox, DateField, Modal, RadioGroup, Select, TextField } from "@/components/ui";
 import { ROUTES } from "@/constants/routes";
-import { CYCLE_OPTIONS, EXECUTION_OPTIONS, ITEM_TYPE_OPTIONS } from "@/features/items/constants";
+import { CYCLE_OPTIONS, EXECUTION_OPTIONS, INSPECTION_ITEM_TYPE_OPTIONS } from "@/features/inspectionItems/constants";
 import { EXECUTION, type InspectionItem } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -19,37 +19,37 @@ import { Link } from "react-router-dom";
 
 type Props = {
   open: boolean;
-  /** 起動元からプリセット(新規時のequipmentId。編集時はitem.equipmentIdと同値) */
+  /** 起動元からプリセット(新規時のequipmentId。編集時はinspectionItem.equipmentIdと同値) */
   equipmentId: string;
   /** 編集対象。undefinedなら新規モード */
-  item?: InspectionItem;
+  inspectionItem?: InspectionItem;
   onClose: () => void;
 };
 
 /** 既存 InspectionItem をフォーム値（すべて string ベース）へ変換する。新規時は既定値 */
-const toFormValues = (item: InspectionItem | undefined): ItemFormValues =>
-  item
+const toFormValues = (inspectionItem: InspectionItem | undefined): InspectionItemFormValues =>
+  inspectionItem
     ? {
-        name: item.name,
-        type: item.type,
-        cycle: item.cycle,
-        execution: item.execution,
-        vendorId: item.vendorId ?? "",
-        leadTimeDays: item.leadTimeDays?.toString() ?? "",
-        bufferDays: item.bufferDays.toString(),
-        personId: item.personId,
-        noticeDaysBefore: item.noticeDaysBefore.toString(),
-        nextDueDate: item.nextDueDate,
-        isActive: item.isActive,
+        name: inspectionItem.name,
+        type: inspectionItem.type,
+        cycle: inspectionItem.cycle,
+        execution: inspectionItem.execution,
+        vendorId: inspectionItem.vendorId ?? "",
+        leadTimeDays: inspectionItem.leadTimeDays?.toString() ?? "",
+        bufferDays: inspectionItem.bufferDays.toString(),
+        personId: inspectionItem.personId,
+        noticeDaysBefore: inspectionItem.noticeDaysBefore.toString(),
+        nextDueDate: inspectionItem.nextDueDate,
+        isActive: inspectionItem.isActive,
       }
-    : defaultItemFormValues;
+    : defaultInspectionItemFormValues;
 
-export const ItemModal = ({ open, equipmentId, item, onClose }: Props): ReactElement => {
+export const InspectionItemModal = ({ open, equipmentId, inspectionItem, onClose }: Props): ReactElement => {
   const equipment = useAppStore((state) => state.equipment[equipmentId]);
   const vendors = useAppStore((state) => state.vendors);
   const persons = useAppStore((state) => state.persons);
-  const addItem = useAppStore((state) => state.addItem);
-  const updateItem = useAppStore((state) => state.updateItem);
+  const addInspectionItem = useAppStore((state) => state.addInspectionItem);
+  const updateInspectionItem = useAppStore((state) => state.updateInspectionItem);
 
   const {
     register,
@@ -58,15 +58,15 @@ export const ItemModal = ({ open, equipmentId, item, onClose }: Props): ReactEle
     setValue,
     reset,
     formState: { errors, isDirty },
-  } = useForm<ItemFormValues>({
-    resolver: zodResolver(itemFormSchema),
-    defaultValues: toFormValues(item),
+  } = useForm<InspectionItemFormValues>({
+    resolver: zodResolver(inspectionItemFormSchema),
+    defaultValues: toFormValues(inspectionItem),
   });
 
-  // なぜ: open/item変更のたびに既存値をプリフィルする（screen-design/README.md §0.5）。
+  // なぜ: open/inspectionItem変更のたびに既存値をプリフィルする（screen-design/README.md §0.5）。
   useEffect(() => {
-    reset(toFormValues(item));
-  }, [open, item, reset]);
+    reset(toFormValues(inspectionItem));
+  }, [open, inspectionItem, reset]);
 
   // なぜ watch() ではなく useWatch か: VendorModal.tsx と同じ理由（react-compiler lint対策）。
   const execution = useWatch({ control, name: "execution" });
@@ -86,7 +86,7 @@ export const ItemModal = ({ open, equipmentId, item, onClose }: Props): ReactEle
   }));
 
   const activePersons = Object.values(persons).filter((person) => person.isActive);
-  const currentPerson = item ? persons[item.personId] : undefined;
+  const currentPerson = inspectionItem ? persons[inspectionItem.personId] : undefined;
   // なぜ: D-012。現担当が無効化済みの項目編集時のみ、選択肢末尾に「(無効)」付きで含める
   // （新規時はcurrentPerson===undefinedのため含まれない）。
   const currentPersonIsInactive = currentPerson !== undefined && !currentPerson.isActive;
@@ -101,7 +101,7 @@ export const ItemModal = ({ open, equipmentId, item, onClose }: Props): ReactEle
     ? `${equipment.managementNo} ${equipment.name}`
     : "(機器情報が見つかりません)";
 
-  const onSubmit = (values: ItemFormValues): void => {
+  const onSubmit = (values: InspectionItemFormValues): void => {
     const isExternal = values.execution === EXECUTION.EXTERNAL;
     const vendorId = isExternal && values.vendorId ? values.vendorId : undefined;
     const leadTimeDays =
@@ -109,8 +109,8 @@ export const ItemModal = ({ open, equipmentId, item, onClose }: Props): ReactEle
     const bufferDays = Number(values.bufferDays);
     const noticeDaysBefore = Number(values.noticeDaysBefore);
 
-    if (item) {
-      updateItem(item.id, {
+    if (inspectionItem) {
+      updateInspectionItem(inspectionItem.id, {
         equipmentId,
         type: values.type,
         name: values.name,
@@ -125,7 +125,7 @@ export const ItemModal = ({ open, equipmentId, item, onClose }: Props): ReactEle
         isActive: values.isActive,
       });
     } else {
-      addItem({
+      addInspectionItem({
         equipmentId,
         type: values.type,
         name: values.name,
@@ -147,7 +147,7 @@ export const ItemModal = ({ open, equipmentId, item, onClose }: Props): ReactEle
   return (
     <Modal
       open={open}
-      title={item ? "点検校正項目を編集" : "点検校正項目を追加"}
+      title={inspectionItem ? "点検校正項目を編集" : "点検校正項目を追加"}
       onClose={onClose}
       isDirty={isDirty}
       footer={
@@ -171,7 +171,7 @@ export const ItemModal = ({ open, equipmentId, item, onClose }: Props): ReactEle
         <RadioGroup
           label="種別"
           required
-          options={ITEM_TYPE_OPTIONS}
+          options={INSPECTION_ITEM_TYPE_OPTIONS}
           error={errors.type?.message}
           // oxlint-disable-next-line react/jsx-props-no-spreading -- register()のname/onChange/onBlur等を素通しするため必須
           {...register("type")}

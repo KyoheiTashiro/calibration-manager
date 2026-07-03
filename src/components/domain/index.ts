@@ -2,7 +2,7 @@
  * ドメイン固有複合UIコンポーネントの集約barrel（directory-structure.md）。
  */
 
-export { ItemModal } from "@/components/domain/ItemModal";
+export { InspectionItemModal } from "@/components/domain/InspectionItemModal";
 export { OrderModal } from "@/components/domain/OrderModal";
 export { PersonModal } from "@/components/domain/PersonModal";
 export { RecordModal } from "@/components/domain/RecordModal";

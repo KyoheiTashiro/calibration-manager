@@ -42,7 +42,7 @@
 
 ## 表示ルール・バリデーション(zod)
 
-- インポート各行を対応エンティティの zod スキーマで検証。必須列欠落・enum不正・日付形式(`YYYY-MM-DD`)不正・数値変換不可・ユニーク重複(managementNo 等)・参照先不存在(manufacturerId/personId/vendor/itemId 等)をエラーとして行単位で報告。
+- インポート各行を対応エンティティの zod スキーマで検証。必須列欠落・enum不正・日付形式(`YYYY-MM-DD`)不正・数値変換不可・ユニーク重複(managementNo 等)・参照先不存在(manufacturerId/personId/vendor/inspectionItemId 等)をエラーとして行単位で報告。
 - 検証を通った行のみ確定可能。1件もエラーがなければ確認後そのまま取り込み。
 
 ## 空状態

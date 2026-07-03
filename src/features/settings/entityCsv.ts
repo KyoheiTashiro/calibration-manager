@@ -24,7 +24,7 @@ export type CsvEntityKind = keyof AppState;
 /** インポート/エクスポート対象の種別一覧(§11 のボタン・セレクトの表示順) */
 export const CSV_ENTITY_KINDS = [
   "equipment",
-  "items",
+  "inspectionItems",
   "records",
   "orders",
   "vendors",
@@ -77,7 +77,7 @@ export const ENTITY_CSV_SPECS: { [Kind in CsvEntityKind]: EntityCsvSpec<Kind> } 
     schema: equipmentSchema,
     uniqueKeys: ["managementNo"],
   },
-  items: {
+  inspectionItems: {
     label: "項目",
     columns: [
       { key: "id", kind: CSV_COLUMN_KIND.STRING },
@@ -102,7 +102,7 @@ export const ENTITY_CSV_SPECS: { [Kind in CsvEntityKind]: EntityCsvSpec<Kind> } 
     label: "実施記録",
     columns: [
       { key: "id", kind: CSV_COLUMN_KIND.STRING },
-      { key: "itemId", kind: CSV_COLUMN_KIND.STRING },
+      { key: "inspectionItemId", kind: CSV_COLUMN_KIND.STRING },
       { key: "doneDate", kind: CSV_COLUMN_KIND.STRING },
       { key: "doneBy", kind: CSV_COLUMN_KIND.STRING },
       { key: "result", kind: CSV_COLUMN_KIND.STRING },
@@ -116,7 +116,7 @@ export const ENTITY_CSV_SPECS: { [Kind in CsvEntityKind]: EntityCsvSpec<Kind> } 
     label: "案件",
     columns: [
       { key: "id", kind: CSV_COLUMN_KIND.STRING },
-      { key: "itemId", kind: CSV_COLUMN_KIND.STRING },
+      { key: "inspectionItemId", kind: CSV_COLUMN_KIND.STRING },
       { key: "vendorId", kind: CSV_COLUMN_KIND.STRING },
       { key: "status", kind: CSV_COLUMN_KIND.STRING },
       { key: "orderedDate", kind: CSV_COLUMN_KIND.OPTIONAL_STRING },

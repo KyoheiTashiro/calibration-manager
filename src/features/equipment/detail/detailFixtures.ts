@@ -1,6 +1,6 @@
 /**
- * index.test.tsx / itemTable.test.tsx / history.test.tsx / modalLaunch.test.tsx で共有する
- * テスト用フィクスチャ。なぜ分割するか: ItemModal.test.tsx と同じ理由（itemModalFixtures.ts
+ * index.test.tsx / inspectionItemTable.test.tsx / history.test.tsx / modalLaunch.test.tsx で共有する
+ * テスト用フィクスチャ。なぜ分割するか: InspectionItemModal.test.tsx と同じ理由（inspectionItemModalFixtures.ts
  * 参照）で、全テストケースを1ファイルに収めると oxlint(max-lines) の300行上限を超過するため、
  * フィクスチャ部分をこのファイルへ切り出した。
  */
@@ -9,7 +9,7 @@ import {
   CYCLE,
   EQUIPMENT_STATUS,
   EXECUTION,
-  ITEM_TYPE,
+  INSPECTION_ITEM_TYPE,
   RECORD_RESULT,
   type Equipment,
   type InspectionItem,
@@ -78,10 +78,10 @@ export const inactivePerson: Person = {
 };
 
 /** 期限切れ(overdue)。nextDueDateを固定日にしてtodayIsoDate依存のflakinessを避ける */
-export const itemOverdue: InspectionItem = {
+export const inspectionItemOverdue: InspectionItem = {
   id: "item-overdue",
   equipmentId: equipmentFull.id,
-  type: ITEM_TYPE.INSPECTION,
+  type: INSPECTION_ITEM_TYPE.INSPECTION,
   name: "月次点検",
   cycle: CYCLE.M1,
   execution: EXECUTION.INTERNAL,
@@ -93,10 +93,10 @@ export const itemOverdue: InspectionItem = {
 };
 
 /** 期限に余裕がある(ok)項目。担当者を無効化済みpersonにして「(無効)」注記を検証する */
-export const itemOkInactivePerson: InspectionItem = {
+export const inspectionItemOkInactivePerson: InspectionItem = {
   id: "item-ok",
   equipmentId: equipmentFull.id,
-  type: ITEM_TYPE.INSPECTION,
+  type: INSPECTION_ITEM_TYPE.INSPECTION,
   name: "外観点検",
   cycle: CYCLE.M3,
   execution: EXECUTION.INTERNAL,
@@ -108,10 +108,10 @@ export const itemOkInactivePerson: InspectionItem = {
 };
 
 /** isActive=false の項目（末尾ソート・淡色表示を検証する） */
-export const itemDeactivated: InspectionItem = {
+export const inspectionItemDeactivated: InspectionItem = {
   id: "item-deactivated",
   equipmentId: equipmentFull.id,
-  type: ITEM_TYPE.INSPECTION,
+  type: INSPECTION_ITEM_TYPE.INSPECTION,
   name: "廃止予定項目",
   cycle: CYCLE.Y1,
   execution: EXECUTION.INTERNAL,
@@ -123,10 +123,10 @@ export const itemDeactivated: InspectionItem = {
 };
 
 /** 外部・校正の項目(種別/内外ラベル、実施履歴の項目横断マージ検証用) */
-export const itemExternal: InspectionItem = {
+export const inspectionItemExternal: InspectionItem = {
   id: "item-external",
   equipmentId: equipmentFull.id,
-  type: ITEM_TYPE.CALIBRATION,
+  type: INSPECTION_ITEM_TYPE.CALIBRATION,
   name: "年次校正",
   cycle: CYCLE.Y1,
   execution: EXECUTION.EXTERNAL,
@@ -140,10 +140,10 @@ export const itemExternal: InspectionItem = {
 };
 
 /** 休止機器(equipmentSuspended)配下の項目。期限切れだがD-014でバッジ非表示になることを検証する */
-export const itemOfSuspendedEquipment: InspectionItem = {
+export const inspectionItemOfSuspendedEquipment: InspectionItem = {
   id: "item-suspended",
   equipmentId: equipmentSuspended.id,
-  type: ITEM_TYPE.INSPECTION,
+  type: INSPECTION_ITEM_TYPE.INSPECTION,
   name: "定期点検",
   cycle: CYCLE.M6,
   execution: EXECUTION.INTERNAL,
@@ -155,25 +155,25 @@ export const itemOfSuspendedEquipment: InspectionItem = {
 };
 
 /** 同一doneDateのレコードを含め、id昇順タイブレークを検証する */
-export const recordOverdueItem: InspectionRecord = {
+export const recordOverdueInspectionItem: InspectionRecord = {
   id: "record-a",
-  itemId: itemOverdue.id,
+  inspectionItemId: inspectionItemOverdue.id,
   doneDate: "2026-06-25",
   doneBy: "鈴木",
   result: RECORD_RESULT.PASS,
 };
 
-export const recordExternalItemSameDay: InspectionRecord = {
+export const recordExternalInspectionItemSameDay: InspectionRecord = {
   id: "record-b",
-  itemId: itemExternal.id,
+  inspectionItemId: inspectionItemExternal.id,
   doneDate: "2026-06-25",
   doneBy: "田中",
   result: RECORD_RESULT.FAIL,
 };
 
-export const recordExternalItemOlder: InspectionRecord = {
+export const recordExternalInspectionItemOlder: InspectionRecord = {
   id: "record-c",
-  itemId: itemExternal.id,
+  inspectionItemId: inspectionItemExternal.id,
   doneDate: "2025-06-18",
   doneBy: "ミツトヨ校正センター",
   result: RECORD_RESULT.ADJUSTED,
@@ -196,18 +196,18 @@ export const seedEquipmentFullMasters = (): void => {
 };
 
 /** equipmentFull配下の全項目・全実施履歴をストアへ投入する */
-export const seedEquipmentFullItemsAndRecords = (): void => {
+export const seedEquipmentFullInspectionItemsAndRecords = (): void => {
   seedStore({
-    items: {
-      [itemOverdue.id]: itemOverdue,
-      [itemOkInactivePerson.id]: itemOkInactivePerson,
-      [itemDeactivated.id]: itemDeactivated,
-      [itemExternal.id]: itemExternal,
+    inspectionItems: {
+      [inspectionItemOverdue.id]: inspectionItemOverdue,
+      [inspectionItemOkInactivePerson.id]: inspectionItemOkInactivePerson,
+      [inspectionItemDeactivated.id]: inspectionItemDeactivated,
+      [inspectionItemExternal.id]: inspectionItemExternal,
     },
     records: {
-      [recordOverdueItem.id]: recordOverdueItem,
-      [recordExternalItemSameDay.id]: recordExternalItemSameDay,
-      [recordExternalItemOlder.id]: recordExternalItemOlder,
+      [recordOverdueInspectionItem.id]: recordOverdueInspectionItem,
+      [recordExternalInspectionItemSameDay.id]: recordExternalInspectionItemSameDay,
+      [recordExternalInspectionItemOlder.id]: recordExternalInspectionItemOlder,
     },
   });
 };

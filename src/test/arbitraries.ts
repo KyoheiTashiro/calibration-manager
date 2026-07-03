@@ -14,7 +14,7 @@ import {
   type InspectionItem,
   type InspectionRecord,
   type IsoDateString,
-  ITEM_TYPE,
+  INSPECTION_ITEM_TYPE,
   NOTIFICATION_TARGET_TYPE,
   NOTIFICATION_TYPE,
   type Notification,
@@ -89,7 +89,7 @@ export const equipmentArb: fc.Arbitrary<Equipment> = fc.record({
 export const inspectionItemArb: fc.Arbitrary<InspectionItem> = fc.record({
   id: fc.uuid(),
   equipmentId: fc.uuid(),
-  type: fc.constantFrom(...Object.values(ITEM_TYPE)),
+  type: fc.constantFrom(...Object.values(INSPECTION_ITEM_TYPE)),
   name: fc.string({ minLength: 1 }),
   cycle: cycleArb,
   execution: fc.constantFrom(...Object.values(EXECUTION)),
@@ -105,7 +105,7 @@ export const inspectionItemArb: fc.Arbitrary<InspectionItem> = fc.record({
 
 export const inspectionRecordArb: fc.Arbitrary<InspectionRecord> = fc.record({
   id: fc.uuid(),
-  itemId: fc.uuid(),
+  inspectionItemId: fc.uuid(),
   doneDate: isoDateArb,
   doneBy: fc.string({ minLength: 1 }),
   result: fc.constantFrom(...Object.values(RECORD_RESULT)),
@@ -115,7 +115,7 @@ export const inspectionRecordArb: fc.Arbitrary<InspectionRecord> = fc.record({
 
 export const calibrationOrderArb: fc.Arbitrary<CalibrationOrder> = fc.record({
   id: fc.uuid(),
-  itemId: fc.uuid(),
+  inspectionItemId: fc.uuid(),
   vendorId: fc.uuid(),
   status: fc.constantFrom(...Object.values(ORDER_STATUS)),
   orderedDate: optionalArb(isoDateArb),

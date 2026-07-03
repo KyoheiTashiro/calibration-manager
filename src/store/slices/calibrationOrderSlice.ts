@@ -34,10 +34,10 @@ export const createCalibrationOrderSlice: AppSliceCreator<CalibrationOrderSlice>
   orders: {},
 
   addOrder: (input): string | null => {
-    const { items, orders } = get();
-    if (recordValue(items, input.itemId) === undefined) return null;
+    const { inspectionItems, orders } = get();
+    if (recordValue(inspectionItems, input.inspectionItemId) === undefined) return null;
     const hasActiveOrder = Object.values(orders).some(
-      (order) => order.itemId === input.itemId && isActiveOrderStatus(order.status),
+      (order) => order.inspectionItemId === input.inspectionItemId && isActiveOrderStatus(order.status),
     );
     if (hasActiveOrder) return null;
 

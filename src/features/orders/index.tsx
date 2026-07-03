@@ -56,7 +56,7 @@ const compareOrdersForColumn = (left: CalibrationOrder, right: CalibrationOrder)
 export const OrderList = (): ReactElement => {
   const navigate = useNavigate();
   const orders = useAppStore((state) => state.orders);
-  const items = useAppStore((state) => state.items);
+  const inspectionItems = useAppStore((state) => state.inspectionItems);
   const equipment = useAppStore((state) => state.equipment);
   const vendors = useAppStore((state) => state.vendors);
   const updateOrderStatus = useAppStore((state) => state.updateOrderStatus);
@@ -135,7 +135,7 @@ export const OrderList = (): ReactElement => {
       {totalOrderCount === 0 ? (
         <EmptyState
           message="外部校正案件はありません。項目一覧から案件を作成できます"
-          action={<Button onClick={() => navigate(ROUTES.ITEM_LIST)}>項目一覧へ</Button>}
+          action={<Button onClick={() => navigate(ROUTES.INSPECTION_ITEM_LIST)}>項目一覧へ</Button>}
         />
       ) : (
         <div className="flex gap-4 overflow-x-auto pb-2">
@@ -157,7 +157,7 @@ export const OrderList = (): ReactElement => {
                       <OrderCard
                         key={order.id}
                         order={order}
-                        items={items}
+                        inspectionItems={inspectionItems}
                         equipment={equipment}
                         vendors={vendors}
                         onOrder={handleOrder}
@@ -184,7 +184,7 @@ export const OrderList = (): ReactElement => {
       {dialog?.type === DIALOG_TYPE.RECORD ? (
         <RecordModal
           open
-          itemId={dialog.order.itemId}
+          inspectionItemId={dialog.order.inspectionItemId}
           orderId={dialog.order.id}
           onClose={closeDialog}
         />

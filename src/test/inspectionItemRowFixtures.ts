@@ -1,14 +1,14 @@
 /**
- * itemRowsOf(store/selectors)と項目一覧フィルタ(features/items/hooks)の純関数テストで共有する固定データ。
+ * inspectionItemRowsOf(store/selectors)と項目一覧フィルタ(features/inspectionItems/hooks)の純関数テストで共有する固定データ。
  * 両テストが同じ機器・担当者・依頼先を前提に組み立てるため、重複を避けて一箇所へ集約する。
  * today は引数注入なので固定日付で決定的にする(flakiness 回避)。
  */
 
-import type { ItemRow } from "@/store/selectors";
+import type { InspectionItemRow } from "@/store/selectors";
 import {
   EQUIPMENT_STATUS,
   EXECUTION,
-  ITEM_TYPE,
+  INSPECTION_ITEM_TYPE,
   type AppState,
   type CalibrationOrder,
   type Equipment,
@@ -41,11 +41,11 @@ export const calibrator: Vendor = {
 };
 
 /** 既定は稼働機器・内部点検・有効の項目。over で個別に上書きする */
-export const makeItem = (
+export const makeInspectionItem = (
   over: Partial<InspectionItem> & Pick<InspectionItem, "id">,
 ): InspectionItem => ({
   equipmentId: eqActive.id,
-  type: ITEM_TYPE.INSPECTION,
+  type: INSPECTION_ITEM_TYPE.INSPECTION,
   name: "点検",
   cycle: "1Y",
   execution: EXECUTION.INTERNAL,
@@ -62,17 +62,17 @@ export const toRecord = <Entry extends { id: string }>(
   list: readonly Entry[],
 ): Record<string, Entry> => Object.fromEntries(list.map((entry) => [entry.id, entry]));
 
-/** items / orders を渡して残りは固定機器・依頼先・担当者で埋めた state を作る */
+/** inspectionItems / orders を渡して残りは固定機器・依頼先・担当者で埋めた state を作る */
 export const makeState = (
-  items: readonly InspectionItem[],
+  inspectionItems: readonly InspectionItem[],
   orders: readonly CalibrationOrder[] = [],
-): Pick<AppState, "items" | "equipment" | "orders" | "vendors" | "persons"> => ({
-  items: toRecord(items),
+): Pick<AppState, "inspectionItems" | "equipment" | "orders" | "vendors" | "persons"> => ({
+  inspectionItems: toRecord(inspectionItems),
   equipment: toRecord([eqActive, eqSuspended, eqRetired]),
   orders: toRecord(orders),
   vendors: toRecord([calibrator]),
   persons: toRecord([activePerson, inactivePerson]),
 });
 
-/** 行配列から item.id 列を取り出す(並び順・絞り込みの検証に使う) */
-export const ids = (rows: readonly ItemRow[]): string[] => rows.map((row) => row.item.id);
+/** 行配列から inspectionItem.id 列を取り出す(並び順・絞り込みの検証に使う) */
+export const ids = (rows: readonly InspectionItemRow[]): string[] => rows.map((row) => row.inspectionItem.id);

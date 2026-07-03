@@ -19,7 +19,7 @@ type NavItem = {
 const NAV_ITEMS: NavItem[] = [
   { path: ROUTES.DASHBOARD, label: "ダッシュボード", end: true },
   { path: ROUTES.EQUIPMENT_LIST, label: "機器一覧" },
-  { path: ROUTES.ITEM_LIST, label: "項目一覧" },
+  { path: ROUTES.INSPECTION_ITEM_LIST, label: "項目一覧" },
   { path: ROUTES.ORDER_LIST, label: "校正案件" },
   { path: ROUTES.VENDOR_LIST, label: "メーカー・取引先" },
   { path: ROUTES.PERSON_LIST, label: "担当者" },
@@ -37,11 +37,11 @@ export const Sidebar = ({ onNavigate }: Props): ReactElement => {
   return (
     <nav aria-label="メインナビゲーション" className="bg-subBg h-full w-60">
       <ul className="flex flex-col gap-1 p-2">
-        {NAV_ITEMS.map((item) => (
-          <li key={item.path}>
+        {NAV_ITEMS.map((inspectionItem) => (
+          <li key={inspectionItem.path}>
             <NavLink
-              to={item.path}
-              end={item.end}
+              to={inspectionItem.path}
+              end={inspectionItem.end}
               onClick={handleNavigate}
               // oxlint-disable-next-line react/forbid-component-props -- NavLinkはisActiveでクラス出し分けする関数classNameが公式APIのため、この用途に限り許容する
               className={({ isActive }): string =>
@@ -50,7 +50,7 @@ export const Sidebar = ({ onNavigate }: Props): ReactElement => {
                 }`
               }
             >
-              {item.label}
+              {inspectionItem.label}
             </NavLink>
           </li>
         ))}

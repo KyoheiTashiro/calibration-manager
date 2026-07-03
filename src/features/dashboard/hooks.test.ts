@@ -3,17 +3,17 @@
  * - countByStatus: 全ステータスの件数集計(該当0のステータスも0で埋める)
  * - actionRequiredRows: overdue/orderNow/dueSoon のみを優先度順に、同グループ内は元順(nextDueDate昇順)維持
  * - latestNotifications: 未読優先 → createdDate 降順 → id 昇順で5件
- * 導出ロジックは itemRowsOf 側で検証済みのため、ここは合成した ItemRow / Notification で純粋に検証する。
+ * 導出ロジックは inspectionItemRowsOf 側で検証済みのため、ここは合成した InspectionItemRow / Notification で純粋に検証する。
  */
 
-import { ITEM_STATUS, type ItemStatus } from "@/domain/itemStatus";
+import { INSPECTION_ITEM_STATUS, type InspectionItemStatus } from "@/domain/inspectionItemStatus";
 import { actionRequiredRows, countByStatus, latestNotifications } from "@/features/dashboard/hooks";
-import type { ItemRow } from "@/store/selectors";
+import type { InspectionItemRow } from "@/store/selectors";
 import {
   CYCLE,
   EQUIPMENT_STATUS,
   EXECUTION,
-  ITEM_TYPE,
+  INSPECTION_ITEM_TYPE,
   NOTIFICATION_TARGET_TYPE,
   NOTIFICATION_TYPE,
   type Equipment,
@@ -29,10 +29,10 @@ const makeEquipment = (id: string): Equipment => ({
   status: EQUIPMENT_STATUS.ACTIVE,
 });
 
-const makeItem = (id: string, equipmentId: string, nextDueDate: string): InspectionItem => ({
+const makeInspectionItem = (id: string, equipmentId: string, nextDueDate: string): InspectionItem => ({
   id,
   equipmentId,
-  type: ITEM_TYPE.INSPECTION,
+  type: INSPECTION_ITEM_TYPE.INSPECTION,
   name: `項目${id}`,
   cycle: CYCLE.Y1,
   execution: EXECUTION.INTERNAL,
@@ -43,9 +43,9 @@ const makeItem = (id: string, equipmentId: string, nextDueDate: string): Inspect
   isActive: true,
 });
 
-/** テスト用の合成 ItemRow(status を直接指定。nextDueDate 昇順で並んだ入力を模す) */
-const makeRow = (id: string, status: ItemStatus, nextDueDate: string): ItemRow => ({
-  item: makeItem(id, `eq-${id}`, nextDueDate),
+/** テスト用の合成 InspectionItemRow(status を直接指定。nextDueDate 昇順で並んだ入力を模す) */
+const makeRow = (id: string, status: InspectionItemStatus, nextDueDate: string): InspectionItemRow => ({
+  inspectionItem: makeInspectionItem(id, `eq-${id}`, nextDueDate),
   equipment: makeEquipment(id),
   status,
   personLabel: "田中",
@@ -57,7 +57,7 @@ const makeNotification = (
   overrides: Partial<Notification> & Pick<Notification, "id">,
 ): Notification => ({
   type: NOTIFICATION_TYPE.OVERDUE,
-  targetType: NOTIFICATION_TARGET_TYPE.ITEM,
+  targetType: NOTIFICATION_TARGET_TYPE.INSPECTION_ITEM,
   targetId: "item-1",
   personId: "person-1",
   message: `通知${overrides.id}`,
@@ -68,68 +68,68 @@ const makeNotification = (
 
 describe("countByStatus", () => {
   it("全ステータスを集計し、該当0のステータスも0で埋める", () => {
-    const rows: ItemRow[] = [
-      makeRow("1", ITEM_STATUS.OVERDUE, "2026-06-01"),
-      makeRow("2", ITEM_STATUS.OVERDUE, "2026-06-02"),
-      makeRow("3", ITEM_STATUS.ORDER_NOW, "2026-07-10"),
-      makeRow("4", ITEM_STATUS.DUE_SOON, "2026-07-20"),
-      makeRow("5", ITEM_STATUS.DUE_SOON, "2026-07-21"),
-      makeRow("6", ITEM_STATUS.OK, "2027-01-01"),
+    const rows: InspectionItemRow[] = [
+      makeRow("1", INSPECTION_ITEM_STATUS.OVERDUE, "2026-06-01"),
+      makeRow("2", INSPECTION_ITEM_STATUS.OVERDUE, "2026-06-02"),
+      makeRow("3", INSPECTION_ITEM_STATUS.ORDER_NOW, "2026-07-10"),
+      makeRow("4", INSPECTION_ITEM_STATUS.DUE_SOON, "2026-07-20"),
+      makeRow("5", INSPECTION_ITEM_STATUS.DUE_SOON, "2026-07-21"),
+      makeRow("6", INSPECTION_ITEM_STATUS.OK, "2027-01-01"),
     ];
 
     expect(countByStatus(rows)).toEqual({
-      [ITEM_STATUS.OVERDUE]: 2,
-      [ITEM_STATUS.ORDER_NOW]: 1,
-      [ITEM_STATUS.IN_PROGRESS]: 0,
-      [ITEM_STATUS.DUE_SOON]: 2,
-      [ITEM_STATUS.OK]: 1,
+      [INSPECTION_ITEM_STATUS.OVERDUE]: 2,
+      [INSPECTION_ITEM_STATUS.ORDER_NOW]: 1,
+      [INSPECTION_ITEM_STATUS.IN_PROGRESS]: 0,
+      [INSPECTION_ITEM_STATUS.DUE_SOON]: 2,
+      [INSPECTION_ITEM_STATUS.OK]: 1,
     });
   });
 
   it("空配列なら全ステータス0", () => {
     expect(countByStatus([])).toEqual({
-      [ITEM_STATUS.OVERDUE]: 0,
-      [ITEM_STATUS.ORDER_NOW]: 0,
-      [ITEM_STATUS.IN_PROGRESS]: 0,
-      [ITEM_STATUS.DUE_SOON]: 0,
-      [ITEM_STATUS.OK]: 0,
+      [INSPECTION_ITEM_STATUS.OVERDUE]: 0,
+      [INSPECTION_ITEM_STATUS.ORDER_NOW]: 0,
+      [INSPECTION_ITEM_STATUS.IN_PROGRESS]: 0,
+      [INSPECTION_ITEM_STATUS.DUE_SOON]: 0,
+      [INSPECTION_ITEM_STATUS.OK]: 0,
     });
   });
 });
 
 describe("actionRequiredRows", () => {
   it("inProgress/ok を除外し、overdue→orderNow→dueSoon の優先度順に並べる", () => {
-    // 入力は nextDueDate 昇順(itemRowsOf の保証)を模した順序
-    const rows: ItemRow[] = [
-      makeRow("due", ITEM_STATUS.DUE_SOON, "2026-07-20"),
-      makeRow("prog", ITEM_STATUS.IN_PROGRESS, "2026-07-22"),
-      makeRow("order", ITEM_STATUS.ORDER_NOW, "2026-07-25"),
-      makeRow("ok", ITEM_STATUS.OK, "2027-01-01"),
-      makeRow("over", ITEM_STATUS.OVERDUE, "2026-06-01"),
+    // 入力は nextDueDate 昇順(inspectionItemRowsOf の保証)を模した順序
+    const rows: InspectionItemRow[] = [
+      makeRow("due", INSPECTION_ITEM_STATUS.DUE_SOON, "2026-07-20"),
+      makeRow("prog", INSPECTION_ITEM_STATUS.IN_PROGRESS, "2026-07-22"),
+      makeRow("order", INSPECTION_ITEM_STATUS.ORDER_NOW, "2026-07-25"),
+      makeRow("ok", INSPECTION_ITEM_STATUS.OK, "2027-01-01"),
+      makeRow("over", INSPECTION_ITEM_STATUS.OVERDUE, "2026-06-01"),
     ];
 
     const result = actionRequiredRows(rows);
 
-    expect(result.map((row) => row.item.id)).toEqual(["over", "order", "due"]);
+    expect(result.map((row) => row.inspectionItem.id)).toEqual(["over", "order", "due"]);
   });
 
   it("同一優先度グループ内は入力順(nextDueDate昇順)を安定に保つ", () => {
-    const rows: ItemRow[] = [
-      makeRow("over-a", ITEM_STATUS.OVERDUE, "2026-06-01"),
-      makeRow("over-b", ITEM_STATUS.OVERDUE, "2026-06-05"),
-      makeRow("due-a", ITEM_STATUS.DUE_SOON, "2026-07-10"),
-      makeRow("due-b", ITEM_STATUS.DUE_SOON, "2026-07-15"),
+    const rows: InspectionItemRow[] = [
+      makeRow("over-a", INSPECTION_ITEM_STATUS.OVERDUE, "2026-06-01"),
+      makeRow("over-b", INSPECTION_ITEM_STATUS.OVERDUE, "2026-06-05"),
+      makeRow("due-a", INSPECTION_ITEM_STATUS.DUE_SOON, "2026-07-10"),
+      makeRow("due-b", INSPECTION_ITEM_STATUS.DUE_SOON, "2026-07-15"),
     ];
 
     const result = actionRequiredRows(rows);
 
-    expect(result.map((row) => row.item.id)).toEqual(["over-a", "over-b", "due-a", "due-b"]);
+    expect(result.map((row) => row.inspectionItem.id)).toEqual(["over-a", "over-b", "due-a", "due-b"]);
   });
 
   it("要対応が0件なら空配列", () => {
-    const rows: ItemRow[] = [
-      makeRow("ok", ITEM_STATUS.OK, "2027-01-01"),
-      makeRow("prog", ITEM_STATUS.IN_PROGRESS, "2026-07-22"),
+    const rows: InspectionItemRow[] = [
+      makeRow("ok", INSPECTION_ITEM_STATUS.OK, "2027-01-01"),
+      makeRow("prog", INSPECTION_ITEM_STATUS.IN_PROGRESS, "2026-07-22"),
     ];
     expect(actionRequiredRows(rows)).toEqual([]);
   });

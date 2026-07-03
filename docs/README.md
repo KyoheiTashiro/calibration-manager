@@ -50,8 +50,8 @@
 - [screen-design/02-equipment-list.md](screen-design/02-equipment-list.md) — 機器一覧
 - [screen-design/03-equipment-form.md](screen-design/03-equipment-form.md) — 機器登録・編集
 - [screen-design/04-equipment-detail.md](screen-design/04-equipment-detail.md) — 機器詳細
-- [screen-design/05-item-list.md](screen-design/05-item-list.md) — 点検校正項目一覧(中核画面)
-- [screen-design/06-item-modal.md](screen-design/06-item-modal.md) — 項目編集モーダル
+- [screen-design/05-inspection-item-list.md](screen-design/05-inspection-item-list.md) — 点検校正項目一覧(中核画面)
+- [screen-design/06-inspection-item-modal.md](screen-design/06-inspection-item-modal.md) — 項目編集モーダル
 - [screen-design/07-record-modal.md](screen-design/07-record-modal.md) — 実施記録登録モーダル
 - [screen-design/08-orders.md](screen-design/08-orders.md) — 外部校正案件一覧(かんばん)
 - [screen-design/09-masters.md](screen-design/09-masters.md) — マスタ管理(メーカー/取引先・担当者)
@@ -65,7 +65,7 @@
 各画面の詳細仕様は `screen-design/` 配下を参照。
 
 - 機器管理(CRUD・稼働/休止/廃棄) → [02](screen-design/02-equipment-list.md)、[03](screen-design/03-equipment-form.md)、[04](screen-design/04-equipment-detail.md)
-- 点検校正項目管理・期限一覧・フィルタ → [05](screen-design/05-item-list.md)、[06](screen-design/06-item-modal.md)
+- 点検校正項目管理・期限一覧・フィルタ → [05](screen-design/05-inspection-item-list.md)、[06](screen-design/06-inspection-item-modal.md)
 - 実施記録登録・次回期限自動更新 → [07](screen-design/07-record-modal.md)
 - 外部校正案件の進捗管理(発注〜返却) → [08](screen-design/08-orders.md)
 - マスタ管理(メーカー/取引先・担当者) → [09](screen-design/09-masters.md)
@@ -94,12 +94,12 @@
 | 2   | `/#/equipment`                              | [機器一覧](screen-design/02-equipment-list.md)                                                                                                                                                         |
 | 3   | `/#/equipment/new`・`/#/equipment/:id/edit` | [機器登録・編集](screen-design/03-equipment-form.md)                                                                                                                                                   |
 | 4   | `/#/equipment/:id`                          | [機器詳細](screen-design/04-equipment-detail.md)                                                                                                                                                       |
-| 5   | `/#/items`                                  | [点検校正項目一覧(中核)](screen-design/05-item-list.md)                                                                                                                                                |
+| 5   | `/#/inspection-items`                                  | [点検校正項目一覧(中核)](screen-design/05-inspection-item-list.md)                                                                                                                                                |
 | 6   | `/#/orders`                                 | [外部校正案件一覧](screen-design/08-orders.md)                                                                                                                                                         |
 | 7   | `/#/vendors`・`/#/persons`                  | [マスタ管理](screen-design/09-masters.md)                                                                                                                                                              |
 | 8   | `/#/notifications`                          | [通知センター](screen-design/10-notifications.md)                                                                                                                                                      |
 | 9   | `/#/settings`                               | [設定・バックアップ](screen-design/11-settings.md)                                                                                                                                                     |
-| —   | モーダル                                    | [項目編集](screen-design/06-item-modal.md) / [実施記録](screen-design/07-record-modal.md) / 案件作成・状態更新([08](screen-design/08-orders.md)) / マスタ追加・編集([09](screen-design/09-masters.md)) |
+| —   | モーダル                                    | [項目編集](screen-design/06-inspection-item-modal.md) / [実施記録](screen-design/07-record-modal.md) / 案件作成・状態更新([08](screen-design/08-orders.md)) / マスタ追加・編集([09](screen-design/09-masters.md)) |
 
 各画面のワイヤーは `screen-design/` 配下参照。
 

@@ -24,15 +24,15 @@
 
 ## 表示項目(Notification §3.7)
 
-各行: `type`(種別アイコン+ラベル)、`message`、`createdDate`、既読状態。対象は `targetType`(item/order)+ `targetId`。
+各行: `type`(種別アイコン+ラベル)、`message`、`createdDate`、既読状態。対象は `targetType`(inspectionItem/order)+ `targetId`。
 
 **通知種別のアイコン/色**:
 
 | type               | ラベル   | 色        | 対象       |
 | ------------------ | -------- | --------- | ---------- |
-| `dueSoon`          | 期限接近 | 🟡 黄     | item       |
-| `overdue`          | 期限超過 | 🔴 赤     | item       |
-| `orderRecommended` | 要発注   | 🟠 橙     | item(外部) |
+| `dueSoon`          | 期限接近 | 🟡 黄     | inspectionItem       |
+| `overdue`          | 期限超過 | 🔴 赤     | inspectionItem       |
+| `orderRecommended` | 要発注   | 🟠 橙     | inspectionItem(外部) |
 | `deliveryDueSoon`  | 納期接近 | 🟣 紫     | order      |
 | `deliveryOverdue`  | 納期超過 | 🔴 赤(濃) | order      |
 
@@ -40,7 +40,7 @@
 
 - タブ: `未読`(件数バッジ)/ `既読`。
 - 行クリック → 対象へ遷移し既読化(`isRead=true`):
-  - `targetType=item` → `/items`(該当項目)または該当機器詳細。
+  - `targetType=inspectionItem` → `/inspection-items`(該当項目)または該当機器詳細。
   - `targetType=order` → `/orders`(該当カード)。
 - 「全て既読」→ 未読すべてを `isRead=true`。
 

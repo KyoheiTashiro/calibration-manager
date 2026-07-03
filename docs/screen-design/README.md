@@ -44,7 +44,7 @@
 | `/equipment/new`      | 機器登録                   | [§3](./03-equipment-form.md)   | フォーム画面                       |
 | `/equipment/:id`      | 機器詳細(項目・履歴含む)   | [§4](./04-equipment-detail.md) |                                    |
 | `/equipment/:id/edit` | 機器編集                   | [§3](./03-equipment-form.md)   | フォーム画面                       |
-| `/items`              | 点検校正項目一覧(中核)     | [§5](./05-item-list.md)        | クエリでステータスフィルタ受け取り |
+| `/inspection-items`              | 点検校正項目一覧(中核)     | [§5](./05-inspection-item-list.md)        | クエリでステータスフィルタ受け取り |
 | `/orders`             | 外部校正案件一覧(かんばん) | [§8](./08-orders.md)           |                                    |
 | `/vendors`            | メーカー/取引先マスタ      | [§9](./09-masters.md)          |                                    |
 | `/persons`            | 担当者マスタ               | [§9](./09-masters.md)          |                                    |
@@ -58,8 +58,8 @@
 - [2. 機器一覧](./02-equipment-list.md)
 - [3. 機器登録・編集](./03-equipment-form.md)
 - [4. 機器詳細](./04-equipment-detail.md)
-- [5. 点検校正項目一覧(中核画面)](./05-item-list.md)
-- [6. 項目編集モーダル](./06-item-modal.md)
+- [5. 点検校正項目一覧(中核画面)](./05-inspection-item-list.md)
+- [6. 項目編集モーダル](./06-inspection-item-modal.md)
 - [7. 実施記録登録モーダル](./07-record-modal.md)
 - [8. 外部校正案件一覧](./08-orders.md)
 - [9. マスタ管理(メーカー/取引先・担当者)](./09-masters.md)
@@ -67,7 +67,7 @@
 - [11. 設定・バックアップ](./11-settings.md)
 - [12. 利用マニュアル](./12-manual.md)
 
-**モーダルで行う操作(ページ遷移しない)**: 点検校正項目の登録・編集([§6](./06-item-modal.md))、実施記録登録([§7](./07-record-modal.md))、外部校正案件の作成・状態更新([§8](./08-orders.md))、Vendor/Person の追加・編集([§9](./09-masters.md))。これらは機器詳細・項目一覧・案件一覧などから起動する。
+**モーダルで行う操作(ページ遷移しない)**: 点検校正項目の登録・編集([§6](./06-inspection-item-modal.md))、実施記録登録([§7](./07-record-modal.md))、外部校正案件の作成・状態更新([§8](./08-orders.md))、Vendor/Person の追加・編集([§9](./09-masters.md))。これらは機器詳細・項目一覧・案件一覧などから起動する。
 
 ### 0.3 ステータスバッジ色(共通定義)
 
@@ -81,7 +81,7 @@
 | `dueSoon`    | 期限接近 | 🟡 黄 | 今日 ≥ nextDueDate − noticeDaysBefore           |
 | `ok`         | 正常     | 🟢 緑 | 上記以外                                        |
 
-- 判定は上表の優先度順(上が優先)。導出関数は1箇所(例: `deriveItemStatus(item, orders, today)`)に集約し、全画面がこれを利用する。
+- 判定は上表の優先度順(上が優先)。導出関数は1箇所(例: `deriveInspectionItemStatus(inspectionItem, orders, today)`)に集約し、全画面がこれを利用する。
 - 色トークンはTailwindのユーティリティ(例: `bg-red-100 text-red-800` 等)へマッピングし、`statusBadgeClass(status)` の単一ヘルパで供給する。
 
 ### 0.4 日付表示形式
@@ -113,19 +113,19 @@
 
 ```mermaid
 flowchart TD
-    Dash[ダッシュボード /] -->|サマリーカード| Items[項目一覧 /items]
+    Dash[ダッシュボード /] -->|サマリーカード| InspectionItems[項目一覧 /inspection-items]
     Dash -->|通知| Notice[通知センター /notifications]
-    Sidebar((サイドバー)) --> Dash & EqList[機器一覧 /equipment] & Items & Orders[案件一覧 /orders] & Vendors[メーカー /vendors] & Persons[担当者 /persons] & Notice & Settings[設定 /settings]
+    Sidebar((サイドバー)) --> Dash & EqList[機器一覧 /equipment] & InspectionItems & Orders[案件一覧 /orders] & Vendors[メーカー /vendors] & Persons[担当者 /persons] & Notice & Settings[設定 /settings]
     EqList -->|行クリック| EqDetail[機器詳細 /equipment/:id]
     EqList -->|追加| EqNew[機器登録 /equipment/new]
     EqDetail -->|編集| EqEdit[機器編集 /equipment/:id/edit]
-    EqDetail -.項目追加/編集.-> ItemModal[[項目編集モーダル]]
+    EqDetail -.項目追加/編集.-> InspectionItemModal[[項目編集モーダル]]
     EqDetail -.実施記録.-> RecModal[[実施記録モーダル]]
-    Items -.実施記録.-> RecModal
-    Items -.案件作成.-> OrderModal[[案件作成モーダル]]
-    Items -.項目編集.-> ItemModal
+    InspectionItems -.実施記録.-> RecModal
+    InspectionItems -.案件作成.-> OrderModal[[案件作成モーダル]]
+    InspectionItems -.項目編集.-> InspectionItemModal
     Orders -.状態遷移/記録.-> RecModal
-    Notice -->|対象へ遷移| Items
+    Notice -->|対象へ遷移| InspectionItems
     Notice -->|対象へ遷移| Orders
 ```
 
@@ -135,7 +135,7 @@ flowchart TD
 
 | 未決事項                                 | 影響画面                                                                            | 現状の扱い                                          |
 | ---------------------------------------- | ----------------------------------------------------------------------------------- | --------------------------------------------------- |
-| 校正値・合格基準の記録                   | [§6 項目編集](./06-item-modal.md) / [§7 記録登録](./07-record-modal.md)             | result(enum)+ note のみ。数値記録欄は設けない ※未決 |
+| 校正値・合格基準の記録                   | [§6 項目編集](./06-inspection-item-modal.md) / [§7 記録登録](./07-record-modal.md)             | result(enum)+ note のみ。数値記録欄は設けない ※未決 |
 | 通知宛先のフォールバック(担当者無効化時) | [§9-B 担当者](./09-masters.md#9-b-担当者マスタ) / [§10 通知](./10-notifications.md) | 警告表示のみ。当面は元 personId で生成 ※未決        |
 | 期限起算(実施日 vs 予定日)               | [§7 記録登録](./07-record-modal.md)                                                 | 実施日基準(doneDate + cycle)※未決                   |
 | 休止機器 再稼働時の期限リセット          | [§3 機器編集](./03-equipment-form.md)                                               | リセットルール未定義。status 変更のみ ※未決         |
