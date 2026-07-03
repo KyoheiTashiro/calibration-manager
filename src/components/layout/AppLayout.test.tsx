@@ -32,11 +32,11 @@ describe("AppLayout", () => {
   // なぜ必須か: Headerがstoreの未読件数を購読するため、テスト間の状態持ち越しを断つ
   beforeEach(setupStoreIsolation);
 
-  it("サイドバーのナビゲーションリンクが8個表示されること", () => {
+  it("サイドバーのナビゲーションリンクが9個表示されること", () => {
     renderAppLayout();
 
     const navigation = screen.getByRole("navigation", { name: "メインナビゲーション" });
-    expect(within(navigation).getAllByRole("link")).toHaveLength(8);
+    expect(within(navigation).getAllByRole("link")).toHaveLength(9);
   });
 
   it("Outlet経由で子ルートのコンテンツが表示されること", () => {

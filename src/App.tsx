@@ -6,6 +6,7 @@ import { EquipmentDetail } from "@/features/equipment/detail";
 import { EquipmentForm } from "@/features/equipment/form";
 import { EquipmentList } from "@/features/equipment/list";
 import { ItemList } from "@/features/items";
+import { Manual } from "@/features/manual";
 import { NotificationCenter } from "@/features/notifications";
 import { useNotificationScan } from "@/features/notifications/useNotificationScan";
 import { OrderList } from "@/features/orders";
@@ -25,7 +26,7 @@ function App(): ReactElement {
 
   return (
     <Routes>
-      {/* 共通レイアウト（サイドバー+ヘッダー+Outlet）配下に全11ルートを定義する
+      {/* 共通レイアウト（サイドバー+ヘッダー+Outlet）配下に全12ルートを定義する
           （screen-design/README.md §0.2 のルーティング一覧に対応）。 */}
       <Route element={<AppLayout />}>
         <Route path={ROUTES.DASHBOARD} element={<Dashboard />} />
@@ -41,7 +42,8 @@ function App(): ReactElement {
         <Route path={ROUTES.PERSON_LIST} element={<PersonList />} />
         <Route path={ROUTES.NOTIFICATION_LIST} element={<NotificationCenter />} />
         <Route path={ROUTES.SETTINGS} element={<Settings />} />
-        {/* 定義済み11パス以外はNotFound相当の簡素な案内を表示する。 */}
+        <Route path={ROUTES.MANUAL} element={<Manual />} />
+        {/* 定義済み12パス以外はNotFound相当の簡素な案内を表示する。 */}
         <Route path="*" element={<div>ページが見つかりません</div>} />
       </Route>
     </Routes>
