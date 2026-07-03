@@ -19,7 +19,7 @@ import { Route, Routes } from "react-router-dom";
 // なぜ function 宣言か（coding-standards.md §4の例外）:
 // アロー関数コンポーネントが原則だが、`App.tsx` のルートコンポーネントのみ
 // `function` 宣言 + `export default` が慣習として許容されている
-// （姉妹プロジェクト pinpon-match-manage 踏襲・directory-structure.mdの想定通りルート定義をここに置く）。
+// （directory-structure.mdの想定通りルート定義をここに置く）。
 function App(): ReactElement {
   // 通知スキャンの起動（D-025）。アプリ全体で1度だけマウントする。
   useNotificationScan();

@@ -2,7 +2,7 @@
 
 関連: [domain-model.md](../domain-model.md) ／ [tech-stack.md](./tech-stack.md) ／ [store.md](./store.md)
 
-calibration-manager は設計フェーズであり、以下は実装時に想定するディレクトリ構成である。姉妹プロジェクト pinpon-match-manage の構成をベースに、calibration-managerのドメイン（7エンティティ・11画面）に合わせて調整する方針とする。
+calibration-manager は設計フェーズであり、以下は実装時に想定するディレクトリ構成である。calibration-managerのドメイン（7エンティティ・11画面）に合わせて構成する方針とする。
 
 ```
 src/
@@ -86,8 +86,8 @@ src/
 ## 補足
 
 - ルーターは `main.tsx` の `HashRouter`。ルート定義は `App.tsx` に置く想定とする。11画面のルーティング対応表は screen-design/README.md §0.2 を参照し、本書では再掲しない。
-- モーダル群（InspectionItemModal/RecordModal/OrderModal/VendorModal/PersonModal）は特定の1画面に属さず複数画面から起動されるため `components/domain/` に配置する方針とする（screen-design §0.2「モーダルで行う操作」）。pinpon（`domain/` には `WinnerBadge` のみ）と比べて `components/domain/` の役割が広いのは、calibration-managerの画面設計上モーダル起動元が多い（機器詳細・点検校正項目一覧・案件一覧など）ことによる calibration-manager 特有の設計判断である。
+- モーダル群（InspectionItemModal/RecordModal/OrderModal/VendorModal/PersonModal）は特定の1画面に属さず複数画面から起動されるため `components/domain/` に配置する方針とする（screen-design §0.2「モーダルで行う操作」）。`components/domain/` の役割が広いのは、calibration-managerの画面設計上モーダル起動元が多い（機器詳細・点検校正項目一覧・案件一覧など）ことによる設計判断である。
 - `features/*/schema.ts` はReact Hook Form + Zod用のフォームスキーマを想定する（機器登録編集、Vendor/Person等）。
 - `store/schema.ts` はCSVインポートの行バリデーションにも再利用する方針とする（[tech-stack.md](./tech-stack.md) 参照）。
 - Storybookのstoryはコンポーネント隣に `*.stories.tsx` で配置する（colocation）想定とする。上記ツリーでは省略している。
-- `src/test/` はテスト支援ユーティリティを置く想定とする（pinpon踏襲。詳細は省略）。
+- `src/test/` はテスト支援ユーティリティを置く想定とする（詳細は省略）。
