@@ -1,5 +1,5 @@
 /**
- * 機器詳細画面のロジック（並び替え・担当者表示名解決・項目ステータスの表示可否判定）を集約する。
+ * 機器詳細画面のロジック（並び替え・項目ステータスの表示可否判定）を集約する。
  * index.tsx を薄いビューに保つ（coding-standards.md §2「hooks.ts は全 feature に置く」）。
  * D-014: 項目ステータスは機器が稼働(active)のときのみ導出し、それ以外は null（「—」表示）とする。
  */
@@ -12,10 +12,13 @@ import {
   type EquipmentStatus,
   type InspectionItem,
   type InspectionRecord,
-  type Person,
   type Vendor,
 } from "@/store/types";
 import { todayIsoDate } from "@/utils/time";
+
+// 担当者表示名は selectors へ昇格済み(D-024)。この画面の表示ロジック一式を
+// hooks 経由で供給するため再 export する(index.tsx の依存数も抑える)
+export { personLabelOf } from "@/store/selectors";
 
 /** 実施履歴の1行(項目横断マージ用に項目名を同梱) */
 export type HistoryRow = { record: InspectionRecord; itemName: string };
@@ -51,13 +54,6 @@ export const historyRowsOf = (
       recordsOf({ records }, item.id).map((record) => ({ record, itemName: item.name })),
     )
     .toSorted(compareHistoryRows);
-
-/** 担当者名の解決。参照先なし(dangling)は「—」、無効化済みは「(無効)」を注記(D-001) */
-export const personLabelOf = (persons: Record<string, Person>, personId: string): string => {
-  const person = persons[personId];
-  if (person === undefined) return "—";
-  return person.isActive ? person.name : `${person.name}(無効)`;
-};
 
 /**
  * 項目一覧行に表示するステータス。D-014により機器が稼働(active)でなければ

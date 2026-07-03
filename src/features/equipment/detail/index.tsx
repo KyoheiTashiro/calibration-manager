@@ -166,7 +166,7 @@ export const EquipmentDetail = (): ReactElement => {
                     <td className="px-3 py-2">{ITEM_TYPE_LABELS[item.type]}</td>
                     <td className="px-3 py-2">{EXECUTION_LABELS[item.execution]}</td>
                     <td className="px-3 py-2">{item.cycle}</td>
-                    <td className="px-3 py-2">{personLabelOf(persons, item.personId)}</td>
+                    <td className="px-3 py-2">{personLabelOf({ persons }, item.personId)}</td>
                     <td className="px-3 py-2">{item.nextDueDate}</td>
                     {/* なぜ td 直下に Button を並べるか: equipment/list や VendorList と同様、
                         div でラップするとjsx-a11yのボタンラベル探索深度を超えるためtdをflex化する */}

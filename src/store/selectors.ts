@@ -23,6 +23,16 @@ export const recordsOf = (state: Pick<AppState, "records">, itemId: string): Ins
         right.doneDate.localeCompare(left.doneDate) || left.id.localeCompare(right.id),
     );
 
+/**
+ * 担当者名の解決。参照先なし(dangling)は「—」、無効化済みは「(無効)」を注記(decisions.md D-001)。
+ * 機器詳細・項目一覧など担当者名を表示する全画面がこれを使う。
+ */
+export const personLabelOf = (state: Pick<AppState, "persons">, personId: string): string => {
+  const person = state.persons[personId];
+  if (person === undefined) return "—";
+  return person.isActive ? person.name : `${person.name}(無効)`;
+};
+
 /** ヘッダーの通知ベルに出す未読件数（screen-design/README.md） */
 export const unreadNotificationCount = (state: Pick<AppState, "notifications">): number =>
   Object.values(state.notifications).filter((notification) => !notification.isRead).length;
