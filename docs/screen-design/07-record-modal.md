@@ -4,7 +4,7 @@
 
 **目的**: 項目の実施結果(InspectionRecord)を登録し、次回期限を更新する。
 
-**起動元**: [機器詳細](./04-equipment-detail.md)、[項目一覧](./05-inspection-item-list.md)、[外部校正案件一覧](./08-orders.md)の `returned` カード
+**起動元**: [機器詳細](./04-equipment-detail.md)、[点検校正項目一覧](./05-inspection-item-list.md)、[外部校正案件一覧](./08-orders.md)の `returned` カード
 
 ## 画面レイアウト
 
