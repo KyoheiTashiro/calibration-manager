@@ -15,8 +15,8 @@ import { Link } from "react-router-dom";
 const STATUS_DESCRIPTIONS = {
   [INSPECTION_ITEM_STATUS.OVERDUE]: "次回期限を過ぎています",
   [INSPECTION_ITEM_STATUS.ORDER_NOW]:
-    "外部校正の発注推奨日を過ぎていて、まだ進行中の点検校正外部案件がありません",
-  [INSPECTION_ITEM_STATUS.IN_PROGRESS]: "外部校正で発注済み・校正中の案件があります",
+    "外部点検校正の発注推奨日を過ぎていて、まだ進行中の点検校正外部案件がありません",
+  [INSPECTION_ITEM_STATUS.IN_PROGRESS]: "外部点検校正で発注済み・校正中の案件があります",
   [INSPECTION_ITEM_STATUS.DUE_SOON]: "次回期限が近づいています(通知開始日数に到達)",
   [INSPECTION_ITEM_STATUS.OK]: "上記のいずれにも当てはまりません",
 } as const satisfies Record<InspectionItemStatus, string>;
@@ -191,7 +191,7 @@ export const Manual = (): ReactElement => (
           </Link>
         </h3>
         <p>
-          外部校正の発注から返却・記録までの進み具合を、状態ごとのボード(かんばん)で管理します。
+          外部点検校正の発注から返却・記録までの進み具合を、状態ごとのボード(かんばん)で管理します。
         </p>
       </div>
 

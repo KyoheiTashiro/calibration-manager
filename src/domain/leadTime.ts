@@ -1,5 +1,5 @@
 /**
- * 発注推奨日の逆算（domain-model.md §4.2。外部校正のみ）。
+ * 発注推奨日の逆算（domain-model.md §4.2。外部点検校正のみ）。
  * `leadTime = inspectionItem.leadTimeDays ?? vendor.standardLeadTimeDays`
  * `発注推奨日 = nextDueDate − leadTime − bufferDays`
  */

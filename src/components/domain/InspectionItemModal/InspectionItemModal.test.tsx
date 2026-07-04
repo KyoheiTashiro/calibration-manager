@@ -194,7 +194,7 @@ describe("InspectionItemModal: 新規追加", () => {
       <InspectionItemModal open equipmentId={equipment.id} onClose={vi.fn<() => void>()} />,
     );
 
-    await user.type(screen.getByLabelText("項目名", { exact: false }), "外部校正項目");
+    await user.type(screen.getByLabelText("項目名", { exact: false }), "外部点検校正項目");
     await user.click(screen.getByLabelText("外部"));
     await user.type(screen.getByLabelText("次回期限", { exact: false }), "2026-08-01");
     await user.click(screen.getByRole("button", { name: "保存" }));
@@ -241,7 +241,7 @@ describe("InspectionItemModal: 新規追加", () => {
       <InspectionItemModal open equipmentId={equipment.id} onClose={vi.fn<() => void>()} />,
     );
 
-    await user.type(screen.getByLabelText("項目名", { exact: false }), "外部校正項目");
+    await user.type(screen.getByLabelText("項目名", { exact: false }), "外部点検校正項目");
     await user.click(screen.getByLabelText("外部"));
     await user.selectOptions(
       screen.getByLabelText("校正依頼先", { exact: false }),

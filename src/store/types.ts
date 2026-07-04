@@ -160,7 +160,7 @@ export type InspectionRecord = {
   /** 実施者名（外部の場合は業者名） */
   doneBy: string;
   result: RecordResult;
-  /** 外部校正の場合、元になった CalibrationOrder 参照 */
+  /** 外部点検校正の場合、元になった CalibrationOrder 参照 */
   orderId?: string;
   note?: string;
 };
