@@ -10,8 +10,8 @@ import { useState } from "react";
 /** persons を購読し、氏名の日本語ロケール昇順で返す */
 export const usePersonList = (): Person[] => {
   const persons = useAppStore((state) => state.persons);
-  return Object.values(persons).toSorted((first, second) =>
-    first.name.localeCompare(second.name, "ja"),
+  return Object.values(persons).toSorted((left, right) =>
+    left.name.localeCompare(right.name, "ja"),
   );
 };
 

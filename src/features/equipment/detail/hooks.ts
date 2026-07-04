@@ -23,6 +23,10 @@ import { todayIsoDate } from "@/utils/time";
 // hooks 経由で供給するため再 export する(index.tsx の依存数も抑える)
 export { personLabelOf } from "@/store/selectors";
 
+// useSafeNavigate も同様に hooks 経由で再 export し、index.tsx が @/utils への
+// 直接依存を持たないようにする(import/max-dependencies 対策)
+export { useSafeNavigate } from "@/utils/navigation";
+
 /** 実施記録の1行(項目横断マージ用に項目名を同梱) */
 export type HistoryRow = { record: InspectionRecord; inspectionItemName: string };
 

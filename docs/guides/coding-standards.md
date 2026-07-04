@@ -62,9 +62,10 @@ Lint/Format は **oxlint + oxfmt**（ESLint/Prettier ではない）。多くは
 - `src/features/**/` の基本: `index.tsx`（薄いビュー本体）+ `hooks.ts`（ロジック）+ `schema.ts`（RHF 用 zod）+ `components/`。
   - feature 例: `dashboard`（ダッシュボード） / `equipment`（機器一覧・詳細） / `inspectionItems`（点検校正項目一覧）/ `inspectionOrder`（点検校正外部案件） / `vendors`・`persons`（メーカー/取引先・担当者マスタ） / `notifications`（通知センター） / `settings`（設定・バックアップ）。
 - **`index.tsx` は barrel ではなく公開コンポーネント本体**。`App.tsx` は `import { Dashboard } from "@/features/dashboard"` のように named export を直接参照。feature にバレル専用ファイルは作らない。
-- **`schema.ts` は RHF フォームを持つ feature にだけ置く**（`equipment`、`inspectionItems` の点検校正項目モーダルなど。必須ではない）。
+- **`schema.ts`（RHF 用 zod）はフォームを持つ場所に colocate する**（D-043）。feature 内フォームは `features/**/schema.ts`（`equipment/form/shared`、`inspectionOrder`）、`components/domain/` の各モーダルはモーダルディレクトリ内 `schema.ts`。必須ではない（フォームがなければ置かない）。
 - **`hooks.ts` は全 feature に置く**（ロジックは hooks に寄せ index.tsx を薄く保つ）。
 - サブコンポーネントが 1 個だけなら feature 直下に置いてよい（複数になったら `components/` へ）。
+- **複数 feature で共有する汎用 React フックは `src/utils/` に他ユーティリティ同様サブディレクトリを切って置く**（D-044。例: `src/utils/navigation/` の `useSafeNavigate` — navigate() の戻り値を無視する共通ラッパー。画面遷移はこれを使い、`Promise.resolve(navigate(...)).catch(...)` を各所に書かない）。
 - **共通 UI `src/components/ui/<Name>/`**: 1 コンポーネント = 1 サブディレクトリ + バレル。`Name.tsx` / `index.ts`（`export { Name } from "./Name"`）/ `Name.test.tsx` / `Name.stories.tsx` を colocate。親バレル `src/components/ui/index.ts` で一括 re-export し `@/components/ui` 経由で import。
 - アイコンは `src/components/icons/` に `XxxIcon.tsx` + 共有 `base.ts` + バレル。
 

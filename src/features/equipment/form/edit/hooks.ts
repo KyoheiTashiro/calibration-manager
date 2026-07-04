@@ -10,9 +10,10 @@ import { emptyFormValues, type EquipmentFormValues } from "@/features/equipment/
 import { useEquipmentFormCore } from "@/features/equipment/form/shared/useFormCore";
 import { EQUIPMENT_STATUS, type Equipment } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
+import { useSafeNavigate } from "@/utils/navigation";
 import { useState } from "react";
 import type { FieldErrors, UseFormHandleSubmit, UseFormRegister } from "react-hook-form";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 // なぜ undefined を許容するか: Rules of Hooks により対象不在（dangling id・URL直打ち等）でも
 // フックは無条件に実行されるため、currentEquipment が undefined の場合のフォールバック
@@ -47,7 +48,7 @@ type UseEditEquipmentFormResult = {
 
 export const useEditEquipmentForm = (): UseEditEquipmentFormResult => {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
+  const safeNavigate = useSafeNavigate();
 
   const equipmentMap = useAppStore((state) => state.equipment);
   const updateEquipment = useAppStore((state) => state.updateEquipment);
@@ -73,21 +74,14 @@ export const useEditEquipmentForm = (): UseEditEquipmentFormResult => {
   const onSubmit = (values: EquipmentFormValues): void => {
     if (currentEquipment === undefined) return;
     updateEquipment(currentEquipment.id, toEquipmentPayload(values));
-    // なぜ Promise.resolve().catch() か: navigate() は react-router 7 で
-    // `void | Promise<void>` を返す。遷移完了を待つ必要はなく、失敗時も
-    // 画面表示に影響しないため、両方の戻り値を統一的に無視する。
-    Promise.resolve(navigate(equipmentDetailPath(currentEquipment.id))).catch(() => {
-      // 遷移エラーは無視する
-    });
+    safeNavigate(equipmentDetailPath(currentEquipment.id));
   };
 
   const handleRetireConfirm = (): void => {
     if (currentEquipment === undefined) return;
     setEquipmentStatus(currentEquipment.id, EQUIPMENT_STATUS.RETIRED);
     setRetireConfirmOpen(false);
-    Promise.resolve(navigate(equipmentDetailPath(currentEquipment.id))).catch(() => {
-      // 遷移エラーは無視する
-    });
+    safeNavigate(equipmentDetailPath(currentEquipment.id));
   };
 
   return {
@@ -108,9 +102,7 @@ export const useEditEquipmentForm = (): UseEditEquipmentFormResult => {
     },
     handleRetireConfirm,
     handleCancel: (): void => {
-      Promise.resolve(navigate(-1)).catch(() => {
-        // 遷移エラーは無視する
-      });
+      safeNavigate(-1);
     },
   };
 };

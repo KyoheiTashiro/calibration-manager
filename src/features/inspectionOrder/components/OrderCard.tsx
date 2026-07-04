@@ -21,7 +21,7 @@ const NO_REFERENCE_LABEL = "(参照先なし)";
 /** 属性が未設定のときの表示 */
 const UNSET_LABEL = "—";
 
-type OrderCardProps = {
+type Props = {
   order: CalibrationOrder;
   inspectionItems: Record<string, InspectionItem>;
   equipment: Record<string, Equipment>;
@@ -43,7 +43,7 @@ export const OrderCard = ({
   onReturn,
   onCancel,
   onRecord,
-}: OrderCardProps): ReactElement => {
+}: Props): ReactElement => {
   const inspectionItem = recordValue(inspectionItems, order.inspectionItemId);
   const equipmentEntry = inspectionItem
     ? recordValue(equipment, inspectionItem.equipmentId)

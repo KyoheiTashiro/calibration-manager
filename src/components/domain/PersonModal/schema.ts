@@ -11,7 +11,9 @@ export const personFormSchema = z.object({
   email: z
     .string()
     .min(1, "メールアドレスは必須です")
-    .pipe(z.email({ message: "メールアドレスの形式が不正です" })),
+    .refine((value) => z.email().safeParse(value).success, {
+      message: "メールアドレスの形式が不正です",
+    }),
   department: z.string().optional(),
   isActive: z.boolean(),
 });

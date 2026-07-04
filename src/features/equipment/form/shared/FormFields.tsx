@@ -12,7 +12,7 @@ import type { ReactElement } from "react";
 import type { FieldErrors, UseFormRegister } from "react-hook-form";
 import { Link } from "react-router-dom";
 
-type EquipmentFormFieldsProps = {
+type Props = {
   register: UseFormRegister<EquipmentFormValues>;
   errors: FieldErrors<EquipmentFormValues>;
   manufacturerOptions: SelectOption[];
@@ -22,7 +22,7 @@ export const EquipmentFormFields = ({
   register,
   errors,
   manufacturerOptions,
-}: EquipmentFormFieldsProps): ReactElement => (
+}: Props): ReactElement => (
   <>
     <TextField
       label="管理番号"

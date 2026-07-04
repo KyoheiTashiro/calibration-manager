@@ -4,8 +4,8 @@
  * （screen-design/README.md §0.5）。
  */
 
+import { vendorFormSchema, type VendorFormValues } from "@/components/domain/VendorModal/schema";
 import { Button, Checkbox, Modal, TextField } from "@/components/ui";
-import { vendorFormSchema, type VendorFormValues } from "@/features/vendors/schema";
 import type { Vendor } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
 import { zodResolver } from "@hookform/resolvers/zod";

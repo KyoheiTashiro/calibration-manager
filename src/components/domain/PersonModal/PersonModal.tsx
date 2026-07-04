@@ -4,8 +4,8 @@
  * 割り当てられている場合は確認ダイアログで警告する（README.md §0.6 の確認ダイアログポリシー）。
  */
 
+import { personFormSchema, type PersonFormValues } from "@/components/domain/PersonModal/schema";
 import { Button, Checkbox, ConfirmModal, Modal, TextField } from "@/components/ui";
-import { personFormSchema, type PersonFormValues } from "@/features/persons/schema";
 import type { Person } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
 import { zodResolver } from "@hookform/resolvers/zod";

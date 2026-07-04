@@ -24,13 +24,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import type { ReactElement } from "react";
 import { useForm, useWatch } from "react-hook-form";
 
-type DialogProps = {
+type Props = {
   /** 対象案件。id と現状態のみ参照する */
   order: CalibrationOrder;
   onClose: () => void;
 };
 
-export const OrderDialog = ({ order, onClose }: DialogProps): ReactElement => {
+export const OrderDialog = ({ order, onClose }: Props): ReactElement => {
   const updateOrderStatus = useAppStore((state) => state.updateOrderStatus);
   const updateOrder = useAppStore((state) => state.updateOrder);
 
@@ -117,7 +117,7 @@ export const OrderDialog = ({ order, onClose }: DialogProps): ReactElement => {
   );
 };
 
-export const ReturnDialog = ({ order, onClose }: DialogProps): ReactElement => {
+export const ReturnDialog = ({ order, onClose }: Props): ReactElement => {
   const updateOrderStatus = useAppStore((state) => state.updateOrderStatus);
   const updateOrder = useAppStore((state) => state.updateOrder);
 

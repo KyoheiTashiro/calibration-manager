@@ -9,8 +9,8 @@ import { toEquipmentPayload, type SelectOption } from "@/features/equipment/form
 import { emptyFormValues, type EquipmentFormValues } from "@/features/equipment/form/shared/schema";
 import { useEquipmentFormCore } from "@/features/equipment/form/shared/useFormCore";
 import { useAppStore } from "@/store/useAppStore";
+import { useSafeNavigate } from "@/utils/navigation";
 import type { FieldErrors, UseFormHandleSubmit, UseFormRegister } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
 
 type UseCreateEquipmentFormResult = {
   register: UseFormRegister<EquipmentFormValues>;
@@ -21,7 +21,7 @@ type UseCreateEquipmentFormResult = {
 };
 
 export const useCreateEquipmentForm = (): UseCreateEquipmentFormResult => {
-  const navigate = useNavigate();
+  const safeNavigate = useSafeNavigate();
   const addEquipment = useAppStore((state) => state.addEquipment);
 
   const { register, errors, handleSubmit, manufacturerOptions } = useEquipmentFormCore({
@@ -30,12 +30,7 @@ export const useCreateEquipmentForm = (): UseCreateEquipmentFormResult => {
 
   const onSubmit = (values: EquipmentFormValues): void => {
     const newId = addEquipment(toEquipmentPayload(values));
-    // なぜ Promise.resolve().catch() か: navigate() は react-router 7 で
-    // `void | Promise<void>` を返す。遷移完了を待つ必要はなく、失敗時も
-    // 画面表示に影響しないため、両方の戻り値を統一的に無視する。
-    Promise.resolve(navigate(equipmentDetailPath(newId))).catch(() => {
-      // 遷移エラーは無視する
-    });
+    safeNavigate(equipmentDetailPath(newId));
   };
 
   return {
@@ -44,9 +39,7 @@ export const useCreateEquipmentForm = (): UseCreateEquipmentFormResult => {
     onFormSubmit: handleSubmit(onSubmit),
     manufacturerOptions,
     handleCancel: (): void => {
-      Promise.resolve(navigate(-1)).catch(() => {
-        // 遷移エラーは無視する
-      });
+      safeNavigate(-1);
     },
   };
 };

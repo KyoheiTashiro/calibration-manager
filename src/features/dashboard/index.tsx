@@ -4,7 +4,7 @@
  *
  * - 集計は inspectionItemRowsOf(@/store/selectors。稼働機器×有効項目×導出ステータスを一元化)の
  *   結果に対し、hooks.ts の純関数(countByStatus / actionRequiredRows / latestNotifications)を適用する。
- * - 遷移(カード→項目一覧プリフィルタ / 行→機器詳細)は useNavigate を子へ渡し、本体は薄いビューに保つ。
+ * - 遷移(カード→項目一覧プリフィルタ / 行→機器詳細)は useSafeNavigate を子へ渡し、本体は薄いビューに保つ。
  */
 
 import { ActionRequiredList } from "@/features/dashboard/components/ActionRequiredList";
@@ -13,12 +13,12 @@ import { SummaryCards } from "@/features/dashboard/components/SummaryCards";
 import { actionRequiredRows, countByStatus, latestNotifications } from "@/features/dashboard/hooks";
 import { inspectionItemRowsOf } from "@/store/selectors";
 import { useAppStore } from "@/store/useAppStore";
+import { useSafeNavigate } from "@/utils/navigation";
 import { todayIsoDate } from "@/utils/time";
 import { useMemo, type ReactElement } from "react";
-import { useNavigate } from "react-router-dom";
 
 export const Dashboard = (): ReactElement => {
-  const navigate = useNavigate();
+  const safeNavigate = useSafeNavigate();
   const inspectionItems = useAppStore((state) => state.inspectionItems);
   const equipment = useAppStore((state) => state.equipment);
   const orders = useAppStore((state) => state.orders);
@@ -42,28 +42,11 @@ export const Dashboard = (): ReactElement => {
     <div className="flex flex-col gap-6">
       <h1 className="text-xl font-bold">ダッシュボード</h1>
 
-      <SummaryCards
-        counts={counts}
-        onNavigate={(path) => {
-          // なぜ Promise.resolve().catch() か: navigate() は react-router 7 で
-          // `void | Promise<void>` を返す。遷移完了を待つ必要はなく、失敗時も
-          // 画面表示に影響しないため、両方の戻り値を統一的に無視する。
-          Promise.resolve(navigate(path)).catch(() => {
-            // 遷移エラーは無視する
-          });
-        }}
-      />
+      <SummaryCards counts={counts} onNavigate={safeNavigate} />
 
       <section className="flex flex-col gap-2">
         <h2 className="text-lg font-semibold">要対応項目</h2>
-        <ActionRequiredList
-          rows={actionRows}
-          onNavigate={(path) => {
-            Promise.resolve(navigate(path)).catch(() => {
-              // 遷移エラーは無視する
-            });
-          }}
-        />
+        <ActionRequiredList rows={actionRows} onNavigate={safeNavigate} />
       </section>
 
       <NotificationList notifications={latest} />

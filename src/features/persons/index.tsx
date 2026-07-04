@@ -1,8 +1,7 @@
 import { PersonModal } from "@/components/domain/PersonModal";
 import { Badge, Button, EmptyState, Table, TableBody, TableHead } from "@/components/ui";
+import { usePersonList, usePersonModal } from "@/features/persons/hooks";
 import type { ReactElement } from "react";
-
-import { usePersonList, usePersonModal } from "./hooks";
 
 /** 状態バッジの色classNameマッピング（screen-design/09-masters.md §9-B、StatusBadgeと同じ配色パターン） */
 const ACTIVE_BADGE_CLASS_NAME = "bg-green-100 text-green-800";
@@ -20,29 +19,33 @@ export const PersonList = (): ReactElement => {
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-bold">担当者</h1>
-        <Button variant="primary" onClick={handleAddClick}>
-          + 追加
-        </Button>
+        <Button onClick={handleAddClick}>+ 追加</Button>
       </div>
 
       {sortedPersons.length === 0 ? (
         <EmptyState
           message="担当者が未登録です"
-          action={
-            <Button variant="primary" onClick={handleAddClick}>
-              + 追加
-            </Button>
-          }
+          action={<Button onClick={handleAddClick}>+ 追加</Button>}
         />
       ) : (
         <Table>
           <TableHead>
             <tr>
-              <th className="px-3 py-2 text-left">氏名</th>
-              <th className="px-3 py-2 text-left">部署</th>
-              <th className="px-3 py-2 text-left">メール</th>
-              <th className="px-3 py-2 text-left">状態</th>
-              <th className="px-3 py-2 text-left">操作</th>
+              <th scope="col" className="px-3 py-2 text-left">
+                氏名
+              </th>
+              <th scope="col" className="px-3 py-2 text-left">
+                部署
+              </th>
+              <th scope="col" className="px-3 py-2 text-left">
+                メール
+              </th>
+              <th scope="col" className="px-3 py-2 text-left">
+                状態
+              </th>
+              <th scope="col" className="px-3 py-2 text-left">
+                操作
+              </th>
             </tr>
           </TableHead>
           <TableBody>

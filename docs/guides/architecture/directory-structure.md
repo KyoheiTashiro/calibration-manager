@@ -42,7 +42,9 @@ src/
 │   └── statusBadge.ts              // statusBadgeClass: ステータス→Tailwindクラスの単一マッピング（screen-design §0.3）
 ├── features/
 │   ├── dashboard/                  // '/'（screen-design §1）
-│   │   └── index.tsx
+│   │   ├── index.tsx
+│   │   ├── hooks.ts                // 集計・選定の純関数（countByStatus / actionRequiredRows / latestNotifications）
+│   │   └── components/             // SummaryCards / ActionRequiredList / NotificationList
 │   ├── equipment/
 │   │   ├── list/                   // '/equipment'（screen-design §2）
 │   │   ├── form/                   // '/equipment/create', '/equipment/:id/edit'（screen-design §3）
@@ -55,13 +57,21 @@ src/
 │   ├── manual/                      // '/manual'（利用マニュアル。静的コンテンツ・store参照なし。screen-design §12。D-035）
 │   │   └── index.tsx
 │   ├── inspectionOrder/            // '/orders'（かんばん。screen-design §8）
-│   │   └── index.tsx
+│   │   ├── index.tsx
+│   │   ├── hooks.ts                // useOrderKanban（store購読・表示列導出・ダイアログ状態・状態遷移アクション）
+│   │   ├── constants.ts            // 状態ラベル・かんばん列順
+│   │   ├── schema.ts               // 遷移ダイアログ（発注/返却）のRHF+zodフォームスキーマ
+│   │   └── components/             // OrderCard / TransitionDialogs
 │   ├── vendors/                    // '/vendors'（screen-design §9）
-│   │   └── index.tsx
+│   │   ├── index.tsx
+│   │   └── hooks.ts                // 一覧購読・モーダル開閉・削除フロー（参照ガード付き）
 │   ├── persons/                    // '/persons'（screen-design §9）
-│   │   └── index.tsx
+│   │   ├── index.tsx
+│   │   └── hooks.ts                // 一覧購読・モーダル開閉（物理削除なし・無効化トグルのみ）
 │   ├── notifications/              // '/notifications'（screen-design §10）
 │   │   ├── index.tsx
+│   │   ├── hooks.ts                // タブ絞り込み・並び替え・遷移先解決の純関数
+│   │   ├── constants.ts            // 通知種別のラベル/バッジ色/アイコン（ダッシュボードと共用）
 │   │   └── scan/useNotificationScan.ts  // アプリ起動時・タブ復帰時の日付変更検知でgenerateNotificationsを呼ぶフック
 │   └── settings/                   // '/settings'（screen-design §11。CSVエクスポート/インポート・データ全削除）
 │       ├── index.tsx
@@ -88,7 +98,8 @@ src/
 │   ├── id/index.ts                 // UUID生成（crypto.randomUUID ラッパー）
 │   ├── time/index.ts               // 日付整形（YYYY-MM-DD固定。screen-design §0.4）
 │   ├── csv/index.ts                // CSV低水準処理（RFC4180 serialize/parse、UTF-8 BOM付き）
-│   └── record/index.ts             // Record<string, T> の安全参照ヘルパ（recordValue / isRecord）
+│   ├── record/index.ts             // Record<string, T> の安全参照ヘルパ（recordValue / isRecord）
+│   └── navigation/index.ts         // 複数featureで共有する遷移系フック。useSafeNavigate: navigate()の戻り値（void | Promise<void>）を無視して遷移する共通ラッパー（D-044）
 ├── dev/                            // DEV限定（本番バンドル非包含）。D-034
 │   ├── seed.ts                     // buildSeedState(today) / seedIfEmpty()。空ストア時のみ投入する開発用シーダー
 │   ├── seedMasterData.ts           // マスタ（vendors/persons/equipment等）のシードデータ
@@ -100,7 +111,7 @@ src/
 
 - ルーターは `main.tsx` の `HashRouter`。ルート定義は `App.tsx` に置く。12画面のルーティング対応表は screen-design/README.md §0.2 を参照し、本書では再掲しない。
 - モーダル群（InspectionItemModal/RecordModal/OrderModal/VendorModal/PersonModal）は特定の1画面に属さず複数画面から起動されるため `components/domain/` に配置している（screen-design §0.2「モーダルで行う操作」）。`components/domain/` の役割が広いのは、calibration-managerの画面設計上モーダル起動元が多い（機器詳細・点検校正項目一覧・案件一覧など）ことによる設計判断である。
-- `features/*/schema.ts` にReact Hook Form + Zod用のフォームスキーマを置く（機器登録編集、Vendor/Person等）。
+- React Hook Form + Zod用のフォームスキーマは**フォームを持つ画面/コンポーネントの直近に colocate する**（D-043）。feature 内のフォーム（機器登録編集の `equipment/form/shared/schema.ts`、かんばん遷移ダイアログの `inspectionOrder/schema.ts`）は features 側、`components/domain/` のモーダル（InspectionItemModal / OrderModal / RecordModal / VendorModal / PersonModal）は各モーダルディレクトリ内の `schema.ts` に置く。永続化データの構造検証（`store/schema.ts`）とは別物。
 - `store/schema.ts` はCSVインポートの行バリデーションにも再利用している（[tech-stack.md](./tech-stack.md) 参照）。
 - Storybookのstoryはコンポーネント隣に `*.stories.tsx` で配置する（colocation）。上記ツリーでは省略している。
 - `src/test/` にテスト支援ユーティリティを置く（詳細は省略）。

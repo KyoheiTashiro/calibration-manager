@@ -19,13 +19,16 @@ import {
   EQUIPMENT_STATUS_BADGE_CLASSES,
   EQUIPMENT_STATUS_LABELS,
 } from "@/features/equipment/constants";
+import {
+  STATUS_FILTER_OPTIONS,
+  isStatusFilter,
+  useEquipmentList,
+} from "@/features/equipment/list/hooks";
+import { useSafeNavigate } from "@/utils/navigation";
 import type { KeyboardEvent, ReactElement } from "react";
-import { useNavigate } from "react-router-dom";
-
-import { STATUS_FILTER_OPTIONS, isStatusFilter, useEquipmentList } from "./hooks";
 
 export const EquipmentList = (): ReactElement => {
-  const navigate = useNavigate();
+  const safeNavigate = useSafeNavigate();
   const {
     totalCount,
     filteredEquipmentList,
@@ -39,18 +42,11 @@ export const EquipmentList = (): ReactElement => {
   } = useEquipmentList();
 
   const handleAddClick = (): void => {
-    // なぜ Promise.resolve().catch() か: navigate() は react-router 7 で
-    // `void | Promise<void>` を返す。遷移完了を待つ必要はなく、失敗時も
-    // 画面表示に影響しないため、両方の戻り値を統一的に無視する。
-    Promise.resolve(navigate(ROUTES.EQUIPMENT_CREATE)).catch(() => {
-      // 遷移エラーは無視する
-    });
+    safeNavigate(ROUTES.EQUIPMENT_CREATE);
   };
 
   const handleRowActivate = (equipmentId: string): void => {
-    Promise.resolve(navigate(equipmentDetailPath(equipmentId))).catch(() => {
-      // 遷移エラーは無視する
-    });
+    safeNavigate(equipmentDetailPath(equipmentId));
   };
 
   const handleRowKeyDown = (

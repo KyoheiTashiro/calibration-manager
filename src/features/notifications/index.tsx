@@ -24,11 +24,11 @@ import {
 import { unreadNotificationCount } from "@/store/selectors";
 import type { Notification } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
+import { useSafeNavigate } from "@/utils/navigation";
 import { useState, type ReactElement } from "react";
-import { useNavigate } from "react-router-dom";
 
 export const NotificationCenter = (): ReactElement => {
-  const navigate = useNavigate();
+  const safeNavigate = useSafeNavigate();
   const notifications = useAppStore((state) => state.notifications);
   const inspectionItems = useAppStore((state) => state.inspectionItems);
   const markAsRead = useAppStore((state) => state.markAsRead);
@@ -44,12 +44,7 @@ export const NotificationCenter = (): ReactElement => {
     markAsRead(notification.id);
     const target = resolveNotificationTarget(notification, inspectionItems);
     if (target !== null) {
-      // なぜ Promise.resolve().catch() か: navigate() は react-router 7 で
-      // `void | Promise<void>` を返す。遷移完了を待つ必要はなく、失敗時も
-      // 通知一覧の表示に影響しないため、両方の戻り値を統一的に無視する。
-      Promise.resolve(navigate(target)).catch(() => {
-        // 遷移エラーは無視する
-      });
+      safeNavigate(target);
     }
   };
 

@@ -17,6 +17,7 @@ import {
   historyRowsOf,
   personLabelOf,
   sortedInspectionItemsOf,
+  useSafeNavigate,
 } from "@/features/equipment/detail/hooks";
 import {
   CYCLE_LABELS,
@@ -27,7 +28,7 @@ import {
 import type { InspectionItem } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
 import { useState, type ReactElement } from "react";
-import { Navigate, useNavigate, useParams } from "react-router-dom";
+import { Navigate, useParams } from "react-router-dom";
 
 type ModalState = {
   open: boolean;
@@ -42,7 +43,7 @@ type RecordModalState = {
 
 export const EquipmentDetail = (): ReactElement => {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
+  const safeNavigate = useSafeNavigate();
 
   const equipmentMap = useAppStore((state) => state.equipment);
   const vendors = useAppStore((state) => state.vendors);
@@ -81,12 +82,7 @@ export const EquipmentDetail = (): ReactElement => {
         </h1>
         <Button
           onClick={() => {
-            // なぜ Promise.resolve().catch() か: navigate() は react-router 7 で
-            // `void | Promise<void>` を返す。遷移完了を待つ必要はなく、失敗時も
-            // 画面表示に影響しないため、両方の戻り値を統一的に無視する。
-            Promise.resolve(navigate(equipmentEditPath(currentEquipment.id))).catch(() => {
-              // 遷移エラーは無視する
-            });
+            safeNavigate(equipmentEditPath(currentEquipment.id));
           }}
         >
           編集
