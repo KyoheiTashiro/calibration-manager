@@ -51,8 +51,8 @@ export const createCalibrationOrderSlice: AppSliceCreator<CalibrationOrderSlice>
 
   updateOrder: (id, patch): void => {
     set((state) => {
-      const order = state.orders[id];
-      if (!order) return;
+      const order = recordValue(state.orders, id);
+      if (order === undefined) return;
       Object.assign(order, patch);
     });
   },
@@ -63,8 +63,8 @@ export const createCalibrationOrderSlice: AppSliceCreator<CalibrationOrderSlice>
     if (nextStatus === ORDER_STATUS.COMPLETED) return false;
     if (!canTransitionOrderStatus(order.status, nextStatus)) return false;
     set((state) => {
-      const draftOrder = state.orders[id];
-      if (draftOrder) draftOrder.status = nextStatus;
+      const draftOrder = recordValue(state.orders, id);
+      if (draftOrder !== undefined) draftOrder.status = nextStatus;
     });
     return true;
   },

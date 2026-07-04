@@ -17,10 +17,10 @@ export const statusOptions: SelectOption[] = Object.entries(EQUIPMENT_STATUS_LAB
 export const toEquipmentPayload = (values: EquipmentFormValues): Omit<Equipment, "id"> => ({
   managementNo: values.managementNo,
   name: values.name,
-  model: values.model || undefined,
-  serialNo: values.serialNo || undefined,
-  manufacturerId: values.manufacturerId || undefined,
-  location: values.location || undefined,
+  model: values.model === "" ? undefined : values.model,
+  serialNo: values.serialNo === "" ? undefined : values.serialNo,
+  manufacturerId: values.manufacturerId === "" ? undefined : values.manufacturerId,
+  location: values.location === "" ? undefined : values.location,
   status: values.status,
-  note: values.note || undefined,
+  note: values.note === "" ? undefined : values.note,
 });

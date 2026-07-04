@@ -31,6 +31,10 @@ type Props = {
   onClose: () => void;
 };
 
+// なぜ: noUncheckedIndexedAccess無効下でも実行時欠落(削除済み参照等)の可能性を型に反映するため
+const pickRecord = <Value,>(record: Record<string, Value>, key: string): Value | undefined =>
+  record[key];
+
 /**
  * doneBy プリフィル値を解決する（D-017 の解決順）:
  * ①案件経由 → 当該案件の業者名、②項目が external → 項目の業者名、
@@ -41,20 +45,28 @@ const resolvePrefillDoneBy = (
   order: CalibrationOrder | undefined,
   vendors: Record<string, Vendor>,
 ): string => {
-  if (order) return vendors[order.vendorId]?.name ?? "";
-  if (inspectionItem?.execution === EXECUTION.EXTERNAL && inspectionItem.vendorId) {
-    return vendors[inspectionItem.vendorId]?.name ?? "";
+  if (order) return pickRecord(vendors, order.vendorId)?.name ?? "";
+  if (inspectionItem !== undefined && inspectionItem.execution === EXECUTION.EXTERNAL) {
+    const { vendorId } = inspectionItem;
+    if (vendorId !== undefined && vendorId !== "") {
+      return pickRecord(vendors, vendorId)?.name ?? "";
+    }
   }
   return "";
 };
 
 export const RecordModal = ({ open, inspectionItemId, orderId, onClose }: Props): ReactElement => {
-  const inspectionItem = useAppStore((state) => state.inspectionItems[inspectionItemId]);
+  const inspectionItem = useAppStore((state) =>
+    pickRecord(state.inspectionItems, inspectionItemId),
+  );
   const equipment = useAppStore((state) =>
-    inspectionItem ? state.equipment[inspectionItem.equipmentId] : undefined,
+    inspectionItem ? pickRecord(state.equipment, inspectionItem.equipmentId) : undefined,
   );
   const vendors = useAppStore((state) => state.vendors);
-  const order = useAppStore((state) => (orderId ? state.orders[orderId] : undefined));
+  const hasOrderId = orderId !== undefined && orderId !== "";
+  const order = useAppStore((state) =>
+    hasOrderId ? pickRecord(state.orders, orderId) : undefined,
+  );
   const addRecord = useAppStore((state) => state.addRecord);
 
   const [submitFailed, setSubmitFailed] = useState(false);
@@ -84,7 +96,7 @@ export const RecordModal = ({ open, inspectionItemId, orderId, onClose }: Props)
   const doneDate = useWatch({ control, name: "doneDate" });
 
   const isFutureDoneDate = typeof doneDate === "string" && doneDate > todayIsoDate();
-  const orderVendorName = order ? (vendors[order.vendorId]?.name ?? "") : "";
+  const orderVendorName = order ? (pickRecord(vendors, order.vendorId)?.name ?? "") : "";
 
   const targetLabel =
     inspectionItem && equipment
@@ -114,6 +126,13 @@ export const RecordModal = ({ open, inspectionItemId, orderId, onClose }: Props)
     handleClose();
   };
 
+  // なぜcatchで終端するか: no-void下でfloating promiseを残さないため(onSubmitは例外を投げない設計)。
+  const handleSave = (): void => {
+    handleSubmit(onSubmit)().catch(() => {
+      // onSubmitは例外を投げない設計のため到達しない想定
+    });
+  };
+
   return (
     <Modal
       open={open}
@@ -121,7 +140,7 @@ export const RecordModal = ({ open, inspectionItemId, orderId, onClose }: Props)
       onClose={handleClose}
       isDirty={isDirty}
       footer={
-        <Button type="button" onClick={handleSubmit(onSubmit)}>
+        <Button type="button" onClick={handleSave}>
           保存
         </Button>
       }
@@ -131,7 +150,7 @@ export const RecordModal = ({ open, inspectionItemId, orderId, onClose }: Props)
           <span className="block text-sm text-slate-700">対象</span>
           <p className="text-sm text-slate-800">{targetLabel}</p>
         </div>
-        {orderId ? (
+        {hasOrderId ? (
           <p className="text-primary text-sm">
             案件連携:{orderVendorName} の案件と紐付けて登録します(登録で記録登録済になります)
           </p>

@@ -83,15 +83,33 @@ export const InspectionItemTable = ({ rows, onRecord, onOrder, onEdit }: Props):
           {/* なぜ td を flex 化して直下に Button を並べるか: equipment/detail と同様、
               div ラップだと jsx-a11y のボタンラベル探索深度を超えるため。 */}
           <td className="flex gap-2 px-3 py-2">
-            <Button variant="secondary" size="sm" onClick={() => onRecord(row)}>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => {
+                onRecord(row);
+              }}
+            >
               記録
             </Button>
             {row.canCreateOrder ? (
-              <Button variant="secondary" size="sm" onClick={() => onOrder(row)}>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => {
+                  onOrder(row);
+                }}
+              >
                 案件
               </Button>
             ) : null}
-            <Button variant="secondary" size="sm" onClick={() => onEdit(row)}>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => {
+                onEdit(row);
+              }}
+            >
               編集
             </Button>
           </td>

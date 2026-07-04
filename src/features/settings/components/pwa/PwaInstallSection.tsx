@@ -5,13 +5,19 @@
  */
 
 import { Button } from "@/components/ui";
-import { clearDeferredPrompt, usePwaInstall } from "@/features/settings/components/pwa/usePwaInstall";
+import {
+  clearDeferredPrompt,
+  usePwaInstall,
+} from "@/features/settings/components/pwa/usePwaInstall";
 import type { ReactElement, ReactNode } from "react";
 
 export const PwaInstallSection = (): ReactElement => {
   const { deferredPrompt, isInstalled } = usePwaInstall();
 
   // なぜ .then か: oxc(no-async-await) 方針のため async/await ではなく Promise チェーンで扱う。
+  // なぜ userChoice を入れ子の .then/.catch にするか: そのまま return すると
+  // 「Promise を返す関数は async 必須」ルールに抵触するが、async は上記方針で使えないため、
+  // 内側で独立したチェーンとして完結させる(いずれの分岐でも clearDeferredPrompt を呼ぶ)。
   const handleInstallClick = (): void => {
     if (deferredPrompt === null) {
       return;
@@ -19,10 +25,16 @@ export const PwaInstallSection = (): ReactElement => {
     const current = deferredPrompt;
     current
       .prompt()
-      .then(() => current.userChoice)
       .then(() => {
-        // なぜ: Chrome は同一イベントの再 prompt() を許さないため、結果に関わらず deferred を破棄する。
-        clearDeferredPrompt();
+        current.userChoice
+          .then(() => {
+            // なぜ: Chrome は同一イベントの再 prompt() を許さないため、結果に関わらず deferred を破棄する。
+            clearDeferredPrompt();
+          })
+          .catch(() => {
+            // インストール操作の失敗は例外を投げず無視する(coding-standards §8)
+            clearDeferredPrompt();
+          });
       })
       .catch(() => {
         // インストール操作の失敗は例外を投げず無視する(coding-standards §8)

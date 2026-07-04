@@ -25,7 +25,7 @@ export const useDialog = (open: boolean): RefObject<HTMLDialogElement | null> =>
     const dialogElement = dialogRef.current;
 
     return (): void => {
-      if (dialogElement?.open) {
+      if (dialogElement?.open === true) {
         dialogElement.close();
       }
     };

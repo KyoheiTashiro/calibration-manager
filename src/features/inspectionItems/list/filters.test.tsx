@@ -4,10 +4,7 @@
  */
 
 import { InspectionItemList } from "@/features/inspectionItems/list";
-import {
-  personSuzuki,
-  seedInspectionItemList,
-} from "@/features/inspectionItems/list/listFixtures";
+import { personSuzuki, seedInspectionItemList } from "@/features/inspectionItems/list/listFixtures";
 import { renderWithStore, setupStoreIsolation } from "@/test/renderWithStore";
 import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -31,7 +28,7 @@ const renderList = (search = ""): ReturnType<typeof renderWithStore> =>
     { initialEntries: [`/inspection-items${search}`] },
   );
 
-const searchValue = (): string => screen.getByTestId("search").textContent ?? "";
+const searchValue = (): string => screen.getByTestId("search").textContent;
 const dataRowCount = (): number => screen.getAllByRole("row").length - 1;
 
 beforeEach(() => {

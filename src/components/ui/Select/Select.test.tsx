@@ -70,7 +70,7 @@ describe("Select", () => {
   // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("name/onChange/ref 等のネイティブ props がそのまま素通しされる", async () => {
     const user = userEvent.setup();
-    const handleChange = vi.fn();
+    const handleChange = vi.fn<() => void>();
     const ref = createRef<HTMLSelectElement>();
     render(
       <Select label="取引先" options={OPTIONS} name="vendorId" onChange={handleChange} ref={ref} />,

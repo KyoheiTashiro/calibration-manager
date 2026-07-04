@@ -27,13 +27,13 @@ src/
 │   └── ui/                         // 汎用UIコンポーネント（各コンポーネントはサブディレクトリ + barrel）
 │       ├── Badge/ Button/ Checkbox/ ConfirmModal/ DateField/ EmptyState/ Modal/ RadioGroup/ Select/ Table/ Tabs/ TextField/ Textarea/
 │       ├── hooks/
-│       │   ├── useDialog.ts        // <dialog> showModal/close を open prop に同期
-│       │   └── useOutsideClick.ts  // 外側クリック購読
+│       │   └── useDialog.ts        // <dialog> showModal/close を open prop に同期
 │       └── index.ts
 ├── constants/
 │   ├── routes.ts                   // ルートパス定数（ROUTES）。screen-design §0.2のルーティング一覧に対応
 │   └── storage.ts                  // localStorageキー・スキーマバージョン定数（calibration-manager:v1 / STORAGE_VERSION=2）
 ├── domain/                         // ビジネスロジック（純粋関数。各 *.test.ts / 一部 *.proptest.test.ts）
+│   ├── constants.ts                // ドメイン定数（DEFAULT_BUFFER_DAYS / DEFAULT_NOTICE_DAYS_BEFORE / DELIVERY_DUE_SOON_NOTICE_DAYS）
 │   ├── dateCycle.ts                // addCycle: 暦月ベースの次回期限計算（domain-model §4.1）
 │   ├── inspectionItemStatus.ts               // deriveInspectionItemStatus: 項目ステータス導出（domain-model §4.3）
 │   ├── leadTime.ts                 // resolveLeadTime / recommendedOrderDate（domain-model §4.2）
@@ -46,10 +46,12 @@ src/
 │   ├── equipment/
 │   │   ├── list/                   // '/equipment'（screen-design §2）
 │   │   ├── form/                   // '/equipment/create', '/equipment/:id/edit'（screen-design §3）
-│   │   │   └── schema.ts           // 機器登録・編集フォームのzodスキーマ
+│   │   │   ├── create/ edit/       // 登録・編集それぞれのエントリ（index.tsx + hooks.ts）
+│   │   │   └── shared/             // FormFields / mapping / useFormCore / schema.ts（機器登録・編集フォームのzodスキーマ）
 │   │   └── detail/                 // '/equipment/:id'（screen-design §4。項目・履歴を含む）
-│   ├── inspectionItems/                      // '/inspection-items'（中核画面。screen-design §5）
-│   │   └── index.tsx
+│   ├── inspectionItems/            // '/inspection-items'（中核画面。screen-design §5）
+│   │   ├── constants.ts            // 種別・実施区分等の日本語ラベル定数（機器詳細・項目一覧・モーダルで共用）
+│   │   └── list/                   // index.tsx + hooks.ts + components/（FilterBar / InspectionItemTable）
 │   ├── manual/                      // '/manual'（利用マニュアル。静的コンテンツ・store参照なし。screen-design §12。D-035）
 │   │   └── index.tsx
 │   ├── inspectionOrder/            // '/orders'（かんばん。screen-design §8）
@@ -60,11 +62,13 @@ src/
 │   │   └── index.tsx
 │   ├── notifications/              // '/notifications'（screen-design §10）
 │   │   ├── index.tsx
-│   │   └── useNotificationScan.ts  // アプリ起動時・タブ復帰時の日付変更検知でgenerateNotificationsを呼ぶフック
+│   │   └── scan/useNotificationScan.ts  // アプリ起動時・タブ復帰時の日付変更検知でgenerateNotificationsを呼ぶフック
 │   └── settings/                   // '/settings'（screen-design §11。CSVエクスポート/インポート・データ全削除）
 │       ├── index.tsx
-│       ├── entityCsv.ts            // エンティティ⇔CSV列仕様レジストリ（buildEntityCsv。utils/csv.tsの低水準処理を利用）
-│       └── importValidation.ts     // CSVインポートの行単位検証（schema.tsのzodで行単位バリデーション）
+│       └── components/
+│           ├── csv/                // ExportSection / ImportSection / entityCsv.ts（エンティティ⇔CSV列仕様レジストリ。utils/csv の低水準処理を利用）/ importValidation.ts（行単位検証）
+│           ├── pwa/                // PwaInstallSection / usePwaInstall（D-037）
+│           └── reset/              // ResetSection（データ全削除。D-031）
 ├── store/
 │   ├── useAppStore.ts              // Zustand + persist + immer（7スライス合成・persist設定）
 │   ├── persistence.ts              // migrate（migrateV1ToV2等をMIGRATIONSへ登録）/ merge（3段サルベージ）/ sanitizeAppState
@@ -80,11 +84,11 @@ src/
 │       ├── inspectionRecordSlice.ts
 │       ├── calibrationOrderSlice.ts
 │       └── notificationSlice.ts
-├── utils/                          // 汎用ユーティリティ
-│   ├── id.ts                       // UUID生成（crypto.randomUUID ラッパー）
-│   ├── time.ts                     // 日付整形（YYYY-MM-DD固定。screen-design §0.4）
-│   ├── csv.ts                      // CSV低水準処理（RFC4180 serialize/parse、UTF-8 BOM付き）
-│   └── record.ts                   // Record<string, T> の安全参照ヘルパ（recordValue）
+├── utils/                          // 汎用ユーティリティ（各ユーティリティは サブディレクトリ/index.ts + テスト colocate）
+│   ├── id/index.ts                 // UUID生成（crypto.randomUUID ラッパー）
+│   ├── time/index.ts               // 日付整形（YYYY-MM-DD固定。screen-design §0.4）
+│   ├── csv/index.ts                // CSV低水準処理（RFC4180 serialize/parse、UTF-8 BOM付き）
+│   └── record/index.ts             // Record<string, T> の安全参照ヘルパ（recordValue / isRecord）
 ├── dev/                            // DEV限定（本番バンドル非包含）。D-034
 │   ├── seed.ts                     // buildSeedState(today) / seedIfEmpty()。空ストア時のみ投入する開発用シーダー
 │   ├── seedMasterData.ts           // マスタ（vendors/persons/equipment等）のシードデータ

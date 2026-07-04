@@ -19,7 +19,11 @@ export const AppLayout = (): ReactElement => {
   useEffect(() => {
     // なぜオーバーレイが開いているときだけ購読するか: 不要なイベントリスナーを
     // 常時貼り続けないため(閉じている間はEscを監視する意味がない)。
-    if (!isOverlayOpen) return;
+    if (!isOverlayOpen) {
+      return (): void => {
+        // オーバーレイ非表示時はイベント購読自体していないため、後始末は不要
+      };
+    }
 
     const handleKeyDown = (event: KeyboardEvent): void => {
       if (event.key === "Escape") {

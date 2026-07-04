@@ -6,6 +6,7 @@
 import type { AppSliceCreator } from "@/store/storeState";
 import type { Person } from "@/store/types";
 import { createId } from "@/utils/id";
+import { recordValue } from "@/utils/record";
 
 export type PersonSlice = {
   persons: Record<string, Person>;
@@ -28,16 +29,16 @@ export const createPersonSlice: AppSliceCreator<PersonSlice> = (set) => ({
 
   updatePerson: (id, patch): void => {
     set((state) => {
-      const person = state.persons[id];
-      if (!person) return;
+      const person = recordValue(state.persons, id);
+      if (person === undefined) return;
       Object.assign(person, patch);
     });
   },
 
   setPersonActive: (id, isActive): void => {
     set((state) => {
-      const person = state.persons[id];
-      if (!person) return;
+      const person = recordValue(state.persons, id);
+      if (person === undefined) return;
       person.isActive = isActive;
     });
   },

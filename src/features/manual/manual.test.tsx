@@ -49,7 +49,9 @@ describe("Manual", () => {
     expect(screen.getAllByRole("link", { name: "点検校正項目一覧" }).length).toBeGreaterThanOrEqual(
       2,
     );
-    expect(screen.getAllByRole("link", { name: "点検校正外部案件" }).length).toBeGreaterThanOrEqual(2);
+    expect(screen.getAllByRole("link", { name: "点検校正外部案件" }).length).toBeGreaterThanOrEqual(
+      2,
+    );
     expect(screen.getAllByRole("link", { name: "メーカー/取引先" }).length).toBeGreaterThanOrEqual(
       2,
     );

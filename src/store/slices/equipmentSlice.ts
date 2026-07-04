@@ -7,6 +7,7 @@
 import type { AppSliceCreator } from "@/store/storeState";
 import type { Equipment, EquipmentStatus } from "@/store/types";
 import { createId } from "@/utils/id";
+import { recordValue } from "@/utils/record";
 
 export type EquipmentSlice = {
   equipment: Record<string, Equipment>;
@@ -29,16 +30,16 @@ export const createEquipmentSlice: AppSliceCreator<EquipmentSlice> = (set) => ({
 
   updateEquipment: (id, patch): void => {
     set((state) => {
-      const entry = state.equipment[id];
-      if (!entry) return;
+      const entry = recordValue(state.equipment, id);
+      if (entry === undefined) return;
       Object.assign(entry, patch);
     });
   },
 
   setEquipmentStatus: (id, status): void => {
     set((state) => {
-      const entry = state.equipment[id];
-      if (!entry) return;
+      const entry = recordValue(state.equipment, id);
+      if (entry === undefined) return;
       entry.status = status;
     });
   },

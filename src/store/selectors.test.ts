@@ -211,7 +211,7 @@ describe("inspectionItemRowsOf: status 導出", () => {
   it("期限超過は overdue", () => {
     const state = makeState([makeInspectionItem({ id: "od", nextDueDate: "2026-01-01" })]);
     const [row] = inspectionItemRowsOf(state, TODAY);
-    expect(row?.status).toBe(INSPECTION_ITEM_STATUS.OVERDUE);
+    expect(row.status).toBe(INSPECTION_ITEM_STATUS.OVERDUE);
   });
 
   it("外部・leadTimeDays 未設定で vendor.standardLeadTimeDays フォールバック経由の orderNow", () => {
@@ -227,14 +227,14 @@ describe("inspectionItemRowsOf: status 導出", () => {
       }),
     ]);
     const [row] = inspectionItemRowsOf(state, TODAY);
-    expect(row?.status).toBe(INSPECTION_ITEM_STATUS.ORDER_NOW);
-    expect(row?.recommendedOrderDate).toBe("2026-06-28");
+    expect(row.status).toBe(INSPECTION_ITEM_STATUS.ORDER_NOW);
+    expect(row.recommendedOrderDate).toBe("2026-06-28");
   });
 
   it("内部実施は recommendedOrderDate が null(発注の概念がない)", () => {
     const state = makeState([makeInspectionItem({ id: "int", execution: EXECUTION.INTERNAL })]);
     const [row] = inspectionItemRowsOf(state, TODAY);
-    expect(row?.recommendedOrderDate).toBeNull();
+    expect(row.recommendedOrderDate).toBeNull();
   });
 
   it("外部でも参照先 Vendor が存在しない(dangling)なら納期解決不可で recommendedOrderDate は null", () => {
@@ -249,8 +249,8 @@ describe("inspectionItemRowsOf: status 導出", () => {
       }),
     ]);
     const [row] = inspectionItemRowsOf(state, TODAY);
-    expect(row?.inspectionItem.id).toBe("dangling-vendor");
-    expect(row?.recommendedOrderDate).toBeNull();
+    expect(row.inspectionItem.id).toBe("dangling-vendor");
+    expect(row.recommendedOrderDate).toBeNull();
   });
 });
 
@@ -265,7 +265,7 @@ describe("inspectionItemRowsOf: canCreateOrder", () => {
 
   it("外部かつ有効案件なしなら true", () => {
     const [row] = inspectionItemRowsOf(makeState([externalInspectionItem]), TODAY);
-    expect(row?.canCreateOrder).toBe(true);
+    expect(row.canCreateOrder).toBe(true);
   });
 
   it("外部でも有効案件があれば false", () => {
@@ -276,12 +276,12 @@ describe("inspectionItemRowsOf: canCreateOrder", () => {
       status: ORDER_STATUS.ORDERED,
     };
     const [row] = inspectionItemRowsOf(makeState([externalInspectionItem], [order]), TODAY);
-    expect(row?.canCreateOrder).toBe(false);
+    expect(row.canCreateOrder).toBe(false);
   });
 
   it("内部項目は常に false", () => {
     const [row] = inspectionItemRowsOf(makeState([makeInspectionItem({ id: "int" })]), TODAY);
-    expect(row?.canCreateOrder).toBe(false);
+    expect(row.canCreateOrder).toBe(false);
   });
 });
 

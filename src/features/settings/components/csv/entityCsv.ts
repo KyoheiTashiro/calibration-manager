@@ -173,12 +173,21 @@ export const ENTITY_CSV_SPECS: { [Kind in CsvEntityKind]: EntityCsvSpec<Kind> } 
   },
 };
 
-/** フィールド値をセル文字列へ変換する(D-028: undefined → 空、boolean → true/false) */
-const cellOfValue = (value: string | number | boolean | undefined): string => {
+/**
+ * フィールド値をセル文字列へ変換する(D-028: undefined → 空、boolean → true/false)。
+ * 引数を unknown にしているのは、呼び出し側の `entity[column.key]` がジェネリックな
+ * `Kind` 越しのインデックスアクセスで具体型(string/number/boolean/undefined)へ
+ * TS上解決しきれないため(型引数を固定しない限り原理的に不可能)。実体は
+ * ENTITY_CSV_SPECS の columns 定義により必ずこの4種のいずれかであり、
+ * typeof による実行時ガードで安全に検証する。
+ */
+const cellOfValue = (value: unknown): string => {
   if (value === undefined) return "";
   if (typeof value === "boolean") return value ? "true" : "false";
   if (typeof value === "number") return String(value);
-  return value;
+  if (typeof value === "string") return value;
+  // 型上到達しない(CsvColumn の kind 定義により value は上記4種のみ)
+  throw new Error("想定外のセル値の型です");
 };
 
 /**
@@ -193,7 +202,7 @@ export const buildEntityCsv = <Kind extends CsvEntityKind>(
   const spec = ENTITY_CSV_SPECS[kind];
   const header = spec.columns.map((column) => column.key);
   const rows = Object.values(entities)
-    .toSorted((left, right) => (left.id < right.id ? -1 : 1))
-    .map((entity) => spec.columns.map((column) => cellOfValue(entity[column.key])));
+    .toSorted((left: EntityOf<Kind>, right: EntityOf<Kind>) => (left.id < right.id ? -1 : 1))
+    .map((entity: EntityOf<Kind>) => spec.columns.map((column) => cellOfValue(entity[column.key])));
   return serializeCsv([header, ...rows]);
 };

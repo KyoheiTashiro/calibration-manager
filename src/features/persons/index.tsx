@@ -1,6 +1,7 @@
 import { PersonModal } from "@/components/domain/PersonModal";
 import { Badge, Button, EmptyState, Table, TableBody, TableHead } from "@/components/ui";
 import type { ReactElement } from "react";
+
 import { usePersonList, usePersonModal } from "./hooks";
 
 /** 状態バッジの色classNameマッピング（screen-design/09-masters.md §9-B、StatusBadgeと同じ配色パターン） */
@@ -48,7 +49,7 @@ export const PersonList = (): ReactElement => {
             {sortedPersons.map((person) => (
               <tr key={person.id}>
                 <td className="px-3 py-2">{person.name}</td>
-                <td className="px-3 py-2">{person.department || "—"}</td>
+                <td className="px-3 py-2">{person.department ?? "—"}</td>
                 <td className="px-3 py-2">{person.email}</td>
                 <td className="px-3 py-2">
                   <Badge
@@ -61,7 +62,13 @@ export const PersonList = (): ReactElement => {
                   </Badge>
                 </td>
                 <td className="px-3 py-2">
-                  <Button size="sm" variant="secondary" onClick={() => handleEditClick(person)}>
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    onClick={() => {
+                      handleEditClick(person);
+                    }}
+                  >
                     編集
                   </Button>
                 </td>

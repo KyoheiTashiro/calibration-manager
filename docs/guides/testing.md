@@ -40,7 +40,7 @@
 - **`notificationRules.ts`（`computeExpectedNotifications`: 通知生成判定。発生条件は[domain-model.md §3.7](../spec/domain-model.md)を参照）**
   - 5種別すべての発生条件を境界値で検証する
   - **重複抑止**: 同一対象・同一種別の未読通知は重複生成しないことをテストする（既存の未読通知がある状態で再スキャンしても件数が増えない）
-- **CSVインポートのバリデーション**（低水準処理は `src/utils/csv.ts`、エンティティ列仕様は `src/features/settings/entityCsv.ts`、インポート検証は `src/features/settings/importValidation.ts`。zodスキーマは `src/store/schema.ts` を再利用）
+- **CSVインポートのバリデーション**（低水準処理は `src/utils/csv/`、エンティティ列仕様は `src/features/settings/components/csv/entityCsv.ts`、インポート検証は `src/features/settings/components/csv/importValidation.ts`。zodスキーマは `src/store/schema.ts` を再利用）
   - zod スキーマによる行単位バリデーション。不正行はインポートを中断せずエラー表示すること（例外を投げない、[coding-standards.md](coding-standards.md) §8 の方針と一致）
   - 文字コードは UTF-8 BOM付きで読み書きできること（Excel互換）
 
@@ -49,9 +49,9 @@
 ## UI / component
 
 - `@testing-library/react` でコンポーネント・feature 単位のテスト
-  - 共通 UI（`src/components/ui/<ComponentName>/<ComponentName>.test.tsx`）: Badge / Button / Modal / ConfirmModal / EmptyState / Select / DateField / Table / Tabs
+  - 共通 UI（`src/components/ui/<ComponentName>/<ComponentName>.test.tsx`）: Badge / Button / Checkbox / ConfirmModal / DateField / EmptyState / Modal / RadioGroup / Select / Table / Tabs / TextField / Textarea（+ `hooks/useDialog`）
   - ドメイン固有 UI（`src/components/domain/<ComponentName>/<ComponentName>.test.tsx`）: StatusBadge（`deriveInspectionItemStatus` の表示）
-  - feature（`src/features/**/*.test.tsx`）: dashboard / equipment（一覧・詳細・登録編集） / inspectionItems（点検校正項目一覧・点検校正項目モーダル・実施記録登録モーダル） / orders（案件一覧） / vendors・persons（メーカー/取引先・担当者マスタ） / notifications（通知センター） / settings（CSVエクスポート/インポート）
+  - feature（`src/features/**/*.test.tsx`）: dashboard / equipment（一覧・詳細・登録編集） / inspectionItems（点検校正項目一覧・点検校正項目モーダル・実施記録登録モーダル） / inspectionOrder（案件一覧） / vendors・persons（メーカー/取引先・担当者マスタ） / notifications（通知センター） / settings（CSVエクスポート/インポート）
 - **Storybook** でコンポーネント単位の見た目・状態を確認
   - 起動: `npm run storybook`（dev・ポート6006） / ビルド: `npm run build-storybook`
   - story配置: 各コンポーネント隣に `*.stories.tsx`（`src/**/*.stories.@(tsx|mdx)`）
@@ -67,10 +67,10 @@
 
 - `src/domain/**`（`dateCycle.ts` / `leadTime.ts` / `inspectionItemStatus.ts` / `notificationRules.ts` 等）: lines 98 / functions 100 / branches 98 / statements 98
 - `src/store/**`: lines 97 / functions 96 / branches 92 / statements 97
-- `src/utils/id.ts`: 100 / 100 / 100 / 100
-- `src/utils/csv.ts`: lines 97 / functions 95 / branches 90 / statements 97
+- `src/utils/id/index.ts`: 100 / 100 / 100 / 100
+- `src/utils/csv/index.ts`: lines 97 / functions 95 / branches 90 / statements 97
 
-除外: `*.test.{ts,tsx}` / `*.stories.tsx` / `src/test/**` / `src/main.tsx` / `**/types.ts` / `src/components/system/**`（PWA SW連携 glue。`virtual:pwa-register/react` 依存で未カバー走査時に JSX をパースできず除外）
+明示的な `exclude` 設定は置かず provider 既定の除外に任せる。閾値ゲートは上記4パターンに限定され、component（`.tsx`）や `src/components/system/**` は対象外。
 
 ## アクセシビリティ
 

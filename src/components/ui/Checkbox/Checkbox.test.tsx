@@ -19,7 +19,7 @@ describe("Checkbox", () => {
   // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("ラベルクリックでチェック状態が切り替わり onChange が呼ばれる", async () => {
     const user = userEvent.setup();
-    const handleChange = vi.fn();
+    const handleChange = vi.fn<() => void>();
     render(<Checkbox label="校正業者" onChange={handleChange} />);
 
     await user.click(screen.getByText("校正業者"));

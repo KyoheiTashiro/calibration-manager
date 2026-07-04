@@ -78,7 +78,7 @@ describe("buildSeedState", () => {
 
     for (const inspectionItem of Object.values(state.inspectionItems)) {
       const equipment = state.equipment[inspectionItem.equipmentId];
-      if (equipment?.status !== EQUIPMENT_STATUS.ACTIVE) continue;
+      if (equipment.status !== EQUIPMENT_STATUS.ACTIVE) continue;
       if (!inspectionItem.isActive) continue;
       const vendor =
         inspectionItem.vendorId === undefined
@@ -98,7 +98,7 @@ describe("buildSeedState", () => {
 
     for (const inspectionItem of Object.values(state.inspectionItems)) {
       const equipment = state.equipment[inspectionItem.equipmentId];
-      if (equipment?.status !== EQUIPMENT_STATUS.ACTIVE) continue;
+      if (equipment.status !== EQUIPMENT_STATUS.ACTIVE) continue;
       if (!inspectionItem.isActive) continue;
       combos.add(`${inspectionItem.type}/${inspectionItem.execution}`);
     }

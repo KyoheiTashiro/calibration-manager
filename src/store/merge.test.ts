@@ -22,6 +22,7 @@ import type {
 } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
 import { setupStoreIsolation } from "@/test/renderWithStore";
+import { isRecord } from "@/utils/record";
 import { beforeEach, describe, expect, it } from "vitest";
 
 const vendor: Vendor = {
@@ -94,7 +95,7 @@ describe("migratePersistedState", () => {
     const result = migratePersistedState({ marker: 0 }, STORAGE_VERSION - 1, {
       [STORAGE_VERSION - 1]: (persisted) => {
         applied.push(STORAGE_VERSION - 1);
-        return { ...(persisted as Record<string, unknown>), migrated: true };
+        return { ...(isRecord(persisted) ? persisted : {}), migrated: true };
       },
     });
     expect(applied).toEqual([STORAGE_VERSION - 1]);
@@ -144,9 +145,10 @@ describe("migrateV1ToV2: item→inspectionItem リネーム（D-036）", () => {
   });
 
   it("MIGRATIONS[1] として登録されており、v1→現行版のパイプラインで適用される", () => {
-    const result = migratePersistedState(v1State(), 1) as Record<string, unknown>;
-    expect(result["inspectionItems"]).toBeDefined();
-    expect(result["items"]).toBeUndefined();
+    const result = migratePersistedState(v1State(), 1);
+    if (!isRecord(result)) throw new Error("result should be a record");
+    expect(result.inspectionItems).toBeDefined();
+    expect(result.items).toBeUndefined();
   });
 
   it("targetType が order の通知は変換しない", () => {
@@ -159,15 +161,21 @@ describe("migrateV1ToV2: item→inspectionItem リネーム（D-036）", () => {
     const migrated = migrateV1ToV2({
       ...v1State(),
       notifications: { "notification-2": orderNotification },
-    }) as { notifications: Record<string, { targetType: string }> };
-    expect(migrated.notifications["notification-2"]?.targetType).toBe("order");
+    });
+    if (!isRecord(migrated) || !isRecord(migrated.notifications)) {
+      throw new Error("migrated.notifications should be a record");
+    }
+    const migratedNotification = migrated.notifications["notification-2"];
+    if (!isRecord(migratedNotification)) throw new Error("notification-2 should be a record");
+    expect(migratedNotification.targetType).toBe("order");
   });
 
   it("非オブジェクトや欠損キーは例外を投げず通す（後段サルベージに委ねる）", () => {
     expect(migrateV1ToV2(null)).toBeNull();
     expect(migrateV1ToV2("broken")).toBe("broken");
-    const migrated = migrateV1ToV2({ vendors: 42, records: "broken" }) as Record<string, unknown>;
-    expect(migrated["records"]).toBe("broken");
+    const migrated = migrateV1ToV2({ vendors: 42, records: "broken" });
+    if (!isRecord(migrated)) throw new Error("migrated should be a record");
+    expect(migrated.records).toBe("broken");
     expect(salvagePersistedState(migrated)).toEqual(emptyAppState());
   });
 });
@@ -250,7 +258,8 @@ describe("sanitizeAppState: 参照整合（D-003）", () => {
 describe("persist 統合（LocalStorage → rehydrate）", () => {
   beforeEach(setupStoreIsolation);
 
-  it("破損混在の LocalStorage から有効レコードのみ復元する", () => {
+  // oxlint-disable-next-line oxc/no-async-await -- rehydrate(Promise)の完了待ちが必要で、Promise 返却は typescript/promise-function-async と衝突するため
+  it("破損混在の LocalStorage から有効レコードのみ復元する", async () => {
     const persisted = {
       state: {
         ...validState(),
@@ -263,14 +272,12 @@ describe("persist 統合（LocalStorage → rehydrate）", () => {
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(persisted));
 
-    // プロジェクト規約で async/await 禁止のため Promise を返して完了を待つ
-    return Promise.resolve(useAppStore.persist.rehydrate()).then(() => {
-      const state = useAppStore.getState();
-      expect(Object.keys(state.persons)).toEqual([person.id]);
-      expect(state.inspectionItems[inspectionItem.id]).toEqual(inspectionItem);
-      // アクションは merge 後も失われない
-      expect(typeof state.addRecord).toBe("function");
-    });
+    await useAppStore.persist.rehydrate();
+    const state = useAppStore.getState();
+    expect(Object.keys(state.persons)).toEqual([person.id]);
+    expect(state.inspectionItems[inspectionItem.id]).toEqual(inspectionItem);
+    // アクションは merge 後も失われない
+    expect(typeof state.addRecord).toBe("function");
   });
 
   it("アクション実行で partialize されたエンティティのみが保存される", () => {
@@ -278,8 +285,12 @@ describe("persist 統合（LocalStorage → rehydrate）", () => {
 
     const raw = localStorage.getItem(STORAGE_KEY);
     expect(raw).not.toBeNull();
-    const persisted = JSON.parse(raw as string) as { state: Record<string, unknown> };
-    expect(Object.keys(persisted.state).toSorted()).toEqual([
+    if (raw === null) throw new Error("raw should not be null");
+    const parsed: unknown = JSON.parse(raw);
+    if (!isRecord(parsed) || !isRecord(parsed.state)) {
+      throw new Error("persisted state shape unexpected");
+    }
+    expect(Object.keys(parsed.state).toSorted()).toEqual([
       "equipment",
       "inspectionItems",
       "notifications",

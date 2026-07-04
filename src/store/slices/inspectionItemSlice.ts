@@ -6,6 +6,7 @@
 import type { AppSliceCreator } from "@/store/storeState";
 import type { InspectionItem } from "@/store/types";
 import { createId } from "@/utils/id";
+import { recordValue } from "@/utils/record";
 
 export type InspectionItemSlice = {
   inspectionItems: Record<string, InspectionItem>;
@@ -28,16 +29,16 @@ export const createInspectionItemSlice: AppSliceCreator<InspectionItemSlice> = (
 
   updateInspectionItem: (id, patch): void => {
     set((state) => {
-      const inspectionItem = state.inspectionItems[id];
-      if (!inspectionItem) return;
+      const inspectionItem = recordValue(state.inspectionItems, id);
+      if (inspectionItem === undefined) return;
       Object.assign(inspectionItem, patch);
     });
   },
 
   setInspectionItemActive: (id, isActive): void => {
     set((state) => {
-      const inspectionItem = state.inspectionItems[id];
-      if (!inspectionItem) return;
+      const inspectionItem = recordValue(state.inspectionItems, id);
+      if (inspectionItem === undefined) return;
       inspectionItem.isActive = isActive;
     });
   },

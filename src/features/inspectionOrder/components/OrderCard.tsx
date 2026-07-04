@@ -13,6 +13,7 @@ import {
   type InspectionItem,
   type Vendor,
 } from "@/store/types";
+import { recordValue } from "@/utils/record";
 import type { ReactElement, ReactNode } from "react";
 
 /** 参照先が消えている（dangling FK）ときの表示。D-003 の寛容方針で例外を投げず表示に留める */
@@ -43,9 +44,11 @@ export const OrderCard = ({
   onCancel,
   onRecord,
 }: OrderCardProps): ReactElement => {
-  const inspectionItem = inspectionItems[order.inspectionItemId];
-  const equipmentEntry = inspectionItem ? equipment[inspectionItem.equipmentId] : undefined;
-  const vendor = vendors[order.vendorId];
+  const inspectionItem = recordValue(inspectionItems, order.inspectionItemId);
+  const equipmentEntry = inspectionItem
+    ? recordValue(equipment, inspectionItem.equipmentId)
+    : undefined;
+  const vendor = recordValue(vendors, order.vendorId);
 
   const managementNo = equipmentEntry?.managementNo ?? NO_REFERENCE_LABEL;
   const equipmentName = equipmentEntry?.name ?? NO_REFERENCE_LABEL;
@@ -60,10 +63,21 @@ export const OrderCard = ({
       case ORDER_STATUS.PLANNED: {
         return (
           <>
-            <Button size="sm" onClick={() => onOrder(order)}>
+            <Button
+              size="sm"
+              onClick={() => {
+                onOrder(order);
+              }}
+            >
               発注する
             </Button>
-            <Button size="sm" variant="danger" onClick={() => onCancel(order)}>
+            <Button
+              size="sm"
+              variant="danger"
+              onClick={() => {
+                onCancel(order);
+              }}
+            >
               中止
             </Button>
           </>
@@ -72,10 +86,21 @@ export const OrderCard = ({
       case ORDER_STATUS.ORDERED: {
         return (
           <>
-            <Button size="sm" onClick={() => onAdvance(order)}>
+            <Button
+              size="sm"
+              onClick={() => {
+                onAdvance(order);
+              }}
+            >
               校正中へ
             </Button>
-            <Button size="sm" variant="danger" onClick={() => onCancel(order)}>
+            <Button
+              size="sm"
+              variant="danger"
+              onClick={() => {
+                onCancel(order);
+              }}
+            >
               中止
             </Button>
           </>
@@ -84,10 +109,21 @@ export const OrderCard = ({
       case ORDER_STATUS.IN_CALIBRATION: {
         return (
           <>
-            <Button size="sm" onClick={() => onReturn(order)}>
+            <Button
+              size="sm"
+              onClick={() => {
+                onReturn(order);
+              }}
+            >
               返却する
             </Button>
-            <Button size="sm" variant="danger" onClick={() => onCancel(order)}>
+            <Button
+              size="sm"
+              variant="danger"
+              onClick={() => {
+                onCancel(order);
+              }}
+            >
               中止
             </Button>
           </>
@@ -95,13 +131,22 @@ export const OrderCard = ({
       }
       case ORDER_STATUS.RETURNED: {
         return (
-          <Button size="sm" onClick={() => onRecord(order)}>
+          <Button
+            size="sm"
+            onClick={() => {
+              onRecord(order);
+            }}
+          >
             記録登録
           </Button>
         );
       }
-      default: {
+      case ORDER_STATUS.COMPLETED:
+      case ORDER_STATUS.CANCELLED: {
         // completed / cancelled はアクションなし（D-018）
+        return null;
+      }
+      default: {
         return null;
       }
     }

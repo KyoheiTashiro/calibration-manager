@@ -31,12 +31,11 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 // なぜ: 「編集」ボタンの遷移先検証のため useNavigate だけスパイへ差し替える
 // (equipment/form/index.test.tsx と同じ理由・同じ手法。Navigate/Routes 等の実実装は維持)。
 const navigateSpy = vi.hoisted(() => vi.fn());
-vi.mock("react-router-dom", (importOriginal) =>
-  importOriginal<typeof ReactRouterDomModule>().then((actual) => ({
-    ...actual,
-    useNavigate: (): typeof navigateSpy => navigateSpy,
-  })),
-);
+// oxlint-disable-next-line oxc/no-async-await -- importOriginal(Promise)の解決が必要で、.then() 連鎖は typescript/promise-function-async と衝突するため
+vi.mock("react-router-dom", async (importOriginal) => {
+  const actual = await importOriginal<typeof ReactRouterDomModule>();
+  return { ...actual, useNavigate: (): typeof navigateSpy => navigateSpy };
+});
 
 const renderDetail = (id: string): ReturnType<typeof renderWithStore> =>
   renderWithStore(<EquipmentDetail />, {
@@ -49,7 +48,7 @@ const renderDetail = (id: string): ReturnType<typeof renderWithStore> =>
  * 出現するため、screen 全体ではなく項目テーブル内にスコープして曖昧マッチを避ける。
  */
 const getInspectionItemRow = (name: string | RegExp): HTMLElement => {
-  const [inspectionItemTable] = screen.getAllByRole("table");
+  const inspectionItemTable = screen.getAllByRole("table").at(0);
   if (!inspectionItemTable) throw new Error("項目テーブルが見つかりません");
   return within(inspectionItemTable).getByRole("row", { name });
 };
@@ -132,7 +131,7 @@ describe("EquipmentDetail: 空状態", () => {
  */
 const getHistoryRows = (): HTMLElement[] => {
   // なぜ2つ目のtableか: 画面には項目テーブルと実施記録テーブルの2つがある
-  const [, historyTable] = screen.getAllByRole("table");
+  const historyTable = screen.getAllByRole("table").at(1);
   if (!historyTable) throw new Error("実施記録テーブルが見つかりません");
   const [, ...dataRows] = within(historyTable).getAllByRole("row");
   return dataRows;
@@ -161,7 +160,10 @@ describe("EquipmentDetail: 実施記録", () => {
   it("実施者・結果の日本語ラベル・備考(空は「—」)が表示される", () => {
     renderDetail(equipmentFull.id);
 
-    const [first, second, third] = getHistoryRows();
+    const rows = getHistoryRows();
+    const first = rows.at(0);
+    const second = rows.at(1);
+    const third = rows.at(2);
     if (!first || !second || !third) throw new Error("実施記録の行が3件表示されていません");
 
     expect(within(first).getByText("鈴木")).toBeInTheDocument();
@@ -220,7 +222,7 @@ describe("EquipmentDetail: 項目テーブルの並び順・淡色表示", () =>
     seedEquipmentFullInspectionItemsAndRecords();
     renderDetail(equipmentFull.id);
 
-    const [inspectionItemTable] = screen.getAllByRole("table");
+    const inspectionItemTable = screen.getAllByRole("table").at(0);
     if (!inspectionItemTable) throw new Error("項目テーブルが見つかりません");
     const [, ...dataRows] = within(inspectionItemTable).getAllByRole("row");
     const names = dataRows.map((row) => within(row).getAllByRole("cell")[1]?.textContent ?? "");

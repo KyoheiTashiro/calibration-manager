@@ -20,6 +20,7 @@ import {
   type InspectionRecord,
   type IsoDateString,
 } from "@/store/types";
+import { recordValue } from "@/utils/record";
 
 /** 機器に属する項目の一覧 */
 export const inspectionItemsOf = (
@@ -54,7 +55,7 @@ export const recordsOf = (
  * 機器詳細・項目一覧など担当者名を表示する全画面がこれを使う。
  */
 export const personLabelOf = (state: Pick<AppState, "persons">, personId: string): string => {
-  const person = state.persons[personId];
+  const person = recordValue(state.persons, personId);
   if (person === undefined) return "—";
   return person.isActive ? person.name : `${person.name}(無効)`;
 };
@@ -92,13 +93,14 @@ export const inspectionItemRowsOf = (
   const rows: InspectionItemRow[] = [];
   for (const inspectionItem of Object.values(state.inspectionItems)) {
     if (!inspectionItem.isActive) continue;
-    const equipment = state.equipment[inspectionItem.equipmentId];
+    const equipment = recordValue(state.equipment, inspectionItem.equipmentId);
     if (equipment === undefined) continue; // dangling: 参照先機器なし
     if (equipment.status !== EQUIPMENT_STATUS.ACTIVE) continue;
 
-    const vendor = inspectionItem.vendorId
-      ? (state.vendors[inspectionItem.vendorId] ?? null)
-      : null;
+    const vendor =
+      inspectionItem.vendorId === undefined
+        ? null
+        : (state.vendors[inspectionItem.vendorId] ?? null);
     const inspectionItemOrders: CalibrationOrder[] = ordersOf(
       { orders: state.orders },
       inspectionItem.id,

@@ -19,9 +19,10 @@ import {
   EQUIPMENT_STATUS_BADGE_CLASSES,
   EQUIPMENT_STATUS_LABELS,
 } from "@/features/equipment/constants";
-import { STATUS_FILTER_OPTIONS, useEquipmentList, type StatusFilter } from "./hooks";
 import type { KeyboardEvent, ReactElement } from "react";
 import { useNavigate } from "react-router-dom";
+
+import { STATUS_FILTER_OPTIONS, isStatusFilter, useEquipmentList } from "./hooks";
 
 export const EquipmentList = (): ReactElement => {
   const navigate = useNavigate();
@@ -38,11 +39,18 @@ export const EquipmentList = (): ReactElement => {
   } = useEquipmentList();
 
   const handleAddClick = (): void => {
-    navigate(ROUTES.EQUIPMENT_CREATE);
+    // なぜ Promise.resolve().catch() か: navigate() は react-router 7 で
+    // `void | Promise<void>` を返す。遷移完了を待つ必要はなく、失敗時も
+    // 画面表示に影響しないため、両方の戻り値を統一的に無視する。
+    Promise.resolve(navigate(ROUTES.EQUIPMENT_CREATE)).catch(() => {
+      // 遷移エラーは無視する
+    });
   };
 
   const handleRowActivate = (equipmentId: string): void => {
-    navigate(equipmentDetailPath(equipmentId));
+    Promise.resolve(navigate(equipmentDetailPath(equipmentId))).catch(() => {
+      // 遷移エラーは無視する
+    });
   };
 
   const handleRowKeyDown = (
@@ -74,7 +82,9 @@ export const EquipmentList = (): ReactElement => {
                 label="検索"
                 placeholder="管理番号/名称/型式で検索"
                 value={searchText}
-                onChange={(event) => setSearchText(event.target.value)}
+                onChange={(event) => {
+                  setSearchText(event.target.value);
+                }}
               />
             </div>
             <div className="w-40">
@@ -82,7 +92,11 @@ export const EquipmentList = (): ReactElement => {
                 label="状態"
                 options={STATUS_FILTER_OPTIONS}
                 value={statusFilter}
-                onChange={(event) => setStatusFilter(event.target.value as StatusFilter)}
+                onChange={(event) => {
+                  if (isStatusFilter(event.target.value)) {
+                    setStatusFilter(event.target.value);
+                  }
+                }}
               />
             </div>
           </div>
@@ -124,15 +138,19 @@ export const EquipmentList = (): ReactElement => {
                   <tr
                     key={entry.id}
                     tabIndex={0}
-                    onClick={() => handleRowActivate(entry.id)}
-                    onKeyDown={(event) => handleRowKeyDown(event, entry.id)}
+                    onClick={() => {
+                      handleRowActivate(entry.id);
+                    }}
+                    onKeyDown={(event) => {
+                      handleRowKeyDown(event, entry.id);
+                    }}
                     className="cursor-pointer hover:bg-slate-50"
                   >
                     <td className="px-3 py-2">{entry.managementNo}</td>
                     <td className="px-3 py-2">{entry.name}</td>
-                    <td className="px-3 py-2">{entry.model || "—"}</td>
-                    <td className="px-3 py-2">{manufacturerNameOf(entry) || "—"}</td>
-                    <td className="px-3 py-2">{entry.location || "—"}</td>
+                    <td className="px-3 py-2">{entry.model ?? "—"}</td>
+                    <td className="px-3 py-2">{manufacturerNameOf(entry) ?? "—"}</td>
+                    <td className="px-3 py-2">{entry.location ?? "—"}</td>
                     <td className="px-3 py-2">
                       {/* oxlint-disable-next-line react/forbid-component-props -- Badgeはclassnameで色を渡す設計（Badge.tsx参照） */}
                       <Badge className={EQUIPMENT_STATUS_BADGE_CLASSES[entry.status]}>

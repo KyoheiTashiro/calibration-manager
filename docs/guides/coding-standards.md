@@ -41,7 +41,7 @@ Lint/Format は **oxlint + oxfmt**（ESLint/Prettier ではない）。多くは
   export type InspectionItemStatus = (typeof INSPECTION_ITEM_STATUS)[keyof typeof INSPECTION_ITEM_STATUS];
   ```
   根拠: 値と型を 1 箇所で同期。`NOTIFICATION_TYPE`/`ORDER_STATUS`/`EQUIPMENT_STATUS`/`ROUTES` 等で一貫。
-- **zustand スライス**: 型 `XxxSlice` + ファクトリ `createXxxSlice` + 初期値 `xxxInitial`（例: `EquipmentSlice` / `createEquipmentSlice` / `equipmentInitial`）。
+- **zustand スライス**: 型 `XxxSlice` + ファクトリ `createXxxSlice`（例: `EquipmentSlice` / `createEquipmentSlice`）。初期値は独立した定数にせずファクトリ内に直接書く。
 - **selector 関数**: `xxxOf` 形（`inspectionItemsOf`, `ordersOf`, `recordsOf`）。件数系は `unreadNotificationCount` のように用途を綴る。`src/store/selectors.ts`。
 - **省略形を使わない**: 識別子（変数・引数・関数・プロパティ・型）は完全な英単語で綴る。短縮形・頭文字省略・単文字いずれも不可。
   - 多文字省略形: `idx`→`index` / `eid`→`equipmentId` / `cfg`→`config` / `prev`→`previous` / `msg`→`message` / `btn`→`button` / `el`→`element` / `info`→説明的な完全名（`errorInfo` 等）。
@@ -60,7 +60,7 @@ Lint/Format は **oxlint + oxfmt**（ESLint/Prettier ではない）。多くは
 ## 2. ディレクトリ/ファイル構成
 
 - `src/features/**/` の基本: `index.tsx`（薄いビュー本体）+ `hooks.ts`（ロジック）+ `schema.ts`（RHF 用 zod）+ `components/`。
-  - feature 例: `dashboard`（ダッシュボード） / `equipment`（機器一覧・詳細） / `inspectionItems`（点検校正項目一覧）/ `orders`（点検校正外部案件） / `vendors`・`persons`（メーカー/取引先・担当者マスタ） / `notifications`（通知センター） / `settings`（設定・バックアップ）。
+  - feature 例: `dashboard`（ダッシュボード） / `equipment`（機器一覧・詳細） / `inspectionItems`（点検校正項目一覧）/ `inspectionOrder`（点検校正外部案件） / `vendors`・`persons`（メーカー/取引先・担当者マスタ） / `notifications`（通知センター） / `settings`（設定・バックアップ）。
 - **`index.tsx` は barrel ではなく公開コンポーネント本体**。`App.tsx` は `import { Dashboard } from "@/features/dashboard"` のように named export を直接参照。feature にバレル専用ファイルは作らない。
 - **`schema.ts` は RHF フォームを持つ feature にだけ置く**（`equipment`、`inspectionItems` の点検校正項目モーダルなど。必須ではない）。
 - **`hooks.ts` は全 feature に置く**（ロジックは hooks に寄せ index.tsx を薄く保つ）。
@@ -84,7 +84,7 @@ Lint/Format は **oxlint + oxfmt**（ESLint/Prettier ではない）。多くは
 ## 4. React / コンポーネント
 
 - **アロー関数コンポーネントが原則**（`export const Xxx = (props) => (...)`）。`function` 宣言コンポーネントは使わない（例外: `App.tsx` のみ）。
-- **named export が原則**。`export default` はアプリ全体で `App.tsx` の 1 箇所のみ（例外: `*.stories.tsx` の CSF `export default meta` は Storybook の要件のため可。実態10ファイル）。
+- **named export が原則**。`export default` はアプリ全体で `App.tsx` の 1 箇所のみ（例外: `*.stories.tsx` の CSF `export default meta` は Storybook の要件のため可。実態14ファイル）。
 - **props はシグネチャで分割代入し、デフォルト値もそこで設定**。残りは `...rest` で DOM へ spread。
 - **event handler 命名**:
   - props で受け取るコールバック → `onXxx`（`onConfirm`, `onClose`）

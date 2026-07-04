@@ -34,8 +34,8 @@ export const createVendorSlice: AppSliceCreator<VendorSlice> = (set, get) => ({
 
   updateVendor: (id, patch): void => {
     set((state) => {
-      const vendor = state.vendors[id];
-      if (!vendor) return;
+      const vendor = recordValue(state.vendors, id);
+      if (vendor === undefined) return;
       Object.assign(vendor, patch);
     });
   },

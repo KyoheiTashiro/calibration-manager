@@ -58,7 +58,9 @@ export const FilterBar = ({ filters, persons, onFilterChange, onClear }: Props):
           label="状態"
           options={STATUS_OPTIONS}
           value={filters.status}
-          onChange={(event) => onFilterChange("status", event.target.value)}
+          onChange={(event) => {
+            onFilterChange("status", event.target.value);
+          }}
         />
       </div>
       <div className="w-32">
@@ -66,7 +68,9 @@ export const FilterBar = ({ filters, persons, onFilterChange, onClear }: Props):
           label="種別"
           options={TYPE_OPTIONS}
           value={filters.type}
-          onChange={(event) => onFilterChange("type", event.target.value)}
+          onChange={(event) => {
+            onFilterChange("type", event.target.value);
+          }}
         />
       </div>
       <div className="w-32">
@@ -74,7 +78,9 @@ export const FilterBar = ({ filters, persons, onFilterChange, onClear }: Props):
           label="内外"
           options={EXECUTION_FILTER_OPTIONS}
           value={filters.execution}
-          onChange={(event) => onFilterChange("execution", event.target.value)}
+          onChange={(event) => {
+            onFilterChange("execution", event.target.value);
+          }}
         />
       </div>
       <div className="w-40">
@@ -82,7 +88,9 @@ export const FilterBar = ({ filters, persons, onFilterChange, onClear }: Props):
           label="担当"
           options={personOptions}
           value={filters.personId}
-          onChange={(event) => onFilterChange("personId", event.target.value)}
+          onChange={(event) => {
+            onFilterChange("personId", event.target.value);
+          }}
         />
       </div>
       <Button variant="secondary" onClick={onClear}>

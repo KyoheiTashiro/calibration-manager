@@ -15,6 +15,7 @@ import {
   NOTIFICATION_TYPE_LABELS,
 } from "@/features/notifications/constants";
 import {
+  isNotificationTab,
   NOTIFICATION_TAB,
   resolveNotificationTarget,
   selectTabNotifications,
@@ -43,7 +44,12 @@ export const NotificationCenter = (): ReactElement => {
     markAsRead(notification.id);
     const target = resolveNotificationTarget(notification, inspectionItems);
     if (target !== null) {
-      navigate(target);
+      // なぜ Promise.resolve().catch() か: navigate() は react-router 7 で
+      // `void | Promise<void>` を返す。遷移完了を待つ必要はなく、失敗時も
+      // 通知一覧の表示に影響しないため、両方の戻り値を統一的に無視する。
+      Promise.resolve(navigate(target)).catch(() => {
+        // 遷移エラーは無視する
+      });
     }
   };
 
@@ -62,7 +68,9 @@ export const NotificationCenter = (): ReactElement => {
         <Button
           variant="secondary"
           disabled={unreadCount === 0}
-          onClick={(): void => markAllAsRead()}
+          onClick={(): void => {
+            markAllAsRead();
+          }}
         >
           全て既読
         </Button>
@@ -71,7 +79,9 @@ export const NotificationCenter = (): ReactElement => {
       <Tabs
         tabs={tabs}
         activeKey={activeTab}
-        onChange={(key): void => setActiveTab(key as NotificationTab)}
+        onChange={(key): void => {
+          if (isNotificationTab(key)) setActiveTab(key);
+        }}
       />
 
       {rows.length === 0 ? (
@@ -82,7 +92,9 @@ export const NotificationCenter = (): ReactElement => {
             <li key={notification.id}>
               <button
                 type="button"
-                onClick={(): void => handleRowClick(notification)}
+                onClick={(): void => {
+                  handleRowClick(notification);
+                }}
                 className="flex w-full flex-col gap-1 px-2 py-3 text-left hover:bg-slate-50"
               >
                 <div className="flex items-center gap-2">

@@ -69,6 +69,13 @@ export const OrderDialog = ({ order, onClose }: DialogProps): ReactElement => {
     onClose();
   };
 
+  // なぜcatchで終端するか: no-void下でfloating promiseを残さないため(onSubmitは例外を投げない設計)。
+  const handleSave = (): void => {
+    handleSubmit(onSubmit)().catch(() => {
+      // onSubmitは例外を投げない設計のため何もしない
+    });
+  };
+
   return (
     <Modal
       open
@@ -76,7 +83,7 @@ export const OrderDialog = ({ order, onClose }: DialogProps): ReactElement => {
       onClose={onClose}
       isDirty={isDirty}
       footer={
-        <Button type="button" onClick={handleSubmit(onSubmit)}>
+        <Button type="button" onClick={handleSave}>
           確定
         </Button>
       }
@@ -141,6 +148,13 @@ export const ReturnDialog = ({ order, onClose }: DialogProps): ReactElement => {
     onClose();
   };
 
+  // なぜcatchで終端するか: no-void下でfloating promiseを残さないため(onSubmitは例外を投げない設計)。
+  const handleSave = (): void => {
+    handleSubmit(onSubmit)().catch(() => {
+      // onSubmitは例外を投げない設計のため何もしない
+    });
+  };
+
   return (
     <Modal
       open
@@ -148,7 +162,7 @@ export const ReturnDialog = ({ order, onClose }: DialogProps): ReactElement => {
       onClose={onClose}
       isDirty={isDirty}
       footer={
-        <Button type="button" onClick={handleSubmit(onSubmit)}>
+        <Button type="button" onClick={handleSave}>
           確定
         </Button>
       }

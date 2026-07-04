@@ -23,7 +23,9 @@ export const Tabs = ({ tabs, activeKey, onChange }: Props): ReactElement => (
           type="button"
           role="tab"
           aria-selected={isActive}
-          onClick={() => onChange(tab.key)}
+          onClick={() => {
+            onChange(tab.key);
+          }}
           className={`px-1 py-2 text-sm font-medium transition-colors duration-150 ${tabClassName}`}
         >
           {tab.label}

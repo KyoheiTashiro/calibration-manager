@@ -29,7 +29,9 @@ export const SummaryCards = ({ counts, onNavigate }: Props): ReactElement => (
       <button
         key={status}
         type="button"
-        onClick={() => onNavigate(inspectionItemListPathForStatus(status))}
+        onClick={() => {
+          onNavigate(inspectionItemListPathForStatus(status));
+        }}
         className={`flex flex-col items-start gap-1 rounded-lg border p-4 text-left transition hover:brightness-95 ${statusBadgeClass(status)}`}
       >
         <span className="text-sm font-medium">{statusBadgeLabel(status)}</span>

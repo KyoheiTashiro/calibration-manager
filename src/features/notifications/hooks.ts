@@ -18,6 +18,10 @@ export const NOTIFICATION_TAB = {
 } as const;
 export type NotificationTab = (typeof NOTIFICATION_TAB)[keyof typeof NOTIFICATION_TAB];
 
+/** Tabs（共通UI）の onChange が渡す string を NotificationTab へ型ガードする */
+export const isNotificationTab = (value: string): value is NotificationTab =>
+  Object.values(NOTIFICATION_TAB).some((tab) => tab === value);
+
 /**
  * createdDate 降順・同日 id 昇順で決定的に並べる（10-notifications.md「表示ルール」）。
  * ISO 日付文字列は辞書順比較がそのまま日付順比較になる（utils/time.ts）。

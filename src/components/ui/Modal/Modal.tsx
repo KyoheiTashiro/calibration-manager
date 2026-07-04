@@ -104,9 +104,9 @@ export const Modal = ({
 
         <div className="flex-1 overflow-y-auto px-4 py-4">{children}</div>
 
-        {footer ? (
+        {footer !== undefined && footer !== null && (
           <div className="border-line flex justify-end gap-2 border-t px-4 py-3">{footer}</div>
-        ) : null}
+        )}
 
         {confirmDiscardOpen ? (
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-white/95 px-4 text-center">

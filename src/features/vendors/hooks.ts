@@ -46,9 +46,15 @@ export const useVendorModal = (): UseVendorModalResult => {
 
   return {
     modalState,
-    handleAddClick: (): void => setModalState({ open: true, vendor: undefined }),
-    handleEditClick: (vendor: Vendor): void => setModalState({ open: true, vendor }),
-    handleModalClose: (): void => setModalState({ open: false, vendor: undefined }),
+    handleAddClick: (): void => {
+      setModalState({ open: true, vendor: undefined });
+    },
+    handleEditClick: (vendor: Vendor): void => {
+      setModalState({ open: true, vendor });
+    },
+    handleModalClose: (): void => {
+      setModalState({ open: false, vendor: undefined });
+    },
   };
 };
 
@@ -93,7 +99,11 @@ export const useVendorDelete = (): UseVendorDeleteResult => {
     referencedErrorOpen,
     handleDeleteClick,
     handleConfirmDelete,
-    handleCancelDelete: (): void => setDeleteTargetId(undefined),
-    closeReferencedError: (): void => setReferencedErrorOpen(false),
+    handleCancelDelete: (): void => {
+      setDeleteTargetId(undefined);
+    },
+    closeReferencedError: (): void => {
+      setReferencedErrorOpen(false);
+    },
   };
 };

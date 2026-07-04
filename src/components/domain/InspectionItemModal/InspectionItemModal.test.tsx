@@ -100,7 +100,9 @@ beforeEach(setupStoreIsolation);
 describe("InspectionItemModal: 新規追加", () => {
   it("全フィールドが表示され、既定値が設定される(通知開始日数/有効)", () => {
     seedBaseMasters();
-    renderWithStore(<InspectionItemModal open equipmentId={equipment.id} onClose={vi.fn()} />);
+    renderWithStore(
+      <InspectionItemModal open equipmentId={equipment.id} onClose={vi.fn<() => void>()} />,
+    );
 
     expect(screen.getByText("点検校正項目を追加")).toBeInTheDocument();
     expect(screen.getByLabelText("項目名", { exact: false })).toBeInTheDocument();
@@ -119,7 +121,9 @@ describe("InspectionItemModal: 新規追加", () => {
   it("外部切替後に発注余裕日の既定値14が確認できる", async () => {
     seedBaseMasters();
     const user = userEvent.setup();
-    renderWithStore(<InspectionItemModal open equipmentId={equipment.id} onClose={vi.fn()} />);
+    renderWithStore(
+      <InspectionItemModal open equipmentId={equipment.id} onClose={vi.fn<() => void>()} />,
+    );
 
     await user.click(screen.getByLabelText("外部"));
     expect(screen.getByLabelText("発注余裕日", { exact: false })).toHaveValue(14);
@@ -127,14 +131,18 @@ describe("InspectionItemModal: 新規追加", () => {
 
   it("対象機器が「管理番号 機器名」の形式で固定表示される", () => {
     seedBaseMasters();
-    renderWithStore(<InspectionItemModal open equipmentId={equipment.id} onClose={vi.fn()} />);
+    renderWithStore(
+      <InspectionItemModal open equipmentId={equipment.id} onClose={vi.fn<() => void>()} />,
+    );
 
     expect(screen.getByText("EQ-001 ノギス")).toBeInTheDocument();
   });
 
   it("実施区分が内部の既定では外部ブロック(校正依頼先/納期/発注余裕日)が非表示", () => {
     seedBaseMasters();
-    renderWithStore(<InspectionItemModal open equipmentId={equipment.id} onClose={vi.fn()} />);
+    renderWithStore(
+      <InspectionItemModal open equipmentId={equipment.id} onClose={vi.fn<() => void>()} />,
+    );
 
     expect(screen.queryByLabelText("校正依頼先", { exact: false })).not.toBeInTheDocument();
     expect(screen.queryByLabelText("納期(日)", { exact: false })).not.toBeInTheDocument();
@@ -145,7 +153,9 @@ describe("InspectionItemModal: 新規追加", () => {
   it("外部選択で外部ブロックが表示され、内部に戻すと非表示 + vendorId/leadTimeDaysがクリアされる", async () => {
     seedBaseMasters();
     const user = userEvent.setup();
-    renderWithStore(<InspectionItemModal open equipmentId={equipment.id} onClose={vi.fn()} />);
+    renderWithStore(
+      <InspectionItemModal open equipmentId={equipment.id} onClose={vi.fn<() => void>()} />,
+    );
 
     await user.click(screen.getByLabelText("外部"));
     expect(screen.getByLabelText("校正依頼先", { exact: false })).toBeInTheDocument();
@@ -169,7 +179,9 @@ describe("InspectionItemModal: 新規追加", () => {
   it("必須未入力で保存するとエラーが表示されストアが変化しない", async () => {
     seedBaseMasters();
     const user = userEvent.setup();
-    renderWithStore(<InspectionItemModal open equipmentId={equipment.id} onClose={vi.fn()} />);
+    renderWithStore(
+      <InspectionItemModal open equipmentId={equipment.id} onClose={vi.fn<() => void>()} />,
+    );
 
     await user.click(screen.getByRole("button", { name: "保存" }));
 
@@ -182,7 +194,9 @@ describe("InspectionItemModal: 新規追加", () => {
   it("外部で校正依頼先未選択のまま保存するとエラーが表示される", async () => {
     seedBaseMasters();
     const user = userEvent.setup();
-    renderWithStore(<InspectionItemModal open equipmentId={equipment.id} onClose={vi.fn()} />);
+    renderWithStore(
+      <InspectionItemModal open equipmentId={equipment.id} onClose={vi.fn<() => void>()} />,
+    );
 
     await user.type(screen.getByLabelText("項目名", { exact: false }), "外部校正項目");
     await user.click(screen.getByLabelText("外部"));
@@ -197,7 +211,7 @@ describe("InspectionItemModal: 新規追加", () => {
   it("有効な入力で保存するとaddInspectionItemが呼ばれストアに反映される(internal時vendorId/leadTimeDaysはundefined)", async () => {
     seedBaseMasters();
     const user = userEvent.setup();
-    const onClose = vi.fn();
+    const onClose = vi.fn<() => void>();
     renderWithStore(<InspectionItemModal open equipmentId={equipment.id} onClose={onClose} />);
 
     await user.type(screen.getByLabelText("項目名", { exact: false }), "床上点検");
@@ -229,7 +243,9 @@ describe("InspectionItemModal: 新規追加", () => {
   it("外部 + 全項目入力で保存するとvendorId/leadTimeDays/bufferDaysが数値で反映される", async () => {
     seedBaseMasters();
     const user = userEvent.setup();
-    renderWithStore(<InspectionItemModal open equipmentId={equipment.id} onClose={vi.fn()} />);
+    renderWithStore(
+      <InspectionItemModal open equipmentId={equipment.id} onClose={vi.fn<() => void>()} />,
+    );
 
     await user.type(screen.getByLabelText("項目名", { exact: false }), "外部校正項目");
     await user.click(screen.getByLabelText("外部"));
@@ -259,7 +275,9 @@ describe("InspectionItemModal: 新規追加", () => {
   it("種別・周期・実施区分の選択が保存値に反映される", async () => {
     seedBaseMasters();
     const user = userEvent.setup();
-    renderWithStore(<InspectionItemModal open equipmentId={equipment.id} onClose={vi.fn()} />);
+    renderWithStore(
+      <InspectionItemModal open equipmentId={equipment.id} onClose={vi.fn<() => void>()} />,
+    );
 
     await user.type(screen.getByLabelText("項目名", { exact: false }), "校正項目");
     await user.click(screen.getByLabelText("校正"));
@@ -292,7 +310,7 @@ describe("InspectionItemModal: 編集", () => {
         open
         equipmentId={equipment.id}
         inspectionItem={existingInspectionItem}
-        onClose={vi.fn()}
+        onClose={vi.fn<() => void>()}
       />,
     );
 
@@ -317,7 +335,7 @@ describe("InspectionItemModal: 編集", () => {
     seedBaseMasters();
     seedStore({ inspectionItems: { [existingInspectionItem.id]: existingInspectionItem } });
     const user = userEvent.setup();
-    const onClose = vi.fn();
+    const onClose = vi.fn<() => void>();
     renderWithStore(
       <InspectionItemModal
         open
@@ -349,7 +367,7 @@ describe("InspectionItemModal: 編集", () => {
         open
         equipmentId={equipment.id}
         inspectionItem={existingInspectionItem}
-        onClose={vi.fn()}
+        onClose={vi.fn<() => void>()}
       />,
     );
 
@@ -385,7 +403,7 @@ describe("InspectionItemModal: 編集", () => {
         open
         equipmentId={equipment.id}
         inspectionItem={inspectionItemWithInactivePerson}
-        onClose={vi.fn()}
+        onClose={vi.fn<() => void>()}
       />,
     );
 
@@ -407,7 +425,9 @@ describe("InspectionItemModal: 空状態", () => {
       persons: { [activePerson.id]: activePerson },
     });
     const user = userEvent.setup();
-    renderWithStore(<InspectionItemModal open equipmentId={equipment.id} onClose={vi.fn()} />);
+    renderWithStore(
+      <InspectionItemModal open equipmentId={equipment.id} onClose={vi.fn<() => void>()} />,
+    );
 
     await user.click(screen.getByLabelText("外部"));
 
@@ -422,7 +442,9 @@ describe("InspectionItemModal: 空状態", () => {
       vendors: { [calibratorVendor.id]: calibratorVendor },
       persons: {},
     });
-    renderWithStore(<InspectionItemModal open equipmentId={equipment.id} onClose={vi.fn()} />);
+    renderWithStore(
+      <InspectionItemModal open equipmentId={equipment.id} onClose={vi.fn<() => void>()} />,
+    );
 
     expect(screen.getByText("有効な担当者がいません")).toBeInTheDocument();
     const personLink = screen.getByRole("link", { name: "担当者マスタへ" });

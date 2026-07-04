@@ -72,7 +72,9 @@ export const InspectionItemList = (): ReactElement => {
     setSearchParams(new URLSearchParams(), { replace: true });
   };
 
-  const closeModal = (): void => setModal(null);
+  const closeModal = (): void => {
+    setModal(null);
+  };
 
   return (
     <div className="flex flex-col gap-4">
@@ -96,9 +98,15 @@ export const InspectionItemList = (): ReactElement => {
           ) : (
             <InspectionItemTable
               rows={filteredRows}
-              onRecord={(row) => setModal({ kind: MODAL_KIND.RECORD, row })}
-              onOrder={(row) => setModal({ kind: MODAL_KIND.ORDER, row })}
-              onEdit={(row) => setModal({ kind: MODAL_KIND.EDIT, row })}
+              onRecord={(row) => {
+                setModal({ kind: MODAL_KIND.RECORD, row });
+              }}
+              onOrder={(row) => {
+                setModal({ kind: MODAL_KIND.ORDER, row });
+              }}
+              onEdit={(row) => {
+                setModal({ kind: MODAL_KIND.EDIT, row });
+              }}
             />
           )}
         </>

@@ -159,10 +159,10 @@ const orderNotificationSeeds = (
  * 実装判断（ドメインモデルの表に対する明確化。テストで固定する）:
  * - overdue と dueSoon の条件は重なるため、期限超過後はより深刻な overdue のみを生成し
  *   dueSoon は生成しない（deliveryOverdue / deliveryDueSoon も同様）。同一項目への
- *   二重通知はノイズになるため。
+ *   二重通知はノイズになるため（D-041）。
  * - 「未発注」は「有効な案件（planned〜returned）が1件もない」と解釈する。planned の
  *   案件があれば発注準備は着手済みであり、発注推奨の再通知は不要なため
- *   （§4.3 orderNow の「有効な案件なし」と同じ判定に揃える）。
+ *   （§4.3 orderNow の「有効な案件なし」と同じ判定に揃える。D-042）。
  *
  * @param inspectionItems 判定対象の項目。休止・廃棄機器の項目や無効項目の除外は呼び出し側
  *   （ストアの generateNotifications）の責務（store.md）

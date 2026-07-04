@@ -13,12 +13,13 @@ export const TextField = ({ label, error, required, ref, ...rest }: Props): Reac
   const generatedId = useId();
   const inputId = rest.id ?? generatedId;
   const errorId = `${inputId}-error`;
+  const hasError = error !== undefined && error !== "";
 
   return (
     <div>
       <label htmlFor={inputId} className="block text-sm text-slate-700">
         {label}
-        {required && <span className="text-red-600">*</span>}
+        {required === true && <span className="text-red-600">*</span>}
       </label>
       <input
         type="text"
@@ -27,13 +28,13 @@ export const TextField = ({ label, error, required, ref, ...rest }: Props): Reac
         ref={ref}
         id={inputId}
         required={required}
-        aria-invalid={error ? "true" : undefined}
-        aria-describedby={error ? errorId : undefined}
+        aria-invalid={hasError ? "true" : undefined}
+        aria-describedby={hasError ? errorId : undefined}
         className={`w-full rounded border px-3 py-2 text-sm ${
-          error ? "border-red-500" : "border-slate-300"
+          hasError ? "border-red-500" : "border-slate-300"
         }`}
       />
-      {error && (
+      {hasError && (
         <p id={errorId} className="text-xs text-red-600">
           {error}
         </p>

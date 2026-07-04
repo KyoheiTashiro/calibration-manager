@@ -27,7 +27,7 @@
 
 ## 表示項目(カード = CalibrationOrder §3.6)
 
-各カード: `管理番号`(inspectionItem→equipment.managementNo)、`機器名`、`項目名`(inspectionItem.name)、`依頼先`(vendorId→Vendor.name)、`発注日`(orderedDate)、`返却予定日`(dueDate)、`費用`(cost)。列は status で分類(planned/ordered/inCalibration/returned)。
+各カード: `管理番号`(inspectionItem→equipment.managementNo)、`機器名`、`項目名`(inspectionItem.name)、`校正依頼先`(vendorId→Vendor.name)、`発注日`(orderedDate)、`返却予定日`(dueDate)、`費用`(cost)。列は status で分類(planned/ordered/inCalibration/returned)。
 
 ## 操作・アクション(状態遷移。ドメインモデル §3.6 に厳密準拠)
 
