@@ -33,7 +33,6 @@ export const Select = ({
         {required === true && <span className="text-red-600">*</span>}
       </label>
       <select
-        // oxlint-disable-next-line react/jsx-props-no-spreading -- register()のname/onChange/onBlur等を素通しするため必須
         {...rest}
         ref={ref}
         id={selectId}

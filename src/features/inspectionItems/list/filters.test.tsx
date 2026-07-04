@@ -52,7 +52,6 @@ describe("InspectionItemList: フィルタ", () => {
     expect(personSelect).toHaveTextContent(`${personSuzuki.name}(無効)`);
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("種別セレクトを変更すると行が絞られ URL に type が反映される", async () => {
     const user = userEvent.setup();
     renderList();
@@ -65,7 +64,6 @@ describe("InspectionItemList: フィルタ", () => {
     expect(searchValue()).toContain("type=inspection");
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("「全て」を選び直すと該当クエリが URL から除去される", async () => {
     const user = userEvent.setup();
     renderList("?type=inspection");
@@ -77,7 +75,6 @@ describe("InspectionItemList: フィルタ", () => {
     expect(searchValue()).not.toContain("type=");
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("クリアで全フィルタが外れ全行が復帰し URL クエリが空になる", async () => {
     const user = userEvent.setup();
     renderList("?status=overdue");
@@ -89,7 +86,6 @@ describe("InspectionItemList: フィルタ", () => {
     expect(searchValue()).toBe("");
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("クリアはフィルタ以外の未知クエリも含めて全除去する(D-022)", async () => {
     const user = userEvent.setup();
     // 未知パラメータ(page)をフィルタと併存させ、クリアが全クエリを消すことを確認する

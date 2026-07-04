@@ -52,7 +52,6 @@ const otherEquipment: Equipment = {
 };
 
 /** 遷移先確認用ダミー: 機器詳細(:id を表示) */
-// oxlint-disable-next-line react/no-multi-comp -- テスト内の遷移先ダミーは複数の別画面を模すため同一ファイルに並べる
 const DummyEquipmentDetail = (): ReactElement => {
   const { id } = useParams();
   return <p>機器詳細:{id}</p>;
@@ -71,7 +70,6 @@ const renderCreateForm = (): void => {
 beforeEach(setupStoreIsolation);
 
 describe("EquipmentCreateForm: 新規登録", () => {
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("必須項目を入力して保存すると Equipment が作成され詳細へ遷移する", async () => {
     const user = userEvent.setup();
     renderCreateForm();
@@ -91,7 +89,6 @@ describe("EquipmentCreateForm: 新規登録", () => {
 });
 
 describe("EquipmentCreateForm: 管理番号ユニーク検証", () => {
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("他の機器と重複する管理番号では保存できずエラーが表示される", async () => {
     const user = userEvent.setup();
     seedStore({
@@ -115,7 +112,6 @@ describe("EquipmentCreateForm: 管理番号ユニーク検証", () => {
 });
 
 describe("EquipmentCreateForm: 必須エラー", () => {
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("管理番号・機器名が空のまま保存すると両方のエラーが表示されストアは変化しない", async () => {
     const user = userEvent.setup();
     renderCreateForm();
@@ -146,7 +142,6 @@ describe("EquipmentCreateForm: メーカーセレクト", () => {
     expect(optionLabels).not.toContain(nonManufacturerVendor.name);
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("メーカーが0件の場合は空状態文言とリンクを表示し、空のまま保存できる", async () => {
     const user = userEvent.setup();
     renderCreateForm();

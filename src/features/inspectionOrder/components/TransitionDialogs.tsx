@@ -93,25 +93,13 @@ export const OrderDialog = ({ order, onClose }: Props): ReactElement => {
           label="発注日"
           required
           error={errors.orderedDate?.message}
-          // oxlint-disable-next-line react/jsx-props-no-spreading -- register()のname/onChange/onBlur等を素通しするため必須
           {...register("orderedDate")}
         />
-        <DateField
-          label="返却予定日"
-          error={errors.dueDate?.message}
-          // oxlint-disable-next-line react/jsx-props-no-spreading -- register()のname/onChange/onBlur等を素通しするため必須
-          {...register("dueDate")}
-        />
+        <DateField label="返却予定日" error={errors.dueDate?.message} {...register("dueDate")} />
         {showDueDateWarning ? (
           <p className="text-xs text-amber-600">発注日が返却予定日より後になっています</p>
         ) : null}
-        <TextField
-          label="費用"
-          type="number"
-          error={errors.cost?.message}
-          // oxlint-disable-next-line react/jsx-props-no-spreading -- register()のname/onChange/onBlur等を素通しするため必須
-          {...register("cost")}
-        />
+        <TextField label="費用" type="number" error={errors.cost?.message} {...register("cost")} />
       </div>
     </Modal>
   );
@@ -172,7 +160,6 @@ export const ReturnDialog = ({ order, onClose }: Props): ReactElement => {
           label="実返却日"
           required
           error={errors.returnedDate?.message}
-          // oxlint-disable-next-line react/jsx-props-no-spreading -- register()のname/onChange/onBlur等を素通しするため必須
           {...register("returnedDate")}
         />
         {showReturnWarning ? (

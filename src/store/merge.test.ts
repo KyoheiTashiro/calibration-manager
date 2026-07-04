@@ -258,7 +258,6 @@ describe("sanitizeAppState: 参照整合（D-003）", () => {
 describe("persist 統合（LocalStorage → rehydrate）", () => {
   beforeEach(setupStoreIsolation);
 
-  // oxlint-disable-next-line oxc/no-async-await -- rehydrate(Promise)の完了待ちが必要で、Promise 返却は typescript/promise-function-async と衝突するため
   it("破損混在の LocalStorage から有効レコードのみ復元する", async () => {
     const persisted = {
       state: {

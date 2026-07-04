@@ -211,7 +211,6 @@ describe("RecordModal", () => {
     expect(screen.getByText(new RegExp(orderVendor.name, "u"))).toBeInTheDocument();
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("fail 選択時に「次回期限は更新されません」の注意書きが表示される", async () => {
     const user = userEvent.setup();
     renderWithStore(
@@ -227,7 +226,6 @@ describe("RecordModal", () => {
     expect(screen.getByText("次回期限は更新されません")).toBeInTheDocument();
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("未来日を入力すると警告を表示するが登録はブロックしない", async () => {
     const user = userEvent.setup();
     const onClose = vi.fn<() => void>();
@@ -247,7 +245,6 @@ describe("RecordModal", () => {
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("pass 登録でストアに記録が追加され onClose される", async () => {
     const user = userEvent.setup();
     const onClose = vi.fn<() => void>();
@@ -271,7 +268,6 @@ describe("RecordModal", () => {
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("addRecord が no-op(null)の場合はエラーを表示しモーダルを閉じない", async () => {
     const user = userEvent.setup();
     const onClose = vi.fn<() => void>();
@@ -295,7 +291,6 @@ describe("RecordModal", () => {
     expect(onClose).not.toHaveBeenCalled();
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("実施者が空のまま登録するとエラーが表示されストアが変化しない", async () => {
     const user = userEvent.setup();
     renderWithStore(
@@ -313,7 +308,6 @@ describe("RecordModal", () => {
     expect(Object.values(recordsOf())).toHaveLength(0);
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("結果未選択で登録するとエラーが表示されストアが変化しない", async () => {
     const user = userEvent.setup();
     renderWithStore(

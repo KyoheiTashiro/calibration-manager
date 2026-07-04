@@ -28,7 +28,6 @@ describe("RadioGroup", () => {
     expect(screen.getByText("*")).toHaveClass("text-red-600");
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("ラベルクリックで選択が切り替わり onChange が呼ばれる", async () => {
     const user = userEvent.setup();
     const handleChange = vi.fn<() => void>();
@@ -48,7 +47,6 @@ describe("RadioGroup", () => {
     expect(screen.getByRole("radio", { name: "点検" })).not.toBeChecked();
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("同名 radio 群として排他選択になる", async () => {
     const user = userEvent.setup();
     render(<RadioGroup label="種別" options={typeOptions} name="type" />);

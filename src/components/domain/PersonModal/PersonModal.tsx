@@ -124,32 +124,10 @@ export const PersonModal = ({ open, person, onClose }: PersonModalProps): ReactE
         }
       >
         <div className="flex flex-col gap-4">
-          <TextField
-            label="氏名"
-            required
-            error={errors.name?.message}
-            // oxlint-disable-next-line react/jsx-props-no-spreading -- register()のname/onChange/onBlur等を素通しするため必須
-            {...register("name")}
-          />
-          <TextField
-            label="メール"
-            required
-            error={errors.email?.message}
-            // oxlint-disable-next-line react/jsx-props-no-spreading -- register()のname/onChange/onBlur等を素通しするため必須
-            {...register("email")}
-          />
-          <TextField
-            label="部署"
-            error={errors.department?.message}
-            // oxlint-disable-next-line react/jsx-props-no-spreading -- register()のname/onChange/onBlur等を素通しするため必須
-            {...register("department")}
-          />
-          <Checkbox
-            label="有効"
-            error={errors.isActive?.message}
-            // oxlint-disable-next-line react/jsx-props-no-spreading -- register()のname/onChange/onBlur等を素通しするため必須
-            {...register("isActive")}
-          />
+          <TextField label="氏名" required error={errors.name?.message} {...register("name")} />
+          <TextField label="メール" required error={errors.email?.message} {...register("email")} />
+          <TextField label="部署" error={errors.department?.message} {...register("department")} />
+          <Checkbox label="有効" error={errors.isActive?.message} {...register("isActive")} />
         </div>
       </Modal>
       {pendingDeactivation ? (

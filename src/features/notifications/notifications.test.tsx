@@ -112,7 +112,6 @@ describe("NotificationCenter: タブと並び順", () => {
     expect(messages[2]).toContain("同日B");
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("既読タブに切り替えると既読通知のみ表示する", async () => {
     const user = userEvent.setup();
     seedStore({
@@ -167,7 +166,6 @@ describe("NotificationCenter: 全て既読", () => {
     expect(screen.getByRole("button", { name: "全て既読" })).toBeDisabled();
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("全て既読で未読が0になりタブ件数も0になる", async () => {
     const user = userEvent.setup();
     seedStore({
@@ -187,7 +185,6 @@ describe("NotificationCenter: 全て既読", () => {
 });
 
 describe("NotificationCenter: 行クリック遷移（D-027）", () => {
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("targetType=order の行クリックで案件一覧へ遷移する", async () => {
     const user = userEvent.setup();
     seedStore({
@@ -208,7 +205,6 @@ describe("NotificationCenter: 行クリック遷移（D-027）", () => {
     expect(screen.getByText("案件一覧画面")).toBeInTheDocument();
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("targetType=inspectionItem の行クリックで機器詳細へ遷移する", async () => {
     const user = userEvent.setup();
     seedStore({
@@ -225,7 +221,6 @@ describe("NotificationCenter: 行クリック遷移（D-027）", () => {
     expect(screen.getByText("機器詳細:equipment-1")).toBeInTheDocument();
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("dangling inspectionItem（項目削除済み）の行クリックは既読化のみで遷移しない", async () => {
     const user = userEvent.setup();
     seedStore({
@@ -255,7 +250,6 @@ describe("NotificationCenter: 空状態", () => {
     expect(screen.getByText("未読の通知はありません")).toBeInTheDocument();
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("既読0件のとき既読タブに専用メッセージを表示する", async () => {
     const user = userEvent.setup();
     seedStore({ notifications: { u1: makeNotif({ id: "u1", isRead: false }) } });

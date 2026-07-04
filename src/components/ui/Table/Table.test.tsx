@@ -54,7 +54,6 @@ describe("Table", () => {
 
   it("className を渡すと table 要素に追加される", () => {
     render(
-      // oxlint-disable-next-line react/forbid-component-props -- classNameでtable要素をカスタムする仕様がテスト対象のため許容する
       <Table className="min-w-max">
         <TableHead>
           <tr>

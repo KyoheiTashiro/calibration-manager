@@ -88,7 +88,6 @@ const returnedOrder: CalibrationOrder = {
 };
 
 /** 記録モーダルを開き、実施日を入力して指定の結果ラジオを選んで登録する */
-// oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
 const registerRecordFromReturnedCard = async (
   user: ReturnType<typeof userEvent.setup>,
   resultLabel: string,
@@ -105,7 +104,6 @@ const registerRecordFromReturnedCard = async (
 beforeEach(setupStoreIsolation);
 
 describe("結合: returned 案件 → 記録登録 → カスケード", () => {
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("pass 登録で record が orderId 付きで作成され、期限再計算と completed 連鎖が起きる", async () => {
     const user = userEvent.setup();
     seedWithOrder(returnedOrder);
@@ -133,7 +131,6 @@ describe("結合: returned 案件 → 記録登録 → カスケード", () => {
     expect(screen.queryByText("EQ-001")).not.toBeInTheDocument();
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("fail 登録は nextDueDate を据え置き、lastDoneDate 更新と completed 連鎖は行う(D-015)", async () => {
     const user = userEvent.setup();
     seedWithOrder(returnedOrder);
@@ -149,7 +146,6 @@ describe("結合: returned 案件 → 記録登録 → カスケード", () => {
     expect(Object.values(state.records)[0]?.result).toBe(RECORD_RESULT.FAIL);
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("fail 選択時はモーダル内に「次回期限は更新されません」の注意書きが出る", async () => {
     const user = userEvent.setup();
     seedWithOrder(returnedOrder);
@@ -166,7 +162,6 @@ describe("結合: returned 案件 → 記録登録 → カスケード", () => {
 });
 
 describe("結合: かんばんの隣接遷移チェーン planned → returned", () => {
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("発注する(orderedDate 既定=今日)→ 校正中へ → 返却する(returnedDate)で順に遷移する", async () => {
     const user = userEvent.setup();
     seedWithOrder({

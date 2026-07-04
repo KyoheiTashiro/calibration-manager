@@ -126,7 +126,6 @@ export const OrderModal = ({ open, inspectionItemId, onClose }: Props): ReactEle
             </span>
             <p className="text-sm text-slate-600">
               校正業者が未登録です
-              {/* oxlint-disable-next-line react/forbid-component-props -- Linkはclassnameでリンク色を渡す設計（InspectionItemModal.tsxと同様） */}
               <Link to={ROUTES.VENDOR_LIST} className="text-primary ml-1 underline">
                 メーカー/取引先マスタへ
               </Link>
@@ -139,29 +138,12 @@ export const OrderModal = ({ open, inspectionItemId, onClose }: Props): ReactEle
             placeholder="選択してください"
             options={vendorOptions}
             error={errors.vendorId?.message}
-            // oxlint-disable-next-line react/jsx-props-no-spreading -- register()のname/onChange/onBlur等を素通しするため必須
             {...register("vendorId")}
           />
         )}
-        <DateField
-          label="返却予定日"
-          error={errors.dueDate?.message}
-          // oxlint-disable-next-line react/jsx-props-no-spreading -- register()のname/onChange/onBlur等を素通しするため必須
-          {...register("dueDate")}
-        />
-        <TextField
-          label="費用"
-          type="number"
-          error={errors.cost?.message}
-          // oxlint-disable-next-line react/jsx-props-no-spreading -- register()のname/onChange/onBlur等を素通しするため必須
-          {...register("cost")}
-        />
-        <TextField
-          label="備考"
-          error={errors.note?.message}
-          // oxlint-disable-next-line react/jsx-props-no-spreading -- register()のname/onChange/onBlur等を素通しするため必須
-          {...register("note")}
-        />
+        <DateField label="返却予定日" error={errors.dueDate?.message} {...register("dueDate")} />
+        <TextField label="費用" type="number" error={errors.cost?.message} {...register("cost")} />
+        <TextField label="備考" error={errors.note?.message} {...register("note")} />
         {submitFailed ? (
           <p role="alert" className="text-xs text-red-600">
             この項目には進行中の案件が既に存在します

@@ -76,7 +76,6 @@ describe("VendorList: 空状態", () => {
 });
 
 describe("VendorList: 追加", () => {
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("モーダルから入力・保存するとストアに追加され一覧に反映される", async () => {
     const user = userEvent.setup();
     renderWithStore(<VendorList />);
@@ -99,7 +98,6 @@ describe("VendorList: 追加", () => {
 });
 
 describe("VendorList: 編集", () => {
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("プリフィルされた値を変更して保存すると一覧に反映される", async () => {
     const user = userEvent.setup();
     seedStore({ vendors: { [manufacturerVendor.id]: manufacturerVendor } });
@@ -118,7 +116,6 @@ describe("VendorList: 編集", () => {
 });
 
 describe("VendorList: 削除ガード", () => {
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("Equipment.manufacturerIdから参照中は削除できない旨を表示し削除されない", async () => {
     const user = userEvent.setup();
     seedStore({
@@ -136,7 +133,6 @@ describe("VendorList: 削除ガード", () => {
     expect(screen.getByRole("row", { name: /ミツトヨ/u })).toBeInTheDocument();
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("参照なしの場合は確認ダイアログ経由で削除される", async () => {
     const user = userEvent.setup();
     seedStore({ vendors: { [manufacturerVendor.id]: manufacturerVendor } });

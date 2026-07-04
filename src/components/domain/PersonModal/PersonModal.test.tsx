@@ -40,7 +40,6 @@ const buildInspectionItem = (overrides: Partial<InspectionItem> = {}): Inspectio
 describe("PersonModal", () => {
   beforeEach(setupStoreIsolation);
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("現役の点検校正項目に割り当てられた担当者を無効化しようとすると件数入りの警告が表示され、確定でisActiveがfalseになりモーダルが閉じる", async () => {
     const user = userEvent.setup();
     const person = buildPerson({ id: "person-1", isActive: true });
@@ -67,7 +66,6 @@ describe("PersonModal", () => {
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("有効な点検校正項目の割り当てがない担当者を無効化しようとすると通常確認文が表示され、確定でisActiveがfalseになる", async () => {
     const user = userEvent.setup();
     const person = buildPerson({ id: "person-1", isActive: true });
@@ -89,7 +87,6 @@ describe("PersonModal", () => {
     expect(useAppStore.getState().persons["person-1"]?.isActive).toBe(false);
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("無効化確認をキャンセルすると保存されず、ストアのisActiveは変化しない", async () => {
     const user = userEvent.setup();
     const person = buildPerson({ id: "person-1", isActive: true });
@@ -113,7 +110,6 @@ describe("PersonModal", () => {
     expect(onClose).not.toHaveBeenCalled();
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("氏名・メールのバリデーションエラーが表示され、エラー時も保存ボタンは無効化されない", async () => {
     const user = userEvent.setup();
     const onClose = vi.fn<() => void>();

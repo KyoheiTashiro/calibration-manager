@@ -81,7 +81,6 @@ describe("エクスポート(§11)", () => {
     }
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("機器ボタンで BOM付き・ヘッダを含む CSV を日付付きファイル名で生成する", async () => {
     seedStore({ equipment: { e1: sampleEquipment } });
     renderWithStore(<Settings />);
@@ -102,7 +101,6 @@ describe("エクスポート(§11)", () => {
     expect(capture.name).toBe(`equipment_${todayIsoDate()}.csv`);
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("データ0件でもヘッダ行のみの CSV を出力する", async () => {
     renderWithStore(<Settings />);
     await userEvent.click(screen.getByRole("button", { name: "機器" }));
@@ -129,7 +127,6 @@ describe("インポート(§11、D-029 / D-030)", () => {
     ).toBeInTheDocument();
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("正常CSVで取り込み可を表示し確定を活性化する", async () => {
     renderWithStore(<Settings />);
     await userEvent.upload(screen.getByLabelText("ファイル"), equipmentCsvFile(sampleEquipment));
@@ -138,7 +135,6 @@ describe("インポート(§11、D-029 / D-030)", () => {
     expect(screen.getByRole("button", { name: "確定" })).toBeEnabled();
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("エラーCSVで行メッセージを表示し確定を非活性にする", async () => {
     renderWithStore(<Settings />);
     const badCsv = `${buildEntityCsv("equipment", {})}e1,M-001,ノギス,,,,,broken,\r\n`;
@@ -150,7 +146,6 @@ describe("インポート(§11、D-029 / D-030)", () => {
     expect(screen.getByRole("button", { name: "確定" })).toBeDisabled();
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("確定 → 確認 → 取り込みで対象Recordを全置換する", async () => {
     seedStore({ equipment: { old: { ...sampleEquipment, id: "old", managementNo: "M-OLD" } } });
     renderWithStore(<Settings />);
@@ -164,7 +159,6 @@ describe("インポート(§11、D-029 / D-030)", () => {
     expect(await screen.findByText("機器を 1 件取り込みました")).toBeInTheDocument();
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("キャンセルでプレビューをクリアする", async () => {
     renderWithStore(<Settings />);
     await userEvent.upload(screen.getByLabelText("ファイル"), equipmentCsvFile(sampleEquipment));
@@ -176,7 +170,6 @@ describe("インポート(§11、D-029 / D-030)", () => {
     ).toBeInTheDocument();
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("対象エンティティ変更でプレビューをクリアする", async () => {
     renderWithStore(<Settings />);
     await userEvent.upload(screen.getByLabelText("ファイル"), equipmentCsvFile(sampleEquipment));
@@ -190,7 +183,6 @@ describe("インポート(§11、D-029 / D-030)", () => {
 });
 
 describe("データ全削除(§11、D-031)", () => {
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("同意チェックまで[削除]は非活性で、実行するとストアが空になる", async () => {
     seedStore({ equipment: { e1: sampleEquipment }, vendors: { v1: sampleVendor } });
     renderWithStore(<Settings />);

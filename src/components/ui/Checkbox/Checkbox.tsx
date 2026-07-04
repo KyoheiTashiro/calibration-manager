@@ -19,7 +19,6 @@ export const Checkbox = ({ label, error, ref, ...rest }: Props): ReactElement =>
       <label htmlFor={inputId} className="flex items-center gap-2 text-sm text-slate-700">
         <input
           type="checkbox"
-          // oxlint-disable-next-line react/jsx-props-no-spreading -- register()のname/onChange/onBlur等を素通しするため必須
           {...rest}
           ref={ref}
           id={inputId}

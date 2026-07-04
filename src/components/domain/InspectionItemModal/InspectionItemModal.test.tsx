@@ -117,7 +117,6 @@ describe("InspectionItemModal: 新規追加", () => {
     expect(screen.getByLabelText("期限管理の対象にする")).toBeChecked();
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("外部切替後に発注余裕日の既定値14が確認できる", async () => {
     seedBaseMasters();
     const user = userEvent.setup();
@@ -149,7 +148,6 @@ describe("InspectionItemModal: 新規追加", () => {
     expect(screen.queryByLabelText("発注余裕日", { exact: false })).not.toBeInTheDocument();
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("外部選択で外部ブロックが表示され、内部に戻すと非表示 + vendorId/leadTimeDaysがクリアされる", async () => {
     seedBaseMasters();
     const user = userEvent.setup();
@@ -175,7 +173,6 @@ describe("InspectionItemModal: 新規追加", () => {
     expect(screen.getByLabelText("納期(日)", { exact: false })).toHaveValue(null);
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("必須未入力で保存するとエラーが表示されストアが変化しない", async () => {
     seedBaseMasters();
     const user = userEvent.setup();
@@ -190,7 +187,6 @@ describe("InspectionItemModal: 新規追加", () => {
     expect(Object.values(useAppStore.getState().inspectionItems)).toHaveLength(0);
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("外部で校正依頼先未選択のまま保存するとエラーが表示される", async () => {
     seedBaseMasters();
     const user = userEvent.setup();
@@ -207,7 +203,6 @@ describe("InspectionItemModal: 新規追加", () => {
     expect(Object.values(useAppStore.getState().inspectionItems)).toHaveLength(0);
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("有効な入力で保存するとaddInspectionItemが呼ばれストアに反映される(internal時vendorId/leadTimeDaysはundefined)", async () => {
     seedBaseMasters();
     const user = userEvent.setup();
@@ -239,7 +234,6 @@ describe("InspectionItemModal: 新規追加", () => {
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("外部 + 全項目入力で保存するとvendorId/leadTimeDays/bufferDaysが数値で反映される", async () => {
     seedBaseMasters();
     const user = userEvent.setup();
@@ -271,7 +265,6 @@ describe("InspectionItemModal: 新規追加", () => {
     });
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("種別・周期・実施区分の選択が保存値に反映される", async () => {
     seedBaseMasters();
     const user = userEvent.setup();
@@ -330,7 +323,6 @@ describe("InspectionItemModal: 編集", () => {
     ).toBeInTheDocument();
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("変更して保存するとupdateInspectionItemが反映され、lastDoneDateは据え置かれる", async () => {
     seedBaseMasters();
     seedStore({ inspectionItems: { [existingInspectionItem.id]: existingInspectionItem } });
@@ -357,7 +349,6 @@ describe("InspectionItemModal: 編集", () => {
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("外部から内部へ切り替えて保存するとvendorId/leadTimeDaysが明示的にundefinedへ更新される", async () => {
     seedBaseMasters();
     seedStore({ inspectionItems: { [existingInspectionItem.id]: existingInspectionItem } });
@@ -417,7 +408,6 @@ describe("InspectionItemModal: 編集", () => {
 
 // 空状態の検証(screen-design/06-inspection-item-modal.md)。
 describe("InspectionItemModal: 空状態", () => {
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("外部選択時にisCalibrator=trueのVendorが0件だと文言とVendorList導線が表示される", async () => {
     seedStore({
       equipment: { [equipment.id]: equipment },

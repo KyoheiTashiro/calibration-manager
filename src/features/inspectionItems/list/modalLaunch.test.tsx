@@ -27,7 +27,6 @@ const getOpenDialog = (title: string): HTMLElement => {
 };
 
 /** 対象行(年次校正)の指定ボタンを押す */
-// oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
 const clickRowAction = async (buttonName: string): Promise<void> => {
   const user = userEvent.setup();
   const row = screen.getByRole("row", { name: /年次校正/u });
@@ -40,7 +39,6 @@ beforeEach(() => {
 });
 
 describe("InspectionItemList: モーダル起動", () => {
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("[記録]で対象項目の RecordModal が開く", async () => {
     renderList();
     await clickRowAction("記録");
@@ -49,7 +47,6 @@ describe("InspectionItemList: モーダル起動", () => {
     expect(within(dialogElement).getByText(/年次校正/u)).toBeInTheDocument();
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("[案件]で対象項目の OrderModal が開く", async () => {
     renderList();
     await clickRowAction("案件");
@@ -58,7 +55,6 @@ describe("InspectionItemList: モーダル起動", () => {
     expect(within(dialogElement).getByText(/年次校正/u)).toBeInTheDocument();
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("[編集]で対象項目がプリフィルされた InspectionItemModal が開く", async () => {
     renderList();
     await clickRowAction("編集");
@@ -69,7 +65,6 @@ describe("InspectionItemList: モーダル起動", () => {
     );
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("モーダルを閉じると起動 state がリセットされ再度開き直せる", async () => {
     const user = userEvent.setup();
     renderList();

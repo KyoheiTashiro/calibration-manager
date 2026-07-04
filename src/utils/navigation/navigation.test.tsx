@@ -72,7 +72,6 @@ const renderWithRoutes = (initialEntries: string[]): void => {
 };
 
 describe("useSafeNavigate", () => {
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("文字列パスへ遷移する", async () => {
     const user = userEvent.setup();
     renderWithRoutes(["/"]);
@@ -83,7 +82,6 @@ describe("useSafeNavigate", () => {
     expect(await screen.findByText("次画面:direct")).toBeInTheDocument();
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("オブジェクトパス(検索クエリ付き)へ遷移する", async () => {
     const user = userEvent.setup();
     renderWithRoutes(["/"]);
@@ -93,7 +91,6 @@ describe("useSafeNavigate", () => {
     expect(await screen.findByText("次画面:object")).toBeInTheDocument();
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("数値(履歴デルタ)で1つ前の画面へ戻る", async () => {
     const user = userEvent.setup();
     renderWithRoutes(["/"]);

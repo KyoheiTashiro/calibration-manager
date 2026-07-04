@@ -16,7 +16,6 @@ describe("Checkbox", () => {
     expect(screen.getByRole("checkbox", { name: "メーカー" })).toBeInTheDocument();
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("ラベルクリックでチェック状態が切り替わり onChange が呼ばれる", async () => {
     const user = userEvent.setup();
     const handleChange = vi.fn<() => void>();

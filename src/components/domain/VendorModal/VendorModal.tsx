@@ -124,24 +124,13 @@ export const VendorModal = ({ open, vendor, onClose }: Props): ReactElement => {
       }
     >
       <div className="flex flex-col gap-4">
-        <TextField
-          label="名称"
-          required
-          error={errors.name?.message}
-          // oxlint-disable-next-line react/jsx-props-no-spreading -- register()のname/onChange/onBlur等を素通しするため必須
-          {...register("name")}
-        />
-        <Checkbox
-          label="メーカー"
-          // oxlint-disable-next-line react/jsx-props-no-spreading -- register()のname/onChange/onBlur等を素通しするため必須
-          {...register("isManufacturer")}
-        />
+        <TextField label="名称" required error={errors.name?.message} {...register("name")} />
+        <Checkbox label="メーカー" {...register("isManufacturer")} />
         <Checkbox
           label="校正業者"
           // なぜ onChange でクリアするか: isCalibrator オフ時は「標準納期(日)」を非表示にするだけでなく
           // 入力値もクリアし、再度オンにしても古い値が復活しないようにする（タスク仕様）。
           // state 変化に反応する effect ではなくユーザー操作イベントで直接処理する。
-          // oxlint-disable-next-line react/jsx-props-no-spreading -- register()のname/onChange/onBlur等を素通しするため必須
           {...register("isCalibrator", {
             onChange: (event: ChangeEvent<HTMLInputElement>) => {
               if (!event.target.checked) {
@@ -158,37 +147,24 @@ export const VendorModal = ({ open, vendor, onClose }: Props): ReactElement => {
         <TextField
           label="窓口担当者"
           error={errors.contactPerson?.message}
-          // oxlint-disable-next-line react/jsx-props-no-spreading -- register()のname/onChange/onBlur等を素通しするため必須
           {...register("contactPerson")}
         />
         <TextField
           label="メール"
           type="email"
           error={errors.email?.message}
-          // oxlint-disable-next-line react/jsx-props-no-spreading -- register()のname/onChange/onBlur等を素通しするため必須
           {...register("email")}
         />
-        <TextField
-          label="電話"
-          error={errors.phone?.message}
-          // oxlint-disable-next-line react/jsx-props-no-spreading -- register()のname/onChange/onBlur等を素通しするため必須
-          {...register("phone")}
-        />
+        <TextField label="電話" error={errors.phone?.message} {...register("phone")} />
         {isCalibrator ? (
           <TextField
             label="標準納期(日)"
             type="number"
             error={errors.standardLeadTimeDays?.message}
-            // oxlint-disable-next-line react/jsx-props-no-spreading -- register()のname/onChange/onBlur等を素通しするため必須
             {...register("standardLeadTimeDays")}
           />
         ) : null}
-        <TextField
-          label="備考"
-          error={errors.note?.message}
-          // oxlint-disable-next-line react/jsx-props-no-spreading -- register()のname/onChange/onBlur等を素通しするため必須
-          {...register("note")}
-        />
+        <TextField label="備考" error={errors.note?.message} {...register("note")} />
       </div>
     </Modal>
   );

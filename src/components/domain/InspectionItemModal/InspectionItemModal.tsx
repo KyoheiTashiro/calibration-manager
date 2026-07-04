@@ -149,19 +149,12 @@ export const InspectionItemModal = ({
           <span className="block text-sm text-slate-700">対象機器</span>
           <p className="text-sm text-slate-800">{equipmentLabel}</p>
         </div>
-        <TextField
-          label="項目名"
-          required
-          error={errors.name?.message}
-          // oxlint-disable-next-line react/jsx-props-no-spreading -- register()のname/onChange/onBlur等を素通しするため必須
-          {...register("name")}
-        />
+        <TextField label="項目名" required error={errors.name?.message} {...register("name")} />
         <RadioGroup
           label="種別"
           required
           options={INSPECTION_ITEM_TYPE_OPTIONS}
           error={errors.type?.message}
-          // oxlint-disable-next-line react/jsx-props-no-spreading -- register()のname/onChange/onBlur等を素通しするため必須
           {...register("type")}
         />
         <Select
@@ -169,7 +162,6 @@ export const InspectionItemModal = ({
           required
           options={CYCLE_OPTIONS}
           error={errors.cycle?.message}
-          // oxlint-disable-next-line react/jsx-props-no-spreading -- register()のname/onChange/onBlur等を素通しするため必須
           {...register("cycle")}
         />
         <RadioGroup
@@ -179,7 +171,6 @@ export const InspectionItemModal = ({
           error={errors.execution?.message}
           // なぜ onChange か: state 変化に反応する effect ではなくユーザー操作イベントで直接クリアする
           // (You Might Not Need an Effect)。bufferDays は必須属性のためクリアしない。
-          // oxlint-disable-next-line react/jsx-props-no-spreading -- register()のname/onChange/onBlur等を素通しするため必須
           {...register("execution", {
             onChange: (event: ChangeEvent<HTMLInputElement>) => {
               if (event.target.value === EXECUTION.INTERNAL) {
@@ -198,7 +189,6 @@ export const InspectionItemModal = ({
                 </span>
                 <p className="text-sm text-slate-600">
                   校正業者が未登録です
-                  {/* oxlint-disable-next-line react/forbid-component-props -- Linkはclassnameでリンク色を渡す設計（equipment/form/index.tsxと同様） */}
                   <Link to={ROUTES.VENDOR_LIST} className="text-primary ml-1 underline">
                     メーカー/取引先マスタへ
                   </Link>
@@ -211,7 +201,6 @@ export const InspectionItemModal = ({
                 placeholder="選択してください"
                 options={vendorOptions}
                 error={errors.vendorId?.message}
-                // oxlint-disable-next-line react/jsx-props-no-spreading -- register()のname/onChange/onBlur等を素通しするため必須
                 {...register("vendorId")}
               />
             )}
@@ -219,7 +208,6 @@ export const InspectionItemModal = ({
               label="納期(日)"
               type="number"
               error={errors.leadTimeDays?.message}
-              // oxlint-disable-next-line react/jsx-props-no-spreading -- register()のname/onChange/onBlur等を素通しするため必須
               {...register("leadTimeDays")}
             />
             <p className="text-xs text-slate-500">
@@ -230,7 +218,6 @@ export const InspectionItemModal = ({
               type="number"
               required
               error={errors.bufferDays?.message}
-              // oxlint-disable-next-line react/jsx-props-no-spreading -- register()のname/onChange/onBlur等を素通しするため必須
               {...register("bufferDays")}
             />
           </div>
@@ -242,7 +229,6 @@ export const InspectionItemModal = ({
             </span>
             <p className="text-sm text-slate-600">
               有効な担当者がいません
-              {/* oxlint-disable-next-line react/forbid-component-props -- Linkはclassnameでリンク色を渡す設計（equipment/form/index.tsxと同様） */}
               <Link to={ROUTES.PERSON_LIST} className="text-primary ml-1 underline">
                 担当者マスタへ
               </Link>
@@ -255,7 +241,6 @@ export const InspectionItemModal = ({
             placeholder="選択してください"
             options={personOptions}
             error={errors.personId?.message}
-            // oxlint-disable-next-line react/jsx-props-no-spreading -- register()のname/onChange/onBlur等を素通しするため必須
             {...register("personId")}
           />
         )}
@@ -264,7 +249,6 @@ export const InspectionItemModal = ({
           type="number"
           required
           error={errors.noticeDaysBefore?.message}
-          // oxlint-disable-next-line react/jsx-props-no-spreading -- register()のname/onChange/onBlur等を素通しするため必須
           {...register("noticeDaysBefore")}
         />
         <div>
@@ -272,7 +256,6 @@ export const InspectionItemModal = ({
             label="次回期限"
             required
             error={errors.nextDueDate?.message}
-            // oxlint-disable-next-line react/jsx-props-no-spreading -- register()のname/onChange/onBlur等を素通しするため必須
             {...register("nextDueDate")}
           />
           <p className="text-xs text-slate-500">
@@ -280,11 +263,7 @@ export const InspectionItemModal = ({
           </p>
         </div>
         <div>
-          <Checkbox
-            label="期限管理の対象にする"
-            // oxlint-disable-next-line react/jsx-props-no-spreading -- register()のname/onChange/onBlur等を素通しするため必須
-            {...register("isActive")}
-          />
+          <Checkbox label="期限管理の対象にする" {...register("isActive")} />
           <p className="text-xs text-slate-500">
             オフにすると点検校正項目一覧・期限管理・通知の対象外になります(機器詳細では確認できます)
           </p>

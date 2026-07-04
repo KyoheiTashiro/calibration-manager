@@ -34,7 +34,6 @@ const DummyInspectionItemList = (): ReactElement => {
 };
 
 /** 遷移先確認用ダミー: 機器詳細(:id を表示) */
-// oxlint-disable-next-line react/no-multi-comp -- テスト内の遷移先ダミーは複数の別画面を模すため同一ファイルに並べる
 const DummyEquipmentDetail = (): ReactElement => {
   const { id } = useParams();
   return <p>機器詳細:{id}</p>;
@@ -133,7 +132,6 @@ describe("Dashboard: サマリーカード", () => {
     ).toBeInTheDocument();
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("カードクリックで /inspection-items?status=<値> へ遷移する", async () => {
     const user = userEvent.setup();
     seedActionScenario();
@@ -166,7 +164,6 @@ describe("Dashboard: 要対応項目リスト", () => {
     expect(names).toEqual(["A校正", "B点検"]);
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("行クリックで機器詳細へ遷移する(D-026)", async () => {
     const user = userEvent.setup();
     seedActionScenario();
@@ -177,7 +174,6 @@ describe("Dashboard: 要対応項目リスト", () => {
     expect(screen.getByText(`機器詳細:${equipment1.id}`)).toBeInTheDocument();
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("行フォーカス + Enter で機器詳細へ遷移する(D-026)", async () => {
     const user = userEvent.setup();
     seedActionScenario();
@@ -189,7 +185,6 @@ describe("Dashboard: 要対応項目リスト", () => {
     expect(screen.getByText(`機器詳細:${equipment1.id}`)).toBeInTheDocument();
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("行フォーカス + Space で機器詳細へ遷移する(D-026)", async () => {
     const user = userEvent.setup();
     seedActionScenario();
@@ -233,7 +228,6 @@ describe("Dashboard: 最新の通知", () => {
     expect(screen.getByText("期限超過")).not.toHaveAttribute("aria-hidden");
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("「通知センターへ」で通知センターへ遷移する", async () => {
     const user = userEvent.setup();
     seedStore({ notifications: { [overdueNotification.id]: overdueNotification } });

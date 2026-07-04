@@ -81,11 +81,9 @@ export const VendorList = (): ReactElement => {
                   ) : (
                     <span className="inline-flex gap-1">
                       {vendor.isManufacturer && (
-                        // oxlint-disable-next-line react/forbid-component-props -- Badgeはclassnameで色を渡す設計（Badge.tsx参照）
                         <Badge className={MANUFACTURER_BADGE_CLASS_NAME}>メーカー</Badge>
                       )}
                       {vendor.isCalibrator && (
-                        // oxlint-disable-next-line react/forbid-component-props -- Badgeはclassnameで色を渡す設計（Badge.tsx参照）
                         <Badge className={CALIBRATOR_BADGE_CLASS_NAME}>校正業者</Badge>
                       )}
                     </span>

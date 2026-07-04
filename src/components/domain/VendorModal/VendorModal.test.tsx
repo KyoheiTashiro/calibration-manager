@@ -33,7 +33,6 @@ describe("VendorModal: 新規追加", () => {
     expect(screen.getByText("取引先を追加")).toBeInTheDocument();
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("必須項目を入力して保存するとaddVendorが呼ばれストアに追加される", async () => {
     const user = userEvent.setup();
     const onClose = vi.fn<() => void>();
@@ -53,7 +52,6 @@ describe("VendorModal: 新規追加", () => {
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("名称が空のまま保存するとエラー文言が表示され保存されない", async () => {
     const user = userEvent.setup();
     render(<VendorModal open onClose={vi.fn<() => void>()} />);
@@ -64,7 +62,6 @@ describe("VendorModal: 新規追加", () => {
     expect(Object.values(useAppStore.getState().vendors)).toHaveLength(0);
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("メール形式が不正だとエラー文言が表示される", async () => {
     const user = userEvent.setup();
     render(<VendorModal open onClose={vi.fn<() => void>()} />);
@@ -89,7 +86,6 @@ describe("VendorModal: 新規追加", () => {
     expect(screen.queryByLabelText("標準納期(日)")).not.toBeInTheDocument();
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("校正業者をチェックすると標準納期(日)フィールドが表示される", async () => {
     const user = userEvent.setup();
     render(<VendorModal open onClose={vi.fn<() => void>()} />);
@@ -99,7 +95,6 @@ describe("VendorModal: 新規追加", () => {
     expect(screen.getByLabelText("標準納期(日)")).toBeInTheDocument();
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("校正業者をチェックしてから外すと標準納期(日)の入力値がクリアされ保存値に含まれない", async () => {
     const user = userEvent.setup();
     const onClose = vi.fn<() => void>();
@@ -135,7 +130,6 @@ describe("VendorModal: 編集", () => {
     expect(screen.getByLabelText("備考")).toHaveValue("備考テキスト");
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("変更して保存するとupdateVendorが反映される", async () => {
     const user = userEvent.setup();
     const onClose = vi.fn<() => void>();

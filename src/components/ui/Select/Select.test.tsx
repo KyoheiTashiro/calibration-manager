@@ -67,7 +67,6 @@ describe("Select", () => {
     expect(optionElements[0]).toHaveTextContent("選択してください");
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("name/onChange/ref 等のネイティブ props がそのまま素通しされる", async () => {
     const user = userEvent.setup();
     const handleChange = vi.fn<() => void>();

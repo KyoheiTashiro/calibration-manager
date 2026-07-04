@@ -45,7 +45,6 @@ const otherEquipment: Equipment = {
 };
 
 /** 遷移先確認用ダミー: 機器詳細(:id を表示) */
-// oxlint-disable-next-line react/no-multi-comp -- テスト内の遷移先ダミーは複数の別画面を模すため同一ファイルに並べる
 const DummyEquipmentDetail = (): ReactElement => {
   const { id } = useParams();
   return <p>機器詳細:{id}</p>;
@@ -76,7 +75,6 @@ describe("EquipmentEditForm: 編集プリフィル・更新", () => {
     expect(screen.getByLabelText("設置場所")).toHaveValue(existingEquipment.location);
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("値を変更して保存するとストアが更新される", async () => {
     const user = userEvent.setup();
     // manufacturerId の存在検証(03-equipment-form.md)が保存時に走るため、参照先 Vendor も seed する
@@ -97,7 +95,6 @@ describe("EquipmentEditForm: 編集プリフィル・更新", () => {
 });
 
 describe("EquipmentEditForm: 管理番号ユニーク検証", () => {
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("編集時に自身の管理番号を変更せず再送信してもエラーにならない", async () => {
     const user = userEvent.setup();
     // manufacturerId の存在検証(03-equipment-form.md)が保存時に走るため、参照先 Vendor も seed する
@@ -128,7 +125,6 @@ describe("EquipmentEditForm: 廃棄ボタン", () => {
     expect(screen.getByRole("button", { name: "廃棄にする" })).toBeInTheDocument();
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("確認ダイアログで確定すると status=retired になり詳細へ遷移する", async () => {
     const user = userEvent.setup();
     seedStore({ equipment: { [existingEquipment.id]: existingEquipment } });

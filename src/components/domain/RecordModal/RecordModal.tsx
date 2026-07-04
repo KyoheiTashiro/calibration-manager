@@ -160,35 +160,22 @@ export const RecordModal = ({ open, inspectionItemId, orderId, onClose }: Props)
             label="実施日"
             required
             error={errors.doneDate?.message}
-            // oxlint-disable-next-line react/jsx-props-no-spreading -- register()のname/onChange/onBlur等を素通しするため必須
             {...register("doneDate")}
           />
           {isFutureDoneDate ? <p className="text-xs text-amber-600">実施日が未来日です</p> : null}
         </div>
-        <TextField
-          label="実施者"
-          required
-          error={errors.doneBy?.message}
-          // oxlint-disable-next-line react/jsx-props-no-spreading -- register()のname/onChange/onBlur等を素通しするため必須
-          {...register("doneBy")}
-        />
+        <TextField label="実施者" required error={errors.doneBy?.message} {...register("doneBy")} />
         <RadioGroup
           label="結果"
           required
           options={RECORD_RESULT_OPTIONS}
           error={errors.result?.message}
-          // oxlint-disable-next-line react/jsx-props-no-spreading -- register()のname/onChange/onBlur等を素通しするため必須
           {...register("result")}
         />
         {result === RECORD_RESULT.FAIL ? (
           <p className="text-xs text-slate-600">次回期限は更新されません</p>
         ) : null}
-        <TextField
-          label="備考"
-          error={errors.note?.message}
-          // oxlint-disable-next-line react/jsx-props-no-spreading -- register()のname/onChange/onBlur等を素通しするため必須
-          {...register("note")}
-        />
+        <TextField label="備考" error={errors.note?.message} {...register("note")} />
         {submitFailed ? (
           <p className="text-sm text-red-600">
             登録できませんでした。データの状態を確認してください

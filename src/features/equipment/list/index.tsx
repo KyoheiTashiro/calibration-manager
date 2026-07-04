@@ -148,7 +148,6 @@ export const EquipmentList = (): ReactElement => {
                     <td className="px-3 py-2">{manufacturerNameOf(entry) ?? "—"}</td>
                     <td className="px-3 py-2">{entry.location ?? "—"}</td>
                     <td className="px-3 py-2">
-                      {/* oxlint-disable-next-line react/forbid-component-props -- Badgeはclassnameで色を渡す設計（Badge.tsx参照） */}
                       <Badge className={EQUIPMENT_STATUS_BADGE_CLASSES[entry.status]}>
                         {EQUIPMENT_STATUS_LABELS[entry.status]}
                       </Badge>

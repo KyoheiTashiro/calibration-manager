@@ -56,7 +56,6 @@ export const PersonList = (): ReactElement => {
                 <td className="px-3 py-2">{person.email}</td>
                 <td className="px-3 py-2">
                   <Badge
-                    // oxlint-disable-next-line react/forbid-component-props -- Badgeはclassnameで色を渡す設計（Badge.tsx参照）
                     className={
                       person.isActive ? ACTIVE_BADGE_CLASS_NAME : INACTIVE_BADGE_CLASS_NAME
                     }

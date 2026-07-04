@@ -123,6 +123,29 @@
     // named import に展開すると `string` / `record` / `boolean` 等の汎用名がスコープを汚染して
     // かえって可読性を損なうため、ワイルドカード import を許可する。
     "import/no-namespace": "off",
+    // なぜ: react-hook-formの `{...register("name")}`（name/onChange/onBlur等の素通し）と、
+    // UIプリミティブ・アイコンのprops素通し（TextField/Select/icons等16ファイル）が本プロジェクト
+    // 全域の標準イディオムであり、全使用箇所への個別disable（52箇所）はノイズにしかならないため
+    // 無効化する。意図しないprops混入はTypeScriptの型チェックで担保する。
+    "react/jsx-props-no-spreading": "off",
+    // なぜ: className は「受け渡しAPIとして設計されたコンポーネント」に限り許可する。
+    // Badge/Link/NavLink は色・リンク色を className で渡す設計（Badge.tsx参照。NavLinkは
+    // isActiveでクラス出し分けする関数classNameが公式API）、Table は table要素カスタムが仕様、
+    // *Icon は呼び出し側でサイズ制御する方針（icons/base.ts）。
+    // それ以外のコンポーネントへの className / style 渡しは引き続き禁止する。
+    "react/forbid-component-props": [
+      "error",
+      {
+        "forbid": [
+          {
+            "propName": "className",
+            "allowedFor": ["Badge", "Link", "NavLink", "Table"],
+            "allowedForPatterns": ["*Icon"]
+          },
+          "style"
+        ]
+      }
+    ],
     // なぜ: coding-standards.md §5「Immerドラフトを直接破壊的変更する」方針（zustandスライスの
     // `set((state) => { state.items[id] = item; })` 等）は、引数を書き換え不可のreadonlyにする
     // このルールと真っ向から矛盾する。またReactのクラスコンポーネントのライフサイクル引数
@@ -204,7 +227,13 @@
       "rules": {
         // なぜ: テストはケース網羅で行数が自然に嵩み、行数上限で機械分割すると同一対象のテストが
         // 複数ファイルに散って見通しが悪化するため、テストファイルに限り行数上限を適用しない。
-        "eslint/max-lines": "off"
+        "eslint/max-lines": "off",
+        // なぜ: user-event 等 Testing Library の操作APIはPromiseを返しawaitが必須であり、
+        // テストでは async/await を避けようがない（全テストで同一のdisableが106箇所必要になっていた）。
+        "oxc/no-async-await": "off",
+        // なぜ: 遷移先ダミー画面など、テスト内で複数の小さなコンポーネントを同一ファイルに
+        // 並べるのはルーティングテストの標準パターンのため、テストに限り複数コンポーネントを許容する。
+        "react/no-multi-comp": "off"
       }
     }
   ]

@@ -56,7 +56,6 @@ beforeEach(() => {
 });
 
 describe("EquipmentDetail: RecordModal起動", () => {
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("行の「記録」で対象項目がプリセットされたモーダルが開く", async () => {
     const user = userEvent.setup();
     renderDetail();
@@ -71,7 +70,6 @@ describe("EquipmentDetail: RecordModal起動", () => {
     ).toBeInTheDocument();
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("登録すると実施記録テーブルへ行が増える", async () => {
     const user = userEvent.setup();
     renderDetail();

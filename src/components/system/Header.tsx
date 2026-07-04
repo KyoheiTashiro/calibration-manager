@@ -31,8 +31,6 @@ export const Header = ({ onMenuClick }: Props): ReactElement => {
           onClick={onMenuClick}
           className="text-slate-600 md:hidden"
         >
-          {/* oxlint-disable-next-line react/forbid-component-props -- icons/base.tsの方針通り
-              アイコンのサイズは呼び出し側classNameで制御する設計のため許容する */}
           <MenuIcon className="h-6 w-6" />
         </button>
         <span className="text-base font-semibold">機器点検・校正管理</span>
@@ -45,8 +43,6 @@ export const Header = ({ onMenuClick }: Props): ReactElement => {
           onClick={handleBellClick}
           className="relative text-slate-600"
         >
-          {/* oxlint-disable-next-line react/forbid-component-props -- icons/base.tsの方針通り
-              アイコンのサイズは呼び出し側classNameで制御する設計のため許容する */}
           <BellIcon className="h-6 w-6" />
           {/* なぜ 0件で非表示か: ui-guidelines.md §5「未読0でバッジ非表示」に従う。
               バッジ自体は装飾表現のためaria-hiddenにし、件数の告知は下のaria-live領域に任せる。 */}

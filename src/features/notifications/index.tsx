@@ -93,7 +93,6 @@ export const NotificationCenter = (): ReactElement => {
                 className="flex w-full flex-col gap-1 px-2 py-3 text-left hover:bg-slate-50"
               >
                 <div className="flex items-center gap-2">
-                  {/* oxlint-disable-next-line react/forbid-component-props -- BadgeはclassNameで色を渡す設計(Badge.tsx参照) */}
                   <Badge className={NOTIFICATION_TYPE_BADGE_CLASSES[notification.type]}>
                     {/* Badge は inline-flex のため空白テキストノードが消える。間隔は margin で確保 */}
                     <span aria-hidden="true" className="mr-1">

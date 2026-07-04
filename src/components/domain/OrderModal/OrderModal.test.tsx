@@ -115,7 +115,6 @@ describe("OrderModal", () => {
     ).not.toBeInTheDocument();
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("有効な入力で「保存」を押すとaddOrderが呼ばれstatus=plannedの案件が追加されonCloseが呼ばれる", async () => {
     seedBaseMasters();
     const user = userEvent.setup();
@@ -142,7 +141,6 @@ describe("OrderModal", () => {
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("既に進行中の案件がある項目で作成するとaddOrderがnullを返しエラー表示・onClose不呼び出し・ストア件数不変", async () => {
     seedBaseMasters();
     seedStore({
@@ -190,7 +188,6 @@ describe("OrderModal", () => {
     expect(screen.queryByLabelText("校正依頼先", { exact: false })).not.toBeInTheDocument();
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("校正依頼先未選択のまま「保存」を押すとエラー表示されストアが変化しない", async () => {
     seedStore({
       equipment: { [equipment.id]: equipment },
@@ -217,7 +214,6 @@ describe("OrderModal", () => {
     expect(Object.values(useAppStore.getState().orders)).toHaveLength(0);
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("費用に負数を入力すると検証エラーが出る", async () => {
     seedBaseMasters();
     const user = userEvent.setup();

@@ -28,34 +28,16 @@ export const EquipmentFormFields = ({
       label="管理番号"
       required
       error={errors.managementNo?.message}
-      // oxlint-disable-next-line react/jsx-props-no-spreading -- register()のname/onChange/onBlur等を素通しするため必須
       {...register("managementNo")}
     />
-    <TextField
-      label="機器名"
-      required
-      error={errors.name?.message}
-      // oxlint-disable-next-line react/jsx-props-no-spreading -- register()のname/onChange/onBlur等を素通しするため必須
-      {...register("name")}
-    />
-    <TextField
-      label="型式"
-      error={errors.model?.message}
-      // oxlint-disable-next-line react/jsx-props-no-spreading -- register()のname/onChange/onBlur等を素通しするため必須
-      {...register("model")}
-    />
-    <TextField
-      label="シリアル番号"
-      error={errors.serialNo?.message}
-      // oxlint-disable-next-line react/jsx-props-no-spreading -- register()のname/onChange/onBlur等を素通しするため必須
-      {...register("serialNo")}
-    />
+    <TextField label="機器名" required error={errors.name?.message} {...register("name")} />
+    <TextField label="型式" error={errors.model?.message} {...register("model")} />
+    <TextField label="シリアル番号" error={errors.serialNo?.message} {...register("serialNo")} />
     {manufacturerOptions.length === 0 ? (
       <div>
         <span className="block text-sm text-slate-700">メーカー</span>
         <p className="text-sm text-slate-600">
           メーカーが未登録です。マスタから追加してください
-          {/* oxlint-disable-next-line react/forbid-component-props -- Linkはclassnameでリンク色を渡す設計（Badgeと同様） */}
           <Link to={ROUTES.VENDOR_LIST} className="text-primary ml-1 underline">
             メーカーマスタへ
           </Link>
@@ -67,29 +49,17 @@ export const EquipmentFormFields = ({
         placeholder="選択してください"
         options={manufacturerOptions}
         error={errors.manufacturerId?.message}
-        // oxlint-disable-next-line react/jsx-props-no-spreading -- register()のname/onChange/onBlur等を素通しするため必須
         {...register("manufacturerId")}
       />
     )}
-    <TextField
-      label="設置場所"
-      error={errors.location?.message}
-      // oxlint-disable-next-line react/jsx-props-no-spreading -- register()のname/onChange/onBlur等を素通しするため必須
-      {...register("location")}
-    />
+    <TextField label="設置場所" error={errors.location?.message} {...register("location")} />
     <Select
       label="状態"
       required
       options={statusOptions}
       error={errors.status?.message}
-      // oxlint-disable-next-line react/jsx-props-no-spreading -- register()のname/onChange/onBlur等を素通しするため必須
       {...register("status")}
     />
-    <Textarea
-      label="備考"
-      error={errors.note?.message}
-      // oxlint-disable-next-line react/jsx-props-no-spreading -- register()のname/onChange/onBlur等を素通しするため必須
-      {...register("note")}
-    />
+    <Textarea label="備考" error={errors.note?.message} {...register("note")} />
   </>
 );

@@ -40,7 +40,6 @@ describe("PwaInstallSection", () => {
     ).not.toBeInTheDocument();
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("beforeinstallprompt 発火後はインストールボタンを表示し、クリックで prompt が呼ばれ非対応案内文に戻る", async () => {
     render(<PwaInstallSection />);
     const mockEvent = createMockEvent();

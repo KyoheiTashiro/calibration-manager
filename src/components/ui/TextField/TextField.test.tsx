@@ -54,7 +54,6 @@ describe("TextField", () => {
     expect(input).not.toHaveAttribute("aria-invalid");
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("value/onChange/ref/name 等のネイティブ props がそのまま素通しされる", async () => {
     const user = userEvent.setup();
     const handleChange = vi.fn<() => void>();

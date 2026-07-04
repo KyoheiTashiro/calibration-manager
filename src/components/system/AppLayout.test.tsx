@@ -45,7 +45,6 @@ describe("AppLayout", () => {
     expect(screen.getByText("テストコンテンツ")).toBeInTheDocument();
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("ハンバーガーボタンをクリックするとオーバーレイが開くこと", async () => {
     const user = userEvent.setup();
     const { container } = renderAppLayout();
@@ -57,7 +56,6 @@ describe("AppLayout", () => {
     expect(container.querySelector('[class*="bg-black/50"]')).not.toBeNull();
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("オーバーレイが開いた状態でEscapeキーを押すと閉じること", async () => {
     const user = userEvent.setup();
     const { container } = renderAppLayout();
@@ -70,7 +68,6 @@ describe("AppLayout", () => {
     expect(container.querySelector('[class*="bg-black/50"]')).toBeNull();
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("オーバーレイが開いた状態で背景をクリックすると閉じること", async () => {
     const user = userEvent.setup();
     const { container } = renderAppLayout();

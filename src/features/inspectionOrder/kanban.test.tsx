@@ -115,7 +115,6 @@ describe("カード表示", () => {
 });
 
 describe("完了/中止も表示 トグル", () => {
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("既定OFFでは記録登録済/中止の列は出ず、ONで右側に追加される", async () => {
     const user = userEvent.setup();
     baseSeed({
@@ -153,7 +152,6 @@ describe("完了/中止も表示 トグル", () => {
 });
 
 describe("中止フロー", () => {
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("中止 → 確認 → cancelled になり、トグルOFFでカードが消える", async () => {
     const user = userEvent.setup();
     baseSeed({
@@ -228,7 +226,6 @@ describe("空状態", () => {
 });
 
 describe("発注ダイアログの整合警告（D-019）", () => {
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("発注日 > 返却予定日 で警告を出すが登録はブロックしない", async () => {
     const user = userEvent.setup();
     baseSeed({

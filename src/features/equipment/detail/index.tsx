@@ -118,7 +118,6 @@ export const EquipmentDetail = (): ReactElement => {
           <div>
             <dt className="text-slate-500">状態</dt>
             <dd>
-              {/* oxlint-disable-next-line react/forbid-component-props -- Badgeはclassnameで色を渡す設計（Badge.tsx参照） */}
               <Badge className={EQUIPMENT_STATUS_BADGE_CLASSES[currentEquipment.status]}>
                 {EQUIPMENT_STATUS_LABELS[currentEquipment.status]}
               </Badge>

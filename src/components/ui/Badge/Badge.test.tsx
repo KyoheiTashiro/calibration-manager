@@ -15,7 +15,6 @@ describe("Badge", () => {
   });
 
   it("className が基調クラスに追加で反映される", () => {
-    // oxlint-disable-next-line react/forbid-component-props -- classNameでカスタムする仕様がテスト対象のため許容する
     render(<Badge className="bg-green-100 text-green-800">正常</Badge>);
 
     const badge = screen.getByText("正常");

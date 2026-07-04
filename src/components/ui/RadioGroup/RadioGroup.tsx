@@ -44,7 +44,6 @@ export const RadioGroup = ({
             >
               <input
                 type="radio"
-                // oxlint-disable-next-line react/jsx-props-no-spreading -- register()のname/onChange/onBlur等を素通しするため必須
                 {...rest}
                 ref={ref}
                 id={inputId}

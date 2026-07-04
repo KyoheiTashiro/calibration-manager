@@ -61,7 +61,6 @@ describe("PersonList", () => {
     expect(screen.getAllByRole("button", { name: "+ 追加" }).length).toBeGreaterThan(0);
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("「+ 追加」からモーダルで入力して保存すると、ストアのpersonsに反映され一覧にも表示される", async () => {
     const user = userEvent.setup();
     renderWithStore(<PersonList />);
@@ -88,7 +87,6 @@ describe("PersonList", () => {
     expect(await screen.findByText("鈴木一郎")).toBeInTheDocument();
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("既存担当者の「編集」からモーダルにプリフィルされ、変更して保存するとストア・一覧に反映される", async () => {
     const user = userEvent.setup();
     seedStore({

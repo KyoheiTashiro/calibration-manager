@@ -35,7 +35,6 @@ export const Manual = (): ReactElement => (
       </p>
       <p>
         端末の故障やブラウザーデータの消去でデータが失われる可能性があるため、
-        {/* oxlint-disable-next-line react/forbid-component-props -- Linkはclassnameでリンク色を渡す設計(Badgeと同様) */}
         <Link to={ROUTES.SETTINGS} className="text-primary mx-1 underline">
           設定画面
         </Link>
@@ -48,19 +47,16 @@ export const Manual = (): ReactElement => (
       <ol className="flex list-decimal flex-col gap-2 pl-5">
         <li>
           はじめに、機器の登録で使う基本情報(
-          {/* oxlint-disable-next-line react/forbid-component-props -- Linkはclassnameでリンク色を渡す設計(Badgeと同様) */}
           <Link to={ROUTES.VENDOR_LIST} className="text-primary underline">
             メーカー/取引先
           </Link>
           ・
-          {/* oxlint-disable-next-line react/forbid-component-props -- Linkはclassnameでリンク色を渡す設計(Badgeと同様) */}
           <Link to={ROUTES.PERSON_LIST} className="text-primary underline">
             担当者
           </Link>
           )を追加します。
         </li>
         <li>
-          {/* oxlint-disable-next-line react/forbid-component-props -- Linkはclassnameでリンク色を渡す設計(Badgeと同様) */}
           <Link to={ROUTES.EQUIPMENT_CREATE} className="text-primary underline">
             機器を追加
           </Link>
@@ -68,7 +64,6 @@ export const Manual = (): ReactElement => (
         </li>
         <li>
           機器に点検校正項目(周期・内外区分など)を追加します。入力画面(モーダル)は、
-          {/* oxlint-disable-next-line react/forbid-component-props -- Linkはclassnameでリンク色を渡す設計(Badgeと同様) */}
           <Link to={ROUTES.EQUIPMENT_LIST} className="text-primary underline">
             機器一覧
           </Link>
@@ -76,7 +71,6 @@ export const Manual = (): ReactElement => (
         </li>
         <li>
           点検・校正を実施したら、
-          {/* oxlint-disable-next-line react/forbid-component-props -- Linkはclassnameでリンク色を渡す設計(Badgeと同様) */}
           <Link to={ROUTES.INSPECTION_ITEM_LIST} className="text-primary underline">
             点検校正項目一覧
           </Link>
@@ -84,7 +78,6 @@ export const Manual = (): ReactElement => (
         </li>
         <li>
           外部の点検・校正が必要な項目は、
-          {/* oxlint-disable-next-line react/forbid-component-props -- Linkはclassnameでリンク色を渡す設計(Badgeと同様) */}
           <Link to={ROUTES.INSPECTION_ITEM_LIST} className="text-primary underline">
             点検校正項目一覧
           </Link>
@@ -93,7 +86,6 @@ export const Manual = (): ReactElement => (
         </li>
         <li>
           作成した案件は
-          {/* oxlint-disable-next-line react/forbid-component-props -- Linkはclassnameでリンク色を渡す設計(Badgeと同様) */}
           <Link to={ROUTES.ORDER_LIST} className="text-primary underline">
             点検校正外部案件
           </Link>
@@ -161,7 +153,6 @@ export const Manual = (): ReactElement => (
 
       <div>
         <h3 className="font-semibold">
-          {/* oxlint-disable-next-line react/forbid-component-props -- Linkはclassnameでリンク色を渡す設計(Badgeと同様) */}
           <Link to={ROUTES.DASHBOARD} className="text-primary underline">
             ダッシュボード
           </Link>
@@ -171,7 +162,6 @@ export const Manual = (): ReactElement => (
 
       <div>
         <h3 className="font-semibold">
-          {/* oxlint-disable-next-line react/forbid-component-props -- Linkはclassnameでリンク色を渡す設計(Badgeと同様) */}
           <Link to={ROUTES.EQUIPMENT_LIST} className="text-primary underline">
             機器一覧・機器詳細
           </Link>
@@ -184,7 +174,6 @@ export const Manual = (): ReactElement => (
 
       <div>
         <h3 className="font-semibold">
-          {/* oxlint-disable-next-line react/forbid-component-props -- Linkはclassnameでリンク色を渡す設計(Badgeと同様) */}
           <Link to={ROUTES.INSPECTION_ITEM_LIST} className="text-primary underline">
             点検校正項目一覧
           </Link>
@@ -197,7 +186,6 @@ export const Manual = (): ReactElement => (
 
       <div>
         <h3 className="font-semibold">
-          {/* oxlint-disable-next-line react/forbid-component-props -- Linkはclassnameでリンク色を渡す設計(Badgeと同様) */}
           <Link to={ROUTES.ORDER_LIST} className="text-primary underline">
             点検校正外部案件
           </Link>
@@ -209,7 +197,6 @@ export const Manual = (): ReactElement => (
 
       <div>
         <h3 className="font-semibold">
-          {/* oxlint-disable-next-line react/forbid-component-props -- Linkはclassnameでリンク色を渡す設計(Badgeと同様) */}
           <Link to={ROUTES.VENDOR_LIST} className="text-primary underline">
             メーカー/取引先
           </Link>
@@ -219,7 +206,6 @@ export const Manual = (): ReactElement => (
 
       <div>
         <h3 className="font-semibold">
-          {/* oxlint-disable-next-line react/forbid-component-props -- Linkはclassnameでリンク色を渡す設計(Badgeと同様) */}
           <Link to={ROUTES.PERSON_LIST} className="text-primary underline">
             担当者
           </Link>
@@ -229,7 +215,6 @@ export const Manual = (): ReactElement => (
 
       <div>
         <h3 className="font-semibold">
-          {/* oxlint-disable-next-line react/forbid-component-props -- Linkはclassnameでリンク色を渡す設計(Badgeと同様) */}
           <Link to={ROUTES.NOTIFICATION_LIST} className="text-primary underline">
             通知
           </Link>
@@ -239,7 +224,6 @@ export const Manual = (): ReactElement => (
 
       <div>
         <h3 className="font-semibold">
-          {/* oxlint-disable-next-line react/forbid-component-props -- Linkはclassnameでリンク色を渡す設計(Badgeと同様) */}
           <Link to={ROUTES.SETTINGS} className="text-primary underline">
             設定
           </Link>
@@ -254,7 +238,6 @@ export const Manual = (): ReactElement => (
     <section className="flex flex-col gap-3 rounded border border-slate-200 p-4">
       <h2 className="border-b border-slate-200 pb-2 text-lg font-semibold">バックアップと復元</h2>
       <p>
-        {/* oxlint-disable-next-line react/forbid-component-props -- Linkはclassnameでリンク色を渡す設計(Badgeと同様) */}
         <Link to={ROUTES.SETTINGS} className="text-primary underline">
           設定画面
         </Link>

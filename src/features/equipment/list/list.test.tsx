@@ -159,7 +159,6 @@ describe("EquipmentList: 非稼働機器の期限", () => {
     expect(dueDateCellOf(row)).toHaveTextContent("—");
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("retired機器はデフォルトフィルタで非表示だが、全てフィルタに切り替えても期限は—になる", async () => {
     const user = userEvent.setup();
     seedStore({
@@ -205,7 +204,6 @@ describe("EquipmentList: active機器でisActive項目のみ", () => {
 });
 
 describe("EquipmentList: 状態フィルタ", () => {
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("デフォルトはretiredを表示せず、全てに切り替えると表示される", async () => {
     const user = userEvent.setup();
     seedStore({
@@ -227,7 +225,6 @@ describe("EquipmentList: 状態フィルタ", () => {
 });
 
 describe("EquipmentList: 検索", () => {
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("managementNo/name/modelの部分一致(大文字小文字無視)で絞り込む", async () => {
     const user = userEvent.setup();
     seedStore({
@@ -251,7 +248,6 @@ describe("EquipmentList: 行クリック・追加ボタン遷移", () => {
     renderWithStore(renderEquipmentListWithRoutes(), { initialEntries: [ROUTES.EQUIPMENT_LIST] });
   };
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("行クリックで機器詳細へ遷移する", async () => {
     const user = userEvent.setup();
     renderWithRoutes();
@@ -259,7 +255,6 @@ describe("EquipmentList: 行クリック・追加ボタン遷移", () => {
     expect(screen.getByText(`機器詳細:${activeEquipmentWithDue.id}`)).toBeInTheDocument();
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("「+ 機器を追加」で機器登録画面へ遷移する", async () => {
     const user = userEvent.setup();
     renderWithRoutes();
@@ -278,7 +273,6 @@ describe("EquipmentList: 空状態", () => {
     expect(screen.queryByLabelText("状態")).not.toBeInTheDocument();
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("検索結果0件時は検索・フィルタを表示したままCTAなしのEmptyStateを表示する", async () => {
     const user = userEvent.setup();
     seedStore({ equipment: { [activeEquipmentWithDue.id]: activeEquipmentWithDue } });

@@ -29,7 +29,6 @@ import { MemoryRouter, Route, Routes, useParams } from "react-router-dom";
 import { beforeEach, describe, expect, it } from "vitest";
 
 /** 遷移先確認用ダミー: 機器編集(:id を表示) */
-// oxlint-disable-next-line react/no-multi-comp -- テスト内の遷移先ダミーは複数の別画面を模すため同一ファイルに並べる
 const DummyEquipmentEdit = (): ReactElement => {
   const { id } = useParams();
   return <p>機器編集:{id}</p>;
@@ -79,7 +78,6 @@ describe("EquipmentDetail: 基本情報カード", () => {
     expect(screen.getAllByText("—")).toHaveLength(5);
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("「編集」ボタンで機器編集画面へ遷移する", async () => {
     const user = userEvent.setup();
     seedEquipmentFullMasters();
@@ -294,7 +292,6 @@ describe("EquipmentDetail: InspectionItemModal起動", () => {
     seedEquipmentFullInspectionItemsAndRecords();
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("「+ 項目を追加」で新規モードのモーダルが開き、対象機器がプリセットされる", async () => {
     const user = userEvent.setup();
     renderDetail(equipmentFull.id);
@@ -306,7 +303,6 @@ describe("EquipmentDetail: InspectionItemModal起動", () => {
     expect(within(dialogElement).getByLabelText("項目名", { exact: false })).toHaveValue("");
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("行の「編集」で編集モードのモーダルが開き、既存値がプリフィルされる", async () => {
     const user = userEvent.setup();
     renderDetail(equipmentFull.id);
@@ -322,7 +318,6 @@ describe("EquipmentDetail: InspectionItemModal起動", () => {
     expect(within(dialogElement).getByLabelText("外部")).toBeChecked();
   });
 
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("モーダルを閉じると再度「+ 項目を追加」で新規モードとして開き直せる", async () => {
     const user = userEvent.setup();
     renderDetail(equipmentFull.id);
