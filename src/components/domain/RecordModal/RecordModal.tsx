@@ -2,6 +2,8 @@
  * 実施記録（InspectionRecord）の登録モーダル（screen-design/07-record-modal.md）。RHF + zodResolver。
  * 対象項目は常に確定した状態で起動元から渡される。登録時の期限更新・案件完了カスケードは
  * ストア層 addRecord が担う（inspectionRecordSlice.ts）。
+ * 呼び出し元は閉時アンマウント（条件マウント）必須。defaultValues はマウント時にのみ評価されるため、
+ * 常時マウントで open をトグルする使い方ではプリフィルされない。
  */
 
 import { recordFormSchema, type RecordFormValues } from "@/components/domain/RecordModal/schema";
@@ -17,7 +19,7 @@ import {
 import { useAppStore } from "@/store/useAppStore";
 import { todayIsoDate } from "@/utils/time";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useState, type ReactElement } from "react";
+import { useState, type ReactElement } from "react";
 import { useForm, useWatch, type DefaultValues } from "react-hook-form";
 
 type Props = {
@@ -57,27 +59,25 @@ export const RecordModal = ({ open, inspectionItemId, orderId, onClose }: Props)
 
   const [submitFailed, setSubmitFailed] = useState(false);
 
+  // なぜ defaultValues 直書きで足りるか: RecordModal は起動元で常に条件マウント（閉時アンマウント）
+  // されるため、defaultValues はマウント時に1度評価されれば足り、open のたびのプリフィルは不要。
+  // なぜ result を undefined か: 既定選択なし（未選択で送信すると zod エラー）とするため。
+  const defaultValues: DefaultValues<RecordFormValues> = {
+    doneDate: todayIsoDate(),
+    doneBy: resolvePrefillDoneBy(inspectionItem, order, vendors),
+    result: undefined,
+    note: "",
+  };
+
   const {
     register,
     handleSubmit,
     control,
-    reset,
     formState: { errors, isDirty },
   } = useForm<RecordFormValues>({
     resolver: zodResolver(recordFormSchema),
+    defaultValues,
   });
-
-  // なぜ: open/対象変更のたびにプリフィルし直す（screen-design/README.md §0.5、InspectionItemModal と同パターン）。
-  // なぜ result を undefined か: 既定選択なし（未選択で送信すると zod エラー）とするため。
-  useEffect(() => {
-    const defaults: DefaultValues<RecordFormValues> = {
-      doneDate: todayIsoDate(),
-      doneBy: resolvePrefillDoneBy(inspectionItem, order, vendors),
-      result: undefined,
-      note: "",
-    };
-    reset(defaults);
-  }, [open, inspectionItemId, orderId, inspectionItem, order, vendors, reset]);
 
   // なぜ watch() ではなく useWatch か: InspectionItemModal の execution 監視と同じ理由（react-compiler lint対策）。
   const result = useWatch({ control, name: "result" });

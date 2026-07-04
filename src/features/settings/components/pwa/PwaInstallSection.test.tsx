@@ -4,10 +4,14 @@
  */
 
 import { PwaInstallSection } from "@/features/settings/components/pwa/PwaInstallSection";
+import {
+  resetPwaInstallStateForTest,
+  setupPwaInstallCapture,
+} from "@/features/settings/components/pwa/usePwaInstall";
 import "@testing-library/jest-dom/vitest";
 import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const createMockEvent = (): BeforeInstallPromptEvent & { prompt: ReturnType<typeof vi.fn> } =>
   Object.assign(new Event("beforeinstallprompt"), {
@@ -18,6 +22,13 @@ const createMockEvent = (): BeforeInstallPromptEvent & { prompt: ReturnType<type
   });
 
 describe("PwaInstallSection", () => {
+  beforeEach(() => {
+    // なぜ: ストアはモジュールスコープで状態を保持するため、テスト間の汚染を防ぐためリセットしてから
+    // 捕捉を再登録する(setupPwaInstallCapture は isSetup ガードで冪等なため毎回呼んでよい)。
+    resetPwaInstallStateForTest();
+    setupPwaInstallCapture();
+  });
+
   it("初期状態では非対応案内文を表示し、インストールボタンは存在しない", () => {
     render(<PwaInstallSection />);
 
@@ -76,5 +87,22 @@ describe("PwaInstallSection", () => {
     });
 
     expect(preventDefaultSpy).toHaveBeenCalled();
+  });
+
+  it("コンポーネントマウント前に beforeinstallprompt が発火してもインストールボタンを表示する（回帰）", () => {
+    const mockEvent = createMockEvent();
+
+    // なぜ render の前に発火させるか: setupPwaInstallCapture はモジュールスコープで捕捉するため、
+    // 設定画面がまだマウントされていなくても状態は保持され、後からマウントされたビューに反映されるはず
+    // （SPA 内遷移で設定画面を初めて表示した時には既にイベント発火済み、という実際のバグ状況を再現）。
+    act(() => {
+      globalThis.dispatchEvent(mockEvent);
+    });
+
+    render(<PwaInstallSection />);
+
+    expect(
+      screen.getByRole("button", { name: "アプリとしてインストール" }),
+    ).toBeInTheDocument();
   });
 });

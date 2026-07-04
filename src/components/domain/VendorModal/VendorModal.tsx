@@ -9,7 +9,7 @@ import { vendorFormSchema, type VendorFormValues } from "@/features/vendors/sche
 import type { Vendor } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, type ReactElement } from "react";
+import type { ReactElement } from "react";
 import { useForm, useWatch } from "react-hook-form";
 
 type Props = {
@@ -57,14 +57,10 @@ export const VendorModal = ({ open, vendor, onClose }: Props): ReactElement => {
     formState: { errors, isDirty },
   } = useForm<VendorFormValues>({
     resolver: zodResolver(vendorFormSchema),
-    defaultValues: toFormValues(vendor),
+    // なぜ values か: 編集対象（vendor）が変わるたびに既存値をプリフィルする
+    // （screen-design/README.md §0.5）。RHF が深い等価比較で変化を検知し reset する。
+    values: toFormValues(vendor),
   });
-
-  // なぜ: モーダル起動（open）または編集対象（vendor）が変わるたびに既存値をプリフィルする
-  // （screen-design/README.md §0.5「モーダル起動時、対象を編集する場合は既存値をプリフィル」）。
-  useEffect(() => {
-    reset(toFormValues(vendor));
-  }, [open, vendor, reset]);
 
   // なぜ watch() ではなく useWatch か: watch() が返す購読値は React Compiler が
   // 安全にメモ化できず lint(react-compiler)がエラーになるため、フックとして使える
@@ -72,14 +68,13 @@ export const VendorModal = ({ open, vendor, onClose }: Props): ReactElement => {
   const isManufacturer = useWatch({ control, name: "isManufacturer" });
   const isCalibrator = useWatch({ control, name: "isCalibrator" });
 
-  // なぜ: isCalibrator を true→false に切り替えたら「標準納期(日)」フィールドを非表示にするだけでなく
-  // 入力値もクリアする（タスク仕様）。setValue で明示的に空へ戻すことで、再度 true に戻しても
-  // 古い値が復活しない。
-  useEffect(() => {
-    if (!isCalibrator) {
-      setValue("standardLeadTimeDays", "", { shouldDirty: false });
-    }
-  }, [isCalibrator, setValue]);
+  // なぜ close 時に reset() を呼ぶか: values オプションは内容が変わらない限り reset しないため、
+  // 同一対象を dirty のまま破棄クローズ→再オープンした場合に入力が残留してしまう。
+  // close 時に明示的に reset()（引数なし）を呼び、最新の defaultValues（values由来）へ戻す。
+  const handleClose = (): void => {
+    reset();
+    onClose();
+  };
 
   const onSubmit = (values: VendorFormValues): void => {
     const payload = {
@@ -100,14 +95,14 @@ export const VendorModal = ({ open, vendor, onClose }: Props): ReactElement => {
     } else {
       addVendor(payload);
     }
-    onClose();
+    handleClose();
   };
 
   return (
     <Modal
       open={open}
       title={vendor ? "取引先を編集" : "取引先を追加"}
-      onClose={onClose}
+      onClose={handleClose}
       isDirty={isDirty}
       footer={
         <Button type="button" onClick={handleSubmit(onSubmit)}>
@@ -130,8 +125,17 @@ export const VendorModal = ({ open, vendor, onClose }: Props): ReactElement => {
         />
         <Checkbox
           label="校正業者"
+          // なぜ onChange でクリアするか: isCalibrator オフ時は「標準納期(日)」を非表示にするだけでなく
+          // 入力値もクリアし、再度オンにしても古い値が復活しないようにする（タスク仕様）。
+          // state 変化に反応する effect ではなくユーザー操作イベントで直接処理する。
           // oxlint-disable-next-line react/jsx-props-no-spreading -- register()のname/onChange/onBlur等を素通しするため必須
-          {...register("isCalibrator")}
+          {...register("isCalibrator", {
+            onChange: (event) => {
+              if (!event.target.checked) {
+                setValue("standardLeadTimeDays", "", { shouldDirty: false });
+              }
+            },
+          })}
         />
         {!isManufacturer && !isCalibrator ? (
           <p role="alert" className="text-xs text-orange-600">

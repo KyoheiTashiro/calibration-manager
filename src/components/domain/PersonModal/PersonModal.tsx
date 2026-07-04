@@ -9,7 +9,7 @@ import { personFormSchema, type PersonFormValues } from "@/features/persons/sche
 import type { Person } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useState, type ReactElement } from "react";
+import { useState, type ReactElement } from "react";
 import { useForm } from "react-hook-form";
 
 type PersonModalProps = {
@@ -47,12 +47,16 @@ export const PersonModal = ({ open, person, onClose }: PersonModalProps): ReactE
     formState: { errors, isDirty },
   } = useForm<PersonFormValues>({
     resolver: zodResolver(personFormSchema),
-    defaultValues: buildDefaultValues(person),
+    values: buildDefaultValues(person),
   });
 
-  useEffect(() => {
-    reset(buildDefaultValues(person));
-  }, [open, person, reset]);
+  // なぜ close 時に reset() を呼ぶか: values オプションは内容が変わらない限り reset しないため、
+  // 同一対象を dirty のまま破棄クローズ→再オープンした場合に入力が残留してしまう。
+  // close 時に明示的に reset()(引数なし)を呼び、最新の defaultValues(values由来)へ戻す。
+  const handleClose = (): void => {
+    reset();
+    onClose();
+  };
 
   const [pendingDeactivation, setPendingDeactivation] = useState<PendingDeactivation | null>(null);
 
@@ -66,7 +70,7 @@ export const PersonModal = ({ open, person, onClose }: PersonModalProps): ReactE
     } else {
       addPerson(normalized);
     }
-    onClose();
+    handleClose();
   };
 
   // なぜ getState() で件数を都度取得するか: 送信時点でしか使わない値を毎レンダー購読するのを
@@ -104,7 +108,7 @@ export const PersonModal = ({ open, person, onClose }: PersonModalProps): ReactE
       <Modal
         open={open}
         title={person ? "担当者を編集" : "担当者を追加"}
-        onClose={onClose}
+        onClose={handleClose}
         isDirty={isDirty}
         footer={
           <Button type="button" onClick={handleSubmit(onSubmit)}>

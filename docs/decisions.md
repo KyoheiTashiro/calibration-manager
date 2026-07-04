@@ -270,3 +270,9 @@
 - 根拠: `create`/`edit` の動詞ペアで対称性を確保。`new` は JS 予約語で識別子に使えず命名の一貫性を欠く。URL はルート定数経由の一括変更で互換確保(ハッシュルーティングのためサーバ設定不要)
 - 例外(変更対象外): UI 文言「機器を追加」・ストアアクション `addEquipment`(既存語彙を維持)、本ファイルの過去エントリ
 - 注意: 旧 URL `/#/equipment/new` のブックマークは 404 相当(未定義ルート)になる
+
+## D-040: beforeinstallprompt の捕捉をアプリ起動時に移動
+
+- ステータス: **docs反映済**(2026-07-04)
+- 判断: `beforeinstallprompt` / `appinstalled` の捕捉をコンポーネントの `useEffect` からモジュールスコープのストア(`src/features/settings/components/pwa/usePwaInstall.ts`)へ移し、`main.tsx` の `setupPwaInstallCapture()` でアプリ起動時に一度だけ登録する。`PwaInstallSection` は `usePwaInstall`(`useSyncExternalStore`)で状態を購読するだけの薄いビューに変更
+- 根拠: `beforeinstallprompt` はページロード直後に一度だけ発火する非標準イベントのため、コンポーネントの `useEffect` で購読していた従来実装では SPA 内遷移で設定画面を初めて表示した時点で既に発火済みとなり取り逃していた(リロードすれば設定画面マウント前に捕捉が間に合うため再現しづらいバグだった)。結果として実際はインストール可能な状況でも「非対応」の案内文が誤表示されていた。起動時に一度だけ捕捉して状態を保持すれば、設定画面をいつ表示してもボタンが正しく出せる
