@@ -111,7 +111,7 @@ export const EquipmentList = (): ReactElement => {
   };
 
   const handleAddClick = (): void => {
-    navigate(ROUTES.EQUIPMENT_NEW);
+    navigate(ROUTES.EQUIPMENT_CREATE);
   };
 
   const handleRowActivate = (equipmentId: string): void => {

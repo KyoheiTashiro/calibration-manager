@@ -5,12 +5,12 @@
  * ステータス導出は todayIsoDate() 依存だが、フィクスチャの nextDueDate を極端値にして決定的にする。
  */
 
-import { InspectionItemList } from "@/features/inspectionItems";
+import { InspectionItemList } from "@/features/inspectionItems/list";
 import {
   personSato,
   personSuzuki,
   seedInspectionItemList,
-} from "@/features/inspectionItems/inspectionItemListFixtures";
+} from "@/features/inspectionItems/list/listFixtures";
 import { renderWithStore, setupStoreIsolation } from "@/test/renderWithStore";
 import { screen, within } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";

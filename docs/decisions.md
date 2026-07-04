@@ -259,3 +259,14 @@
   - 実施記録モーダルのタイトルは「実施記録を追加」(他モーダルの「〜を追加」系に合わせ、07-record-modal.md 側を修正)
 - 根拠: ユビキタス言語(domain-model.md §1)・UI 文言・docs 間の表記揺れを解消する。サイドバーの短縮形「校正案件」と画面タイトル「外部校正案件」、仕様書内のスラッシュ/中黒混在など、仕様内部でも不統一だった
 - 例外(変更対象外): コード識別子(CalibrationOrder、historyTable 等)・ルートパス・ファイル名・本ファイルの過去エントリ
+
+## D-039: 機器登録の「new」命名を「create」へ統一
+
+- ステータス: **docs反映済**(2026-07-04)
+- 判断: 機器登録に関する「new」命名を「create」へリネーム
+  - ディレクトリ `src/features/equipment/form/new/` → `form/create/`(同時に form/ を shared / create / edit の3分割構成へ再編)
+  - コンポーネント/フック `EquipmentNewForm` → `EquipmentCreateForm`、`useNewEquipmentForm` → `useCreateEquipmentForm`
+  - ルート定数 `ROUTES.EQUIPMENT_NEW` → `ROUTES.EQUIPMENT_CREATE`、URL `/equipment/new` → `/equipment/create`(docs/README.md・screen-design 各所も更新)
+- 根拠: `create`/`edit` の動詞ペアで対称性を確保。`new` は JS 予約語で識別子に使えず命名の一貫性を欠く。URL はルート定数経由の一括変更で互換確保(ハッシュルーティングのためサーバ設定不要)
+- 例外(変更対象外): UI 文言「機器を追加」・ストアアクション `addEquipment`(既存語彙を維持)、本ファイルの過去エントリ
+- 注意: 旧 URL `/#/equipment/new` のブックマークは 404 相当(未定義ルート)になる

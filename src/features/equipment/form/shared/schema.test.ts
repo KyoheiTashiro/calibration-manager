@@ -1,10 +1,10 @@
 /**
- * EquipmentForm のフォームスキーマ検証（screen-design/03-equipment-form.md）。
- * 画面経由の検証は index.test.tsx が担い、ここでは manufacturerId の存在チェック
+ * 機器登録・編集フォームのフォームスキーマ検証（screen-design/03-equipment-form.md）。
+ * 画面経由の検証は create/edit 各 form.test.tsx が担い、ここでは manufacturerId の存在チェック
  * （vendors 参照、未指定=空文字は常に許可）をスキーマ単体で固定する。
  */
 
-import { createEquipmentFormSchema } from "@/features/equipment/form/schema";
+import { createEquipmentFormSchema } from "@/features/equipment/form/shared/schema";
 import { EQUIPMENT_STATUS, type Vendor } from "@/store/types";
 import { describe, expect, it } from "vitest";
 

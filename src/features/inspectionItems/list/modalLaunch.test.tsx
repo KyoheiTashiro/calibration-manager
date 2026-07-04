@@ -4,11 +4,11 @@
  * モーダル内部の入力・検証は各モーダルの単体テストの責務。
  */
 
-import { InspectionItemList } from "@/features/inspectionItems";
+import { InspectionItemList } from "@/features/inspectionItems/list";
 import {
   inspectionItemExternalOverdue,
   seedInspectionItemList,
-} from "@/features/inspectionItems/inspectionItemListFixtures";
+} from "@/features/inspectionItems/list/listFixtures";
 import { renderWithStore, setupStoreIsolation } from "@/test/renderWithStore";
 import { screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";

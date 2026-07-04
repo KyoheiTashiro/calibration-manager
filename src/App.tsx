@@ -3,12 +3,13 @@ import { AppLayout } from "@/components/system";
 import { ROUTES } from "@/constants/routes";
 import { Dashboard } from "@/features/dashboard";
 import { EquipmentDetail } from "@/features/equipment/detail";
-import { EquipmentForm } from "@/features/equipment/form";
+import { EquipmentEditForm } from "@/features/equipment/form/edit";
+import { EquipmentCreateForm } from "@/features/equipment/form/create";
 import { EquipmentList } from "@/features/equipment/list";
-import { InspectionItemList } from "@/features/inspectionItems";
+import { InspectionItemList } from "@/features/inspectionItems/list";
 import { Manual } from "@/features/manual";
 import { NotificationCenter } from "@/features/notifications";
-import { useNotificationScan } from "@/features/notifications/useNotificationScan";
+import { useNotificationScan } from "@/features/notifications/scan/useNotificationScan";
 import { OrderList } from "@/features/orders";
 import { PersonList } from "@/features/persons";
 import { Settings } from "@/features/settings";
@@ -31,11 +32,10 @@ function App(): ReactElement {
       <Route element={<AppLayout />}>
         <Route path={ROUTES.DASHBOARD} element={<Dashboard />} />
         <Route path={ROUTES.EQUIPMENT_LIST} element={<EquipmentList />} />
-        {/* なぜ登録・編集で同一コンポーネントか: タスク指示の通りEQUIPMENT_NEW/EQUIPMENT_EDITは
-            同じフォームプレースホルダを表示する（後続フェーズで新規/編集モードを内部分岐する想定）。 */}
-        <Route path={ROUTES.EQUIPMENT_NEW} element={<EquipmentForm />} />
+        {/* 新規/編集は form/create・form/edit に分割している（共通フィールドは form/shared）。 */}
+        <Route path={ROUTES.EQUIPMENT_CREATE} element={<EquipmentCreateForm />} />
         <Route path={ROUTES.EQUIPMENT_DETAIL} element={<EquipmentDetail />} />
-        <Route path={ROUTES.EQUIPMENT_EDIT} element={<EquipmentForm />} />
+        <Route path={ROUTES.EQUIPMENT_EDIT} element={<EquipmentEditForm />} />
         <Route path={ROUTES.INSPECTION_ITEM_LIST} element={<InspectionItemList />} />
         <Route path={ROUTES.ORDER_LIST} element={<OrderList />} />
         <Route path={ROUTES.VENDOR_LIST} element={<VendorList />} />

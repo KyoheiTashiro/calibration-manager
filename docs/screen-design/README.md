@@ -42,7 +42,7 @@
 | --------------------- | -------------------------- | ------------------------------ | ---------------------------------- |
 | `/`                   | ダッシュボード             | [§1](./01-dashboard.md)        |                                    |
 | `/equipment`          | 機器一覧                   | [§2](./02-equipment-list.md)   |                                    |
-| `/equipment/new`      | 機器登録                   | [§3](./03-equipment-form.md)   | フォーム画面                       |
+| `/equipment/create`      | 機器登録                   | [§3](./03-equipment-form.md)   | フォーム画面                       |
 | `/equipment/:id`      | 機器詳細(項目・記録含む)   | [§4](./04-equipment-detail.md) |                                    |
 | `/equipment/:id/edit` | 機器編集                   | [§3](./03-equipment-form.md)   | フォーム画面                       |
 | `/inspection-items`              | 点検校正項目一覧(中核)     | [§5](./05-inspection-item-list.md)        | クエリでステータスフィルタ受け取り |
@@ -118,7 +118,7 @@ flowchart TD
     Dash -->|通知| Notice[通知センター /notifications]
     Sidebar((サイドバー)) --> Dash & EqList[機器一覧 /equipment] & InspectionItems & Orders[案件一覧 /orders] & Vendors[メーカー /vendors] & Persons[担当者 /persons] & Notice & Settings[設定 /settings] & Manual[利用マニュアル /manual]
     EqList -->|行クリック| EqDetail[機器詳細 /equipment/:id]
-    EqList -->|追加| EqNew[機器登録 /equipment/new]
+    EqList -->|追加| EqCreate[機器登録 /equipment/create]
     EqDetail -->|編集| EqEdit[機器編集 /equipment/:id/edit]
     EqDetail -.項目追加/編集.-> InspectionItemModal[[項目編集モーダル]]
     EqDetail -.実施記録.-> RecModal[[実施記録モーダル]]

@@ -4,7 +4,7 @@
 
 **目的**: 機器(Equipment)の新規登録および編集。
 
-**URL**: 登録 `/equipment/new` / 編集 `/equipment/:id/edit`
+**URL**: 登録 `/equipment/create` / 編集 `/equipment/:id/edit`
 
 ## 画面レイアウト
 

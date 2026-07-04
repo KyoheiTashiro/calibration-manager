@@ -60,7 +60,7 @@ export const Manual = (): ReactElement => (
         </li>
         <li>
           {/* oxlint-disable-next-line react/forbid-component-props -- Linkはclassnameでリンク色を渡す設計(Badgeと同様) */}
-          <Link to={ROUTES.EQUIPMENT_NEW} className="text-primary underline">
+          <Link to={ROUTES.EQUIPMENT_CREATE} className="text-primary underline">
             機器を追加
           </Link>
           します。

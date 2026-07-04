@@ -1,8 +1,7 @@
 import { PersonModal } from "@/components/domain/PersonModal";
 import { Badge, Button, EmptyState, Table, TableBody, TableHead } from "@/components/ui";
-import type { Person } from "@/store/types";
-import { useAppStore } from "@/store/useAppStore";
-import { useState, type ReactElement } from "react";
+import type { ReactElement } from "react";
+import { usePersonList, usePersonModal } from "./hooks";
 
 /** 状態バッジの色classNameマッピング（screen-design/09-masters.md §9-B、StatusBadgeと同じ配色パターン） */
 const ACTIVE_BADGE_CLASS_NAME = "bg-green-100 text-green-800";
@@ -13,27 +12,8 @@ const INACTIVE_BADGE_CLASS_NAME = "bg-slate-100 text-slate-600";
  * 物理削除は行わず、モーダル内の「有効」チェックボックストグルで無効化する。
  */
 export const PersonList = (): ReactElement => {
-  const persons = useAppStore((state) => state.persons);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [editingPerson, setEditingPerson] = useState<Person | undefined>();
-
-  const sortedPersons = Object.values(persons).toSorted((first, second) =>
-    first.name.localeCompare(second.name, "ja"),
-  );
-
-  const handleAddClick = (): void => {
-    setEditingPerson(undefined);
-    setModalOpen(true);
-  };
-
-  const handleEditClick = (person: Person): void => {
-    setEditingPerson(person);
-    setModalOpen(true);
-  };
-
-  const handleModalClose = (): void => {
-    setModalOpen(false);
-  };
+  const sortedPersons = usePersonList();
+  const { modalState, handleAddClick, handleEditClick, handleModalClose } = usePersonModal();
 
   return (
     <div className="flex flex-col gap-4">
@@ -91,7 +71,7 @@ export const PersonList = (): ReactElement => {
         </Table>
       )}
 
-      <PersonModal open={modalOpen} person={editingPerson} onClose={handleModalClose} />
+      <PersonModal open={modalState.open} person={modalState.person} onClose={handleModalClose} />
     </div>
   );
 };

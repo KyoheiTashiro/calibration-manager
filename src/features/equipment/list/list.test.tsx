@@ -94,7 +94,7 @@ const renderEquipmentListWithRoutes = (): ReactElement => (
   <Routes>
     <Route path={ROUTES.EQUIPMENT_LIST} element={<EquipmentList />} />
     <Route path={ROUTES.EQUIPMENT_DETAIL} element={<DummyEquipmentDetail />} />
-    <Route path={ROUTES.EQUIPMENT_NEW} element={<p>機器登録画面</p>} />
+    <Route path={ROUTES.EQUIPMENT_CREATE} element={<p>機器登録画面</p>} />
   </Routes>
 );
 

@@ -3,11 +3,11 @@
  * URLクエリが唯一の真実源: 初期化(?status=)・Select 操作による絞り込みと URL 反映・クリアを確認する。
  */
 
-import { InspectionItemList } from "@/features/inspectionItems";
+import { InspectionItemList } from "@/features/inspectionItems/list";
 import {
   personSuzuki,
   seedInspectionItemList,
-} from "@/features/inspectionItems/inspectionItemListFixtures";
+} from "@/features/inspectionItems/list/listFixtures";
 import { renderWithStore, setupStoreIsolation } from "@/test/renderWithStore";
 import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";

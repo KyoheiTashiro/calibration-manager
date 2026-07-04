@@ -45,7 +45,7 @@ src/
 │   │   └── index.tsx
 │   ├── equipment/
 │   │   ├── list/                   // '/equipment'（screen-design §2）
-│   │   ├── form/                   // '/equipment/new', '/equipment/:id/edit'（screen-design §3）
+│   │   ├── form/                   // '/equipment/create', '/equipment/:id/edit'（screen-design §3）
 │   │   │   └── schema.ts           // 機器登録・編集フォームのzodスキーマ
 │   │   └── detail/                 // '/equipment/:id'（screen-design §4。項目・履歴を含む）
 │   ├── inspectionItems/                      // '/inspection-items'（中核画面。screen-design §5）

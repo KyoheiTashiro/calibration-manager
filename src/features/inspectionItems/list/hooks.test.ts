@@ -12,7 +12,7 @@ import {
   hasActiveFilter,
   parseInspectionItemListFilters,
   type InspectionItemListFilters,
-} from "@/features/inspectionItems/hooks";
+} from "@/features/inspectionItems/list/hooks";
 import { inspectionItemRowsOf, type InspectionItemRow } from "@/store/selectors";
 import { EXECUTION, INSPECTION_ITEM_TYPE } from "@/store/types";
 import {

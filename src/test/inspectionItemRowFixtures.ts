@@ -1,5 +1,5 @@
 /**
- * inspectionItemRowsOf(store/selectors)と項目一覧フィルタ(features/inspectionItems/hooks)の純関数テストで共有する固定データ。
+ * inspectionItemRowsOf(store/selectors)と項目一覧フィルタ(features/inspectionItems/list/hooks)の純関数テストで共有する固定データ。
  * 両テストが同じ機器・担当者・依頼先を前提に組み立てるため、重複を避けて一箇所へ集約する。
  * today は引数注入なので固定日付で決定的にする(flakiness 回避)。
  */

@@ -181,7 +181,7 @@ describe("unreadNotificationCount", () => {
 });
 
 /**
- * inspectionItemRowsOf(横断 selector。features/inspectionItems/hooks.ts から昇格、D-024/coding-standards §5)の検証。
+ * inspectionItemRowsOf(横断 selector。features/inspectionItems/list/hooks.ts から昇格、D-024/coding-standards §5)の検証。
  * 固定データは @/test/inspectionItemRowFixtures に集約(項目一覧フィルタのテストと共有)。
  * 無効非稼働除外(D-023)・personLabelOf(D-001)・発注推奨日(§4.2)の導出を扱う。
  */

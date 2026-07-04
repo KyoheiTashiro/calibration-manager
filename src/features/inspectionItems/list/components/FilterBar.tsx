@@ -12,7 +12,7 @@ import {
   EXECUTION_OPTIONS,
   INSPECTION_ITEM_TYPE_OPTIONS,
 } from "@/features/inspectionItems/constants";
-import { FILTER_ALL, type InspectionItemListFilters } from "@/features/inspectionItems/hooks";
+import { FILTER_ALL, type InspectionItemListFilters } from "@/features/inspectionItems/list/hooks";
 import { personLabelOf } from "@/store/selectors";
 import type { Person } from "@/store/types";
 import type { ReactElement } from "react";

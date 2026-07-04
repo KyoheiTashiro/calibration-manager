@@ -30,7 +30,7 @@ Equipment を主体とし各行に: `管理番号`(managementNo)、`機器名`(n
 - 検索ボックス: managementNo / name / model の部分一致(大文字小文字無視)。
 - 状態フィルタ(5択、D-010): `稼働+休止`(既定)/ `全て` / `稼働` / `休止` / `廃棄`。フィルタ値は EquipmentStatus とは別軸の画面ローカル定数。
 - 行クリック → `/equipment/:id`。
-- 「+ 機器を追加」→ `/equipment/new`。
+- 「+ 機器を追加」→ `/equipment/create`。
 
 ## 表示ルール・バリデーション
 
