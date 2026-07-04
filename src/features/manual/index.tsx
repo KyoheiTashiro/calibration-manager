@@ -80,7 +80,7 @@ export const Manual = (): ReactElement => (
           <Link to={ROUTES.INSPECTION_ITEM_LIST} className="text-primary underline">
             点検校正項目一覧
           </Link>
-          から実施記録を追加します。記録を追加すると、次回期限が自動で更新されます。
+          から実施記録を登録します。記録を登録すると、次回期限が自動で更新されます。
         </li>
         <li>
           外部の点検・校正が必要な項目は、
@@ -121,7 +121,7 @@ export const Manual = (): ReactElement => (
       <h3 className="font-semibold">次回期限</h3>
       <p>
         次回期限は「前回実施日 + 周期」で自動計算されます。項目を登録した直後はまだ実施記録が
-        ないため、初回の次回期限だけは手で入力します。以降は実施記録を追加するたびに、その実施日を
+        ないため、初回の次回期限だけは手で入力します。以降は実施記録を登録するたびに、その実施日を
         起点に自動で更新されます。
       </p>
       <p>

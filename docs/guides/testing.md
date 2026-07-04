@@ -1,7 +1,5 @@
 # テスト方針
 
-親: [README.md](README.md)
-
 ## テストツール
 
 - **Vitest** (`vitest run` / `vitest`)
@@ -26,7 +24,7 @@
 
 ## domain層（必須）
 
-`src/domain/` の純粋関数に property-based test（`*.proptest.test.ts`）必須。calibration-manager で特にテストすべき純ロジックは以下（すべて [`domain-model.md`](./domain-model.md) と一言一句矛盾しないこと）。
+`src/domain/` の純粋関数に property-based test（`*.proptest.test.ts`）必須。calibration-manager で特にテストすべき純ロジックは以下（すべて [`domain-model.md`](../spec/domain-model.md) と一言一句矛盾しないこと）。
 
 - **`dateCycle.ts`（`addCycle`: 次回期限計算、ドメインモデル §4.1）**
   - `nextDueDate = lastDoneDate + cycle`
@@ -36,23 +34,11 @@
   - `leadTime = inspectionItem.leadTimeDays ?? vendor.standardLeadTimeDays`
   - `発注推奨日 = nextDueDate − leadTime − bufferDays`
   - `inspectionItem.leadTimeDays` 未設定時に `vendor.standardLeadTimeDays` へフォールバックするケースを検証
-- **`inspectionItemStatus.ts`（`deriveInspectionItemStatus`、ドメインモデル §4.3）**
-  - 優先度順（上が優先。5段階）で判定することを検証:
-    1. `overdue`（期限切れ）: 今日 > nextDueDate
-    2. `orderNow`（要発注）: 外部 かつ 今日 ≥ 発注推奨日 かつ 有効な案件なし
-    3. `inProgress`（校正中）: 外部 かつ `ordered`/`inCalibration` の案件あり
-    4. `dueSoon`（期限接近）: 今日 ≥ nextDueDate − noticeDaysBefore
-    5. `ok`（正常）: 上記以外
+- **`inspectionItemStatus.ts`（`deriveInspectionItemStatus`。判定条件・優先度は[domain-model.md §4.3](../spec/domain-model.md)を参照）**
+  - 優先度順（5段階）で判定することを検証する
   - 優先度の逆転がないこと（例: `overdue` かつ `orderNow` の条件を両方満たす場合に `overdue` が勝つ）を境界ケースで確認
-- **`notificationRules.ts`（`computeExpectedNotifications`: 通知生成判定、ドメインモデル §3.7）**
-  - 5種別すべての発生条件を検証:
-    | type | 対象 | 発生条件 |
-    |------|------|----------|
-    | `dueSoon` | 内部・外部 | 今日 ≥ 期限 − noticeDaysBefore |
-    | `overdue` | 内部・外部 | 今日 > 期限 |
-    | `orderRecommended` | 外部のみ | 今日 ≥ 発注推奨日 かつ 未発注 |
-    | `deliveryDueSoon` | 発注済案件 | 今日 ≥ 返却予定日 − 7日 かつ 未返却 |
-    | `deliveryOverdue` | 発注済案件 | 今日 > 返却予定日 かつ 未返却 |
+- **`notificationRules.ts`（`computeExpectedNotifications`: 通知生成判定。発生条件は[domain-model.md §3.7](../spec/domain-model.md)を参照）**
+  - 5種別すべての発生条件を境界値で検証する
   - **重複抑止**: 同一対象・同一種別の未読通知は重複生成しないことをテストする（既存の未読通知がある状態で再スキャンしても件数が増えない）
 - **CSVインポートのバリデーション**（低水準処理は `src/utils/csv.ts`、エンティティ列仕様は `src/features/settings/entityCsv.ts`、インポート検証は `src/features/settings/importValidation.ts`。zodスキーマは `src/store/schema.ts` を再利用）
   - zod スキーマによる行単位バリデーション。不正行はインポートを中断せずエラー表示すること（例外を投げない、[coding-standards.md](coding-standards.md) §8 の方針と一致）
@@ -65,7 +51,7 @@
 - `@testing-library/react` でコンポーネント・feature 単位のテスト
   - 共通 UI（`src/components/ui/<ComponentName>/<ComponentName>.test.tsx`）: Badge / Button / Modal / ConfirmModal / EmptyState / Select / DateField / Table / Tabs
   - ドメイン固有 UI（`src/components/domain/<ComponentName>/<ComponentName>.test.tsx`）: StatusBadge（`deriveInspectionItemStatus` の表示）
-  - feature（`src/features/**/*.test.tsx`）: dashboard / equipment（一覧・詳細・登録編集） / inspectionItems（点検校正項目一覧・項目編集モーダル・実施記録モーダル） / orders（案件一覧） / vendors・persons（メーカー/取引先・担当者マスタ） / notifications（通知センター） / settings（CSVエクスポート/インポート）
+  - feature（`src/features/**/*.test.tsx`）: dashboard / equipment（一覧・詳細・登録編集） / inspectionItems（点検校正項目一覧・点検校正項目モーダル・実施記録登録モーダル） / orders（案件一覧） / vendors・persons（メーカー/取引先・担当者マスタ） / notifications（通知センター） / settings（CSVエクスポート/インポート）
 - **Storybook** でコンポーネント単位の見た目・状態を確認
   - 起動: `npm run storybook`（dev・ポート6006） / ビルド: `npm run build-storybook`
   - story配置: 各コンポーネント隣に `*.stories.tsx`（`src/**/*.stories.@(tsx|mdx)`）
@@ -77,7 +63,7 @@
 
 `@vitest/coverage-v8`（provider `v8`）。`vitest.config.ts` の `thresholds` でロジック層のみ厳格ゲート。component（`.tsx`）は重要部のみ方針のため全体ゲートしない。
 
-以下はdecisions.md D-032で最終確定した値（実測に対し数%の余白を残す）。
+以下は最終確定した値（実測に対し数%の余白を残す。D-032）。
 
 - `src/domain/**`（`dateCycle.ts` / `leadTime.ts` / `inspectionItemStatus.ts` / `notificationRules.ts` 等）: lines 98 / functions 100 / branches 98 / statements 98
 - `src/store/**`: lines 97 / functions 96 / branches 92 / statements 97

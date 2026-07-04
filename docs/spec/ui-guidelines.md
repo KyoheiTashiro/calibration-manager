@@ -1,8 +1,8 @@
 # UIガイドライン(業務用・情報density優先)
 
-親: [domain-model.md](../domain-model.md) / [screen-design/README.md](../screen-design/README.md)
+親: [domain-model.md](./domain-model.md) / [screen-design/README.md](./screen-design/README.md)
 
-対象読者: フロントエンド実装者。本書はビジュアルデザインの規約集であり、画面ごとの表示項目・遷移・状態遷移などの仕様は [screen-design/](../screen-design/) が正であり本書では再定義しない。共通仕様(§0)と矛盾する記述がある場合は screen-design 側を優先する。
+対象読者: フロントエンド実装者。本書はビジュアルデザインの規約集であり、画面ごとの表示項目・遷移・状態遷移などの仕様は [screen-design/](./screen-design/) が正であり本書では再定義しない。共通仕様(§0)と矛盾する記述がある場合は screen-design 側を優先する。
 
 ## 1. 設計方針
 
@@ -47,7 +47,7 @@ calibration-manager は**業務用の機器管理アプリ**である。
 
 ## 4. ステータスバッジ(5色)
 
-[screen-design/README.md §0.3](../screen-design/README.md#03-ステータスバッジ色共通定義) の5値・優先度・判定条件を UI トークンへ落とし込む。判定ロジック自体は本書では再定義しない。
+[screen-design/README.md §0.3](./screen-design/README.md#03-ステータスバッジ色共通定義) の5値・優先度・判定条件を UI トークンへ落とし込む。判定ロジック自体は本書では再定義しない。
 
 | ステータス   | ラベル   | Tailwind (bg / text)            | 補助枠線                   |
 | ------------ | -------- | ------------------------------- | -------------------------- |
@@ -64,7 +64,7 @@ calibration-manager は**業務用の機器管理アプリ**である。
 
 ## 5. 共通レイアウト
 
-構成は [screen-design README §0.1](../screen-design/README.md#01-全体構成) に準拠。本書では見た目の仕様のみ定める。
+構成は [screen-design README §0.1](./screen-design/README.md#01-全体構成) に準拠。本書では見た目の仕様のみ定める。
 
 - **サイドバー**: PC幅では左固定、幅 `w-60`(240px)。ロゴ/アプリ名 + ルート一覧(§0.2の9項目)。現在ルートは `bg-blue-50 text-blue-700` でハイライト。
 - **ヘッダー**: 高さ `h-14`(56px)。左にハンバーガー(モバイルのみ表示、`md:hidden`)、右端に通知ベル + 未読バッジ(未読0で非表示、§0.1準拠)。
@@ -73,16 +73,16 @@ calibration-manager は**業務用の機器管理アプリ**である。
 
 ## 6. テーブル・一覧
 
-一覧画面の表示項目・フィルタ項目・行アクションは各画面設計([02](../screen-design/02-equipment-list.md) [05](../screen-design/05-inspection-item-list.md) [08](../screen-design/08-orders.md) 等)に従う。本書は共通の見た目とインタラクションパターンを定める。
+一覧画面の表示項目・フィルタ項目・行アクションは各画面設計([02](./screen-design/02-equipment-list.md) [05](./screen-design/05-inspection-item-list.md) [08](./screen-design/08-orders.md) 等)に従う。本書は共通の見た目とインタラクションパターンを定める。
 
 - **行の高さ**: 密度優先で `h-10`〜`h-11`(40〜44px)。大型タップ領域は不要(マウス操作前提)。
 - **配色**: ヘッダー行 `bg-slate-50 text-slate-600 text-xs font-medium`。偶数行の軽微なzebra(`bg-slate-50`)は任意、罫線 `border-slate-200` の横線のみで縦罫線は原則引かない。行ホバーは `hover:bg-slate-50`。
 - **ソート**: ソート可能な列見出しはクリック可能にし、`aria-sort="ascending" | "descending" | "none"` を付与。現在のソート列に矢印アイコンを表示。既定ソートは各画面設計の指定に従う(例: 点検校正項目一覧は `nextDueDate` 昇順)。
-- **フィルタ**: 表上部に横並びのセレクト群 + 「クリア」ボタン(§0.7のワイヤーフレーム踏襲)。自由入力の検索ボックスがある画面([機器一覧](../screen-design/02-equipment-list.md))はセレクト群の左に配置する。フィルタは即時反映(適用ボタンなし)。
+- **フィルタ**: 表上部に横並びのセレクト群 + 「クリア」ボタン(§0.7のワイヤーフレーム踏襲)。自由入力の検索ボックスがある画面([機器一覧](./screen-design/02-equipment-list.md))はセレクト群の左に配置する。フィルタは即時反映(適用ボタンなし)。
 - **数値・日付列**: 右揃え + `tabular-nums`。文字列列(名称等)は左揃え。
 - **横スクロール**: 列数が多い一覧はテーブルを `overflow-x-auto` のコンテナで包み、ページ全体は横スクロールさせない(WCAG 1.4.10 のデータテーブル例外を踏まえた対応。§11参照)。管理番号など主キー列の横固定(sticky first column)は将来検討とし本フェーズでは必須にしない。
 - **行アクション**: 行右端にテキストボタン群(「記録」「案件」「編集」等)。ボタン高さ `h-8`(32px)程度、`gap-2` で配置。
-- **空状態**: [screen-design README §0.7](../screen-design/README.md#07-空状態共通方針) の方針(アイコン + 説明文 + 主要CTA)を全一覧で統一実装する。アイコンは `text-slate-300` の中型(32px程度)、説明文は `text-sm text-slate-500`。
+- **空状態**: [screen-design README §0.7](./screen-design/README.md#07-空状態共通方針) の方針(アイコン + 説明文 + 主要CTA)を全一覧で統一実装する。アイコンは `text-slate-300` の中型(32px程度)、説明文は `text-sm text-slate-500`。
 
 ## 7. フォーム入力・エラー表示
 
@@ -90,21 +90,21 @@ calibration-manager は**業務用の機器管理アプリ**である。
 
 - ラベルは入力欄の上、必須項目は「◯◯ <span class="text-red-600">\*</span>」で明示。
 - エラーは該当フィールド直下に `text-xs text-red-600` で表示し、入力枠は `border-red-500 aria-invalid:border-red-500` に切り替える。フィールドとエラー文言は `aria-describedby` で関連付ける。
-- 送信ボタンはエラー有無で無効化しない([screen-design README §0.5](../screen-design/README.md#05-モーダルの共通挙動)準拠)。送信試行(`handleSubmit` の invalid コールバック)でエラーを表示し、最初のエラーフィールドへフォーカスを移す。
+- 送信ボタンはエラー有無で無効化しない([screen-design README §0.5](./screen-design/README.md#05-モーダルの共通挙動)準拠)。送信試行(`handleSubmit` の invalid コールバック)でエラーを表示し、最初のエラーフィールドへフォーカスを移す。
 - ヘルプテキスト(未入力時の補足)は `text-xs text-slate-500` でエラーと同じ位置に表示し、エラー発生時はヘルプをエラーに差し替える(同時表示しない)。
 - CSVインポート等のファイル系エラーは行番号付きの一覧表示とし、個別フィールドエラーと視覚的に区別する(赤背景の警告ボックス)。
 
 ## 8. モーダル・確認ダイアログ
 
-挙動・発火条件は再定義せず、[screen-design README §0.5](../screen-design/README.md#05-モーダルの共通挙動)(モーダル共通挙動)・[§0.6](../screen-design/README.md#06-確認ダイアログポリシー)(確認ダイアログポリシー)を参照する。見た目の規約のみ以下に定める。
+挙動・発火条件は再定義せず、[screen-design README §0.5](./screen-design/README.md#05-モーダルの共通挙動)(モーダル共通挙動)・[§0.6](./screen-design/README.md#06-確認ダイアログポリシー)(確認ダイアログポリシー)を参照する。見た目の規約のみ以下に定める。
 
 - 確認ダイアログ: `max-w-sm`、タイトル `text-base font-semibold`、破壊的操作の実行ボタンは §3 の危険色(`bg-red-600`)、キャンセルは中立(`border border-slate-300 text-slate-700`)。既定フォーカスは安全側(キャンセル)。
-- フォーム系モーダル(項目編集・実施記録登録・案件作成・マスタ編集など): `max-w-lg`〜`max-w-2xl`。フッターは右寄せで「キャンセル」→「保存」の順。
-- データ全削除モーダル([設定](../screen-design/11-settings.md))はチェックボックス同意までは実行ボタンを `disabled` の淡色表示にしてよい(§0.6の2段階確認を視覚的に表現する例外)。
+- フォーム系モーダル(点検校正項目・実施記録登録・案件作成・マスタ編集など): `max-w-lg`〜`max-w-2xl`。フッターは右寄せで「キャンセル」→「保存」の順。
+- データ全削除モーダル([設定](./screen-design/11-settings.md))はチェックボックス同意までは実行ボタンを `disabled` の淡色表示にしてよい(§0.6の2段階確認を視覚的に表現する例外)。
 
 ## 9. 日付表示
 
-[screen-design README §0.4](../screen-design/README.md#04-日付表示形式)準拠で `YYYY-MM-DD` に統一する。
+[screen-design README §0.4](./screen-design/README.md#04-日付表示形式)準拠で `YYYY-MM-DD` に統一する。
 
 - 表示・入力・CSV すべて同一フォーマット。相対表現(「3日前」等)は使用しない。
 - 未実施・未設定は `—`(em dash 1文字)で表示し、空白のまま放置しない。

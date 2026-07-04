@@ -254,7 +254,7 @@ describe("Dashboard: 空状態", () => {
     });
     renderDashboardWithRoutes();
 
-    expect(screen.getByText("対応が必要な項目はありません 🎉")).toBeInTheDocument();
+    expect(screen.getByText("対応が必要な項目はありません")).toBeInTheDocument();
   });
 
   it("通知0件は「新しい通知はありません」を表示する", () => {

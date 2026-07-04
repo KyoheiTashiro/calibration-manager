@@ -1,4 +1,4 @@
-# 6. 項目編集モーダル
+# 6. 点検校正項目モーダル
 
 [画面設計 共通仕様・全体構成](./README.md) の一部。ステータス色・モーダル共通挙動・確認ダイアログ等の共通仕様は [README(§0 共通仕様)](./README.md#0-共通仕様) を参照。
 
@@ -46,7 +46,7 @@
 | 校正依頼先   | vendorId         | 外部時○ | セレクト(Vendor `isCalibrator=true`)                    |
 | 納期(日)     | leadTimeDays     |         | 数値。空欄なら Vendor.standardLeadTimeDays を使用(§4.2) |
 | 発注余裕日   | bufferDays       | ○       | 数値。既定14                                            |
-| 担当者       | personId         | ○       | セレクト(Person `isActive=true`)                        |
+| 担当者       | personId         | ○       | セレクト(Person `isActive=true`。編集時のみ、現担当が無効化済みなら「◯◯(無効)」として選択肢末尾に含める。新規時は有効担当者のみ。D-012) |
 | 通知開始日数 | noticeDaysBefore | ○       | 数値。既定30                                            |
 | 次回期限     | nextDueDate      | ○       | 日付。新規は手入力必須                                  |
 | 期限管理の対象にする | isActive | ○       | チェックボックス。既定true。補足文「オフにすると点検校正項目一覧・期限管理・通知の対象外になります(機器詳細では確認できます)」を直下に表示 |

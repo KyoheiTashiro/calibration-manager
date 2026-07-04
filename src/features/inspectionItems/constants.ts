@@ -1,7 +1,7 @@
 /**
  * 点検校正項目の表示定数(screen-design/04-equipment-detail.md / 05-inspection-item-list.md /
  * 06-inspection-item-modal.md)。種別・実施区分のラベルをここに一元化し、機器詳細・項目一覧・
- * 項目編集モーダルで重複定義しない(features/equipment/constants.ts と同じ運用)。
+ * 点検校正項目モーダルで重複定義しない(features/equipment/constants.ts と同じ運用)。
  */
 
 import {

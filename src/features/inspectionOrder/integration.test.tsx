@@ -1,5 +1,5 @@
 /**
- * Phase 7 結合シナリオ(implementation-plan.md Phase 7。メイン作成)。
+ * かんばん×記録モーダルの結合シナリオ。
  * かんばん(screen-design/08-orders.md)→ 実施記録登録モーダル(07-record-modal.md)→
  * ストアカスケード(record 追加 → 期限再計算 → Order completed 連鎖)を画面操作で貫通検証する。
  * 各モーダル・ダイアログ単体の入力検証は RecordModal.test.tsx / orders の各テストの責務。

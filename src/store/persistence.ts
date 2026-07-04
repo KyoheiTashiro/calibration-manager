@@ -44,7 +44,7 @@ const renameFieldInRecord = (value: unknown, from: string, to: string): unknown 
 };
 
 /**
- * v1→v2: item→inspectionItem リネーム（decisions.md D-036）。
+ * v1→v2: item→inspectionItem リネーム（D-036）。
  * - 状態キー items → inspectionItems
  * - records / orders の itemId → inspectionItemId
  * - notifications の targetType "item" → "inspectionItem"
@@ -126,7 +126,7 @@ const salvageAppStatePerRecord = (persisted: Record<string, unknown>): AppState 
 });
 
 /**
- * 参照整合の修復（decisions.md D-003）。
+ * 参照整合の修復（D-003）。
  * ユーザー入力データは dangling FK があっても保持し（表示側が「参照先なし」として扱う）、
  * 再生成可能な導出データである Notification のみ、参照先（target / person）を
  * 失ったものを除去する。

@@ -2,7 +2,7 @@
 
 calibration-managerのコード慣習。**実装・レビュー時はこれに従う**。「実際に守られている慣習」として明文化する。各ルールに根拠を添える（このコードベースは設定ファイルにまで「なぜ」を日本語コメントで残す文化のため）。
 
-設計の真実源は `docs/`（特に [`domain-model.md`](./domain-model.md)、[`screen-design/README.md`](./screen-design/README.md)）、エントリポイントは `CLAUDE.md`。本書は「どう書くか」を扱い、「何を作るか/なぜその設計か」は各 `docs/` を参照。
+設計の真実源は `docs/`（特に [`domain-model.md`](../spec/domain-model.md)、[`screen-design/README.md`](../spec/screen-design/README.md)）、エントリポイントは `CLAUDE.md`。本書は「どう書くか」を扱い、「何を作るか/なぜその設計か」は各 `docs/` を参照。
 
 Lint/Format は **oxlint + oxfmt**（ESLint/Prettier ではない）。多くは自動強制されるため、本書は機械検出しづらい慣習を中心に明文化する。CI 相当: `npm run lint:typed && npm run format:check && npm test`。
 
@@ -62,7 +62,7 @@ Lint/Format は **oxlint + oxfmt**（ESLint/Prettier ではない）。多くは
 - `src/features/**/` の基本: `index.tsx`（薄いビュー本体）+ `hooks.ts`（ロジック）+ `schema.ts`（RHF 用 zod）+ `components/`。
   - feature 例: `dashboard`（ダッシュボード） / `equipment`（機器一覧・詳細） / `inspectionItems`（点検校正項目一覧）/ `orders`（点検校正外部案件） / `vendors`・`persons`（メーカー/取引先・担当者マスタ） / `notifications`（通知センター） / `settings`（設定・バックアップ）。
 - **`index.tsx` は barrel ではなく公開コンポーネント本体**。`App.tsx` は `import { Dashboard } from "@/features/dashboard"` のように named export を直接参照。feature にバレル専用ファイルは作らない。
-- **`schema.ts` は RHF フォームを持つ feature にだけ置く**（`equipment`、`inspectionItems` の項目編集モーダルなど。必須ではない）。
+- **`schema.ts` は RHF フォームを持つ feature にだけ置く**（`equipment`、`inspectionItems` の点検校正項目モーダルなど。必須ではない）。
 - **`hooks.ts` は全 feature に置く**（ロジックは hooks に寄せ index.tsx を薄く保つ）。
 - サブコンポーネントが 1 個だけなら feature 直下に置いてよい（複数になったら `components/` へ）。
 - **共通 UI `src/components/ui/<Name>/`**: 1 コンポーネント = 1 サブディレクトリ + バレル。`Name.tsx` / `index.ts`（`export { Name } from "./Name"`）/ `Name.test.tsx` / `Name.stories.tsx` を colocate。親バレル `src/components/ui/index.ts` で一括 re-export し `@/components/ui` 経由で import。

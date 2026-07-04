@@ -36,7 +36,7 @@
 | 備考         | note                 |      | テキスト                               |
 
 - バリデーション: `name` 必須。`isManufacturer`/`isCalibrator` は真偽値(両方false も許容するが警告表示: どちらの用途にも出てこない)。`email` は入力時に email 形式。`standardLeadTimeDays` は0以上。
-- **削除ガード**: 参照されている Vendor(Equipment.manufacturerId / InspectionItem.vendorId / CalibrationOrder.vendorId のいずれかから参照)は削除不可。削除ボタン押下時に「この取引先は参照されているため削除できません」を表示。未参照時のみ確認ダイアログ後に削除。
+- **削除ガード**: 削除ボタン押下時に UI 側で参照有無(Equipment.manufacturerId / InspectionItem.vendorId / CalibrationOrder.vendorId のいずれかから参照)を判定する(D-008)。参照ありは確認ダイアログを出さず即「この取引先は参照されているため削除できません」を表示。未参照時のみ確認ダイアログ後に `removeVendor` を実行し、`removeVendor` が false を返した場合(確認中の競合等)も同メッセージへフォールバックする(D-008)。
 - 空状態: 「取引先が未登録です」+「+ 追加」。
 
 ## 9-B. 担当者マスタ
@@ -62,7 +62,7 @@
 | 氏名       | name       | ○    | テキスト                 |
 | メール     | email      | ○    | email形式                |
 | 部署       | department |      | テキスト                 |
-| 有効       | isActive   | ○    | チェックボックス(トグル) |
+| 有効       | isActive   | ○    | チェックボックス(トグル)。新規追加フォームは既定 `true`(D-007) |
 
 - バリデーション: `name` 必須、`email` 必須・email 形式。
 - **削除の代わりに無効化**: 物理削除は行わず `isActive=false` にする(ドメインモデル §3.2)。無効化は確認ダイアログ付き。

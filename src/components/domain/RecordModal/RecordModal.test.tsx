@@ -255,7 +255,7 @@ describe("RecordModal", () => {
   it("addRecord が no-op(null)の場合はエラーを表示しモーダルを閉じない", async () => {
     const user = userEvent.setup();
     const onClose = vi.fn();
-    // planned 案件は completed へ遷移不可のため addRecord は null を返す（decisions.md D-005）
+    // planned 案件は completed へ遷移不可のため addRecord は null を返す（D-005）
     renderWithStore(
       <RecordModal
         open

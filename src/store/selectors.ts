@@ -50,7 +50,7 @@ export const recordsOf = (
     );
 
 /**
- * 担当者名の解決。参照先なし(dangling)は「—」、無効化済みは「(無効)」を注記(decisions.md D-001)。
+ * 担当者名の解決。参照先なし(dangling)は「—」、無効化済みは「(無効)」を注記(D-001)。
  * 機器詳細・項目一覧など担当者名を表示する全画面がこれを使う。
  */
 export const personLabelOf = (state: Pick<AppState, "persons">, personId: string): string => {

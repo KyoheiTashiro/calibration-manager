@@ -1,7 +1,7 @@
 /**
  * OrderModal: 案件作成モーダルの検証（screen-design/08-orders.md「案件作成モーダル」）。
  * 対象表示・依頼先既定値/選択肢絞り込み・addOrder連携・D-006 no-op時のエラー表示・
- * 校正業者0件の空状態・バリデーションを扱う。起動元との接続はPhase 8（decisions.md D-020）。
+ * 校正業者0件の空状態・バリデーションを扱う。起動元(項目一覧)との結線は modalLaunch.test.tsx 側の責務。
  */
 
 import { OrderModal } from "@/components/domain/OrderModal";

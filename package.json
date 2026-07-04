@@ -1,6 +1,7 @@
 {
   "name": "calibration-manager",
   "private": true,
+  "license": "MIT",
   "type": "module",
   "scripts": {
     "dev": "vite",

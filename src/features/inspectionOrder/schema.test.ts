@@ -1,5 +1,5 @@
 /**
- * 遷移ダイアログ用フォームスキーマの検証(screen-design/08-orders.md、decisions.md D-021)。
+ * 遷移ダイアログ用フォームスキーマの検証(screen-design/08-orders.md、D-021)。
  * 画面経由の検証は kanban.test.tsx / integration.test.tsx が担い、ここでは
  * 費用の整数粒度(D-021)等、境界値をスキーマ単体で固定する。
  */

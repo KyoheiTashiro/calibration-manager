@@ -1,4 +1,4 @@
-# 8. 点検校正外部案件一覧
+# 8. 点検校正外部案件
 
 [画面設計 共通仕様・全体構成](./README.md) の一部。ステータス色・モーダル共通挙動・確認ダイアログ等の共通仕様は [README(§0 共通仕様)](./README.md#0-共通仕様) を参照。
 
@@ -50,10 +50,10 @@ planned → ordered → inCalibration → returned → completed
 
 ## 表示ルール・バリデーション(zod)
 
-- 表示トグル「完了/中止も表示」で `completed`/`cancelled` 列(またはグレー表示)を出す。**既定は非表示**。
+- 表示トグル「完了/中止も表示」ON で `completed`/`cancelled` の2列を右側に追加表示する(カードはグレー調・アクションボタンなし)。**既定は OFF(非表示)**(D-018)。
 - `orderedDate`(発注時)/ `returnedDate`(返却時)は必須・`YYYY-MM-DD`。
-- `dueDate`・`returnedDate` が入力されている場合 `orderedDate ≤ dueDate`、`orderedDate ≤ returnedDate` を推奨チェック(整合警告)。
-- `cost`: 任意・0以上の数値。
+- `dueDate`・`returnedDate` が入力されている場合 `orderedDate ≤ dueDate`、`orderedDate ≤ returnedDate` の不整合は警告表示のみでブロックしない。形式検証(必須・`YYYY-MM-DD`)は zod でブロックする(D-019)。
+- `cost`: 任意・0以上の整数のみ(小数は検証エラー。D-021)。
 - 1つの項目に対し有効案件(`planned`〜`returned` の全状態)は同時に1件まで(D-006)。`addOrder` がストア層で強制し、既存の有効案件がある場合は no-op(null 返却)する。
 
 ## 空状態

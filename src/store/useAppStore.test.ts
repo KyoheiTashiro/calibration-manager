@@ -1,5 +1,5 @@
 /**
- * カスケードアクションの検証（store.md「アクション仕様」、decisions.md D-005 / D-006）。
+ * カスケードアクションの検証（store.md「アクション仕様」、D-005 / D-006）。
  * 単純CRUDのスライス単体検証は slices/*.test.ts、読込パイプラインは merge.test.ts が担う。
  */
 

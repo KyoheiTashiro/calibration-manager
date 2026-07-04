@@ -1,6 +1,6 @@
 /**
  * 読込パイプライン（migrate → merge 3段サルベージ → sanitize）の検証
- * （store.md「永続化」、decisions.md D-003）。
+ * （store.md「永続化」、D-003）。
  */
 
 import { STORAGE_KEY, STORAGE_VERSION } from "@/constants/storage";
@@ -107,7 +107,7 @@ describe("migratePersistedState", () => {
   });
 });
 
-describe("migrateV1ToV2: item→inspectionItem リネーム（decisions.md D-036）", () => {
+describe("migrateV1ToV2: item→inspectionItem リネーム（D-036）", () => {
   /** v1 形式の永続化データ（items キー / itemId / targetType "item"） */
   const v1State = (): Record<string, unknown> => ({
     vendors: { [vendor.id]: vendor },

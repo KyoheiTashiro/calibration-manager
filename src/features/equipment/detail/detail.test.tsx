@@ -1,7 +1,7 @@
 /**
  * EquipmentDetail(/equipment/:id)の検証(screen-design/04-equipment-detail.md)。
  * 基本情報カード・編集遷移・存在しないid・空状態、点検校正項目テーブル、実施記録、
- * 項目編集モーダル・実施記録登録モーダルの起動を扱う。
+ * 点検校正項目モーダル・実施記録登録モーダルの起動を扱う。
  */
 
 import { ROUTES, equipmentDetailPath, equipmentEditPath } from "@/constants/routes";
@@ -266,7 +266,7 @@ describe("EquipmentDetail: 項目ステータス(D-014)", () => {
 describe("EquipmentDetail: 記録ボタン", () => {
   beforeEach(setupStoreIsolation);
 
-  // なぜ変更したか: Phase 7 で実施記録モーダル(RecordModal)を接続し、記録ボタンを活性化した。
+  // なぜ変更したか: Phase 7 で実施記録登録モーダル(RecordModal)を接続し、記録ボタンを活性化した。
   // 旧テストは接続前の先行設置(常時disabled)を検証していたが、活性化が仕様(07-record-modal.md)の
   // ため期待値を活性へ是正する(テストを弱める改変ではない)。起動結節点の検証は recordLaunch.test.tsx。
   it("各項目行の記録ボタンが活性で表示される", () => {
@@ -283,7 +283,7 @@ describe("EquipmentDetail: 記録ボタン", () => {
 });
 
 /**
- * EquipmentDetail: 項目編集モーダル(InspectionItemModal)の起動結節点の検証
+ * EquipmentDetail: 点検校正項目モーダル(InspectionItemModal)の起動結節点の検証
  * (screen-design/04-equipment-detail.md「操作・アクション」)。
  * 「+ 項目を追加」=新規モード(equipmentIdプリセット)、行「編集」=編集モード(プリフィル)。
  * モーダル自体の入力・検証は InspectionItemModal.test.tsx の責務。
