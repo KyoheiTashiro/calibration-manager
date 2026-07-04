@@ -15,7 +15,14 @@
     "format": "oxfmt",
     "format:check": "oxfmt --check",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": [
+      "oxlint",
+      "oxfmt"
+    ]
   },
   "dependencies": {
     "@fontsource/noto-sans-jp": "5.2.9",
@@ -41,7 +48,9 @@
     "@vitejs/plugin-react": "6.0.3",
     "@vitest/coverage-v8": "4.1.9",
     "fast-check": "4.8.0",
+    "husky": "9.1.7",
     "jsdom": "29.1.1",
+    "lint-staged": "17.0.8",
     "oxfmt": "0.57.0",
     "oxlint": "1.72.0",
     "oxlint-tsgolint": "0.24.0",
