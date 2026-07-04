@@ -48,8 +48,9 @@ export const createServiceRecordSlice: AppSliceCreator<ServiceRecordSlice> = (se
       if (
         !serviceOrder ||
         !canTransitionServiceOrderStatus(serviceOrder.status, SERVICE_ORDER_STATUS.COMPLETED)
-      )
+      ) {
         return null;
+      }
     }
 
     const id = createId();
@@ -62,8 +63,9 @@ export const createServiceRecordSlice: AppSliceCreator<ServiceRecordSlice> = (se
       }
       if (input.serviceOrderId !== undefined) {
         const draftServiceOrder = recordValue(state.serviceOrders, input.serviceOrderId);
-        if (draftServiceOrder !== undefined)
+        if (draftServiceOrder !== undefined) {
           draftServiceOrder.status = SERVICE_ORDER_STATUS.COMPLETED;
+        }
       }
     });
     return id;
