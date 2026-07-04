@@ -13,7 +13,7 @@ import {
 import { useEquipmentFormCore } from "@/features/equipment/form/shared/useFormCore";
 import { EQUIPMENT_STATUS, type Equipment } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { FieldErrors, UseFormHandleSubmit, UseFormRegister } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -60,16 +60,18 @@ export const useEditEquipmentForm = (): UseEditEquipmentFormResult => {
 
   const [retireConfirmOpen, setRetireConfirmOpen] = useState(false);
 
-  const { register, errors, handleSubmit, reset, manufacturerOptions } = useEquipmentFormCore({
-    defaultValues: toFormValues(currentEquipment),
+  const currentFormValues = toFormValues(currentEquipment);
+
+  // なぜ values を渡すか: 編集画面はルートページで対象（currentEquipment）が変わる場合のみ
+  // 内容を更新すればよい。RHF の values は深い等価比較で変化を検知した際に reset +
+  // defaultValues 更新を行うため、対象切り替え時のみプリフィルし直す従来の挙動を維持できる
+  // （screen-design/README.md §0.5「対象を編集する場合は既存値をプリフィルする」と同方針）。
+  // defaultValues は初回マウント時（currentEquipment 未確定タイミング含む）用に残す。
+  const { register, errors, handleSubmit, manufacturerOptions } = useEquipmentFormCore({
+    defaultValues: currentFormValues,
+    values: currentFormValues,
     excludeEquipmentId: id,
   });
-
-  // なぜ: 編集対象（currentEquipment）が変わるたびに既存値をプリフィルする
-  // （screen-design/README.md §0.5「対象を編集する場合は既存値をプリフィルする」と同方針）。
-  useEffect(() => {
-    reset(toFormValues(currentEquipment));
-  }, [currentEquipment, reset]);
 
   const onSubmit = (values: EquipmentFormValues): void => {
     if (currentEquipment === undefined) return;

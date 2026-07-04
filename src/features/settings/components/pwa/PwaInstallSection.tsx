@@ -1,58 +1,32 @@
 /**
  * 設定画面のPWAインストール案内セクション。
- * `beforeinstallprompt` / `appinstalled` の非標準イベントを購読し(src/types/beforeinstallprompt.d.ts 参照)、
- * インストール可否・インストール済みかで案内文/ボタンを出し分ける。
+ * usePwaInstall の状態を表示に反映するだけの薄いビュー。イベント捕捉は main.tsx の
+ * setupPwaInstallCapture が起動時に行う(コンポーネントマウント前の発火を取り逃さないため)。
  */
 
 import { Button } from "@/components/ui";
-import { useEffect, useState, type ReactElement, type ReactNode } from "react";
+import { clearDeferredPrompt, usePwaInstall } from "@/features/settings/components/pwa/usePwaInstall";
+import type { ReactElement, ReactNode } from "react";
 
 export const PwaInstallSection = (): ReactElement => {
-  const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null);
-  // なぜ: jsdom は matchMedia 未実装のためガード必須。standalone 表示中 = インストール済みアプリとして起動中、という判定。
-  const [isInstalled, setIsInstalled] = useState<boolean>(
-    () =>
-      typeof globalThis.matchMedia === "function" &&
-      globalThis.matchMedia("(display-mode: standalone)").matches,
-  );
-
-  useEffect(() => {
-    const handleBeforeInstallPrompt = (event: BeforeInstallPromptEvent): void => {
-      // なぜ: Chrome のミニ情報バー自動表示を抑止し、設定画面のボタンから任意タイミングで出すため。
-      event.preventDefault();
-      setDeferred(event);
-    };
-
-    const handleAppInstalled = (): void => {
-      setIsInstalled(true);
-      setDeferred(null);
-    };
-
-    globalThis.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
-    globalThis.addEventListener("appinstalled", handleAppInstalled);
-
-    return (): void => {
-      globalThis.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
-      globalThis.removeEventListener("appinstalled", handleAppInstalled);
-    };
-  }, []);
+  const { deferredPrompt, isInstalled } = usePwaInstall();
 
   // なぜ .then か: oxc(no-async-await) 方針のため async/await ではなく Promise チェーンで扱う。
   const handleInstallClick = (): void => {
-    if (deferred === null) {
+    if (deferredPrompt === null) {
       return;
     }
-    const current = deferred;
+    const current = deferredPrompt;
     current
       .prompt()
       .then(() => current.userChoice)
       .then(() => {
         // なぜ: Chrome は同一イベントの再 prompt() を許さないため、結果に関わらず deferred を破棄する。
-        setDeferred(null);
+        clearDeferredPrompt();
       })
       .catch(() => {
         // インストール操作の失敗は例外を投げず無視する(coding-standards §8)
-        setDeferred(null);
+        clearDeferredPrompt();
       });
   };
 
@@ -64,7 +38,7 @@ export const PwaInstallSection = (): ReactElement => {
         </p>
       );
     }
-    if (deferred !== null) {
+    if (deferredPrompt !== null) {
       return (
         <div>
           <Button variant="primary" onClick={handleInstallClick}>

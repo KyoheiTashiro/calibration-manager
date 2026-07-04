@@ -17,11 +17,16 @@ import {
   type FieldErrors,
   type UseFormHandleSubmit,
   type UseFormRegister,
-  type UseFormReset,
 } from "react-hook-form";
 
 type UseEquipmentFormCoreParams = {
   defaultValues: EquipmentFormValues;
+  /**
+   * 編集対象の最新値。指定時は RHF の values として渡す。深い等価比較で変化を検知した際に
+   * reset + defaultValues 更新が行われるため、対象切り替え時のみプリフィルし直す用途に使う
+   * （新規作成では指定しない＝undefined）。
+   */
+  values?: EquipmentFormValues;
   /** 編集時: 管理番号ユニーク検証から自身を除外するための機器 id。新規時は undefined */
   excludeEquipmentId?: string;
 };
@@ -30,12 +35,12 @@ type UseEquipmentFormCoreResult = {
   register: UseFormRegister<EquipmentFormValues>;
   errors: FieldErrors<EquipmentFormValues>;
   handleSubmit: UseFormHandleSubmit<EquipmentFormValues>;
-  reset: UseFormReset<EquipmentFormValues>;
   manufacturerOptions: SelectOption[];
 };
 
 export const useEquipmentFormCore = ({
   defaultValues,
+  values,
   excludeEquipmentId,
 }: UseEquipmentFormCoreParams): UseEquipmentFormCoreResult => {
   const equipmentMap = useAppStore((state) => state.equipment);
@@ -62,11 +67,11 @@ export const useEquipmentFormCore = ({
   const {
     register,
     handleSubmit,
-    reset,
     formState: { errors },
   } = useForm<EquipmentFormValues>({
     resolver,
     defaultValues,
+    values,
   });
 
   const manufacturerOptions = Object.values(vendors)
@@ -74,5 +79,5 @@ export const useEquipmentFormCore = ({
     .toSorted((left, right) => left.name.localeCompare(right.name, "ja"))
     .map((vendor) => ({ value: vendor.id, label: vendor.name }));
 
-  return { register, errors, handleSubmit, reset, manufacturerOptions };
+  return { register, errors, handleSubmit, manufacturerOptions };
 };

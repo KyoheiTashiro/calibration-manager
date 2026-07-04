@@ -17,7 +17,7 @@ import {
 import { EXECUTION, type InspectionItem } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, type ReactElement } from "react";
+import type { ReactElement } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { Link } from "react-router-dom";
 
@@ -51,24 +51,21 @@ export const InspectionItemModal = ({
     formState: { errors, isDirty },
   } = useForm<InspectionItemFormValues>({
     resolver: zodResolver(inspectionItemFormSchema),
-    defaultValues: toFormValues(inspectionItem),
+    // なぜ values か: 編集対象（inspectionItem）が変わるたびに既存値をプリフィルする
+    // （screen-design/README.md §0.5）。RHF が深い等価比較で変化を検知し reset する。
+    values: toFormValues(inspectionItem),
   });
 
-  // なぜ: open/inspectionItem変更のたびに既存値をプリフィルする（screen-design/README.md §0.5）。
-  useEffect(() => {
-    reset(toFormValues(inspectionItem));
-  }, [open, inspectionItem, reset]);
+  // なぜ close 時に reset() を呼ぶか: values オプションは内容が変わらない限り reset しないため、
+  // 同一対象を dirty のまま破棄クローズ→再オープンした場合に入力が残留してしまう。
+  // close 時に明示的に reset()(引数なし)を呼び、最新の defaultValues(values由来)へ戻す。
+  const handleClose = (): void => {
+    reset();
+    onClose();
+  };
 
   // なぜ watch() ではなく useWatch か: VendorModal.tsx と同じ理由（react-compiler lint対策）。
   const execution = useWatch({ control, name: "execution" });
-
-  // なぜ: internal切替時はvendorId/leadTimeDaysをクリア。bufferDaysは必須属性のためクリアしない。
-  useEffect(() => {
-    if (execution === EXECUTION.INTERNAL) {
-      setValue("vendorId", "", { shouldDirty: false });
-      setValue("leadTimeDays", "", { shouldDirty: false });
-    }
-  }, [execution, setValue]);
 
   const calibratorVendors = Object.values(vendors).filter((vendor) => vendor.isCalibrator);
   const vendorOptions = calibratorVendors.map((vendor) => ({
@@ -132,14 +129,14 @@ export const InspectionItemModal = ({
         isActive: values.isActive,
       });
     }
-    onClose();
+    handleClose();
   };
 
   return (
     <Modal
       open={open}
       title={inspectionItem ? "点検校正項目を編集" : "点検校正項目を追加"}
-      onClose={onClose}
+      onClose={handleClose}
       isDirty={isDirty}
       footer={
         <Button type="button" onClick={handleSubmit(onSubmit)}>
@@ -180,8 +177,17 @@ export const InspectionItemModal = ({
           required
           options={EXECUTION_OPTIONS}
           error={errors.execution?.message}
+          // なぜ onChange か: state 変化に反応する effect ではなくユーザー操作イベントで直接クリアする
+          // (You Might Not Need an Effect)。bufferDays は必須属性のためクリアしない。
           // oxlint-disable-next-line react/jsx-props-no-spreading -- register()のname/onChange/onBlur等を素通しするため必須
-          {...register("execution")}
+          {...register("execution", {
+            onChange: (event) => {
+              if (event.target.value === EXECUTION.INTERNAL) {
+                setValue("vendorId", "", { shouldDirty: false });
+                setValue("leadTimeDays", "", { shouldDirty: false });
+              }
+            },
+          })}
         />
         {execution === EXECUTION.EXTERNAL ? (
           <div className="border-line flex flex-col gap-4 border-t pt-4">

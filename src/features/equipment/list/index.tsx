@@ -1,6 +1,7 @@
 /**
  * 機器一覧画面（screen-design/02-equipment-list.md）。
  * 検索・状態フィルタ・行クリック遷移のみを扱う（廃棄・削除・編集はこの画面の責務外）。
+ * フィルタ・導出ロジックは hooks.ts（useEquipmentList）に切り出し、このファイルは薄いビューに保つ。
  */
 
 import {
@@ -18,97 +19,23 @@ import {
   EQUIPMENT_STATUS_BADGE_CLASSES,
   EQUIPMENT_STATUS_LABELS,
 } from "@/features/equipment/constants";
-import { inspectionItemsOf } from "@/store/selectors";
-import { EQUIPMENT_STATUS, type Equipment, type EquipmentStatus } from "@/store/types";
-import { useAppStore } from "@/store/useAppStore";
-import { useMemo, useState, type KeyboardEvent, type ReactElement } from "react";
+import { STATUS_FILTER_OPTIONS, useEquipmentList, type StatusFilter } from "./hooks";
+import type { KeyboardEvent, ReactElement } from "react";
 import { useNavigate } from "react-router-dom";
-
-/**
- * 状態フィルタの選択肢（as const + 派生union、coding-standards.md §1）。
- * ドメインの EquipmentStatus とは別軸（「稼働+休止」「全て」という複合値を持つ）のため
- * features/equipment/constants.ts には追加せずこのファイルに閉じたモジュールレベル定数とする。
- */
-const STATUS_FILTER = {
-  ACTIVE_AND_SUSPENDED: "activeAndSuspended",
-  ALL: "all",
-  ACTIVE: "active",
-  SUSPENDED: "suspended",
-  RETIRED: "retired",
-} as const;
-type StatusFilter = (typeof STATUS_FILTER)[keyof typeof STATUS_FILTER];
-
-const STATUS_FILTER_OPTIONS: { value: StatusFilter; label: string }[] = [
-  { value: STATUS_FILTER.ACTIVE_AND_SUSPENDED, label: "稼働+休止" },
-  { value: STATUS_FILTER.ALL, label: "全て" },
-  { value: STATUS_FILTER.ACTIVE, label: "稼働" },
-  { value: STATUS_FILTER.SUSPENDED, label: "休止" },
-  { value: STATUS_FILTER.RETIRED, label: "廃棄" },
-];
-
-/** 状態フィルタの選択値が機器の状態に一致するか（screen-design/02-equipment-list.md「操作・アクション」） */
-const matchesStatusFilter = (status: EquipmentStatus, filter: StatusFilter): boolean => {
-  switch (filter) {
-    case STATUS_FILTER.ALL: {
-      return true;
-    }
-    case STATUS_FILTER.ACTIVE: {
-      return status === EQUIPMENT_STATUS.ACTIVE;
-    }
-    case STATUS_FILTER.SUSPENDED: {
-      return status === EQUIPMENT_STATUS.SUSPENDED;
-    }
-    case STATUS_FILTER.RETIRED: {
-      return status === EQUIPMENT_STATUS.RETIRED;
-    }
-    case STATUS_FILTER.ACTIVE_AND_SUSPENDED: {
-      return status !== EQUIPMENT_STATUS.RETIRED;
-    }
-    default: {
-      return true;
-    }
-  }
-};
-
-/** 検索語がmanagementNo/name/modelのいずれかに部分一致するか(大文字小文字無視) */
-const matchesSearch = (equipment: Equipment, normalizedSearch: string): boolean => {
-  if (normalizedSearch === "") return true;
-  const haystack = [equipment.managementNo, equipment.name, equipment.model ?? ""]
-    .join("\n")
-    .toLowerCase();
-  return haystack.includes(normalizedSearch);
-};
 
 export const EquipmentList = (): ReactElement => {
   const navigate = useNavigate();
-  const equipment = useAppStore((state) => state.equipment);
-  const vendors = useAppStore((state) => state.vendors);
-  const inspectionItems = useAppStore((state) => state.inspectionItems);
-
-  const [searchText, setSearchText] = useState("");
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>(
-    STATUS_FILTER.ACTIVE_AND_SUSPENDED,
-  );
-
-  const totalCount = Object.keys(equipment).length;
-
-  const filteredEquipmentList = useMemo(() => {
-    const normalizedSearch = searchText.trim().toLowerCase();
-    return Object.values(equipment)
-      .filter((entry) => matchesStatusFilter(entry.status, statusFilter))
-      .filter((entry) => matchesSearch(entry, normalizedSearch))
-      .toSorted((left, right) => left.managementNo.localeCompare(right.managementNo));
-  }, [equipment, searchText, statusFilter]);
-
-  /** 機器の最も近い次回期限（非稼働は無条件で— / 有効項目なしも—。screen-design §2「最も近い次回期限」） */
-  const nearestDueDateOf = (target: Equipment): string => {
-    if (target.status !== EQUIPMENT_STATUS.ACTIVE) return "—";
-    const dueDates = inspectionItemsOf({ inspectionItems }, target.id)
-      .filter((inspectionItem) => inspectionItem.isActive)
-      .map((inspectionItem) => inspectionItem.nextDueDate);
-    if (dueDates.length === 0) return "—";
-    return dueDates.toSorted((left, right) => left.localeCompare(right))[0] ?? "—";
-  };
+  const {
+    totalCount,
+    filteredEquipmentList,
+    searchText,
+    setSearchText,
+    statusFilter,
+    setStatusFilter,
+    manufacturerNameOf,
+    inspectionItemCountOf,
+    nearestDueDateOf,
+  } = useEquipmentList();
 
   const handleAddClick = (): void => {
     navigate(ROUTES.EQUIPMENT_CREATE);
@@ -204,11 +131,7 @@ export const EquipmentList = (): ReactElement => {
                     <td className="px-3 py-2">{entry.managementNo}</td>
                     <td className="px-3 py-2">{entry.name}</td>
                     <td className="px-3 py-2">{entry.model || "—"}</td>
-                    <td className="px-3 py-2">
-                      {(entry.manufacturerId !== undefined &&
-                        vendors[entry.manufacturerId]?.name) ||
-                        "—"}
-                    </td>
+                    <td className="px-3 py-2">{manufacturerNameOf(entry) || "—"}</td>
                     <td className="px-3 py-2">{entry.location || "—"}</td>
                     <td className="px-3 py-2">
                       {/* oxlint-disable-next-line react/forbid-component-props -- Badgeはclassnameで色を渡す設計（Badge.tsx参照） */}
@@ -217,7 +140,7 @@ export const EquipmentList = (): ReactElement => {
                       </Badge>
                     </td>
                     <td className="px-3 py-2 text-right tabular-nums">
-                      {inspectionItemsOf({ inspectionItems }, entry.id).length}
+                      {inspectionItemCountOf(entry)}
                     </td>
                     <td className="px-3 py-2">{nearestDueDateOf(entry)}</td>
                   </tr>

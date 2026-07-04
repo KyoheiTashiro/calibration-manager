@@ -3,6 +3,8 @@
  * RHF + zodResolver。起動元は項目一覧の「案件」アクション（外部・有効案件なしの項目）だが、
  * 起動元との接続は Phase 8 で行う（decisions.md D-020）。新規作成専用（status は常に addOrder が
  * planned 固定で付与するため渡さない)。1項目1有効案件制約（D-006）はストア層 addOrder が最終防衛線。
+ * 呼び出し元は閉時アンマウント（条件マウント）必須。defaultValues はマウント時にのみ評価されるため、
+ * 常時マウントで open をトグルする使い方ではプリフィルされない。
  */
 
 import {
@@ -14,7 +16,7 @@ import { Button, DateField, Modal, Select, TextField } from "@/components/ui";
 import { ROUTES } from "@/constants/routes";
 import { useAppStore } from "@/store/useAppStore";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useState, type ReactElement } from "react";
+import { useState, type ReactElement } from "react";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
 
@@ -35,27 +37,20 @@ export const OrderModal = ({ open, inspectionItemId, onClose }: Props): ReactEle
 
   const [submitFailed, setSubmitFailed] = useState(false);
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors, isDirty },
-  } = useForm<OrderFormValues>({
-    resolver: zodResolver(orderFormSchema),
-    defaultValues: defaultOrderFormValues,
-  });
-
   const presetVendorId = inspectionItem?.vendorId;
   const defaultVendorId =
     presetVendorId !== undefined && vendors[presetVendorId]?.isCalibrator ? presetVendorId : "";
 
-  // なぜ: open/inspectionItemId変更のたびに既定値をプリフィルする（screen-design/README.md §0.5、InspectionItemModal と同パターン）。
-  // なぜ submitFailed をここでリセットしないか: react-compiler(EffectSetState)がeffect内での
-  // 同期setStateを禁則とするため、RecordModal.tsxと同じ方針でイベントハンドラ側（onSubmit）に
-  // 一本化し、再送信のたびに最新の結果へ更新する。
-  useEffect(() => {
-    reset({ ...defaultOrderFormValues, vendorId: defaultVendorId });
-  }, [open, inspectionItemId, defaultVendorId, reset]);
+  // なぜ defaultValues 直書きで足りるか: OrderModal は起動元で常に条件マウント（閉時アンマウント）
+  // されるため、defaultValues はマウント時に1度評価されれば足り、open のたびのプリフィルは不要。
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isDirty },
+  } = useForm<OrderFormValues>({
+    resolver: zodResolver(orderFormSchema),
+    defaultValues: { ...defaultOrderFormValues, vendorId: defaultVendorId },
+  });
 
   const calibratorVendors = Object.values(vendors).filter((vendor) => vendor.isCalibrator);
   const vendorOptions = calibratorVendors.map((vendor) => ({
@@ -83,6 +78,9 @@ export const OrderModal = ({ open, inspectionItemId, onClose }: Props): ReactEle
       cost: values.cost ? Number(values.cost) : undefined,
       note: values.note || undefined,
     });
+    // なぜここで setState か: react-compiler(EffectSetState) が effect 内での同期 setState を
+    // 禁則とするため、submitFailed はイベントハンドラ側（onSubmit）に一本化し（RecordModal.tsx
+    // と同方針）、再送信のたびに最新の結果へ更新する。
     setSubmitFailed(orderId === null);
     if (orderId === null) return;
     handleClose();
