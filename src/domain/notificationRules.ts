@@ -34,10 +34,7 @@ export type NotificationSeed = Omit<Notification, "id" | "createdDate" | "isRead
  * 参照先の機器が見つからない場合（dangling FK）は項目名のみの通知文になる
  * （例外を投げない。coding-standards.md §8）。
  */
-const messagePrefix = (
-  serviceItem: ServiceItem,
-  equipment: Record<string, Equipment>,
-): string => {
+const messagePrefix = (serviceItem: ServiceItem, equipment: Record<string, Equipment>): string => {
   const managementNo = recordValue(equipment, serviceItem.equipmentId)?.managementNo;
   return managementNo === undefined ? "" : `${managementNo} `;
 };
@@ -82,7 +79,9 @@ const serviceItemNotificationSeeds = (
         : (recordValue(vendors, serviceItem.vendorId) ?? null);
     const orderDate = recommendedOrderDate(serviceItem, vendor);
     const hasActiveServiceOrder = serviceOrders.some(
-      (serviceOrder) => serviceOrder.serviceItemId === serviceItem.id && isActiveServiceOrderStatus(serviceOrder.status),
+      (serviceOrder) =>
+        serviceOrder.serviceItemId === serviceItem.id &&
+        isActiveServiceOrderStatus(serviceOrder.status),
     );
     if (orderDate !== null && today >= orderDate && !hasActiveServiceOrder) {
       seeds.push({
@@ -109,7 +108,8 @@ const serviceOrderNotificationSeeds = (
   today: IsoDateString,
 ): NotificationSeed[] => {
   const isAwaitingReturn =
-    serviceOrder.status === SERVICE_ORDER_STATUS.ORDERED || serviceOrder.status === SERVICE_ORDER_STATUS.IN_CALIBRATION;
+    serviceOrder.status === SERVICE_ORDER_STATUS.ORDERED ||
+    serviceOrder.status === SERVICE_ORDER_STATUS.IN_CALIBRATION;
   if (!isAwaitingReturn || serviceOrder.dueDate === undefined) return [];
   const serviceItem = serviceItemById.get(serviceOrder.serviceItemId);
   if (!serviceItem) return [];
@@ -178,9 +178,7 @@ export const computeExpectedNotifications = (
   equipment: Record<string, Equipment>,
   today: IsoDateString,
 ): NotificationSeed[] => {
-  const serviceItemById = new Map(
-    serviceItems.map((serviceItem) => [serviceItem.id, serviceItem]),
-  );
+  const serviceItemById = new Map(serviceItems.map((serviceItem) => [serviceItem.id, serviceItem]));
   return [
     ...serviceItems.flatMap((serviceItem) =>
       serviceItemNotificationSeeds(serviceItem, serviceOrders, vendors, equipment, today),

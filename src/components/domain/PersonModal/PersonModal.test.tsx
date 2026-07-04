@@ -1,11 +1,5 @@
 import { PersonModal } from "@/components/domain/PersonModal";
-import {
-  CYCLE,
-  EXECUTION,
-  SERVICE_ITEM_TYPE,
-  type ServiceItem,
-  type Person,
-} from "@/store/types";
+import { CYCLE, EXECUTION, SERVICE_ITEM_TYPE, type ServiceItem, type Person } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
 import { renderWithStore, seedStore, setupStoreIsolation } from "@/test/renderWithStore";
 import { screen } from "@testing-library/react";

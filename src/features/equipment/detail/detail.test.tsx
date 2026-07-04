@@ -307,9 +307,7 @@ describe("EquipmentDetail: ServiceItemModal起動", () => {
     const user = userEvent.setup();
     renderDetail(equipmentFull.id);
 
-    await user.click(
-      within(getServiceItemRow(/年次校正/u)).getByRole("button", { name: "編集" }),
-    );
+    await user.click(within(getServiceItemRow(/年次校正/u)).getByRole("button", { name: "編集" }));
 
     const dialogElement = getOpenDialog("点検校正項目を編集");
     expect(within(dialogElement).getByLabelText("項目名", { exact: false })).toHaveValue(
@@ -322,9 +320,7 @@ describe("EquipmentDetail: ServiceItemModal起動", () => {
     const user = userEvent.setup();
     renderDetail(equipmentFull.id);
 
-    await user.click(
-      within(getServiceItemRow(/年次校正/u)).getByRole("button", { name: "編集" }),
-    );
+    await user.click(within(getServiceItemRow(/年次校正/u)).getByRole("button", { name: "編集" }));
     await user.click(screen.getByRole("button", { name: "閉じる" }));
     await user.click(screen.getByRole("button", { name: "+ 項目を追加" }));
 

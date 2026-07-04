@@ -21,15 +21,24 @@ import { SERVICE_ORDER_STATUS, type ServiceOrderStatus } from "@/store/types";
  */
 export const SERVICE_ORDER_STATUS_TRANSITIONS = {
   [SERVICE_ORDER_STATUS.PLANNED]: [SERVICE_ORDER_STATUS.ORDERED, SERVICE_ORDER_STATUS.CANCELLED],
-  [SERVICE_ORDER_STATUS.ORDERED]: [SERVICE_ORDER_STATUS.IN_CALIBRATION, SERVICE_ORDER_STATUS.CANCELLED],
-  [SERVICE_ORDER_STATUS.IN_CALIBRATION]: [SERVICE_ORDER_STATUS.RETURNED, SERVICE_ORDER_STATUS.CANCELLED],
+  [SERVICE_ORDER_STATUS.ORDERED]: [
+    SERVICE_ORDER_STATUS.IN_CALIBRATION,
+    SERVICE_ORDER_STATUS.CANCELLED,
+  ],
+  [SERVICE_ORDER_STATUS.IN_CALIBRATION]: [
+    SERVICE_ORDER_STATUS.RETURNED,
+    SERVICE_ORDER_STATUS.CANCELLED,
+  ],
   [SERVICE_ORDER_STATUS.RETURNED]: [SERVICE_ORDER_STATUS.COMPLETED, SERVICE_ORDER_STATUS.CANCELLED],
   [SERVICE_ORDER_STATUS.COMPLETED]: [],
   [SERVICE_ORDER_STATUS.CANCELLED]: [],
 } as const satisfies Record<ServiceOrderStatus, readonly ServiceOrderStatus[]>;
 
 /** from → to の遷移が許可されているかを判定する */
-export const canTransitionServiceOrderStatus = (from: ServiceOrderStatus, to: ServiceOrderStatus): boolean =>
+export const canTransitionServiceOrderStatus = (
+  from: ServiceOrderStatus,
+  to: ServiceOrderStatus,
+): boolean =>
   (SERVICE_ORDER_STATUS_TRANSITIONS[from] as readonly ServiceOrderStatus[]).includes(to);
 
 /**

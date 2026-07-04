@@ -32,9 +32,7 @@ const pickRecord = <Value,>(record: Record<string, Value>, key: string): Value |
   record[key];
 
 export const ServiceOrderModal = ({ open, serviceItemId, onClose }: Props): ReactElement => {
-  const serviceItem = useAppStore((state) =>
-    pickRecord(state.serviceItems, serviceItemId),
-  );
+  const serviceItem = useAppStore((state) => pickRecord(state.serviceItems, serviceItemId));
   const equipment = useAppStore((state) =>
     serviceItem ? pickRecord(state.equipment, serviceItem.equipmentId) : undefined,
   );

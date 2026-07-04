@@ -77,9 +77,7 @@ export const PersonModal = ({ open, person, onClose }: PersonModalProps): ReactE
   // 避けるため（coding-standards.md §5「1値1呼び出しで分割購読」の趣旨に沿ったスナップショット取得）。
   const onSubmit = (values: PersonFormValues): void => {
     if (person?.isActive === true && !values.isActive) {
-      const assignedServiceItemCount = Object.values(
-        useAppStore.getState().serviceItems,
-      ).filter(
+      const assignedServiceItemCount = Object.values(useAppStore.getState().serviceItems).filter(
         (serviceItem) => serviceItem.personId === person.id && serviceItem.isActive,
       ).length;
       setPendingDeactivation({ values, assignedServiceItemCount });

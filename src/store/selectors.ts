@@ -4,11 +4,8 @@
  * （coding-standards.md §5、store.md「派生」）。
  */
 
-import {
-  deriveServiceItemStatus,
-  type ServiceItemStatus,
-} from "@/domain/serviceItemStatus";
 import { recommendedOrderDate } from "@/domain/leadTime";
+import { deriveServiceItemStatus, type ServiceItemStatus } from "@/domain/serviceItemStatus";
 import { isActiveServiceOrderStatus } from "@/domain/serviceOrderStatus";
 import {
   EQUIPMENT_STATUS,
@@ -36,7 +33,9 @@ export const serviceOrdersOf = (
   state: Pick<AppState, "serviceOrders">,
   serviceItemId: string,
 ): ServiceOrder[] =>
-  Object.values(state.serviceOrders).filter((serviceOrder) => serviceOrder.serviceItemId === serviceItemId);
+  Object.values(state.serviceOrders).filter(
+    (serviceOrder) => serviceOrder.serviceItemId === serviceItemId,
+  );
 
 /** 項目に紐づく実施記録の一覧（実施日の新しい順。同日はid辞書順で決定的に） */
 export const recordsOf = (
@@ -75,7 +74,9 @@ export const isVendorReferenced = (
   Object.values(state.serviceItems).some(
     (serviceItemEntry) => serviceItemEntry.vendorId === vendorId,
   ) ||
-  Object.values(state.serviceOrders).some((serviceOrderEntry) => serviceOrderEntry.vendorId === vendorId);
+  Object.values(state.serviceOrders).some(
+    (serviceOrderEntry) => serviceOrderEntry.vendorId === vendorId,
+  );
 
 /** ヘッダーの通知ベルに出す未読件数（screen-design/README.md） */
 export const unreadNotificationCount = (state: Pick<AppState, "notifications">): number =>
@@ -115,9 +116,7 @@ export const serviceItemRowsOf = (
     if (equipment.status !== EQUIPMENT_STATUS.ACTIVE) continue;
 
     const vendor =
-      serviceItem.vendorId === undefined
-        ? null
-        : (state.vendors[serviceItem.vendorId] ?? null);
+      serviceItem.vendorId === undefined ? null : (state.vendors[serviceItem.vendorId] ?? null);
     const itemServiceOrders: ServiceOrder[] = serviceOrdersOf(
       { serviceOrders: state.serviceOrders },
       serviceItem.id,
@@ -131,7 +130,8 @@ export const serviceItemRowsOf = (
       personLabel: personLabelOf({ persons: state.persons }, serviceItem.personId),
       recommendedOrderDate: recommendedOrderDate(serviceItem, vendor),
       canCreateServiceOrder:
-        isExternal && !itemServiceOrders.some((serviceOrder) => isActiveServiceOrderStatus(serviceOrder.status)),
+        isExternal &&
+        !itemServiceOrders.some((serviceOrder) => isActiveServiceOrderStatus(serviceOrder.status)),
     });
   }
   return rows.toSorted(compareServiceItemRows);

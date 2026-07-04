@@ -28,10 +28,8 @@ export type ServiceItemListFilters = {
   personId: string; // Person.id または "all"("all" は string の部分集合のため union にしない)
 };
 
-const SERVICE_ITEM_STATUS_VALUES: readonly ServiceItemStatus[] =
-  Object.values(SERVICE_ITEM_STATUS);
-const SERVICE_ITEM_TYPE_VALUES: readonly ServiceItemType[] =
-  Object.values(SERVICE_ITEM_TYPE);
+const SERVICE_ITEM_STATUS_VALUES: readonly ServiceItemStatus[] = Object.values(SERVICE_ITEM_STATUS);
+const SERVICE_ITEM_TYPE_VALUES: readonly ServiceItemType[] = Object.values(SERVICE_ITEM_TYPE);
 const EXECUTION_VALUES: readonly Execution[] = Object.values(EXECUTION);
 
 /** raw が allowed の要素かどうかを判定しつつ Enum へ絞り込む型ガード(readEnumParam から利用) */
@@ -54,10 +52,7 @@ export const parseServiceItemListFilters = (
 ): ServiceItemListFilters => {
   const personId = params.get("personId");
   return {
-    status: readEnumParam<ServiceItemStatus>(
-      params.get("status"),
-      SERVICE_ITEM_STATUS_VALUES,
-    ),
+    status: readEnumParam<ServiceItemStatus>(params.get("status"), SERVICE_ITEM_STATUS_VALUES),
     type: readEnumParam<ServiceItemType>(params.get("type"), SERVICE_ITEM_TYPE_VALUES),
     execution: readEnumParam<Execution>(params.get("execution"), EXECUTION_VALUES),
     personId: personId !== null && personId in persons ? personId : FILTER_ALL,

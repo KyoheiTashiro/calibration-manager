@@ -30,9 +30,7 @@ const STATUS_BADGE_LABELS = {
 } as const satisfies Record<ServiceItemStatus, string>;
 
 /** バッジのTailwindクラス文字列を返す */
-export const statusBadgeClass = (status: ServiceItemStatus): string =>
-  STATUS_BADGE_CLASSES[status];
+export const statusBadgeClass = (status: ServiceItemStatus): string => STATUS_BADGE_CLASSES[status];
 
 /** バッジの日本語ラベルを返す */
-export const statusBadgeLabel = (status: ServiceItemStatus): string =>
-  STATUS_BADGE_LABELS[status];
+export const statusBadgeLabel = (status: ServiceItemStatus): string => STATUS_BADGE_LABELS[status];

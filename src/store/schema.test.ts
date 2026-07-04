@@ -33,9 +33,9 @@ describe("serviceItemSchema", () => {
 
   it("internal なら vendorId 無しでも受理する", () => {
     const { vendorId: _dropped, ...withoutVendor } = validServiceItem;
-    expect(
-      serviceItemSchema.safeParse({ ...withoutVendor, execution: "internal" }).success,
-    ).toBe(true);
+    expect(serviceItemSchema.safeParse({ ...withoutVendor, execution: "internal" }).success).toBe(
+      true,
+    );
   });
 
   it("暦上あり得ない日付（2026-02-30）を拒否する", () => {
@@ -45,9 +45,7 @@ describe("serviceItemSchema", () => {
   });
 
   it("未知の cycle 値を拒否する", () => {
-    expect(serviceItemSchema.safeParse({ ...validServiceItem, cycle: "4M" }).success).toBe(
-      false,
-    );
+    expect(serviceItemSchema.safeParse({ ...validServiceItem, cycle: "4M" }).success).toBe(false);
   });
 
   it("負の日数（bufferDays）を拒否する", () => {

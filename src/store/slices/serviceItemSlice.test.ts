@@ -70,9 +70,7 @@ describe("serviceItemSlice", () => {
 
   describe("setServiceItemActive", () => {
     it("isActiveをfalseに切り替えられる", () => {
-      const id = useAppStore
-        .getState()
-        .addServiceItem(buildServiceItemInput({ isActive: true }));
+      const id = useAppStore.getState().addServiceItem(buildServiceItemInput({ isActive: true }));
 
       useAppStore.getState().setServiceItemActive(id, false);
 
@@ -80,9 +78,7 @@ describe("serviceItemSlice", () => {
     });
 
     it("isActiveをtrueに切り替えられる", () => {
-      const id = useAppStore
-        .getState()
-        .addServiceItem(buildServiceItemInput({ isActive: false }));
+      const id = useAppStore.getState().addServiceItem(buildServiceItemInput({ isActive: false }));
 
       useAppStore.getState().setServiceItemActive(id, true);
 

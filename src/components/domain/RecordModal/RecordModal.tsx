@@ -55,10 +55,13 @@ const resolvePrefillDoneBy = (
   return "";
 };
 
-export const RecordModal = ({ open, serviceItemId, serviceOrderId, onClose }: Props): ReactElement => {
-  const serviceItem = useAppStore((state) =>
-    pickRecord(state.serviceItems, serviceItemId),
-  );
+export const RecordModal = ({
+  open,
+  serviceItemId,
+  serviceOrderId,
+  onClose,
+}: Props): ReactElement => {
+  const serviceItem = useAppStore((state) => pickRecord(state.serviceItems, serviceItemId));
   const equipment = useAppStore((state) =>
     serviceItem ? pickRecord(state.equipment, serviceItem.equipmentId) : undefined,
   );
@@ -96,7 +99,9 @@ export const RecordModal = ({ open, serviceItemId, serviceOrderId, onClose }: Pr
   const doneDate = useWatch({ control, name: "doneDate" });
 
   const isFutureDoneDate = typeof doneDate === "string" && doneDate > todayIsoDate();
-  const serviceOrderVendorName = serviceOrder ? (pickRecord(vendors, serviceOrder.vendorId)?.name ?? "") : "";
+  const serviceOrderVendorName = serviceOrder
+    ? (pickRecord(vendors, serviceOrder.vendorId)?.name ?? "")
+    : "";
 
   const targetLabel =
     serviceItem && equipment

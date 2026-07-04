@@ -3,7 +3,10 @@
  * 状態遷移は domain/serviceOrderStatus.ts の許可テーブルで検証する（domain-model.md §3.6）。
  */
 
-import { canTransitionServiceOrderStatus, isActiveServiceOrderStatus } from "@/domain/serviceOrderStatus";
+import {
+  canTransitionServiceOrderStatus,
+  isActiveServiceOrderStatus,
+} from "@/domain/serviceOrderStatus";
 import type { AppSliceCreator } from "@/store/storeState";
 import { type ServiceOrder, SERVICE_ORDER_STATUS, type ServiceOrderStatus } from "@/store/types";
 import { createId } from "@/utils/id";
@@ -38,7 +41,8 @@ export const createServiceOrderSlice: AppSliceCreator<ServiceOrderSlice> = (set,
     if (recordValue(serviceItems, input.serviceItemId) === undefined) return null;
     const hasActiveServiceOrder = Object.values(serviceOrders).some(
       (serviceOrder) =>
-        serviceOrder.serviceItemId === input.serviceItemId && isActiveServiceOrderStatus(serviceOrder.status),
+        serviceOrder.serviceItemId === input.serviceItemId &&
+        isActiveServiceOrderStatus(serviceOrder.status),
     );
     if (hasActiveServiceOrder) return null;
 

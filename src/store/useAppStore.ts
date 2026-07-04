@@ -7,12 +7,12 @@
 
 import { STORAGE_KEY, STORAGE_VERSION } from "@/constants/storage";
 import { emptyAppState, migratePersistedState, salvagePersistedState } from "@/store/persistence";
-import { createServiceOrderSlice } from "@/store/slices/serviceOrderSlice";
 import { createEquipmentSlice } from "@/store/slices/equipmentSlice";
-import { createServiceItemSlice } from "@/store/slices/serviceItemSlice";
-import { createServiceRecordSlice } from "@/store/slices/serviceRecordSlice";
 import { createNotificationSlice } from "@/store/slices/notificationSlice";
 import { createPersonSlice } from "@/store/slices/personSlice";
+import { createServiceItemSlice } from "@/store/slices/serviceItemSlice";
+import { createServiceOrderSlice } from "@/store/slices/serviceOrderSlice";
+import { createServiceRecordSlice } from "@/store/slices/serviceRecordSlice";
 import { createVendorSlice } from "@/store/slices/vendorSlice";
 import type { StoreState } from "@/store/storeState";
 import type { AppState } from "@/store/types";

@@ -57,9 +57,7 @@ describe("serviceItemsOf", () => {
       },
     };
 
-    expect(serviceItemsOf({ serviceItems }, "equipment-1")).toEqual([
-      serviceItems["item-1"],
-    ]);
+    expect(serviceItemsOf({ serviceItems }, "equipment-1")).toEqual([serviceItems["item-1"]]);
   });
 
   it("該当する項目が無ければ空配列を返す", () => {

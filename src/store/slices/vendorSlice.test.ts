@@ -85,7 +85,10 @@ describe("removeVendor: 参照ガード", () => {
   });
 
   it("ServiceOrder.vendorId から参照中は no-op（false）", () => {
-    seedStore({ vendors: { [vendor.id]: vendor }, serviceOrders: { [serviceOrder.id]: serviceOrder } });
+    seedStore({
+      vendors: { [vendor.id]: vendor },
+      serviceOrders: { [serviceOrder.id]: serviceOrder },
+    });
     expect(useAppStore.getState().removeVendor(vendor.id)).toBe(false);
   });
 

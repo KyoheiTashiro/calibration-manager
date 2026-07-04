@@ -125,7 +125,9 @@ describe("結合: returned 案件 → 記録登録 → カスケード", () => {
     const updatedServiceItem = state.serviceItems[serviceItem.id];
     expect(updatedServiceItem.lastDoneDate).toBe("2026-06-20");
     expect(updatedServiceItem.nextDueDate).toBe("2027-06-20"); // 1Y 周期の暦月加算
-    expect(state.serviceOrders[returnedServiceOrder.id].status).toBe(SERVICE_ORDER_STATUS.COMPLETED);
+    expect(state.serviceOrders[returnedServiceOrder.id].status).toBe(
+      SERVICE_ORDER_STATUS.COMPLETED,
+    );
 
     // completed は既定トグルOFFで非表示 → returned 列からカードが消える(08-service-orders.md)
     expect(screen.queryByText("EQ-001")).not.toBeInTheDocument();
@@ -142,7 +144,9 @@ describe("結合: returned 案件 → 記録登録 → カスケード", () => {
     const updatedServiceItem = state.serviceItems[serviceItem.id];
     expect(updatedServiceItem.nextDueDate).toBe("2026-07-10"); // 据え置き
     expect(updatedServiceItem.lastDoneDate).toBe("2026-06-20"); // 実施の事実は記録(D-015)
-    expect(state.serviceOrders[returnedServiceOrder.id].status).toBe(SERVICE_ORDER_STATUS.COMPLETED);
+    expect(state.serviceOrders[returnedServiceOrder.id].status).toBe(
+      SERVICE_ORDER_STATUS.COMPLETED,
+    );
     expect(Object.values(state.records)[0]?.result).toBe(RECORD_RESULT.FAIL);
   });
 
@@ -176,12 +180,16 @@ describe("結合: かんばんの隣接遷移チェーン planned → returned",
     await user.click(screen.getByRole("button", { name: "発注する" }));
     expect(screen.getByLabelText("発注日", { exact: false })).toHaveValue(todayIsoDate());
     await user.click(screen.getByRole("button", { name: "確定" }));
-    expect(useAppStore.getState().serviceOrders["serviceOrder-1"].status).toBe(SERVICE_ORDER_STATUS.ORDERED);
+    expect(useAppStore.getState().serviceOrders["serviceOrder-1"].status).toBe(
+      SERVICE_ORDER_STATUS.ORDERED,
+    );
     expect(useAppStore.getState().serviceOrders["serviceOrder-1"].orderedDate).toBe(todayIsoDate());
 
     // ordered → inCalibration: 即時遷移(入力なし)
     await user.click(screen.getByRole("button", { name: "校正中へ" }));
-    expect(useAppStore.getState().serviceOrders["serviceOrder-1"].status).toBe(SERVICE_ORDER_STATUS.IN_CALIBRATION);
+    expect(useAppStore.getState().serviceOrders["serviceOrder-1"].status).toBe(
+      SERVICE_ORDER_STATUS.IN_CALIBRATION,
+    );
 
     // inCalibration → returned: 返却ダイアログ(returnedDate 入力)
     await user.click(screen.getByRole("button", { name: "返却する" }));

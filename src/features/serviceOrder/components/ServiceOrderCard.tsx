@@ -45,9 +45,7 @@ export const ServiceOrderCard = ({
   onRecord,
 }: Props): ReactElement => {
   const serviceItem = recordValue(serviceItems, serviceOrder.serviceItemId);
-  const equipmentEntry = serviceItem
-    ? recordValue(equipment, serviceItem.equipmentId)
-    : undefined;
+  const equipmentEntry = serviceItem ? recordValue(equipment, serviceItem.equipmentId) : undefined;
   const vendor = recordValue(vendors, serviceOrder.vendorId);
 
   const managementNo = equipmentEntry?.managementNo ?? NO_REFERENCE_LABEL;
@@ -56,7 +54,8 @@ export const ServiceOrderCard = ({
   const vendorName = vendor?.name ?? NO_REFERENCE_LABEL;
 
   const isClosed =
-    serviceOrder.status === SERVICE_ORDER_STATUS.COMPLETED || serviceOrder.status === SERVICE_ORDER_STATUS.CANCELLED;
+    serviceOrder.status === SERVICE_ORDER_STATUS.COMPLETED ||
+    serviceOrder.status === SERVICE_ORDER_STATUS.CANCELLED;
 
   const renderActions = (): ReactNode => {
     switch (serviceOrder.status) {
@@ -176,7 +175,9 @@ export const ServiceOrderCard = ({
         </div>
         <div>
           <dt className="inline text-slate-500">費用: </dt>
-          <dd className="inline">{serviceOrder.cost === undefined ? UNSET_LABEL : `${serviceOrder.cost}円`}</dd>
+          <dd className="inline">
+            {serviceOrder.cost === undefined ? UNSET_LABEL : `${serviceOrder.cost}円`}
+          </dd>
         </div>
       </dl>
       {isClosed ? null : <div className="mt-3 flex flex-wrap gap-2">{renderActions()}</div>}

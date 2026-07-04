@@ -151,9 +151,7 @@ describe("addRecord: 期限更新カスケード", () => {
     });
     expect(id).toBeNull();
     expect(useAppStore.getState().records).toEqual({});
-    expect(useAppStore.getState().serviceItems[serviceItem.id].nextDueDate).toBe(
-      "2026-07-15",
-    );
+    expect(useAppStore.getState().serviceItems[serviceItem.id].nextDueDate).toBe("2026-07-15");
   });
 });
 
@@ -181,7 +179,9 @@ describe("addRecord: 案件完了カスケード", () => {
     "%s の案件を serviceOrderId 指定すると全体 no-op（D-005: completed へ遷移不可）",
     (status) => {
       seedBase();
-      seedStore({ serviceOrders: { [returnedServiceOrder.id]: { ...returnedServiceOrder, status } } });
+      seedStore({
+        serviceOrders: { [returnedServiceOrder.id]: { ...returnedServiceOrder, status } },
+      });
 
       const id = useAppStore.getState().addRecord({
         serviceItemId: serviceItem.id,
@@ -231,7 +231,9 @@ describe("addServiceOrder: 1項目1有効案件（D-006）", () => {
     "有効な案件（%s）が既にある項目には no-op",
     (status) => {
       seedBase();
-      seedStore({ serviceOrders: { [returnedServiceOrder.id]: { ...returnedServiceOrder, status } } });
+      seedStore({
+        serviceOrders: { [returnedServiceOrder.id]: { ...returnedServiceOrder, status } },
+      });
       expect(
         useAppStore
           .getState()
@@ -245,7 +247,9 @@ describe("addServiceOrder: 1項目1有効案件（D-006）", () => {
     "終端状態（%s）の案件のみなら追加できる",
     (status) => {
       seedBase();
-      seedStore({ serviceOrders: { [returnedServiceOrder.id]: { ...returnedServiceOrder, status } } });
+      seedStore({
+        serviceOrders: { [returnedServiceOrder.id]: { ...returnedServiceOrder, status } },
+      });
       expect(
         useAppStore
           .getState()
@@ -284,19 +288,25 @@ describe("updateServiceOrderStatus: 遷移テーブル検証", () => {
     ["cancelled", "planned"], // 終端から
   ] as const)("許可されない遷移 %s → %s は no-op（false）", (from, to) => {
     seedServiceOrderWith(from);
-    expect(useAppStore.getState().updateServiceOrderStatus(returnedServiceOrder.id, to)).toBe(false);
+    expect(useAppStore.getState().updateServiceOrderStatus(returnedServiceOrder.id, to)).toBe(
+      false,
+    );
     expect(useAppStore.getState().serviceOrders[returnedServiceOrder.id].status).toBe(from);
   });
 
   it("completed への直接遷移は returned からでも拒否する（addRecord 経由のみ）", () => {
     seedServiceOrderWith("returned");
-    expect(useAppStore.getState().updateServiceOrderStatus(returnedServiceOrder.id, "completed")).toBe(false);
+    expect(
+      useAppStore.getState().updateServiceOrderStatus(returnedServiceOrder.id, "completed"),
+    ).toBe(false);
     expect(useAppStore.getState().serviceOrders[returnedServiceOrder.id].status).toBe("returned");
   });
 
   it("存在しない案件は false", () => {
     seedBase();
-    expect(useAppStore.getState().updateServiceOrderStatus("serviceOrder-gone", "ordered")).toBe(false);
+    expect(useAppStore.getState().updateServiceOrderStatus("serviceOrder-gone", "ordered")).toBe(
+      false,
+    );
   });
 });
 

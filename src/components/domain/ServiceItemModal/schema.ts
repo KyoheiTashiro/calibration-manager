@@ -96,9 +96,7 @@ export const defaultServiceItemFormValues: ServiceItemFormValues = {
 };
 
 /** 既存 ServiceItem をフォーム値（すべて string ベース）へ変換する。新規時は既定値 */
-export const toFormValues = (
-  serviceItem: ServiceItem | undefined,
-): ServiceItemFormValues =>
+export const toFormValues = (serviceItem: ServiceItem | undefined): ServiceItemFormValues =>
   serviceItem
     ? {
         name: serviceItem.name,

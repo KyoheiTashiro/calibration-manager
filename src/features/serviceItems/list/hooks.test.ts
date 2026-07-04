@@ -105,9 +105,7 @@ describe("filterServiceItemRows", () => {
 
   it("type 単独", () => {
     expect(
-      ids(
-        filterServiceItemRows(rows, { ...ALL_FILTERS, type: SERVICE_ITEM_TYPE.CALIBRATION }),
-      ),
+      ids(filterServiceItemRows(rows, { ...ALL_FILTERS, type: SERVICE_ITEM_TYPE.CALIBRATION })),
     ).toEqual(["i-ext"]);
   });
 

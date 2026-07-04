@@ -137,11 +137,7 @@ const recordsOf = (): ReturnType<typeof useAppStore.getState>["records"] =>
 describe("RecordModal", () => {
   it("対象が「対象:管理番号 機器名 / 項目名」で固定表示される", () => {
     renderWithStore(
-      <RecordModal
-        open
-        serviceItemId={serviceItemExternal.id}
-        onClose={vi.fn<() => void>()}
-      />,
+      <RecordModal open serviceItemId={serviceItemExternal.id} onClose={vi.fn<() => void>()} />,
     );
     expect(screen.getByText("対象:EQ-001 ノギス / 年次校正")).toBeInTheDocument();
   });
@@ -153,11 +149,7 @@ describe("RecordModal", () => {
 
   it("実施日の既定値は今日", () => {
     renderWithStore(
-      <RecordModal
-        open
-        serviceItemId={serviceItemExternal.id}
-        onClose={vi.fn<() => void>()}
-      />,
+      <RecordModal open serviceItemId={serviceItemExternal.id} onClose={vi.fn<() => void>()} />,
     );
     expect(screen.getByLabelText("実施日", { exact: false })).toHaveValue(todayIsoDate());
   });
@@ -176,24 +168,14 @@ describe("RecordModal", () => {
 
   it("doneBy プリフィル: external 項目(serviceOrder なし)は項目の業者名", () => {
     renderWithStore(
-      <RecordModal
-        open
-        serviceItemId={serviceItemExternal.id}
-        onClose={vi.fn<() => void>()}
-      />,
+      <RecordModal open serviceItemId={serviceItemExternal.id} onClose={vi.fn<() => void>()} />,
     );
-    expect(screen.getByLabelText("実施者", { exact: false })).toHaveValue(
-      serviceItemVendor.name,
-    );
+    expect(screen.getByLabelText("実施者", { exact: false })).toHaveValue(serviceItemVendor.name);
   });
 
   it("doneBy プリフィル: internal 項目は空欄", () => {
     renderWithStore(
-      <RecordModal
-        open
-        serviceItemId={serviceItemInternal.id}
-        onClose={vi.fn<() => void>()}
-      />,
+      <RecordModal open serviceItemId={serviceItemInternal.id} onClose={vi.fn<() => void>()} />,
     );
     expect(screen.getByLabelText("実施者", { exact: false })).toHaveValue("");
   });
@@ -214,11 +196,7 @@ describe("RecordModal", () => {
   it("fail 選択時に「次回期限は更新されません」の注意書きが表示される", async () => {
     const user = userEvent.setup();
     renderWithStore(
-      <RecordModal
-        open
-        serviceItemId={serviceItemExternal.id}
-        onClose={vi.fn<() => void>()}
-      />,
+      <RecordModal open serviceItemId={serviceItemExternal.id} onClose={vi.fn<() => void>()} />,
     );
 
     expect(screen.queryByText("次回期限は更新されません")).not.toBeInTheDocument();
@@ -229,9 +207,7 @@ describe("RecordModal", () => {
   it("未来日を入力すると警告を表示するが登録はブロックしない", async () => {
     const user = userEvent.setup();
     const onClose = vi.fn<() => void>();
-    renderWithStore(
-      <RecordModal open serviceItemId={serviceItemExternal.id} onClose={onClose} />,
-    );
+    renderWithStore(<RecordModal open serviceItemId={serviceItemExternal.id} onClose={onClose} />);
 
     const doneDateField = screen.getByLabelText("実施日", { exact: false });
     await user.clear(doneDateField);
@@ -248,9 +224,7 @@ describe("RecordModal", () => {
   it("pass 登録でストアに記録が追加され onClose される", async () => {
     const user = userEvent.setup();
     const onClose = vi.fn<() => void>();
-    renderWithStore(
-      <RecordModal open serviceItemId={serviceItemExternal.id} onClose={onClose} />,
-    );
+    renderWithStore(<RecordModal open serviceItemId={serviceItemExternal.id} onClose={onClose} />);
 
     await user.click(screen.getByLabelText("合格"));
     await user.type(screen.getByLabelText("備考", { exact: false }), "証明書#A-102");
@@ -294,11 +268,7 @@ describe("RecordModal", () => {
   it("実施者が空のまま登録するとエラーが表示されストアが変化しない", async () => {
     const user = userEvent.setup();
     renderWithStore(
-      <RecordModal
-        open
-        serviceItemId={serviceItemInternal.id}
-        onClose={vi.fn<() => void>()}
-      />,
+      <RecordModal open serviceItemId={serviceItemInternal.id} onClose={vi.fn<() => void>()} />,
     );
 
     await user.click(screen.getByLabelText("合格"));
@@ -311,11 +281,7 @@ describe("RecordModal", () => {
   it("結果未選択で登録するとエラーが表示されストアが変化しない", async () => {
     const user = userEvent.setup();
     renderWithStore(
-      <RecordModal
-        open
-        serviceItemId={serviceItemExternal.id}
-        onClose={vi.fn<() => void>()}
-      />,
+      <RecordModal open serviceItemId={serviceItemExternal.id} onClose={vi.fn<() => void>()} />,
     );
 
     await user.click(screen.getByRole("button", { name: "保存" }));

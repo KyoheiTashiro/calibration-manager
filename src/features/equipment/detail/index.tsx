@@ -189,9 +189,7 @@ export const EquipmentDetail = (): ReactElement => {
                       {status === null ? "—" : <StatusBadge status={status} />}
                     </td>
                     <td className="px-3 py-2">{serviceItem.name}</td>
-                    <td className="px-3 py-2">
-                      {SERVICE_ITEM_TYPE_LABELS[serviceItem.type]}
-                    </td>
+                    <td className="px-3 py-2">{SERVICE_ITEM_TYPE_LABELS[serviceItem.type]}</td>
                     <td className="px-3 py-2">{EXECUTION_LABELS[serviceItem.execution]}</td>
                     <td className="px-3 py-2">{CYCLE_LABELS[serviceItem.cycle]}</td>
                     <td className="px-3 py-2">

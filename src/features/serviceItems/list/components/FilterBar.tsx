@@ -8,10 +8,7 @@
 import { Button, Select } from "@/components/ui";
 import { SERVICE_ITEM_STATUS } from "@/domain/serviceItemStatus";
 import { statusBadgeLabel } from "@/domain/statusBadge";
-import {
-  EXECUTION_OPTIONS,
-  SERVICE_ITEM_TYPE_OPTIONS,
-} from "@/features/serviceItems/constants";
+import { EXECUTION_OPTIONS, SERVICE_ITEM_TYPE_OPTIONS } from "@/features/serviceItems/constants";
 import { FILTER_ALL, type ServiceItemListFilters } from "@/features/serviceItems/list/hooks";
 import { personLabelOf } from "@/store/selectors";
 import type { Person } from "@/store/types";

@@ -4,10 +4,7 @@
  * D-014: 項目ステータスは機器が稼働(active)のときのみ導出し、それ以外は null（「—」表示）とする。
  */
 
-import {
-  deriveServiceItemStatus,
-  type ServiceItemStatus,
-} from "@/domain/serviceItemStatus";
+import { deriveServiceItemStatus, type ServiceItemStatus } from "@/domain/serviceItemStatus";
 import { serviceItemsOf, serviceOrdersOf, recordsOf } from "@/store/selectors";
 import {
   EQUIPMENT_STATUS,
@@ -51,8 +48,7 @@ const compareHistoryRows = (left: HistoryRow, right: HistoryRow): number =>
 export const sortedServiceItemsOf = (
   serviceItems: Record<string, ServiceItem>,
   equipmentId: string,
-): ServiceItem[] =>
-  serviceItemsOf({ serviceItems }, equipmentId).toSorted(compareServiceItemRows);
+): ServiceItem[] => serviceItemsOf({ serviceItems }, equipmentId).toSorted(compareServiceItemRows);
 
 /** この機器の全項目の実施記録を項目横断でマージし、doneDate降順(同日はid昇順)に並べる */
 export const historyRowsOf = (

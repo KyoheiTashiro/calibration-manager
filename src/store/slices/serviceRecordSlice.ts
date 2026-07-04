@@ -40,14 +40,16 @@ export const createServiceRecordSlice: AppSliceCreator<ServiceRecordSlice> = (se
     if (!serviceItem) return null;
 
     const shouldAdvanceDueDate = input.result !== RECORD_RESULT.FAIL;
-    const nextDueDate = shouldAdvanceDueDate
-      ? addCycle(input.doneDate, serviceItem.cycle)
-      : null;
+    const nextDueDate = shouldAdvanceDueDate ? addCycle(input.doneDate, serviceItem.cycle) : null;
     if (shouldAdvanceDueDate && nextDueDate === null) return null;
 
     if (input.serviceOrderId !== undefined) {
       const serviceOrder = recordValue(serviceOrders, input.serviceOrderId);
-      if (!serviceOrder || !canTransitionServiceOrderStatus(serviceOrder.status, SERVICE_ORDER_STATUS.COMPLETED)) return null;
+      if (
+        !serviceOrder ||
+        !canTransitionServiceOrderStatus(serviceOrder.status, SERVICE_ORDER_STATUS.COMPLETED)
+      )
+        return null;
     }
 
     const id = createId();
@@ -60,7 +62,8 @@ export const createServiceRecordSlice: AppSliceCreator<ServiceRecordSlice> = (se
       }
       if (input.serviceOrderId !== undefined) {
         const draftServiceOrder = recordValue(state.serviceOrders, input.serviceOrderId);
-        if (draftServiceOrder !== undefined) draftServiceOrder.status = SERVICE_ORDER_STATUS.COMPLETED;
+        if (draftServiceOrder !== undefined)
+          draftServiceOrder.status = SERVICE_ORDER_STATUS.COMPLETED;
       }
     });
     return id;

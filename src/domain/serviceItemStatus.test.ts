@@ -80,7 +80,10 @@ describe("deriveServiceItemStatus（優先度: overdue > orderNow > inProgress >
   });
 
   it("completed / cancelled の案件は「有効な案件」ではないので orderNow が成立する", () => {
-    const finished = [buildServiceOrder(SERVICE_ORDER_STATUS.COMPLETED), buildServiceOrder(SERVICE_ORDER_STATUS.CANCELLED)];
+    const finished = [
+      buildServiceOrder(SERVICE_ORDER_STATUS.COMPLETED),
+      buildServiceOrder(SERVICE_ORDER_STATUS.CANCELLED),
+    ];
     expect(deriveServiceItemStatus(buildServiceItem(), finished, null, "2026-07-07")).toBe(
       SERVICE_ITEM_STATUS.ORDER_NOW,
     );
@@ -103,12 +106,7 @@ describe("deriveServiceItemStatus（優先度: overdue > orderNow > inProgress >
   it("他項目の案件は判定に影響しない（serviceItemId で絞り込む）", () => {
     const otherItemServiceOrders = [buildServiceOrder(SERVICE_ORDER_STATUS.ORDERED, "item-other")];
     expect(
-      deriveServiceItemStatus(
-        buildServiceItem(),
-        otherItemServiceOrders,
-        null,
-        "2026-07-07",
-      ),
+      deriveServiceItemStatus(buildServiceItem(), otherItemServiceOrders, null, "2026-07-07"),
     ).toBe(SERVICE_ITEM_STATUS.ORDER_NOW);
   });
 

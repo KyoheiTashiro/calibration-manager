@@ -10,37 +10,90 @@ const ALL_STATUSES: ServiceOrderStatus[] = Object.values(SERVICE_ORDER_STATUS);
 
 describe("canTransitionServiceOrderStatus（domain-model.md §3.6 の状態遷移）", () => {
   it("正常系の隣接遷移をすべて許可する", () => {
-    expect(canTransitionServiceOrderStatus(SERVICE_ORDER_STATUS.PLANNED, SERVICE_ORDER_STATUS.ORDERED)).toBe(true);
-    expect(canTransitionServiceOrderStatus(SERVICE_ORDER_STATUS.ORDERED, SERVICE_ORDER_STATUS.IN_CALIBRATION)).toBe(true);
-    expect(canTransitionServiceOrderStatus(SERVICE_ORDER_STATUS.IN_CALIBRATION, SERVICE_ORDER_STATUS.RETURNED)).toBe(true);
-    expect(canTransitionServiceOrderStatus(SERVICE_ORDER_STATUS.RETURNED, SERVICE_ORDER_STATUS.COMPLETED)).toBe(true);
+    expect(
+      canTransitionServiceOrderStatus(SERVICE_ORDER_STATUS.PLANNED, SERVICE_ORDER_STATUS.ORDERED),
+    ).toBe(true);
+    expect(
+      canTransitionServiceOrderStatus(
+        SERVICE_ORDER_STATUS.ORDERED,
+        SERVICE_ORDER_STATUS.IN_CALIBRATION,
+      ),
+    ).toBe(true);
+    expect(
+      canTransitionServiceOrderStatus(
+        SERVICE_ORDER_STATUS.IN_CALIBRATION,
+        SERVICE_ORDER_STATUS.RETURNED,
+      ),
+    ).toBe(true);
+    expect(
+      canTransitionServiceOrderStatus(
+        SERVICE_ORDER_STATUS.RETURNED,
+        SERVICE_ORDER_STATUS.COMPLETED,
+      ),
+    ).toBe(true);
   });
 
   it("planned〜returned の各段階から cancelled へ遷移できる", () => {
-    expect(canTransitionServiceOrderStatus(SERVICE_ORDER_STATUS.PLANNED, SERVICE_ORDER_STATUS.CANCELLED)).toBe(true);
-    expect(canTransitionServiceOrderStatus(SERVICE_ORDER_STATUS.ORDERED, SERVICE_ORDER_STATUS.CANCELLED)).toBe(true);
-    expect(canTransitionServiceOrderStatus(SERVICE_ORDER_STATUS.IN_CALIBRATION, SERVICE_ORDER_STATUS.CANCELLED)).toBe(
-      true,
-    );
-    expect(canTransitionServiceOrderStatus(SERVICE_ORDER_STATUS.RETURNED, SERVICE_ORDER_STATUS.CANCELLED)).toBe(true);
+    expect(
+      canTransitionServiceOrderStatus(SERVICE_ORDER_STATUS.PLANNED, SERVICE_ORDER_STATUS.CANCELLED),
+    ).toBe(true);
+    expect(
+      canTransitionServiceOrderStatus(SERVICE_ORDER_STATUS.ORDERED, SERVICE_ORDER_STATUS.CANCELLED),
+    ).toBe(true);
+    expect(
+      canTransitionServiceOrderStatus(
+        SERVICE_ORDER_STATUS.IN_CALIBRATION,
+        SERVICE_ORDER_STATUS.CANCELLED,
+      ),
+    ).toBe(true);
+    expect(
+      canTransitionServiceOrderStatus(
+        SERVICE_ORDER_STATUS.RETURNED,
+        SERVICE_ORDER_STATUS.CANCELLED,
+      ),
+    ).toBe(true);
   });
 
   it("飛び越し遷移は許可しない（screen-design/08-service-orders.md「隣接遷移のみ」）", () => {
-    expect(canTransitionServiceOrderStatus(SERVICE_ORDER_STATUS.PLANNED, SERVICE_ORDER_STATUS.IN_CALIBRATION)).toBe(false);
-    expect(canTransitionServiceOrderStatus(SERVICE_ORDER_STATUS.PLANNED, SERVICE_ORDER_STATUS.COMPLETED)).toBe(false);
-    expect(canTransitionServiceOrderStatus(SERVICE_ORDER_STATUS.ORDERED, SERVICE_ORDER_STATUS.RETURNED)).toBe(false);
-    expect(canTransitionServiceOrderStatus(SERVICE_ORDER_STATUS.ORDERED, SERVICE_ORDER_STATUS.COMPLETED)).toBe(false);
-    expect(canTransitionServiceOrderStatus(SERVICE_ORDER_STATUS.IN_CALIBRATION, SERVICE_ORDER_STATUS.COMPLETED)).toBe(
-      false,
-    );
+    expect(
+      canTransitionServiceOrderStatus(
+        SERVICE_ORDER_STATUS.PLANNED,
+        SERVICE_ORDER_STATUS.IN_CALIBRATION,
+      ),
+    ).toBe(false);
+    expect(
+      canTransitionServiceOrderStatus(SERVICE_ORDER_STATUS.PLANNED, SERVICE_ORDER_STATUS.COMPLETED),
+    ).toBe(false);
+    expect(
+      canTransitionServiceOrderStatus(SERVICE_ORDER_STATUS.ORDERED, SERVICE_ORDER_STATUS.RETURNED),
+    ).toBe(false);
+    expect(
+      canTransitionServiceOrderStatus(SERVICE_ORDER_STATUS.ORDERED, SERVICE_ORDER_STATUS.COMPLETED),
+    ).toBe(false);
+    expect(
+      canTransitionServiceOrderStatus(
+        SERVICE_ORDER_STATUS.IN_CALIBRATION,
+        SERVICE_ORDER_STATUS.COMPLETED,
+      ),
+    ).toBe(false);
   });
 
   it("逆行遷移は許可しない", () => {
-    expect(canTransitionServiceOrderStatus(SERVICE_ORDER_STATUS.ORDERED, SERVICE_ORDER_STATUS.PLANNED)).toBe(false);
-    expect(canTransitionServiceOrderStatus(SERVICE_ORDER_STATUS.IN_CALIBRATION, SERVICE_ORDER_STATUS.ORDERED)).toBe(false);
-    expect(canTransitionServiceOrderStatus(SERVICE_ORDER_STATUS.RETURNED, SERVICE_ORDER_STATUS.IN_CALIBRATION)).toBe(
-      false,
-    );
+    expect(
+      canTransitionServiceOrderStatus(SERVICE_ORDER_STATUS.ORDERED, SERVICE_ORDER_STATUS.PLANNED),
+    ).toBe(false);
+    expect(
+      canTransitionServiceOrderStatus(
+        SERVICE_ORDER_STATUS.IN_CALIBRATION,
+        SERVICE_ORDER_STATUS.ORDERED,
+      ),
+    ).toBe(false);
+    expect(
+      canTransitionServiceOrderStatus(
+        SERVICE_ORDER_STATUS.RETURNED,
+        SERVICE_ORDER_STATUS.IN_CALIBRATION,
+      ),
+    ).toBe(false);
   });
 
   it("completed / cancelled は終端でありどこへも遷移できない", () => {
@@ -57,7 +110,9 @@ describe("canTransitionServiceOrderStatus（domain-model.md §3.6 の状態遷�
   });
 
   it("遷移テーブルは全6状態を起点として網羅している", () => {
-    expect(Object.keys(SERVICE_ORDER_STATUS_TRANSITIONS).toSorted()).toEqual(ALL_STATUSES.toSorted());
+    expect(Object.keys(SERVICE_ORDER_STATUS_TRANSITIONS).toSorted()).toEqual(
+      ALL_STATUSES.toSorted(),
+    );
   });
 });
 

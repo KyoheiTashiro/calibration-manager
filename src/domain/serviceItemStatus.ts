@@ -26,8 +26,7 @@ export const SERVICE_ITEM_STATUS = {
   DUE_SOON: "dueSoon",
   OK: "ok",
 } as const;
-export type ServiceItemStatus =
-  (typeof SERVICE_ITEM_STATUS)[keyof typeof SERVICE_ITEM_STATUS];
+export type ServiceItemStatus = (typeof SERVICE_ITEM_STATUS)[keyof typeof SERVICE_ITEM_STATUS];
 
 /**
  * 項目ステータスを優先度順（overdue > orderNow > inProgress > dueSoon > ok）に判定する。
@@ -61,14 +60,17 @@ export const deriveServiceItemStatus = (
 
   if (isExternal) {
     const orderDate = recommendedOrderDate(serviceItem, vendor);
-    const hasActiveServiceOrder = itemServiceOrders.some((serviceOrder) => isActiveServiceOrderStatus(serviceOrder.status));
+    const hasActiveServiceOrder = itemServiceOrders.some((serviceOrder) =>
+      isActiveServiceOrderStatus(serviceOrder.status),
+    );
     if (orderDate !== null && today >= orderDate && !hasActiveServiceOrder) {
       return SERVICE_ITEM_STATUS.ORDER_NOW;
     }
 
     const hasInProgressServiceOrder = itemServiceOrders.some(
       (serviceOrder) =>
-        serviceOrder.status === SERVICE_ORDER_STATUS.ORDERED || serviceOrder.status === SERVICE_ORDER_STATUS.IN_CALIBRATION,
+        serviceOrder.status === SERVICE_ORDER_STATUS.ORDERED ||
+        serviceOrder.status === SERVICE_ORDER_STATUS.IN_CALIBRATION,
     );
     if (hasInProgressServiceOrder) return SERVICE_ITEM_STATUS.IN_PROGRESS;
   }

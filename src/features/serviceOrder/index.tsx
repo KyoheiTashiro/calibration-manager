@@ -9,7 +9,10 @@ import { RecordModal } from "@/components/domain";
 import { Button, Checkbox, ConfirmModal, EmptyState } from "@/components/ui";
 import { ROUTES } from "@/constants/routes";
 import { ServiceOrderCard } from "@/features/serviceOrder/components/ServiceOrderCard";
-import { ServiceOrderDialog, ReturnDialog } from "@/features/serviceOrder/components/TransitionDialogs";
+import {
+  ServiceOrderDialog,
+  ReturnDialog,
+} from "@/features/serviceOrder/components/TransitionDialogs";
 import { SERVICE_ORDER_STATUS_LABELS } from "@/features/serviceOrder/constants";
 import { DIALOG_TYPE, useServiceOrderKanban } from "@/features/serviceOrder/hooks";
 import { SERVICE_ORDER_STATUS, type ServiceOrderStatus } from "@/store/types";
@@ -83,7 +86,9 @@ export const ServiceOrderList = (): ReactElement => {
                   className={`rounded-t border-t-4 bg-slate-50 px-3 py-2 text-sm font-semibold ${COLUMN_ACCENT_CLASS[status]}`}
                 >
                   {SERVICE_ORDER_STATUS_LABELS[status]}
-                  <span className="ml-1 font-normal text-slate-500">({columnServiceOrders.length})</span>
+                  <span className="ml-1 font-normal text-slate-500">
+                    ({columnServiceOrders.length})
+                  </span>
                 </header>
                 <div className="flex flex-col gap-2 py-2">
                   {columnServiceOrders.length === 0 ? (

@@ -116,7 +116,10 @@ const REFERENCE_CHECKS: {
     if (recordValue(state.serviceItems, entity.serviceItemId) === undefined) {
       messages.push(`serviceItemId: 参照先が存在しません '${entity.serviceItemId}'`);
     }
-    if (entity.serviceOrderId !== undefined && recordValue(state.serviceOrders, entity.serviceOrderId) === undefined) {
+    if (
+      entity.serviceOrderId !== undefined &&
+      recordValue(state.serviceOrders, entity.serviceOrderId) === undefined
+    ) {
       messages.push(`serviceOrderId: 参照先が存在しません '${entity.serviceOrderId}'`);
     }
     return messages;

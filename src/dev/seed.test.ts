@@ -4,10 +4,7 @@
  */
 
 import { buildSeedState, seedIfEmpty } from "@/dev/seed";
-import {
-  deriveServiceItemStatus,
-  type ServiceItemStatus,
-} from "@/domain/serviceItemStatus";
+import { deriveServiceItemStatus, type ServiceItemStatus } from "@/domain/serviceItemStatus";
 import { isActiveServiceOrderStatus } from "@/domain/serviceOrderStatus";
 import { appStateSchema } from "@/store/schema";
 import { CYCLE, EQUIPMENT_STATUS, EXECUTION, SERVICE_ITEM_TYPE } from "@/store/types";
@@ -81,9 +78,7 @@ describe("buildSeedState", () => {
       if (equipment.status !== EQUIPMENT_STATUS.ACTIVE) continue;
       if (!serviceItem.isActive) continue;
       const vendor =
-        serviceItem.vendorId === undefined
-          ? null
-          : (state.vendors[serviceItem.vendorId] ?? null);
+        serviceItem.vendorId === undefined ? null : (state.vendors[serviceItem.vendorId] ?? null);
       statuses.add(deriveServiceItemStatus(serviceItem, serviceOrders, vendor, TODAY));
     }
 

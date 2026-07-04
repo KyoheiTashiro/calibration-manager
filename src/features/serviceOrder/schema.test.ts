@@ -24,7 +24,9 @@ describe("serviceOrderDialogSchema", () => {
 
   it("発注日が空・形式不正なら弾く", () => {
     expect(serviceOrderDialogSchema.safeParse({ ...base, orderedDate: "" }).success).toBe(false);
-    expect(serviceOrderDialogSchema.safeParse({ ...base, orderedDate: "2026-02-30" }).success).toBe(false);
+    expect(serviceOrderDialogSchema.safeParse({ ...base, orderedDate: "2026-02-30" }).success).toBe(
+      false,
+    );
   });
 });
 
