@@ -1,5 +1,12 @@
 import { useDialog } from "@/components/ui/hooks/useDialog";
-import { useEffect, useId, useRef, type ReactElement } from "react";
+import {
+  useEffect,
+  useId,
+  useRef,
+  type MouseEvent,
+  type ReactElement,
+  type SyntheticEvent,
+} from "react";
 
 type ConfirmModalProps = {
   open: boolean;
@@ -25,47 +32,40 @@ export const ConfirmModal = ({
   const cancelButtonRef = useRef<HTMLButtonElement>(null);
 
   // なぜ: 破壊的操作の確認ダイアログは既定フォーカスを安全側（キャンセル）に置く。
+  // showModal()の既定フォーカスも実ブラウザでは最初のフォーカス可能要素（＝キャンセル）に
+  // 当たるが、DOM順への暗黙依存になるため明示的にフォーカスする（フォーカス管理は
+  // effectの正当用途）。
   useEffect(() => {
     if (open) {
       cancelButtonRef.current?.focus();
     }
   }, [open]);
 
-  useEffect(() => {
-    const dialogElement = dialogRef.current;
-    if (!dialogElement) return;
+  // なぜ: dialogの標準Esc挙動（自動close）を止め、onCancelに一本化する。
+  const handleCancel = (event: SyntheticEvent<HTMLDialogElement>): void => {
+    event.preventDefault();
+    onCancel();
+  };
 
-    // なぜ: dialogの標準Esc挙動（自動close）を止め、onCancelに一本化する。
-    const handleCancel = (event: Event): void => {
-      event.preventDefault();
+  // なぜ: dialog自身がイベントターゲットになるのは内側コンテンツ外（余白＝オーバーレイ）が
+  // クリックされたときのみのため、targetチェックだけで十分。
+  const handleClick = (event: MouseEvent<HTMLDialogElement>): void => {
+    if (event.target === event.currentTarget) {
       onCancel();
-    };
-
-    // なぜ: dialog自身がイベントターゲットになるのは内側コンテンツ外（余白＝オーバーレイ）が
-    // クリックされたときのみのため、targetチェックだけで十分。
-    const handleClick = (event: MouseEvent): void => {
-      if (event.target === dialogElement) {
-        onCancel();
-      }
-    };
-
-    dialogElement.addEventListener("cancel", handleCancel);
-    dialogElement.addEventListener("click", handleClick);
-
-    return (): void => {
-      dialogElement.removeEventListener("cancel", handleCancel);
-      dialogElement.removeEventListener("click", handleClick);
-    };
-  }, [dialogRef, onCancel]);
+    }
+  };
 
   const confirmButtonClassName = danger
     ? "h-9 rounded bg-danger px-4 text-sm text-white"
     : "h-9 rounded bg-primary px-4 text-sm text-white";
 
   return (
+    // oxlint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions -- オーバーレイ（余白）クリックで閉じるためのonClick。キーボード経路はonCancel（Esc）が担う
     <dialog
       ref={dialogRef}
       aria-labelledby={titleId}
+      onCancel={handleCancel}
+      onClick={handleClick}
       className="border-line m-auto w-full max-w-sm rounded-lg border p-0 backdrop:bg-slate-900/50"
     >
       <div className="flex flex-col gap-4 px-4 py-4">

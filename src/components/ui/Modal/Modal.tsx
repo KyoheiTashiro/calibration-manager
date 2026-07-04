@@ -1,5 +1,12 @@
 import { useDialog } from "@/components/ui/hooks/useDialog";
-import { useCallback, useEffect, useId, useState, type ReactElement, type ReactNode } from "react";
+import {
+  useId,
+  useState,
+  type MouseEvent,
+  type ReactElement,
+  type ReactNode,
+  type SyntheticEvent,
+} from "react";
 
 type ModalProps = {
   open: boolean;
@@ -32,50 +39,34 @@ export const Modal = ({
 
   // なぜ: isDirty時は即座に閉じずに破棄確認オーバーレイを出す。×ボタン・Esc相当・
   // オーバーレイクリックの3経路すべてがこの関数を経由することで挙動を一本化する。
-  // useCallbackで安定化し、下のuseEffectが依存配列越しに毎レンダー再購読するのを避ける。
-  const attemptClose = useCallback((): void => {
+  const attemptClose = (): void => {
     if (isDirty) {
       setConfirmDiscardOpen(true);
       return;
     }
     onClose();
-  }, [isDirty, onClose]);
+  };
 
-  useEffect(() => {
-    const dialogElement = dialogRef.current;
-    if (!dialogElement) return;
+  // なぜ: dialogの標準Esc挙動（自動close）を止め、破棄確認を挟めるよう自前制御にする。
+  const handleCancel = (event: SyntheticEvent<HTMLDialogElement>): void => {
+    event.preventDefault();
+    attemptClose();
+  };
 
-    // なぜ: dialogの標準Esc挙動（自動close）を止め、破棄確認を挟めるよう自前制御にする。
-    const handleCancel = (event: Event): void => {
-      event.preventDefault();
+  // なぜ: dialog自身がイベントターゲットになるのは内側コンテンツ外（余白＝オーバーレイ）が
+  // クリックされたときのみのため、targetチェックだけで十分（内側でのstopPropagation不要）。
+  const handleClick = (event: MouseEvent<HTMLDialogElement>): void => {
+    if (event.target === event.currentTarget) {
       attemptClose();
-    };
+    }
+  };
 
-    // なぜ: dialog自身がイベントターゲットになるのは内側コンテンツ外（余白＝オーバーレイ）が
-    // クリックされたときのみのため、targetチェックだけで十分（内側でのstopPropagation不要）。
-    const handleClick = (event: MouseEvent): void => {
-      if (event.target === dialogElement) {
-        attemptClose();
-      }
-    };
-
-    // なぜ: 破棄確認を出したまま親が open=false で強制クローズした場合に確認オーバーレイの
-    // stateが残留し、次回オープン時に亡霊表示されるのを防ぐ。dialogのcloseイベント
-    // （どの経路で閉じても発火する外部システムイベント）を購読してリセットする。
-    const handleDialogClose = (): void => {
-      setConfirmDiscardOpen(false);
-    };
-
-    dialogElement.addEventListener("cancel", handleCancel);
-    dialogElement.addEventListener("click", handleClick);
-    dialogElement.addEventListener("close", handleDialogClose);
-
-    return (): void => {
-      dialogElement.removeEventListener("cancel", handleCancel);
-      dialogElement.removeEventListener("click", handleClick);
-      dialogElement.removeEventListener("close", handleDialogClose);
-    };
-  }, [dialogRef, attemptClose]);
+  // なぜ: 破棄確認を出したまま親が open=false で強制クローズした場合に確認オーバーレイの
+  // stateが残留し、次回オープン時に亡霊表示されるのを防ぐ。dialogのcloseイベント
+  // （どの経路で閉じても発火する）でリセットする。
+  const handleDialogClose = (): void => {
+    setConfirmDiscardOpen(false);
+  };
 
   const handleCancelDiscard = (): void => {
     setConfirmDiscardOpen(false);
@@ -87,9 +78,13 @@ export const Modal = ({
   };
 
   return (
+    // oxlint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions -- オーバーレイ（余白）クリックで閉じるためのonClick。キーボード経路はonCancel（Esc）が担う
     <dialog
       ref={dialogRef}
       aria-labelledby={titleId}
+      onCancel={handleCancel}
+      onClick={handleClick}
+      onClose={handleDialogClose}
       className={`m-auto w-full ${SIZE_CLASS_NAME[size]} border-line rounded-lg border p-0 backdrop:bg-slate-900/50`}
     >
       <div className="relative flex max-h-[85vh] flex-col">

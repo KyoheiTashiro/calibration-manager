@@ -1,5 +1,5 @@
 /**
- * 校正案件（CalibrationOrder）の新規作成モーダル（screen-design/08-orders.md「案件作成モーダル」）。
+ * 点検校正外部案件（CalibrationOrder）の新規作成モーダル（screen-design/08-orders.md「案件作成モーダル」）。
  * RHF + zodResolver。起動元は項目一覧の「案件」アクション（外部・有効案件なしの項目）だが、
  * 起動元との接続は Phase 8 で行う（decisions.md D-020）。新規作成専用（status は常に addOrder が
  * planned 固定で付与するため渡さない)。1項目1有効案件制約（D-006）はストア層 addOrder が最終防衛線。
@@ -89,7 +89,7 @@ export const OrderModal = ({ open, inspectionItemId, onClose }: Props): ReactEle
   return (
     <Modal
       open={open}
-      title="校正案件を追加"
+      title="点検校正外部案件を追加"
       onClose={handleClose}
       isDirty={isDirty}
       footer={

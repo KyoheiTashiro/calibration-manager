@@ -113,7 +113,7 @@ export const ENTITY_CSV_SPECS: { [Kind in CsvEntityKind]: EntityCsvSpec<Kind> } 
     uniqueKeys: [],
   },
   orders: {
-    label: "校正案件",
+    label: "点検校正外部案件",
     columns: [
       { key: "id", kind: CSV_COLUMN_KIND.STRING },
       { key: "inspectionItemId", kind: CSV_COLUMN_KIND.STRING },

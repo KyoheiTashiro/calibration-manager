@@ -53,7 +53,7 @@
 - [screen-design/05-inspection-item-list.md](screen-design/05-inspection-item-list.md) — 点検校正項目一覧(中核画面)
 - [screen-design/06-inspection-item-modal.md](screen-design/06-inspection-item-modal.md) — 項目編集モーダル
 - [screen-design/07-record-modal.md](screen-design/07-record-modal.md) — 実施記録登録モーダル
-- [screen-design/08-orders.md](screen-design/08-orders.md) — 校正案件一覧(かんばん)
+- [screen-design/08-orders.md](screen-design/08-orders.md) — 点検校正外部案件一覧(かんばん)
 - [screen-design/09-masters.md](screen-design/09-masters.md) — マスタ管理(メーカー/取引先・担当者)
 - [screen-design/10-notifications.md](screen-design/10-notifications.md) — 通知センター
 - [screen-design/11-settings.md](screen-design/11-settings.md) — 設定・バックアップ
@@ -68,7 +68,7 @@
 - 機器管理(CRUD・稼働/休止/廃棄) → [02](screen-design/02-equipment-list.md)、[03](screen-design/03-equipment-form.md)、[04](screen-design/04-equipment-detail.md)
 - 点検校正項目管理・期限一覧・フィルタ → [05](screen-design/05-inspection-item-list.md)、[06](screen-design/06-inspection-item-modal.md)
 - 実施記録登録・次回期限自動更新 → [07](screen-design/07-record-modal.md)
-- 校正案件の進捗管理(発注〜返却) → [08](screen-design/08-orders.md)
+- 点検校正外部案件の進捗管理(発注〜返却) → [08](screen-design/08-orders.md)
 - マスタ管理(メーカー/取引先・担当者) → [09](screen-design/09-masters.md)
 - アプリ内通知(期限接近・発注推奨・納期遅延) → [10](screen-design/10-notifications.md)
 - CSVエクスポート/インポート・データ全削除 → [11](screen-design/11-settings.md)
@@ -96,7 +96,7 @@
 | 3   | `/#/equipment/create`・`/#/equipment/:id/edit` | [機器登録・編集](screen-design/03-equipment-form.md)                                                                                                                                                   |
 | 4   | `/#/equipment/:id`                          | [機器詳細](screen-design/04-equipment-detail.md)                                                                                                                                                       |
 | 5   | `/#/inspection-items`                                  | [点検校正項目一覧(中核)](screen-design/05-inspection-item-list.md)                                                                                                                                                |
-| 6   | `/#/orders`                                 | [校正案件一覧](screen-design/08-orders.md)                                                                                                                                                         |
+| 6   | `/#/orders`                                 | [点検校正外部案件一覧](screen-design/08-orders.md)                                                                                                                                                         |
 | 7   | `/#/vendors`・`/#/persons`                  | [マスタ管理](screen-design/09-masters.md)                                                                                                                                                              |
 | 8   | `/#/notifications`                          | [通知センター](screen-design/10-notifications.md)                                                                                                                                                      |
 | 9   | `/#/settings`                               | [設定・バックアップ](screen-design/11-settings.md)                                                                                                                                                     |

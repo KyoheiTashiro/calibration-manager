@@ -20,7 +20,7 @@ const NAV_ITEMS: NavItem[] = [
   { path: ROUTES.DASHBOARD, label: "ダッシュボード", end: true },
   { path: ROUTES.EQUIPMENT_LIST, label: "機器一覧" },
   { path: ROUTES.INSPECTION_ITEM_LIST, label: "点検校正項目一覧" },
-  { path: ROUTES.ORDER_LIST, label: "校正案件" },
+  { path: ROUTES.ORDER_LIST, label: "点検校正外部案件" },
   { path: ROUTES.VENDOR_LIST, label: "メーカー/取引先" },
   { path: ROUTES.PERSON_LIST, label: "担当者" },
   { path: ROUTES.NOTIFICATION_LIST, label: "通知" },

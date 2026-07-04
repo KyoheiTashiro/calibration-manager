@@ -3,8 +3,8 @@
  * 中止フロー・トグルON表示・カード表示解決・dangling参照・空状態2種・発注ダイアログの整合警告・列内ソート。
  */
 
-import { OrderList } from "@/features/orders";
-import { KANBAN_ACTIVE_COLUMNS, ORDER_STATUS_LABELS } from "@/features/orders/constants";
+import { OrderList } from "@/features/inspectionOrder";
+import { KANBAN_ACTIVE_COLUMNS, ORDER_STATUS_LABELS } from "@/features/inspectionOrder/constants";
 import type { CalibrationOrder, Equipment, InspectionItem, Vendor } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
 import { renderWithStore, seedStore, setupStoreIsolation } from "@/test/renderWithStore";
@@ -126,7 +126,7 @@ describe("完了/中止も表示 トグル", () => {
     // 列見出し「中止」の有無だけを厳密に判定するには <header> 要素に候補を絞る必要がある。
     expect(screen.queryByText("中止", { selector: "header" })).not.toBeInTheDocument();
     expect(
-      screen.queryByText("校正案件はありません。点検校正項目一覧から案件を追加できます"),
+      screen.queryByText("点検校正外部案件はありません。点検校正項目一覧から案件を追加できます"),
     ).not.toBeInTheDocument();
     for (const status of KANBAN_ACTIVE_COLUMNS) {
       expect(screen.getByText(ORDER_STATUS_LABELS[status])).toBeInTheDocument();
@@ -173,7 +173,7 @@ describe("空状態", () => {
     renderWithStore(<OrderList />);
 
     expect(
-      screen.getByText("校正案件はありません。点検校正項目一覧から案件を追加できます"),
+      screen.getByText("点検校正外部案件はありません。点検校正項目一覧から案件を追加できます"),
     ).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "点検校正項目一覧へ" })).toBeInTheDocument();
   });
@@ -206,7 +206,7 @@ describe("空状態", () => {
 
     // 案件は存在する（completed 1件）ため、全列0件の空状態メッセージは出ない
     expect(
-      screen.queryByText("校正案件はありません。点検校正項目一覧から案件を追加できます"),
+      screen.queryByText("点検校正外部案件はありません。点検校正項目一覧から案件を追加できます"),
     ).not.toBeInTheDocument();
     // 進行中4列（発注準備/発注済/校正中/返却済）のヘッダーは表示される
     for (const status of KANBAN_ACTIVE_COLUMNS) {

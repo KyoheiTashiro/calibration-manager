@@ -1,5 +1,5 @@
 /**
- * 校正案件スライス（store.md「スライス構成」）。
+ * 点検校正外部案件スライス（store.md「スライス構成」）。
  * 状態遷移は domain/orderStatus.ts の許可テーブルで検証する（domain-model.md §3.6）。
  */
 

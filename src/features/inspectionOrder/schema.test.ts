@@ -4,7 +4,7 @@
  * 費用の整数粒度(D-021)等、境界値をスキーマ単体で固定する。
  */
 
-import { orderDialogSchema, returnDialogSchema } from "@/features/orders/schema";
+import { orderDialogSchema, returnDialogSchema } from "@/features/inspectionOrder/schema";
 import { describe, expect, it } from "vitest";
 
 describe("orderDialogSchema", () => {

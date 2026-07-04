@@ -5,7 +5,7 @@
  * 各モーダル・ダイアログ単体の入力検証は RecordModal.test.tsx / orders の各テストの責務。
  */
 
-import { OrderList } from "@/features/orders";
+import { OrderList } from "@/features/inspectionOrder";
 import type {
   CalibrationOrder,
   Equipment,
