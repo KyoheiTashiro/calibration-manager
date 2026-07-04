@@ -178,16 +178,16 @@ export const ENTITY_CSV_SPECS: { [Kind in CsvEntityKind]: EntityCsvSpec<Kind> } 
  * 引数を unknown にしているのは、呼び出し側の `entity[column.key]` がジェネリックな
  * `Kind` 越しのインデックスアクセスで具体型(string/number/boolean/undefined)へ
  * TS上解決しきれないため(型引数を固定しない限り原理的に不可能)。実体は
- * ENTITY_CSV_SPECS の columns 定義により必ずこの4種のいずれかであり、
- * typeof による実行時ガードで安全に検証する。
+ * ENTITY_CSV_SPECS の columns 定義により必ずこの4種のいずれかである。
  */
 const cellOfValue = (value: unknown): string => {
   if (value === undefined) return "";
   if (typeof value === "boolean") return value ? "true" : "false";
   if (typeof value === "number") return String(value);
   if (typeof value === "string") return value;
-  // 型上到達しない(CsvColumn の kind 定義により value は上記4種のみ)
-  throw new Error("想定外のセル値の型です");
+  // 型上到達しない(CsvColumn の kind 定義により value は上記4種のみ)。
+  // §8 の例外禁止方針に従い、万一の想定外値は空セルとして扱う。
+  return "";
 };
 
 /**

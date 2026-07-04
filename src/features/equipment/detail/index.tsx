@@ -3,6 +3,7 @@
  * 1機器の基本情報・点検校正項目一覧・実施記録(項目横断)を集約表示し、
  * 項目追加/編集モーダルの起動起点となる。表示専用画面であり、入力検証は各モーダル側の責務。
  * 並び替え・派生ステータスの計算ロジックは hooks.ts に集約する（coding-standards.md §2）。
+ * モーダル起動は単一 state で kind を持ち、1度に開くのは1つ。閉じたら state をリセットする。
  */
 
 import { InspectionItemModal, RecordModal, StatusBadge } from "@/components/domain";
@@ -17,6 +18,7 @@ import {
   historyRowsOf,
   personLabelOf,
   sortedInspectionItemsOf,
+  todayIsoDate,
   useSafeNavigate,
 } from "@/features/equipment/detail/hooks";
 import {
@@ -30,16 +32,16 @@ import { useAppStore } from "@/store/useAppStore";
 import { useState, type ReactElement } from "react";
 import { Navigate, useParams } from "react-router-dom";
 
-type ModalState = {
-  open: boolean;
-  inspectionItem?: InspectionItem;
-};
-
-/** 実施記録登録モーダルの起動状態（InspectionItemModal とは独立管理）。対象項目IDのみ保持する */
-type RecordModalState = {
-  open: boolean;
-  inspectionItemId?: string;
-};
+/** 起動中モーダルの種別(画面ローカルUI状態)。1度に1つのみ開く */
+const MODAL_KIND = {
+  ADD: "add",
+  EDIT: "edit",
+  RECORD: "record",
+} as const;
+type ModalState =
+  | { kind: typeof MODAL_KIND.ADD }
+  | { kind: typeof MODAL_KIND.EDIT; inspectionItem: InspectionItem }
+  | { kind: typeof MODAL_KIND.RECORD; inspectionItemId: string };
 
 export const EquipmentDetail = (): ReactElement => {
   const { id } = useParams<{ id: string }>();
@@ -52,8 +54,7 @@ export const EquipmentDetail = (): ReactElement => {
   const orders = useAppStore((state) => state.orders);
   const records = useAppStore((state) => state.records);
 
-  const [modalState, setModalState] = useState<ModalState>({ open: false });
-  const [recordModalState, setRecordModalState] = useState<RecordModalState>({ open: false });
+  const [modal, setModal] = useState<ModalState | null>(null);
 
   const currentEquipment = id === undefined ? undefined : equipmentMap[id];
 
@@ -62,17 +63,20 @@ export const EquipmentDetail = (): ReactElement => {
   }
 
   const handleAddInspectionItemClick = (): void => {
-    setModalState({ open: true, inspectionItem: undefined });
+    setModal({ kind: MODAL_KIND.ADD });
   };
   const handleEditInspectionItemClick = (inspectionItem: InspectionItem): void => {
-    setModalState({ open: true, inspectionItem });
+    setModal({ kind: MODAL_KIND.EDIT, inspectionItem });
   };
   const handleModalClose = (): void => {
-    setModalState({ open: false, inspectionItem: undefined });
+    setModal(null);
   };
 
   const inspectionItemList = sortedInspectionItemsOf(inspectionItems, currentEquipment.id);
   const historyRows = historyRowsOf(inspectionItems, records, currentEquipment.id);
+  // today は行ごとに再取得せず1度だけ計算し、displayedInspectionItemStatus へ注入する
+  // (inspectionItemRowsOf と同方針、テスト容易性のため)
+  const today = todayIsoDate();
 
   return (
     <div className="flex flex-col gap-6">
@@ -175,6 +179,7 @@ export const EquipmentDetail = (): ReactElement => {
                   currentEquipment.status,
                   orders,
                   vendors,
+                  today,
                 );
                 return (
                   <tr
@@ -201,7 +206,10 @@ export const EquipmentDetail = (): ReactElement => {
                         variant="secondary"
                         size="sm"
                         onClick={() => {
-                          setRecordModalState({ open: true, inspectionItemId: inspectionItem.id });
+                          setModal({
+                            kind: MODAL_KIND.RECORD,
+                            inspectionItemId: inspectionItem.id,
+                          });
                         }}
                       >
                         記録
@@ -265,23 +273,25 @@ export const EquipmentDetail = (): ReactElement => {
         )}
       </div>
 
-      <InspectionItemModal
-        open={modalState.open}
-        equipmentId={currentEquipment.id}
-        inspectionItem={modalState.inspectionItem}
-        onClose={handleModalClose}
-      />
-
-      {recordModalState.inspectionItemId === undefined ? null : (
-        <RecordModal
-          key={recordModalState.inspectionItemId}
-          open={recordModalState.open}
-          inspectionItemId={recordModalState.inspectionItemId}
-          onClose={() => {
-            setRecordModalState({ open: false, inspectionItemId: undefined });
-          }}
+      {modal?.kind === MODAL_KIND.ADD ? (
+        <InspectionItemModal open equipmentId={currentEquipment.id} onClose={handleModalClose} />
+      ) : null}
+      {modal?.kind === MODAL_KIND.EDIT ? (
+        <InspectionItemModal
+          open
+          equipmentId={currentEquipment.id}
+          inspectionItem={modal.inspectionItem}
+          onClose={handleModalClose}
         />
-      )}
+      ) : null}
+      {modal?.kind === MODAL_KIND.RECORD ? (
+        <RecordModal
+          key={modal.inspectionItemId}
+          open
+          inspectionItemId={modal.inspectionItemId}
+          onClose={handleModalClose}
+        />
+      ) : null}
     </div>
   );
 };

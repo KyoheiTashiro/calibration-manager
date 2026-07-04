@@ -41,6 +41,14 @@ const getInspectionItemRow = (name: RegExp): HTMLElement => {
   return within(inspectionItemTable).getByRole("row", { name });
 };
 
+/** 実施記録テーブル(2つ目のtable)のデータ行を返す */
+const getHistoryRows = (): HTMLElement[] => {
+  const historyTable = screen.getAllByRole("table").at(1);
+  if (!historyTable) throw new Error("実施記録テーブルが見つかりません");
+  const [, ...dataRows] = within(historyTable).getAllByRole("row");
+  return dataRows;
+};
+
 beforeEach(() => {
   setupStoreIsolation();
   seedEquipmentFullMasters();
@@ -69,6 +77,7 @@ describe("EquipmentDetail: RecordModal起動", () => {
     renderDetail();
 
     const recordsBefore = Object.keys(useAppStore.getState().records).length;
+    const historyRowsBefore = getHistoryRows().length;
 
     await user.click(
       within(getInspectionItemRow(/年次校正/u)).getByRole("button", { name: "記録" }),
@@ -77,6 +86,7 @@ describe("EquipmentDetail: RecordModal起動", () => {
     await user.click(within(dialogElement).getByLabelText("合格"));
     await user.click(within(dialogElement).getByRole("button", { name: "保存" }));
 
+    expect(getHistoryRows()).toHaveLength(historyRowsBefore + 1);
     expect(Object.keys(useAppStore.getState().records)).toHaveLength(recordsBefore + 1);
   });
 });

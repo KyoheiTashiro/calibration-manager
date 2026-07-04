@@ -4,7 +4,7 @@
  * 編集モードの存在しないid（リダイレクト）を扱う。
  */
 
-import { ROUTES, equipmentDetailPath, equipmentEditPath } from "@/constants/routes";
+import { ROUTES, equipmentEditPath } from "@/constants/routes";
 import { EquipmentEditForm } from "@/features/equipment/form/edit";
 import { EQUIPMENT_STATUS, type Equipment, type Vendor } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
@@ -16,19 +16,9 @@ import userEvent from "@testing-library/user-event";
 // jest-domのmatcher拡張が伝播しない。テストファイル側でも明示的にimportし型を解決する
 // （coding-standards.md §6・.oxlintrc.jsonのallowリストで明示的に許容されているパターン）。
 import "@testing-library/jest-dom/vitest";
-import { MemoryRouter, Route, Routes } from "react-router-dom";
-import type * as ReactRouterDomModule from "react-router-dom";
-import { beforeEach, describe, expect, it, vi } from "vitest";
-
-// なぜ: このテストファイルに閉じてnavigate呼び出しをスパイに差し替える。
-// MemoryRouter/Route/Routes/useParams/Navigate/Link 等の実実装は importOriginal 経由で維持する
-// （renderWithStore・本テストファイルの両方が実物のこれらを必要とするため）。
-const navigateSpy = vi.hoisted(() => vi.fn());
-// oxlint-disable-next-line oxc/no-async-await -- importOriginal(Promise)の解決が必要で、.then() 連鎖は typescript/promise-function-async と衝突するため
-vi.mock("react-router-dom", async (importOriginal) => {
-  const actual = await importOriginal<typeof ReactRouterDomModule>();
-  return { ...actual, useNavigate: (): typeof navigateSpy => navigateSpy };
-});
+import type { ReactElement } from "react";
+import { MemoryRouter, Route, Routes, useParams } from "react-router-dom";
+import { beforeEach, describe, expect, it } from "vitest";
 
 const mitutoyo: Vendor = {
   id: "vendor-1",
@@ -54,16 +44,24 @@ const otherEquipment: Equipment = {
   status: EQUIPMENT_STATUS.ACTIVE,
 };
 
-const renderEditForm = (id: string): ReturnType<typeof renderWithStore> =>
-  renderWithStore(<EquipmentEditForm />, {
-    initialEntries: [equipmentEditPath(id)],
-    routePath: ROUTES.EQUIPMENT_EDIT,
-  });
+/** 遷移先確認用ダミー: 機器詳細(:id を表示) */
+// oxlint-disable-next-line react/no-multi-comp -- テスト内の遷移先ダミーは複数の別画面を模すため同一ファイルに並べる
+const DummyEquipmentDetail = (): ReactElement => {
+  const { id } = useParams();
+  return <p>機器詳細:{id}</p>;
+};
 
-beforeEach(() => {
-  setupStoreIsolation();
-  navigateSpy.mockClear();
-});
+const renderEditForm = (id: string): void => {
+  renderWithStore(
+    <Routes>
+      <Route path={ROUTES.EQUIPMENT_EDIT} element={<EquipmentEditForm />} />
+      <Route path={ROUTES.EQUIPMENT_DETAIL} element={<DummyEquipmentDetail />} />
+    </Routes>,
+    { initialEntries: [equipmentEditPath(id)] },
+  );
+};
+
+beforeEach(setupStoreIsolation);
 
 describe("EquipmentEditForm: 編集プリフィル・更新", () => {
   it("既存値がプリフィルされる", () => {
@@ -94,7 +92,7 @@ describe("EquipmentEditForm: 編集プリフィル・更新", () => {
     await user.click(screen.getByRole("button", { name: "保存" }));
 
     expect(useAppStore.getState().equipment[existingEquipment.id]?.location).toBe("校正室");
-    expect(navigateSpy).toHaveBeenCalledWith(equipmentDetailPath(existingEquipment.id));
+    expect(screen.getByText(`機器詳細:${existingEquipment.id}`)).toBeInTheDocument();
   });
 });
 
@@ -118,7 +116,7 @@ describe("EquipmentEditForm: 管理番号ユニーク検証", () => {
     expect(useAppStore.getState().equipment[existingEquipment.id]?.managementNo).toBe(
       existingEquipment.managementNo,
     );
-    expect(navigateSpy).toHaveBeenCalledWith(equipmentDetailPath(existingEquipment.id));
+    expect(screen.getByText(`機器詳細:${existingEquipment.id}`)).toBeInTheDocument();
   });
 });
 
@@ -146,7 +144,7 @@ describe("EquipmentEditForm: 廃棄ボタン", () => {
     expect(useAppStore.getState().equipment[existingEquipment.id]?.status).toBe(
       EQUIPMENT_STATUS.RETIRED,
     );
-    expect(navigateSpy).toHaveBeenCalledWith(equipmentDetailPath(existingEquipment.id));
+    expect(screen.getByText(`機器詳細:${existingEquipment.id}`)).toBeInTheDocument();
   });
 });
 

@@ -15,9 +15,9 @@ import {
   type EquipmentStatus,
   type InspectionItem,
   type InspectionRecord,
+  type IsoDateString,
   type Vendor,
 } from "@/store/types";
-import { todayIsoDate } from "@/utils/time";
 
 // 担当者表示名は selectors へ昇格済み(D-024)。この画面の表示ロジック一式を
 // hooks 経由で供給するため再 export する(index.tsx の依存数も抑える)
@@ -26,6 +26,9 @@ export { personLabelOf } from "@/store/selectors";
 // useSafeNavigate も同様に hooks 経由で再 export し、index.tsx が @/utils への
 // 直接依存を持たないようにする(import/max-dependencies 対策)
 export { useSafeNavigate } from "@/utils/navigation";
+
+// todayIsoDate も同様の理由で hooks 経由で再 export する(import/max-dependencies 対策)
+export { todayIsoDate } from "@/utils/time";
 
 /** 実施記録の1行(項目横断マージ用に項目名を同梱) */
 export type HistoryRow = { record: InspectionRecord; inspectionItemName: string };
@@ -69,12 +72,14 @@ export const historyRowsOf = (
 /**
  * 項目一覧行に表示するステータス。D-014により機器が稼働(active)でなければ
  * null を返す。呼び出し側は null のとき「—」を表示する。
+ * today は呼び出し側から注入する(inspectionItemRowsOf と同方針、テスト容易性のため)。
  */
 export const displayedInspectionItemStatus = (
   inspectionItem: InspectionItem,
   equipmentStatus: EquipmentStatus,
   orders: Record<string, CalibrationOrder>,
   vendors: Record<string, Vendor>,
+  today: IsoDateString,
 ): InspectionItemStatus | null => {
   if (equipmentStatus !== EQUIPMENT_STATUS.ACTIVE) return null;
   const vendor =
@@ -85,6 +90,6 @@ export const displayedInspectionItemStatus = (
     inspectionItem,
     ordersOf({ orders }, inspectionItem.id),
     vendor,
-    todayIsoDate(),
+    today,
   );
 };

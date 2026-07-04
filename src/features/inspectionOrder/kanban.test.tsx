@@ -5,7 +5,17 @@
 
 import { OrderList } from "@/features/inspectionOrder";
 import { KANBAN_ACTIVE_COLUMNS, ORDER_STATUS_LABELS } from "@/features/inspectionOrder/constants";
-import type { CalibrationOrder, Equipment, InspectionItem, Vendor } from "@/store/types";
+import {
+  CYCLE,
+  EQUIPMENT_STATUS,
+  EXECUTION,
+  INSPECTION_ITEM_TYPE,
+  ORDER_STATUS,
+  type CalibrationOrder,
+  type Equipment,
+  type InspectionItem,
+  type Vendor,
+} from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
 import { renderWithStore, seedStore, setupStoreIsolation } from "@/test/renderWithStore";
 import { screen, within } from "@testing-library/react";
@@ -23,15 +33,15 @@ const equipment: Equipment = {
   id: "equipment-1",
   managementNo: "EQ-001",
   name: "ノギス",
-  status: "active",
+  status: EQUIPMENT_STATUS.ACTIVE,
 };
 const inspectionItem: InspectionItem = {
   id: "item-1",
   equipmentId: "equipment-1",
-  type: "calibration",
+  type: INSPECTION_ITEM_TYPE.CALIBRATION,
   name: "年次校正",
-  cycle: "1Y",
-  execution: "external",
+  cycle: CYCLE.Y1,
+  execution: EXECUTION.EXTERNAL,
   vendorId: "vendor-1",
   bufferDays: 14,
   personId: "person-1",
@@ -44,7 +54,7 @@ const makeEquipment = (id: string, managementNo: string): Equipment => ({
   id,
   managementNo,
   name: "機器",
-  status: "active",
+  status: EQUIPMENT_STATUS.ACTIVE,
 });
 const makeInspectionItem = (id: string, equipmentId: string): InspectionItem => ({
   ...inspectionItem,
@@ -70,7 +80,7 @@ describe("カード表示", () => {
         id: "order-1",
         inspectionItemId: "item-1",
         vendorId: "vendor-1",
-        status: "ordered",
+        status: ORDER_STATUS.ORDERED,
         orderedDate: "2026-06-01",
         cost: 12_000,
       },
@@ -93,7 +103,7 @@ describe("カード表示", () => {
           id: "order-1",
           inspectionItemId: "missing-item",
           vendorId: "missing-vendor",
-          status: "planned",
+          status: ORDER_STATUS.PLANNED,
         },
       },
     });
@@ -113,7 +123,7 @@ describe("完了/中止も表示 トグル", () => {
         id: "order-c",
         inspectionItemId: "item-1",
         vendorId: "vendor-1",
-        status: "completed",
+        status: ORDER_STATUS.COMPLETED,
       },
     });
     renderWithStore(<OrderList />);
@@ -151,7 +161,7 @@ describe("中止フロー", () => {
         id: "order-1",
         inspectionItemId: "item-1",
         vendorId: "vendor-1",
-        status: "planned",
+        status: ORDER_STATUS.PLANNED,
       },
     });
     renderWithStore(<OrderList />);
@@ -161,7 +171,7 @@ describe("中止フロー", () => {
     const dialog = screen.getByRole("dialog");
     await user.click(within(dialog).getByRole("button", { name: "中止" }));
 
-    expect(useAppStore.getState().orders["order-1"].status).toBe("cancelled");
+    expect(useAppStore.getState().orders["order-1"].status).toBe(ORDER_STATUS.CANCELLED);
     // cancelled はトグルOFFで非表示
     expect(screen.queryByText("EQ-001")).not.toBeInTheDocument();
   });
@@ -184,7 +194,7 @@ describe("空状態", () => {
         id: "order-1",
         inspectionItemId: "item-1",
         vendorId: "vendor-1",
-        status: "planned",
+        status: ORDER_STATUS.PLANNED,
       },
     });
     renderWithStore(<OrderList />);
@@ -199,7 +209,7 @@ describe("空状態", () => {
         id: "order-c",
         inspectionItemId: "item-1",
         vendorId: "vendor-1",
-        status: "completed",
+        status: ORDER_STATUS.COMPLETED,
       },
     });
     renderWithStore(<OrderList />);
@@ -226,7 +236,7 @@ describe("発注ダイアログの整合警告（D-019）", () => {
         id: "order-1",
         inspectionItemId: "item-1",
         vendorId: "vendor-1",
-        status: "planned",
+        status: ORDER_STATUS.PLANNED,
       },
     });
     renderWithStore(<OrderList />);
@@ -240,7 +250,7 @@ describe("発注ダイアログの整合警告（D-019）", () => {
 
     // 警告があっても確定できる（ブロックしない）
     await user.click(screen.getByRole("button", { name: "確定" }));
-    expect(useAppStore.getState().orders["order-1"].status).toBe("ordered");
+    expect(useAppStore.getState().orders["order-1"].status).toBe(ORDER_STATUS.ORDERED);
     expect(useAppStore.getState().orders["order-1"].dueDate).toBe("2020-01-01");
   });
 });
@@ -264,21 +274,21 @@ describe("列内ソート", () => {
           id: "order-a",
           inspectionItemId: "item-a",
           vendorId: "vendor-1",
-          status: "planned",
+          status: ORDER_STATUS.PLANNED,
           dueDate: "2026-08-01",
         },
         "order-b": {
           id: "order-b",
           inspectionItemId: "item-b",
           vendorId: "vendor-1",
-          status: "planned",
+          status: ORDER_STATUS.PLANNED,
           dueDate: "2026-06-01",
         },
         "order-c": {
           id: "order-c",
           inspectionItemId: "item-c",
           vendorId: "vendor-1",
-          status: "planned",
+          status: ORDER_STATUS.PLANNED,
         },
       },
     });

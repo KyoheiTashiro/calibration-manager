@@ -58,7 +58,7 @@ export const useEquipmentFormCore = ({
 
   // なぜ Object.values(vendors) を useMemo 内で算出するか: vendors オブジェクト自体を
   // 依存配列に入れれば、ストアが実際に変わらない限り Object.values の再生成は起きず
-  // resolver も不要に再生成されない（manufacturerOptions と同じパターン）。
+  // resolver も不要に再生成されない。
   const resolver = useMemo(
     () => zodResolver(createEquipmentFormSchema(existingManagementNumbers, Object.values(vendors))),
     [existingManagementNumbers, vendors],

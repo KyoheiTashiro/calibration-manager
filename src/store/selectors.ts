@@ -60,6 +60,23 @@ export const personLabelOf = (state: Pick<AppState, "persons">, personId: string
   return person.isActive ? person.name : `${person.name}(無効)`;
 };
 
+/**
+ * Vendor が Equipment.manufacturerId / InspectionItem.vendorId / CalibrationOrder.vendorId の
+ * いずれかから参照されているかを判定する。store の removeVendor の参照ガードと、
+ * features/vendors 側の削除クリック時の事前チェックが同一判定を共用するための横断 selector。
+ */
+export const isVendorReferenced = (
+  state: Pick<AppState, "equipment" | "inspectionItems" | "orders">,
+  vendorId: string,
+): boolean =>
+  Object.values(state.equipment).some(
+    (equipmentEntry) => equipmentEntry.manufacturerId === vendorId,
+  ) ||
+  Object.values(state.inspectionItems).some(
+    (inspectionItemEntry) => inspectionItemEntry.vendorId === vendorId,
+  ) ||
+  Object.values(state.orders).some((orderEntry) => orderEntry.vendorId === vendorId);
+
 /** ヘッダーの通知ベルに出す未読件数（screen-design/README.md） */
 export const unreadNotificationCount = (state: Pick<AppState, "notifications">): number =>
   Object.values(state.notifications).filter((notification) => !notification.isRead).length;

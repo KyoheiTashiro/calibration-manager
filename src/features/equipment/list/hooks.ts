@@ -38,29 +38,22 @@ export const STATUS_FILTER_OPTIONS: { value: StatusFilter; label: string }[] = [
 export const isStatusFilter = (value: string): value is StatusFilter =>
   STATUS_FILTER_OPTIONS.some((option) => option.value === value);
 
-/** 状態フィルタの選択値が機器の状態に一致するか（screen-design/02-equipment-list.md「操作・アクション」） */
-const matchesStatusFilter = (status: EquipmentStatus, filter: StatusFilter): boolean => {
-  switch (filter) {
-    case STATUS_FILTER.ALL: {
-      return true;
-    }
-    case STATUS_FILTER.ACTIVE: {
-      return status === EQUIPMENT_STATUS.ACTIVE;
-    }
-    case STATUS_FILTER.SUSPENDED: {
-      return status === EQUIPMENT_STATUS.SUSPENDED;
-    }
-    case STATUS_FILTER.RETIRED: {
-      return status === EQUIPMENT_STATUS.RETIRED;
-    }
-    case STATUS_FILTER.ACTIVE_AND_SUSPENDED: {
-      return status !== EQUIPMENT_STATUS.RETIRED;
-    }
-    default: {
-      return true;
-    }
-  }
+/**
+ * 状態フィルタと機器の状態マッチングルール。
+ * switch だと lint(default-case)が到達不能な default を要求してしまうため、
+ * Record<StatusFilter, ...> のルックアップ定数で全フィルタ値の網羅を型レベルで保証する。
+ */
+const MATCHES_STATUS_FILTER_RULES: Record<StatusFilter, (status: EquipmentStatus) => boolean> = {
+  [STATUS_FILTER.ALL]: () => true,
+  [STATUS_FILTER.ACTIVE]: (status) => status === EQUIPMENT_STATUS.ACTIVE,
+  [STATUS_FILTER.SUSPENDED]: (status) => status === EQUIPMENT_STATUS.SUSPENDED,
+  [STATUS_FILTER.RETIRED]: (status) => status === EQUIPMENT_STATUS.RETIRED,
+  [STATUS_FILTER.ACTIVE_AND_SUSPENDED]: (status) => status !== EQUIPMENT_STATUS.RETIRED,
 };
+
+/** 状態フィルタの選択値が機器の状態に一致するか（screen-design/02-equipment-list.md「操作・アクション」） */
+const matchesStatusFilter = (status: EquipmentStatus, filter: StatusFilter): boolean =>
+  MATCHES_STATUS_FILTER_RULES[filter](status);
 
 /** 検索語がmanagementNo/name/modelのいずれかに部分一致するか(大文字小文字無視) */
 const matchesSearch = (equipment: Equipment, normalizedSearch: string): boolean => {

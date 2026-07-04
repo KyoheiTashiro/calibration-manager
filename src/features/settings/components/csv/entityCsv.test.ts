@@ -3,7 +3,7 @@ import {
   CSV_ENTITY_KINDS,
   ENTITY_CSV_SPECS,
 } from "@/features/settings/components/csv/entityCsv";
-import type { Equipment, Vendor } from "@/store/types";
+import { EQUIPMENT_STATUS, type Equipment, type Vendor } from "@/store/types";
 import { describe, expect, it } from "vitest";
 
 const vendorA: Vendor = {
@@ -58,7 +58,12 @@ describe("buildEntityCsv", () => {
 
   it("エクスポート列に型上の全フィールドを含む(equipment)", () => {
     const keys = ENTITY_CSV_SPECS.equipment.columns.map((column) => column.key);
-    const equipment: Equipment = { id: "e", managementNo: "m", name: "n", status: "active" };
+    const equipment: Equipment = {
+      id: "e",
+      managementNo: "m",
+      name: "n",
+      status: EQUIPMENT_STATUS.ACTIVE,
+    };
     expect(keys).toEqual(expect.arrayContaining(Object.keys(equipment)));
   });
 });

@@ -5,13 +5,18 @@
 
 import { validateEntityCsv } from "@/features/settings/components/csv/importValidation";
 import { emptyAppState } from "@/store/persistence";
-import type {
-  AppState,
-  CalibrationOrder,
-  Equipment,
-  InspectionItem,
-  Person,
-  Vendor,
+import {
+  CYCLE,
+  EQUIPMENT_STATUS,
+  EXECUTION,
+  INSPECTION_ITEM_TYPE,
+  ORDER_STATUS,
+  type AppState,
+  type CalibrationOrder,
+  type Equipment,
+  type InspectionItem,
+  type Person,
+  type Vendor,
 } from "@/store/types";
 import { describe, expect, it } from "vitest";
 
@@ -26,15 +31,15 @@ const equipment: Equipment = {
   id: "equipment-1",
   managementNo: "EQ-001",
   name: "ノギス",
-  status: "active",
+  status: EQUIPMENT_STATUS.ACTIVE,
 };
 const inspectionItem: InspectionItem = {
   id: "item-1",
   equipmentId: "equipment-1",
-  type: "calibration",
+  type: INSPECTION_ITEM_TYPE.CALIBRATION,
   name: "年次校正",
-  cycle: "1Y",
-  execution: "external",
+  cycle: CYCLE.Y1,
+  execution: EXECUTION.EXTERNAL,
   vendorId: "vendor-1",
   bufferDays: 14,
   personId: "person-1",
@@ -46,7 +51,7 @@ const order: CalibrationOrder = {
   id: "order-1",
   inspectionItemId: "item-1",
   vendorId: "vendor-1",
-  status: "ordered",
+  status: ORDER_STATUS.ORDERED,
 };
 
 /** 参照整合の突合先(D-029: 現在ストアのスナップショット相当) */
@@ -83,7 +88,7 @@ describe("validateEntityCsv: 取り込み成功", () => {
         managementNo: "EQ-101",
         name: "ノギスA",
         manufacturerId: "vendor-1",
-        status: "active",
+        status: EQUIPMENT_STATUS.ACTIVE,
       },
       "eq-2": {
         id: "eq-2",
@@ -92,7 +97,7 @@ describe("validateEntityCsv: 取り込み成功", () => {
         model: "M-2",
         serialNo: "S-2",
         location: "検査室",
-        status: "suspended",
+        status: EQUIPMENT_STATUS.SUSPENDED,
         note: "予備",
       },
     });
@@ -113,10 +118,10 @@ describe("validateEntityCsv: 取り込み成功", () => {
     expect(result.entities?.["it-1"]).toEqual({
       id: "it-1",
       equipmentId: "equipment-1",
-      type: "inspection",
+      type: INSPECTION_ITEM_TYPE.INSPECTION,
       name: "月次点検",
-      cycle: "1M",
-      execution: "internal",
+      cycle: CYCLE.M1,
+      execution: EXECUTION.INTERNAL,
       bufferDays: 14,
       personId: "person-1",
       noticeDaysBefore: 30,

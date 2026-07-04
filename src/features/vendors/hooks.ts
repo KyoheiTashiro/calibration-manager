@@ -6,19 +6,10 @@
  * CalibrationOrder.vendorId のいずれかから参照されている Vendor は削除できない。
  */
 
+import { isVendorReferenced } from "@/store/selectors";
 import type { Vendor } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
 import { useState } from "react";
-
-/** 参照されている Vendor は削除ガード対象（store の removeVendor と同じ判定条件） */
-const isVendorReferenced = (vendorId: string): boolean => {
-  const { equipment, inspectionItems, orders } = useAppStore.getState();
-  return (
-    Object.values(equipment).some((entry) => entry.manufacturerId === vendorId) ||
-    Object.values(inspectionItems).some((entry) => entry.vendorId === vendorId) ||
-    Object.values(orders).some((entry) => entry.vendorId === vendorId)
-  );
-};
 
 /** vendors を購読し、名称の日本語ロケール昇順で返す */
 export const useVendorList = (): Vendor[] => {
@@ -76,7 +67,7 @@ export const useVendorDelete = (): UseVendorDeleteResult => {
   const [referencedErrorOpen, setReferencedErrorOpen] = useState(false);
 
   const handleDeleteClick = (vendorId: string): void => {
-    if (isVendorReferenced(vendorId)) {
+    if (isVendorReferenced(useAppStore.getState(), vendorId)) {
       setReferencedErrorOpen(true);
       return;
     }

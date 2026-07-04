@@ -7,6 +7,10 @@
 import { ROUTES } from "@/constants/routes";
 import { NotificationCenter } from "@/features/notifications";
 import {
+  CYCLE,
+  EQUIPMENT_STATUS,
+  EXECUTION,
+  INSPECTION_ITEM_TYPE,
   NOTIFICATION_TARGET_TYPE,
   NOTIFICATION_TYPE,
   type Equipment,
@@ -31,16 +35,16 @@ const equipment1: Equipment = {
   id: "equipment-1",
   managementNo: "EQ-001",
   name: "ノギス",
-  status: "active",
+  status: EQUIPMENT_STATUS.ACTIVE,
 };
 
 const item1: InspectionItem = {
   id: "item-1",
   equipmentId: "equipment-1",
-  type: "inspection",
+  type: INSPECTION_ITEM_TYPE.INSPECTION,
   name: "定期点検",
-  cycle: "1Y",
-  execution: "internal",
+  cycle: CYCLE.Y1,
+  execution: EXECUTION.INTERNAL,
   bufferDays: 14,
   personId: "person-1",
   noticeDaysBefore: 30,
@@ -73,11 +77,11 @@ const renderCenter = (): void => {
 const rowMessages = (): string[] =>
   within(screen.getByRole("list"))
     .getAllByRole("listitem")
-    .map((inspectionItem) => inspectionItem.textContent);
+    .map((listItem) => listItem.textContent);
+
+beforeEach(setupStoreIsolation);
 
 describe("NotificationCenter: タブと並び順", () => {
-  beforeEach(setupStoreIsolation);
-
   it("既定は未読タブで、未読件数がタブに表示される", () => {
     seedStore({
       notifications: {
@@ -127,8 +131,6 @@ describe("NotificationCenter: タブと並び順", () => {
 });
 
 describe("NotificationCenter: 種別バッジ", () => {
-  beforeEach(setupStoreIsolation);
-
   it("種別の日本語ラベルと色クラスを併記する", () => {
     seedStore({
       notifications: {
@@ -158,8 +160,6 @@ describe("NotificationCenter: 種別バッジ", () => {
 });
 
 describe("NotificationCenter: 全て既読", () => {
-  beforeEach(setupStoreIsolation);
-
   it("未読0件のときは全て既読ボタンが無効", () => {
     seedStore({ notifications: { r1: makeNotif({ id: "r1", isRead: true }) } });
     renderCenter();
@@ -187,8 +187,6 @@ describe("NotificationCenter: 全て既読", () => {
 });
 
 describe("NotificationCenter: 行クリック遷移（D-027）", () => {
-  beforeEach(setupStoreIsolation);
-
   // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("targetType=order の行クリックで案件一覧へ遷移する", async () => {
     const user = userEvent.setup();
@@ -250,8 +248,6 @@ describe("NotificationCenter: 行クリック遷移（D-027）", () => {
 });
 
 describe("NotificationCenter: 空状態", () => {
-  beforeEach(setupStoreIsolation);
-
   it("未読0件のとき未読タブに専用メッセージを表示する", () => {
     seedStore({ notifications: { r1: makeNotif({ id: "r1", isRead: true }) } });
     renderCenter();

@@ -4,7 +4,7 @@
  * 点検校正項目モーダル・実施記録登録モーダルの起動を扱う。
  */
 
-import { ROUTES, equipmentDetailPath, equipmentEditPath } from "@/constants/routes";
+import { ROUTES, equipmentDetailPath } from "@/constants/routes";
 import { EquipmentDetail } from "@/features/equipment/detail";
 import {
   activePerson,
@@ -24,24 +24,26 @@ import userEvent from "@testing-library/user-event";
 // jest-domのmatcher拡張が伝播しない。テストファイル側でも明示的にimportし型を解決する
 // （coding-standards.md §6・.oxlintrc.jsonのallowリストで明示的に許容されているパターン）。
 import "@testing-library/jest-dom/vitest";
-import { MemoryRouter, Route, Routes } from "react-router-dom";
-import type * as ReactRouterDomModule from "react-router-dom";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { ReactElement } from "react";
+import { MemoryRouter, Route, Routes, useParams } from "react-router-dom";
+import { beforeEach, describe, expect, it } from "vitest";
 
-// なぜ: 「編集」ボタンの遷移先検証のため useNavigate だけスパイへ差し替える
-// (equipment/form/index.test.tsx と同じ理由・同じ手法。Navigate/Routes 等の実実装は維持)。
-const navigateSpy = vi.hoisted(() => vi.fn());
-// oxlint-disable-next-line oxc/no-async-await -- importOriginal(Promise)の解決が必要で、.then() 連鎖は typescript/promise-function-async と衝突するため
-vi.mock("react-router-dom", async (importOriginal) => {
-  const actual = await importOriginal<typeof ReactRouterDomModule>();
-  return { ...actual, useNavigate: (): typeof navigateSpy => navigateSpy };
-});
+/** 遷移先確認用ダミー: 機器編集(:id を表示) */
+// oxlint-disable-next-line react/no-multi-comp -- テスト内の遷移先ダミーは複数の別画面を模すため同一ファイルに並べる
+const DummyEquipmentEdit = (): ReactElement => {
+  const { id } = useParams();
+  return <p>機器編集:{id}</p>;
+};
 
-const renderDetail = (id: string): ReturnType<typeof renderWithStore> =>
-  renderWithStore(<EquipmentDetail />, {
-    initialEntries: [equipmentDetailPath(id)],
-    routePath: ROUTES.EQUIPMENT_DETAIL,
-  });
+const renderDetail = (id: string): void => {
+  renderWithStore(
+    <Routes>
+      <Route path={ROUTES.EQUIPMENT_DETAIL} element={<EquipmentDetail />} />
+      <Route path={ROUTES.EQUIPMENT_EDIT} element={<DummyEquipmentEdit />} />
+    </Routes>,
+    { initialEntries: [equipmentDetailPath(id)] },
+  );
+};
 
 /**
  * 項目テーブル(1つ目のtable)のデータ行を取得する。項目名は実施記録テーブルの行にも
@@ -53,10 +55,7 @@ const getInspectionItemRow = (name: string | RegExp): HTMLElement => {
   return within(inspectionItemTable).getByRole("row", { name });
 };
 
-beforeEach(() => {
-  setupStoreIsolation();
-  navigateSpy.mockClear();
-});
+beforeEach(setupStoreIsolation);
 
 describe("EquipmentDetail: 基本情報カード", () => {
   it("ヘッダに「管理番号 機器名」、カードに全属性(メーカー名解決・状態バッジ含む)が表示される", () => {
@@ -88,7 +87,7 @@ describe("EquipmentDetail: 基本情報カード", () => {
 
     await user.click(screen.getByRole("button", { name: "編集" }));
 
-    expect(navigateSpy).toHaveBeenCalledWith(equipmentEditPath(equipmentFull.id));
+    expect(screen.getByText(`機器編集:${equipmentFull.id}`)).toBeInTheDocument();
   });
 });
 
@@ -139,7 +138,6 @@ const getHistoryRows = (): HTMLElement[] => {
 
 describe("EquipmentDetail: 実施記録", () => {
   beforeEach(() => {
-    setupStoreIsolation();
     seedEquipmentFullMasters();
     seedEquipmentFullInspectionItemsAndRecords();
   });
@@ -186,8 +184,6 @@ describe("EquipmentDetail: 実施記録", () => {
  * 記録ボタンの活性(Phase 7でRecordModalへ接続)を扱う。
  */
 describe("EquipmentDetail: 項目テーブルの列内容", () => {
-  beforeEach(setupStoreIsolation);
-
   it("種別・内外・周期・担当者名・次回期限が表示される", () => {
     seedEquipmentFullMasters();
     seedEquipmentFullInspectionItemsAndRecords();
@@ -215,8 +211,6 @@ describe("EquipmentDetail: 項目テーブルの列内容", () => {
 });
 
 describe("EquipmentDetail: 項目テーブルの並び順・淡色表示", () => {
-  beforeEach(setupStoreIsolation);
-
   it("isActive=trueをnextDueDate昇順で先に、isActive=falseは末尾+淡色になる", () => {
     seedEquipmentFullMasters();
     seedEquipmentFullInspectionItemsAndRecords();
@@ -235,8 +229,6 @@ describe("EquipmentDetail: 項目テーブルの並び順・淡色表示", () =>
 });
 
 describe("EquipmentDetail: 項目ステータス(D-014)", () => {
-  beforeEach(setupStoreIsolation);
-
   it("稼働機器では導出ステータスをバッジ表示する", () => {
     seedEquipmentFullMasters();
     seedEquipmentFullInspectionItemsAndRecords();
@@ -266,8 +258,6 @@ describe("EquipmentDetail: 項目ステータス(D-014)", () => {
 });
 
 describe("EquipmentDetail: 記録ボタン", () => {
-  beforeEach(setupStoreIsolation);
-
   // なぜ変更したか: Phase 7 で実施記録登録モーダル(RecordModal)を接続し、記録ボタンを活性化した。
   // 旧テストは接続前の先行設置(常時disabled)を検証していたが、活性化が仕様(07-record-modal.md)の
   // ため期待値を活性へ是正する(テストを弱める改変ではない)。起動結節点の検証は recordLaunch.test.tsx。
@@ -300,7 +290,6 @@ const getOpenDialog = (title: string): HTMLElement => {
 
 describe("EquipmentDetail: InspectionItemModal起動", () => {
   beforeEach(() => {
-    setupStoreIsolation();
     seedEquipmentFullMasters();
     seedEquipmentFullInspectionItemsAndRecords();
   });

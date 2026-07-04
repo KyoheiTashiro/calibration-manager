@@ -6,13 +6,19 @@
  */
 
 import { OrderList } from "@/features/inspectionOrder";
-import type {
-  CalibrationOrder,
-  Equipment,
-  InspectionItem,
-  InspectionRecord,
-  Person,
-  Vendor,
+import {
+  CYCLE,
+  EQUIPMENT_STATUS,
+  EXECUTION,
+  INSPECTION_ITEM_TYPE,
+  ORDER_STATUS,
+  RECORD_RESULT,
+  type CalibrationOrder,
+  type Equipment,
+  type InspectionItem,
+  type InspectionRecord,
+  type Person,
+  type Vendor,
 } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
 import { renderWithStore, seedStore, setupStoreIsolation } from "@/test/renderWithStore";
@@ -43,15 +49,15 @@ const equipment: Equipment = {
   id: "equipment-1",
   managementNo: "EQ-001",
   name: "ノギス",
-  status: "active",
+  status: EQUIPMENT_STATUS.ACTIVE,
 };
 const inspectionItem: InspectionItem = {
   id: "item-1",
   equipmentId: "equipment-1",
-  type: "calibration",
+  type: INSPECTION_ITEM_TYPE.CALIBRATION,
   name: "年次校正",
-  cycle: "1Y",
-  execution: "external",
+  cycle: CYCLE.Y1,
+  execution: EXECUTION.EXTERNAL,
   vendorId: "vendor-1",
   bufferDays: 14,
   personId: "person-1",
@@ -75,7 +81,7 @@ const returnedOrder: CalibrationOrder = {
   id: "order-1",
   inspectionItemId: "item-1",
   vendorId: "vendor-1",
-  status: "returned",
+  status: ORDER_STATUS.RETURNED,
   orderedDate: "2026-06-01",
   dueDate: "2026-06-20",
   returnedDate: "2026-06-18",
@@ -116,12 +122,12 @@ describe("結合: returned 案件 → 記録登録 → カスケード", () => {
       orderId: returnedOrder.id,
       doneDate: "2026-06-20",
       doneBy: vendor.name,
-      result: "pass",
+      result: RECORD_RESULT.PASS,
     } satisfies Partial<InspectionRecord>);
     const updatedInspectionItem = state.inspectionItems[inspectionItem.id];
     expect(updatedInspectionItem.lastDoneDate).toBe("2026-06-20");
     expect(updatedInspectionItem.nextDueDate).toBe("2027-06-20"); // 1Y 周期の暦月加算
-    expect(state.orders[returnedOrder.id].status).toBe("completed");
+    expect(state.orders[returnedOrder.id].status).toBe(ORDER_STATUS.COMPLETED);
 
     // completed は既定トグルOFFで非表示 → returned 列からカードが消える(08-orders.md)
     expect(screen.queryByText("EQ-001")).not.toBeInTheDocument();
@@ -139,8 +145,8 @@ describe("結合: returned 案件 → 記録登録 → カスケード", () => {
     const updatedInspectionItem = state.inspectionItems[inspectionItem.id];
     expect(updatedInspectionItem.nextDueDate).toBe("2026-07-10"); // 据え置き
     expect(updatedInspectionItem.lastDoneDate).toBe("2026-06-20"); // 実施の事実は記録(D-015)
-    expect(state.orders[returnedOrder.id].status).toBe("completed");
-    expect(Object.values(state.records)[0]?.result).toBe("fail");
+    expect(state.orders[returnedOrder.id].status).toBe(ORDER_STATUS.COMPLETED);
+    expect(Object.values(state.records)[0]?.result).toBe(RECORD_RESULT.FAIL);
   });
 
   // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
@@ -167,7 +173,7 @@ describe("結合: かんばんの隣接遷移チェーン planned → returned",
       id: "order-1",
       inspectionItemId: "item-1",
       vendorId: "vendor-1",
-      status: "planned",
+      status: ORDER_STATUS.PLANNED,
     });
     renderWithStore(<OrderList />);
 
@@ -175,12 +181,12 @@ describe("結合: かんばんの隣接遷移チェーン planned → returned",
     await user.click(screen.getByRole("button", { name: "発注する" }));
     expect(screen.getByLabelText("発注日", { exact: false })).toHaveValue(todayIsoDate());
     await user.click(screen.getByRole("button", { name: "確定" }));
-    expect(useAppStore.getState().orders["order-1"].status).toBe("ordered");
+    expect(useAppStore.getState().orders["order-1"].status).toBe(ORDER_STATUS.ORDERED);
     expect(useAppStore.getState().orders["order-1"].orderedDate).toBe(todayIsoDate());
 
     // ordered → inCalibration: 即時遷移(入力なし)
     await user.click(screen.getByRole("button", { name: "校正中へ" }));
-    expect(useAppStore.getState().orders["order-1"].status).toBe("inCalibration");
+    expect(useAppStore.getState().orders["order-1"].status).toBe(ORDER_STATUS.IN_CALIBRATION);
 
     // inCalibration → returned: 返却ダイアログ(returnedDate 入力)
     await user.click(screen.getByRole("button", { name: "返却する" }));
@@ -189,7 +195,7 @@ describe("結合: かんばんの隣接遷移チェーン planned → returned",
     await user.type(returnedDateField, "2026-07-01");
     await user.click(screen.getByRole("button", { name: "確定" }));
     const finalOrder = useAppStore.getState().orders["order-1"];
-    expect(finalOrder.status).toBe("returned");
+    expect(finalOrder.status).toBe(ORDER_STATUS.RETURNED);
     expect(finalOrder.returnedDate).toBe("2026-07-01");
 
     // returned 列に「記録登録」導線が現れる(§7 への結節点)
