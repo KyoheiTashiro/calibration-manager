@@ -95,7 +95,7 @@ const REFERENCE_CHECKS: {
     recordValue(state.vendors, entity.manufacturerId) === undefined
       ? [`manufacturerId: 参照先が存在しません '${entity.manufacturerId}'`]
       : [],
-  inspectionItems: (entity, state) => {
+  serviceItems: (entity, state) => {
     const messages: string[] = [];
     if (recordValue(state.equipment, entity.equipmentId) === undefined) {
       messages.push(`equipmentId: 参照先が存在しません '${entity.equipmentId}'`);
@@ -113,8 +113,8 @@ const REFERENCE_CHECKS: {
   },
   records: (entity, state) => {
     const messages: string[] = [];
-    if (recordValue(state.inspectionItems, entity.inspectionItemId) === undefined) {
-      messages.push(`inspectionItemId: 参照先が存在しません '${entity.inspectionItemId}'`);
+    if (recordValue(state.serviceItems, entity.serviceItemId) === undefined) {
+      messages.push(`serviceItemId: 参照先が存在しません '${entity.serviceItemId}'`);
     }
     if (entity.orderId !== undefined && recordValue(state.orders, entity.orderId) === undefined) {
       messages.push(`orderId: 参照先が存在しません '${entity.orderId}'`);
@@ -123,8 +123,8 @@ const REFERENCE_CHECKS: {
   },
   orders: (entity, state) => {
     const messages: string[] = [];
-    if (recordValue(state.inspectionItems, entity.inspectionItemId) === undefined) {
-      messages.push(`inspectionItemId: 参照先が存在しません '${entity.inspectionItemId}'`);
+    if (recordValue(state.serviceItems, entity.serviceItemId) === undefined) {
+      messages.push(`serviceItemId: 参照先が存在しません '${entity.serviceItemId}'`);
     }
     if (recordValue(state.vendors, entity.vendorId) === undefined) {
       messages.push(`vendorId: 参照先が存在しません '${entity.vendorId}'`);
@@ -136,8 +136,8 @@ const REFERENCE_CHECKS: {
   notifications: (entity, state) => {
     const messages: string[] = [];
     const targetExists =
-      entity.targetType === NOTIFICATION_TARGET_TYPE.INSPECTION_ITEM
-        ? recordValue(state.inspectionItems, entity.targetId) !== undefined
+      entity.targetType === NOTIFICATION_TARGET_TYPE.SERVICE_ITEM
+        ? recordValue(state.serviceItems, entity.targetId) !== undefined
         : recordValue(state.orders, entity.targetId) !== undefined;
     if (!targetExists) {
       messages.push(`targetId: 参照先が存在しません '${entity.targetId}'`);

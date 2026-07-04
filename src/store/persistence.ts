@@ -6,10 +6,10 @@
 import { STORAGE_VERSION } from "@/constants/storage";
 import {
   appStateSchema,
-  calibrationOrderSchema,
+  serviceOrderSchema,
   equipmentSchema,
-  inspectionItemSchema,
-  inspectionRecordSchema,
+  serviceItemSchema,
+  serviceRecordSchema,
   notificationSchema,
   personSchema,
   vendorSchema,
@@ -22,7 +22,7 @@ export const emptyAppState = (): AppState => ({
   vendors: {},
   persons: {},
   equipment: {},
-  inspectionItems: {},
+  serviceItems: {},
   records: {},
   orders: {},
   notifications: {},
@@ -43,35 +43,62 @@ const renameFieldInRecord = (value: unknown, from: string, to: string): unknown 
   );
 };
 
+/** notifications の targetType を from → to へ変更する。非オブジェクトはそのまま残す */
+const renameNotificationTargetType = (
+  notifications: unknown,
+  from: string,
+  to: string,
+): unknown => {
+  if (!isRecord(notifications)) return notifications;
+  return Object.fromEntries(
+    Object.entries(notifications).map(([key, entry]) => {
+      if (!isRecord(entry)) return [key, entry];
+      return [key, entry.targetType === from ? { ...entry, targetType: to } : entry];
+    }),
+  );
+};
+
 /**
  * v1→v2: item→inspectionItem リネーム（D-036）。
  * - 状態キー items → inspectionItems
  * - records / orders の itemId → inspectionItemId
  * - notifications の targetType "item" → "inspectionItem"
- * 比較の "item" は v1 の歴史的リテラル値（現行列挙に存在しない）のため直書き。
+ * ステップ変換は「v2 当時の形式」を出力する（最終形式は後続ステップが作る）ため、
+ * "item" / "inspectionItem" 等はいずれも歴史的リテラル値（現行列挙に存在しない）で直書き。
  */
 export const migrateV1ToV2: MigrationStep = (persisted) => {
   if (!isRecord(persisted)) return persisted;
   const { items, records, orders, notifications, ...rest } = persisted;
-  const migratedNotifications = isRecord(notifications)
-    ? Object.fromEntries(
-        Object.entries(notifications).map(([key, entry]) => {
-          if (!isRecord(entry)) return [key, entry];
-          return [
-            key,
-            entry.targetType === "item"
-              ? { ...entry, targetType: NOTIFICATION_TARGET_TYPE.INSPECTION_ITEM }
-              : entry,
-          ];
-        }),
-      )
-    : notifications;
   return {
     ...rest,
     inspectionItems: items,
     records: renameFieldInRecord(records, "itemId", "inspectionItemId"),
     orders: renameFieldInRecord(orders, "itemId", "inspectionItemId"),
-    notifications: migratedNotifications,
+    notifications: renameNotificationTargetType(notifications, "item", "inspectionItem"),
+  };
+};
+
+/**
+ * v2→v3: inspectionItem→serviceItem リネーム（D-045。Inspection 系と Calibration 系が
+ * 混在していたエンティティ英語名を Service 系へ統一）。
+ * - 状態キー inspectionItems → serviceItems
+ * - records / orders の inspectionItemId → serviceItemId
+ * - notifications の targetType "inspectionItem" → "serviceItem"
+ * "inspectionItem" は v2 の歴史的リテラル値のため直書き。
+ */
+export const migrateV2ToV3: MigrationStep = (persisted) => {
+  if (!isRecord(persisted)) return persisted;
+  const { inspectionItems, records, orders, notifications, ...rest } = persisted;
+  return {
+    ...rest,
+    serviceItems: inspectionItems,
+    records: renameFieldInRecord(records, "inspectionItemId", "serviceItemId"),
+    orders: renameFieldInRecord(orders, "inspectionItemId", "serviceItemId"),
+    notifications: renameNotificationTargetType(
+      notifications,
+      "inspectionItem",
+      NOTIFICATION_TARGET_TYPE.SERVICE_ITEM,
+    ),
   };
 };
 
@@ -79,7 +106,7 @@ export const migrateV1ToV2: MigrationStep = (persisted) => {
  * 将来のスキーマ変更時は migrateVNToVN+1 を追加してここへ登録し、
  * STORAGE_VERSION をインクリメントする（store.md「migrate」）。
  */
-export const MIGRATIONS: Record<number, MigrationStep> = { 1: migrateV1ToV2 };
+export const MIGRATIONS: Record<number, MigrationStep> = { 1: migrateV1ToV2, 2: migrateV2ToV3 };
 
 /**
  * fromVersion から STORAGE_VERSION までステップ変換を順に適用する。
@@ -120,9 +147,9 @@ const salvageAppStatePerRecord = (persisted: Record<string, unknown>): AppState 
   vendors: salvageRecords(persisted.vendors, vendorSchema),
   persons: salvageRecords(persisted.persons, personSchema),
   equipment: salvageRecords(persisted.equipment, equipmentSchema),
-  inspectionItems: salvageRecords(persisted.inspectionItems, inspectionItemSchema),
-  records: salvageRecords(persisted.records, inspectionRecordSchema),
-  orders: salvageRecords(persisted.orders, calibrationOrderSchema),
+  serviceItems: salvageRecords(persisted.serviceItems, serviceItemSchema),
+  records: salvageRecords(persisted.records, serviceRecordSchema),
+  orders: salvageRecords(persisted.orders, serviceOrderSchema),
   notifications: salvageRecords(persisted.notifications, notificationSchema),
 });
 
@@ -136,8 +163,8 @@ export const sanitizeAppState = (state: AppState): AppState => {
   const notifications = Object.fromEntries(
     Object.entries(state.notifications).filter(([, notification]) => {
       if (recordValue(state.persons, notification.personId) === undefined) return false;
-      return notification.targetType === NOTIFICATION_TARGET_TYPE.INSPECTION_ITEM
-        ? recordValue(state.inspectionItems, notification.targetId) !== undefined
+      return notification.targetType === NOTIFICATION_TARGET_TYPE.SERVICE_ITEM
+        ? recordValue(state.serviceItems, notification.targetId) !== undefined
         : recordValue(state.orders, notification.targetId) !== undefined;
     }),
   );

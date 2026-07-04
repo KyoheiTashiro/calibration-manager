@@ -7,10 +7,10 @@
 
 import { STORAGE_KEY, STORAGE_VERSION } from "@/constants/storage";
 import { emptyAppState, migratePersistedState, salvagePersistedState } from "@/store/persistence";
-import { createCalibrationOrderSlice } from "@/store/slices/calibrationOrderSlice";
+import { createServiceOrderSlice } from "@/store/slices/serviceOrderSlice";
 import { createEquipmentSlice } from "@/store/slices/equipmentSlice";
-import { createInspectionItemSlice } from "@/store/slices/inspectionItemSlice";
-import { createInspectionRecordSlice } from "@/store/slices/inspectionRecordSlice";
+import { createServiceItemSlice } from "@/store/slices/serviceItemSlice";
+import { createServiceRecordSlice } from "@/store/slices/serviceRecordSlice";
 import { createNotificationSlice } from "@/store/slices/notificationSlice";
 import { createPersonSlice } from "@/store/slices/personSlice";
 import { createVendorSlice } from "@/store/slices/vendorSlice";
@@ -25,7 +25,7 @@ const partializeAppState = (state: StoreState): AppState => ({
   vendors: state.vendors,
   persons: state.persons,
   equipment: state.equipment,
-  inspectionItems: state.inspectionItems,
+  serviceItems: state.serviceItems,
   records: state.records,
   orders: state.orders,
   notifications: state.notifications,
@@ -37,9 +37,9 @@ export const useAppStore = create<StoreState>()(
       ...createVendorSlice(set, get, api),
       ...createPersonSlice(set, get, api),
       ...createEquipmentSlice(set, get, api),
-      ...createInspectionItemSlice(set, get, api),
-      ...createInspectionRecordSlice(set, get, api),
-      ...createCalibrationOrderSlice(set, get, api),
+      ...createServiceItemSlice(set, get, api),
+      ...createServiceRecordSlice(set, get, api),
+      ...createServiceOrderSlice(set, get, api),
       ...createNotificationSlice(set, get, api),
       resetAll: (): void => {
         set((state) => {

@@ -71,7 +71,7 @@
     "import/no-named-export": "off",
     "import/prefer-default-export": "off",
     // なぜ: coding-standards.md §3で許容されている「値importとtype importの混在形」
-    // （`import { ITEM_STATUS, type InspectionItem } from ...`）を使う方針のため、
+    // （`import { ITEM_STATUS, type ServiceItem } from ...`）を使う方針のため、
     // トップレベルでのtype専用import分離を強制するルールは適用しない。
     "import/consistent-type-specifier-style": "off",
     // なぜ: coding-standards.md §6「副作用importはallowリスト内に限定（CSS / jest-dom / seed注入）」。

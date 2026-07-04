@@ -11,14 +11,14 @@
 
 import {
   type AppState,
-  type CalibrationOrder,
+  type ServiceOrder,
   CYCLE,
   type Equipment,
   EQUIPMENT_STATUS,
   EXECUTION,
-  type InspectionItem,
-  type InspectionRecord,
-  INSPECTION_ITEM_TYPE,
+  type ServiceItem,
+  type ServiceRecord,
+  SERVICE_ITEM_TYPE,
   NOTIFICATION_TARGET_TYPE,
   NOTIFICATION_TYPE,
   type Notification,
@@ -73,11 +73,11 @@ export const equipmentSchema = z.object({
   note: z.string().optional(),
 });
 
-export const inspectionItemSchema = z
+export const serviceItemSchema = z
   .object({
     id: requiredStringSchema,
     equipmentId: requiredStringSchema,
-    type: z.enum(INSPECTION_ITEM_TYPE),
+    type: z.enum(SERVICE_ITEM_TYPE),
     name: requiredStringSchema,
     cycle: z.enum(CYCLE),
     execution: z.enum(EXECUTION),
@@ -92,8 +92,8 @@ export const inspectionItemSchema = z
   })
   // なぜ superRefine か: 「external の場合 vendorId 必須」（domain-model.md §3.4）は
   // 型では表現していない相関制約のため、スキーマ側で強制する。
-  .superRefine((inspectionItem, context) => {
-    if (inspectionItem.execution === EXECUTION.EXTERNAL && (inspectionItem.vendorId ?? "") === "") {
+  .superRefine((serviceItem, context) => {
+    if (serviceItem.execution === EXECUTION.EXTERNAL && (serviceItem.vendorId ?? "") === "") {
       context.addIssue({
         code: "custom",
         path: ["vendorId"],
@@ -102,9 +102,9 @@ export const inspectionItemSchema = z
     }
   });
 
-export const inspectionRecordSchema = z.object({
+export const serviceRecordSchema = z.object({
   id: requiredStringSchema,
-  inspectionItemId: requiredStringSchema,
+  serviceItemId: requiredStringSchema,
   doneDate: isoDateStringSchema,
   doneBy: requiredStringSchema,
   result: z.enum(RECORD_RESULT),
@@ -112,9 +112,9 @@ export const inspectionRecordSchema = z.object({
   note: z.string().optional(),
 });
 
-export const calibrationOrderSchema = z.object({
+export const serviceOrderSchema = z.object({
   id: requiredStringSchema,
-  inspectionItemId: requiredStringSchema,
+  serviceItemId: requiredStringSchema,
   vendorId: requiredStringSchema,
   status: z.enum(ORDER_STATUS),
   orderedDate: isoDateStringSchema.optional(),
@@ -140,9 +140,9 @@ export const appStateSchema = z.object({
   vendors: z.record(z.string(), vendorSchema),
   persons: z.record(z.string(), personSchema),
   equipment: z.record(z.string(), equipmentSchema),
-  inspectionItems: z.record(z.string(), inspectionItemSchema),
-  records: z.record(z.string(), inspectionRecordSchema),
-  orders: z.record(z.string(), calibrationOrderSchema),
+  serviceItems: z.record(z.string(), serviceItemSchema),
+  records: z.record(z.string(), serviceRecordSchema),
+  orders: z.record(z.string(), serviceOrderSchema),
   notifications: z.record(z.string(), notificationSchema),
 });
 
@@ -161,17 +161,17 @@ type AssertEqual<Left, Right> = [Left] extends [Right]
 export const schemaMatchesVendor: AssertEqual<z.infer<typeof vendorSchema>, Vendor> = true;
 export const schemaMatchesPerson: AssertEqual<z.infer<typeof personSchema>, Person> = true;
 export const schemaMatchesEquipment: AssertEqual<z.infer<typeof equipmentSchema>, Equipment> = true;
-export const schemaMatchesInspectionItem: AssertEqual<
-  z.infer<typeof inspectionItemSchema>,
-  InspectionItem
+export const schemaMatchesServiceItem: AssertEqual<
+  z.infer<typeof serviceItemSchema>,
+  ServiceItem
 > = true;
-export const schemaMatchesInspectionRecord: AssertEqual<
-  z.infer<typeof inspectionRecordSchema>,
-  InspectionRecord
+export const schemaMatchesServiceRecord: AssertEqual<
+  z.infer<typeof serviceRecordSchema>,
+  ServiceRecord
 > = true;
-export const schemaMatchesCalibrationOrder: AssertEqual<
-  z.infer<typeof calibrationOrderSchema>,
-  CalibrationOrder
+export const schemaMatchesServiceOrder: AssertEqual<
+  z.infer<typeof serviceOrderSchema>,
+  ServiceOrder
 > = true;
 export const schemaMatchesNotification: AssertEqual<
   z.infer<typeof notificationSchema>,

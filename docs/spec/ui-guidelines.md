@@ -73,7 +73,7 @@ calibration-manager は**業務用の機器管理アプリ**である。
 
 ## 6. テーブル・一覧
 
-一覧画面の表示項目・フィルタ項目・行アクションは各画面設計([02](./screen-design/02-equipment-list.md) [05](./screen-design/05-inspection-item-list.md) [08](./screen-design/08-orders.md) 等)に従う。本書は共通の見た目とインタラクションパターンを定める。
+一覧画面の表示項目・フィルタ項目・行アクションは各画面設計([02](./screen-design/02-equipment-list.md) [05](./screen-design/05-service-item-list.md) [08](./screen-design/08-orders.md) 等)に従う。本書は共通の見た目とインタラクションパターンを定める。
 
 - **行の高さ**: 密度優先で `h-10`〜`h-11`(40〜44px)。大型タップ領域は不要(マウス操作前提)。
 - **配色**: ヘッダー行 `bg-slate-50 text-slate-600 text-xs font-medium`。偶数行の軽微なzebra(`bg-slate-50`)は任意、罫線 `border-slate-200` の横線のみで縦罫線は原則引かない。行ホバーは `hover:bg-slate-50`。

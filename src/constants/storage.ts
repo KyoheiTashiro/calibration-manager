@@ -7,8 +7,9 @@
 export const STORAGE_KEY = "calibration-manager:v1";
 
 /**
- * スキーマバージョン。初回スキーマ=1、v2=item→inspectionItem リネーム（persistence.ts migrateV1ToV2）。
+ * スキーマバージョン。初回スキーマ=1、v2=item→inspectionItem リネーム（persistence.ts
+ * migrateV1ToV2）、v3=inspectionItem→serviceItem リネーム（同 migrateV2ToV3、D-045）。
  * 将来スキーマを変更する際は migrate ステップ（store.md「migrate」）を追加した上で
  * この値をインクリメントする。
  */
-export const STORAGE_VERSION = 2;
+export const STORAGE_VERSION = 3;

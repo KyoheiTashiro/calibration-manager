@@ -2,9 +2,9 @@
 
 [画面設計 共通仕様・全体構成](./README.md) の一部。ステータス色・モーダル共通挙動・確認ダイアログ等の共通仕様は [README(§0 共通仕様)](./README.md#0-共通仕様) を参照。
 
-**目的**: 項目の実施結果(InspectionRecord)を登録し、次回期限を更新する。
+**目的**: 項目の実施結果(ServiceRecord)を登録し、次回期限を更新する。
 
-**起動元**: [機器詳細](./04-equipment-detail.md)、[点検校正項目一覧](./05-inspection-item-list.md)、[点検校正外部案件](./08-orders.md)の `returned` カード
+**起動元**: [機器詳細](./04-equipment-detail.md)、[点検校正項目一覧](./05-service-item-list.md)、[点検校正外部案件](./08-orders.md)の `returned` カード
 
 ## 画面レイアウト
 
@@ -21,11 +21,11 @@
 └───────────────────────────────────────┘
 ```
 
-## 表示項目 / 入力フィールド(InspectionRecord §3.5)
+## 表示項目 / 入力フィールド(ServiceRecord §3.5)
 
 | フィールド | 属性     | 必須 | 形式                                                      |
 | ---------- | -------- | ---- | --------------------------------------------------------- |
-| 対象項目   | inspectionItemId   | ○    | 起動元からプリセット・固定表示                            |
+| 対象項目   | serviceItemId   | ○    | 起動元からプリセット・固定表示                            |
 | 実施日     | doneDate | ○    | 日付。既定=今日                                           |
 | 実施者     | doneBy   | ○    | テキスト(外部は業者名。可能なら Vendor.name をプリフィル) |
 | 結果       | result   | ○    | pass/fail/adjusted                                        |
@@ -38,14 +38,14 @@
 
 登録時の副作用を以下に明記する(ドメインモデル §3.5 / §4.1):
 
-1. InspectionRecord を新規作成。
-2. `inspectionItem.lastDoneDate = doneDate`。
-3. **`result` が `pass` または `adjusted` のとき**: `inspectionItem.nextDueDate = doneDate + cycle`(暦月ベース [§0.4](./README.md#04-日付表示形式))。
+1. ServiceRecord を新規作成。
+2. `serviceItem.lastDoneDate = doneDate`。
+3. **`result` が `pass` または `adjusted` のとき**: `serviceItem.nextDueDate = doneDate + cycle`(暦月ベース [§0.4](./README.md#04-日付表示形式))。
 4. **`result` が `fail` のとき**: `nextDueDate` を更新せず、項目は要対応状態(再実施が必要)として扱う。※期限が過ぎていれば `overdue` のまま表示。
-5. **点検校正外部案件(status=`returned`)から起動した場合**: `orderId` を記録に紐付け、当該 CalibrationOrder を `completed` へ遷移(§3.6)。
+5. **点検校正外部案件(status=`returned`)から起動した場合**: `orderId` を記録に紐付け、当該 ServiceOrder を `completed` へ遷移(§3.6)。
 
 **不正入力時の挙動(D-005)**: 以下のいずれかに該当する場合、レコード追加ごと全体 no-op(部分適用しない)とする。
-- `inspectionItemId` が存在しない。
+- `serviceItemId` が存在しない。
 - `result !== 'fail'` かつ `addCycle(doneDate, cycle)` が null(doneDate 不正)。
 - `orderId` 指定時に、案件が存在しない、または現状態から `completed` へ遷移不可(`returned` 以外からの遷移)。
 

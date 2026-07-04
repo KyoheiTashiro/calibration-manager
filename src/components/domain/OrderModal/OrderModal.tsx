@@ -1,5 +1,5 @@
 /**
- * 点検校正外部案件（CalibrationOrder）の新規作成モーダル（screen-design/08-orders.md「案件作成モーダル」）。
+ * 点検校正外部案件（ServiceOrder）の新規作成モーダル（screen-design/08-orders.md「案件作成モーダル」）。
  * RHF + zodResolver。起動元は項目一覧の「案件」アクション（外部・有効案件なしの項目）。
  * 新規作成専用（status は常に addOrder が
  * planned 固定で付与するため渡さない)。1項目1有効案件制約（D-006）はストア層 addOrder が最終防衛線。
@@ -23,7 +23,7 @@ import { Link } from "react-router-dom";
 type Props = {
   open: boolean;
   /** 対象項目。起動元で常に確定した状態で渡す（外部項目のみが起動対象） */
-  inspectionItemId: string;
+  serviceItemId: string;
   onClose: () => void;
 };
 
@@ -31,19 +31,19 @@ type Props = {
 const pickRecord = <Value,>(record: Record<string, Value>, key: string): Value | undefined =>
   record[key];
 
-export const OrderModal = ({ open, inspectionItemId, onClose }: Props): ReactElement => {
-  const inspectionItem = useAppStore((state) =>
-    pickRecord(state.inspectionItems, inspectionItemId),
+export const OrderModal = ({ open, serviceItemId, onClose }: Props): ReactElement => {
+  const serviceItem = useAppStore((state) =>
+    pickRecord(state.serviceItems, serviceItemId),
   );
   const equipment = useAppStore((state) =>
-    inspectionItem ? pickRecord(state.equipment, inspectionItem.equipmentId) : undefined,
+    serviceItem ? pickRecord(state.equipment, serviceItem.equipmentId) : undefined,
   );
   const vendors = useAppStore((state) => state.vendors);
   const addOrder = useAppStore((state) => state.addOrder);
 
   const [submitFailed, setSubmitFailed] = useState(false);
 
-  const presetVendorId = inspectionItem?.vendorId;
+  const presetVendorId = serviceItem?.vendorId;
   const defaultVendorId =
     presetVendorId !== undefined && vendors[presetVendorId]?.isCalibrator ? presetVendorId : "";
 
@@ -65,8 +65,8 @@ export const OrderModal = ({ open, inspectionItemId, onClose }: Props): ReactEle
   }));
 
   const targetLabel =
-    inspectionItem && equipment
-      ? `対象:${equipment.managementNo} ${equipment.name} / ${inspectionItem.name}`
+    serviceItem && equipment
+      ? `対象:${equipment.managementNo} ${equipment.name} / ${serviceItem.name}`
       : "対象:(項目情報が見つかりません)";
 
   // なぜ: submitFailed を閉時にリセットし、同一対象で開き直した際の残留エラー表示を防ぐ
@@ -81,7 +81,7 @@ export const OrderModal = ({ open, inspectionItemId, onClose }: Props): ReactEle
     const hasCost = values.cost !== undefined && values.cost !== "";
     const hasNote = values.note !== undefined && values.note !== "";
     const orderId = addOrder({
-      inspectionItemId,
+      serviceItemId,
       vendorId: values.vendorId,
       dueDate: hasDueDate ? values.dueDate : undefined,
       cost: hasCost ? Number(values.cost) : undefined,

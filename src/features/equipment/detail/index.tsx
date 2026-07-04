@@ -6,7 +6,7 @@
  * モーダル起動は単一 state で kind を持ち、1度に開くのは1つ。閉じたら state をリセットする。
  */
 
-import { InspectionItemModal, RecordModal, StatusBadge } from "@/components/domain";
+import { ServiceItemModal, RecordModal, StatusBadge } from "@/components/domain";
 import { Badge, Button, EmptyState, Table, TableBody, TableHead } from "@/components/ui";
 import { ROUTES, equipmentEditPath } from "@/constants/routes";
 import {
@@ -14,20 +14,20 @@ import {
   EQUIPMENT_STATUS_LABELS,
 } from "@/features/equipment/constants";
 import {
-  displayedInspectionItemStatus,
+  displayedServiceItemStatus,
   historyRowsOf,
   personLabelOf,
-  sortedInspectionItemsOf,
+  sortedServiceItemsOf,
   todayIsoDate,
   useSafeNavigate,
 } from "@/features/equipment/detail/hooks";
 import {
   CYCLE_LABELS,
   EXECUTION_LABELS,
-  INSPECTION_ITEM_TYPE_LABELS,
+  SERVICE_ITEM_TYPE_LABELS,
   RECORD_RESULT_LABELS,
-} from "@/features/inspectionItems/constants";
-import type { InspectionItem } from "@/store/types";
+} from "@/features/serviceItems/constants";
+import type { ServiceItem } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
 import { useState, type ReactElement } from "react";
 import { Navigate, useParams } from "react-router-dom";
@@ -40,8 +40,8 @@ const MODAL_KIND = {
 } as const;
 type ModalState =
   | { kind: typeof MODAL_KIND.ADD }
-  | { kind: typeof MODAL_KIND.EDIT; inspectionItem: InspectionItem }
-  | { kind: typeof MODAL_KIND.RECORD; inspectionItemId: string };
+  | { kind: typeof MODAL_KIND.EDIT; serviceItem: ServiceItem }
+  | { kind: typeof MODAL_KIND.RECORD; serviceItemId: string };
 
 export const EquipmentDetail = (): ReactElement => {
   const { id } = useParams<{ id: string }>();
@@ -50,7 +50,7 @@ export const EquipmentDetail = (): ReactElement => {
   const equipmentMap = useAppStore((state) => state.equipment);
   const vendors = useAppStore((state) => state.vendors);
   const persons = useAppStore((state) => state.persons);
-  const inspectionItems = useAppStore((state) => state.inspectionItems);
+  const serviceItems = useAppStore((state) => state.serviceItems);
   const orders = useAppStore((state) => state.orders);
   const records = useAppStore((state) => state.records);
 
@@ -62,20 +62,20 @@ export const EquipmentDetail = (): ReactElement => {
     return <Navigate to={ROUTES.EQUIPMENT_LIST} replace />;
   }
 
-  const handleAddInspectionItemClick = (): void => {
+  const handleAddServiceItemClick = (): void => {
     setModal({ kind: MODAL_KIND.ADD });
   };
-  const handleEditInspectionItemClick = (inspectionItem: InspectionItem): void => {
-    setModal({ kind: MODAL_KIND.EDIT, inspectionItem });
+  const handleEditServiceItemClick = (serviceItem: ServiceItem): void => {
+    setModal({ kind: MODAL_KIND.EDIT, serviceItem });
   };
   const handleModalClose = (): void => {
     setModal(null);
   };
 
-  const inspectionItemList = sortedInspectionItemsOf(inspectionItems, currentEquipment.id);
-  const historyRows = historyRowsOf(inspectionItems, records, currentEquipment.id);
-  // today は行ごとに再取得せず1度だけ計算し、displayedInspectionItemStatus へ注入する
-  // (inspectionItemRowsOf と同方針、テスト容易性のため)
+  const serviceItemList = sortedServiceItemsOf(serviceItems, currentEquipment.id);
+  const historyRows = historyRowsOf(serviceItems, records, currentEquipment.id);
+  // today は行ごとに再取得せず1度だけ計算し、displayedServiceItemStatus へ注入する
+  // (serviceItemRowsOf と同方針、テスト容易性のため)
   const today = todayIsoDate();
 
   return (
@@ -133,13 +133,13 @@ export const EquipmentDetail = (): ReactElement => {
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold">点検校正項目</h2>
-          <Button onClick={handleAddInspectionItemClick}>+ 項目を追加</Button>
+          <Button onClick={handleAddServiceItemClick}>+ 項目を追加</Button>
         </div>
 
-        {inspectionItemList.length === 0 ? (
+        {serviceItemList.length === 0 ? (
           <EmptyState
             message="点検校正項目が未登録です"
-            action={<Button onClick={handleAddInspectionItemClick}>+ 項目を追加</Button>}
+            action={<Button onClick={handleAddServiceItemClick}>+ 項目を追加</Button>}
           />
         ) : (
           <Table>
@@ -172,9 +172,9 @@ export const EquipmentDetail = (): ReactElement => {
               </tr>
             </TableHead>
             <TableBody>
-              {inspectionItemList.map((inspectionItem) => {
-                const status = displayedInspectionItemStatus(
-                  inspectionItem,
+              {serviceItemList.map((serviceItem) => {
+                const status = displayedServiceItemStatus(
+                  serviceItem,
                   currentEquipment.status,
                   orders,
                   vendors,
@@ -182,22 +182,22 @@ export const EquipmentDetail = (): ReactElement => {
                 );
                 return (
                   <tr
-                    key={inspectionItem.id}
-                    className={inspectionItem.isActive ? undefined : "text-slate-400"}
+                    key={serviceItem.id}
+                    className={serviceItem.isActive ? undefined : "text-slate-400"}
                   >
                     <td className="px-3 py-2">
                       {status === null ? "—" : <StatusBadge status={status} />}
                     </td>
-                    <td className="px-3 py-2">{inspectionItem.name}</td>
+                    <td className="px-3 py-2">{serviceItem.name}</td>
                     <td className="px-3 py-2">
-                      {INSPECTION_ITEM_TYPE_LABELS[inspectionItem.type]}
+                      {SERVICE_ITEM_TYPE_LABELS[serviceItem.type]}
                     </td>
-                    <td className="px-3 py-2">{EXECUTION_LABELS[inspectionItem.execution]}</td>
-                    <td className="px-3 py-2">{CYCLE_LABELS[inspectionItem.cycle]}</td>
+                    <td className="px-3 py-2">{EXECUTION_LABELS[serviceItem.execution]}</td>
+                    <td className="px-3 py-2">{CYCLE_LABELS[serviceItem.cycle]}</td>
                     <td className="px-3 py-2">
-                      {personLabelOf({ persons }, inspectionItem.personId)}
+                      {personLabelOf({ persons }, serviceItem.personId)}
                     </td>
-                    <td className="px-3 py-2">{inspectionItem.nextDueDate}</td>
+                    <td className="px-3 py-2">{serviceItem.nextDueDate}</td>
                     {/* なぜ td 直下に Button を並べるか: equipment/list や VendorList と同様、
                         div でラップするとjsx-a11yのボタンラベル探索深度を超えるためtdをflex化する */}
                     <td className="flex gap-2 px-3 py-2">
@@ -207,7 +207,7 @@ export const EquipmentDetail = (): ReactElement => {
                         onClick={() => {
                           setModal({
                             kind: MODAL_KIND.RECORD,
-                            inspectionItemId: inspectionItem.id,
+                            serviceItemId: serviceItem.id,
                           });
                         }}
                       >
@@ -217,7 +217,7 @@ export const EquipmentDetail = (): ReactElement => {
                         variant="secondary"
                         size="sm"
                         onClick={() => {
-                          handleEditInspectionItemClick(inspectionItem);
+                          handleEditServiceItemClick(serviceItem);
                         }}
                       >
                         編集
@@ -258,10 +258,10 @@ export const EquipmentDetail = (): ReactElement => {
               </tr>
             </TableHead>
             <TableBody>
-              {historyRows.map(({ record, inspectionItemName }) => (
+              {historyRows.map(({ record, serviceItemName }) => (
                 <tr key={record.id}>
                   <td className="px-3 py-2">{record.doneDate}</td>
-                  <td className="px-3 py-2">{inspectionItemName}</td>
+                  <td className="px-3 py-2">{serviceItemName}</td>
                   <td className="px-3 py-2">{record.doneBy}</td>
                   <td className="px-3 py-2">{RECORD_RESULT_LABELS[record.result]}</td>
                   <td className="px-3 py-2">{record.note ?? "—"}</td>
@@ -273,21 +273,21 @@ export const EquipmentDetail = (): ReactElement => {
       </div>
 
       {modal?.kind === MODAL_KIND.ADD ? (
-        <InspectionItemModal open equipmentId={currentEquipment.id} onClose={handleModalClose} />
+        <ServiceItemModal open equipmentId={currentEquipment.id} onClose={handleModalClose} />
       ) : null}
       {modal?.kind === MODAL_KIND.EDIT ? (
-        <InspectionItemModal
+        <ServiceItemModal
           open
           equipmentId={currentEquipment.id}
-          inspectionItem={modal.inspectionItem}
+          serviceItem={modal.serviceItem}
           onClose={handleModalClose}
         />
       ) : null}
       {modal?.kind === MODAL_KIND.RECORD ? (
         <RecordModal
-          key={modal.inspectionItemId}
+          key={modal.serviceItemId}
           open
-          inspectionItemId={modal.inspectionItemId}
+          serviceItemId={modal.serviceItemId}
           onClose={handleModalClose}
         />
       ) : null}

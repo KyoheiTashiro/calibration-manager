@@ -30,7 +30,7 @@ import { useState, type ReactElement } from "react";
 export const NotificationCenter = (): ReactElement => {
   const safeNavigate = useSafeNavigate();
   const notifications = useAppStore((state) => state.notifications);
-  const inspectionItems = useAppStore((state) => state.inspectionItems);
+  const serviceItems = useAppStore((state) => state.serviceItems);
   const markAsRead = useAppStore((state) => state.markAsRead);
   const markAllAsRead = useAppStore((state) => state.markAllAsRead);
   const unreadCount = useAppStore((state) => unreadNotificationCount(state));
@@ -39,10 +39,10 @@ export const NotificationCenter = (): ReactElement => {
 
   const rows = selectTabNotifications(Object.values(notifications), activeTab);
 
-  // 行クリック（D-027）: まず既読化、次に遷移先が解決できれば遷移。dangling inspectionItem は既読化のみ。
+  // 行クリック（D-027）: まず既読化、次に遷移先が解決できれば遷移。dangling serviceItem は既読化のみ。
   const handleRowClick = (notification: Notification): void => {
     markAsRead(notification.id);
-    const target = resolveNotificationTarget(notification, inspectionItems);
+    const target = resolveNotificationTarget(notification, serviceItems);
     if (target !== null) {
       safeNavigate(target);
     }

@@ -2,8 +2,8 @@
  * メーカー/取引先マスタ画面（screen-design/09-masters.md §9-A）の状態管理フック。
  * UI（index.tsx）を薄いビューに保つため切り出す（coding-standards.md §2）。
  *
- * 削除は参照ガード付き: Equipment.manufacturerId / InspectionItem.vendorId /
- * CalibrationOrder.vendorId のいずれかから参照されている Vendor は削除できない。
+ * 削除は参照ガード付き: Equipment.manufacturerId / ServiceItem.vendorId /
+ * ServiceOrder.vendorId のいずれかから参照されている Vendor は削除できない。
  */
 
 import { isVendorReferenced } from "@/store/selectors";

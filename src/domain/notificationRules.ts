@@ -9,10 +9,10 @@ import { DELIVERY_DUE_SOON_NOTICE_DAYS } from "@/domain/constants";
 import { recommendedOrderDate } from "@/domain/leadTime";
 import { isActiveOrderStatus } from "@/domain/orderStatus";
 import {
-  type CalibrationOrder,
+  type ServiceOrder,
   type Equipment,
   EXECUTION,
-  type InspectionItem,
+  type ServiceItem,
   type IsoDateString,
   NOTIFICATION_TARGET_TYPE,
   NOTIFICATION_TYPE,
@@ -35,60 +35,60 @@ export type NotificationSeed = Omit<Notification, "id" | "createdDate" | "isRead
  * （例外を投げない。coding-standards.md §8）。
  */
 const messagePrefix = (
-  inspectionItem: InspectionItem,
+  serviceItem: ServiceItem,
   equipment: Record<string, Equipment>,
 ): string => {
-  const managementNo = recordValue(equipment, inspectionItem.equipmentId)?.managementNo;
+  const managementNo = recordValue(equipment, serviceItem.equipmentId)?.managementNo;
   return managementNo === undefined ? "" : `${managementNo} `;
 };
 
-/** 1項目に対する inspectionItem 宛先通知（dueSoon / overdue / orderRecommended）を判定する */
-const inspectionItemNotificationSeeds = (
-  inspectionItem: InspectionItem,
-  orders: readonly CalibrationOrder[],
+/** 1項目に対する serviceItem 宛先通知（dueSoon / overdue / orderRecommended）を判定する */
+const serviceItemNotificationSeeds = (
+  serviceItem: ServiceItem,
+  orders: readonly ServiceOrder[],
   vendors: Record<string, Vendor>,
   equipment: Record<string, Equipment>,
   today: IsoDateString,
 ): NotificationSeed[] => {
   const seeds: NotificationSeed[] = [];
-  const prefix = messagePrefix(inspectionItem, equipment);
+  const prefix = messagePrefix(serviceItem, equipment);
   const baseSeed = {
-    targetType: NOTIFICATION_TARGET_TYPE.INSPECTION_ITEM,
-    targetId: inspectionItem.id,
-    personId: inspectionItem.personId,
+    targetType: NOTIFICATION_TARGET_TYPE.SERVICE_ITEM,
+    targetId: serviceItem.id,
+    personId: serviceItem.personId,
   } as const;
 
-  if (today > inspectionItem.nextDueDate) {
+  if (today > serviceItem.nextDueDate) {
     seeds.push({
       ...baseSeed,
       type: NOTIFICATION_TYPE.OVERDUE,
-      message: `${prefix}${inspectionItem.name}が期限を過ぎています`,
+      message: `${prefix}${serviceItem.name}が期限を過ぎています`,
     });
   } else {
-    const dueSoonFrom = addDays(inspectionItem.nextDueDate, -inspectionItem.noticeDaysBefore);
+    const dueSoonFrom = addDays(serviceItem.nextDueDate, -serviceItem.noticeDaysBefore);
     if (dueSoonFrom !== null && today >= dueSoonFrom) {
       seeds.push({
         ...baseSeed,
         type: NOTIFICATION_TYPE.DUE_SOON,
-        message: `${prefix}${inspectionItem.name}の期限が近づいています`,
+        message: `${prefix}${serviceItem.name}の期限が近づいています`,
       });
     }
   }
 
-  if (inspectionItem.execution === EXECUTION.EXTERNAL) {
+  if (serviceItem.execution === EXECUTION.EXTERNAL) {
     const vendor =
-      inspectionItem.vendorId === undefined
+      serviceItem.vendorId === undefined
         ? null
-        : (recordValue(vendors, inspectionItem.vendorId) ?? null);
-    const orderDate = recommendedOrderDate(inspectionItem, vendor);
+        : (recordValue(vendors, serviceItem.vendorId) ?? null);
+    const orderDate = recommendedOrderDate(serviceItem, vendor);
     const hasActiveOrder = orders.some(
-      (order) => order.inspectionItemId === inspectionItem.id && isActiveOrderStatus(order.status),
+      (order) => order.serviceItemId === serviceItem.id && isActiveOrderStatus(order.status),
     );
     if (orderDate !== null && today >= orderDate && !hasActiveOrder) {
       seeds.push({
         ...baseSeed,
         type: NOTIFICATION_TYPE.ORDER_RECOMMENDED,
-        message: `${prefix}${inspectionItem.name}の発注時期です`,
+        message: `${prefix}${serviceItem.name}の発注時期です`,
       });
     }
   }
@@ -99,26 +99,26 @@ const inspectionItemNotificationSeeds = (
 /**
  * 1案件に対する order 宛先通知（deliveryDueSoon / deliveryOverdue）を判定する。
  * 対象は発注済かつ未返却（ordered / inCalibration）で返却予定日が入力済みの案件のみ。
- * 宛先: CalibrationOrder は personId を持たないため、inspectionItemId から項目を辿って
- * inspectionItem.personId を宛先とする（store.md「アクション仕様」）。項目を辿れない案件は対象外。
+ * 宛先: ServiceOrder は personId を持たないため、serviceItemId から項目を辿って
+ * serviceItem.personId を宛先とする（store.md「アクション仕様」）。項目を辿れない案件は対象外。
  */
 const orderNotificationSeeds = (
-  order: CalibrationOrder,
-  inspectionItemById: ReadonlyMap<string, InspectionItem>,
+  order: ServiceOrder,
+  serviceItemById: ReadonlyMap<string, ServiceItem>,
   equipment: Record<string, Equipment>,
   today: IsoDateString,
 ): NotificationSeed[] => {
   const isAwaitingReturn =
     order.status === ORDER_STATUS.ORDERED || order.status === ORDER_STATUS.IN_CALIBRATION;
   if (!isAwaitingReturn || order.dueDate === undefined) return [];
-  const inspectionItem = inspectionItemById.get(order.inspectionItemId);
-  if (!inspectionItem) return [];
+  const serviceItem = serviceItemById.get(order.serviceItemId);
+  if (!serviceItem) return [];
 
-  const prefix = messagePrefix(inspectionItem, equipment);
+  const prefix = messagePrefix(serviceItem, equipment);
   const baseSeed = {
     targetType: NOTIFICATION_TARGET_TYPE.ORDER,
     targetId: order.id,
-    personId: inspectionItem.personId,
+    personId: serviceItem.personId,
   } as const;
 
   if (today > order.dueDate) {
@@ -126,7 +126,7 @@ const orderNotificationSeeds = (
       {
         ...baseSeed,
         type: NOTIFICATION_TYPE.DELIVERY_OVERDUE,
-        message: `${prefix}${inspectionItem.name}の返却予定日を過ぎています`,
+        message: `${prefix}${serviceItem.name}の返却予定日を過ぎています`,
       },
     ];
   }
@@ -137,7 +137,7 @@ const orderNotificationSeeds = (
       {
         ...baseSeed,
         type: NOTIFICATION_TYPE.DELIVERY_DUE_SOON,
-        message: `${prefix}${inspectionItem.name}の返却予定日が近づいています`,
+        message: `${prefix}${serviceItem.name}の返却予定日が近づいています`,
       },
     ];
   }
@@ -164,29 +164,29 @@ const orderNotificationSeeds = (
  *   案件があれば発注準備は着手済みであり、発注推奨の再通知は不要なため
  *   （§4.3 orderNow の「有効な案件なし」と同じ判定に揃える。D-042）。
  *
- * @param inspectionItems 判定対象の項目。休止・廃棄機器の項目や無効項目の除外は呼び出し側
+ * @param serviceItems 判定対象の項目。休止・廃棄機器の項目や無効項目の除外は呼び出し側
  *   （ストアの generateNotifications）の責務（store.md）
- * @param orders 全案件。項目との対応は inspectionItemId で内部照合する。inspectionItems に含まれない項目の
+ * @param orders 全案件。項目との対応は serviceItemId で内部照合する。serviceItems に含まれない項目の
  *   案件は判定対象外
  * @param vendors 発注推奨日の納期フォールバック解決に使用
  * @param equipment 通知文の管理番号表示に使用
  */
 export const computeExpectedNotifications = (
-  inspectionItems: readonly InspectionItem[],
-  orders: readonly CalibrationOrder[],
+  serviceItems: readonly ServiceItem[],
+  orders: readonly ServiceOrder[],
   vendors: Record<string, Vendor>,
   equipment: Record<string, Equipment>,
   today: IsoDateString,
 ): NotificationSeed[] => {
-  const inspectionItemById = new Map(
-    inspectionItems.map((inspectionItem) => [inspectionItem.id, inspectionItem]),
+  const serviceItemById = new Map(
+    serviceItems.map((serviceItem) => [serviceItem.id, serviceItem]),
   );
   return [
-    ...inspectionItems.flatMap((inspectionItem) =>
-      inspectionItemNotificationSeeds(inspectionItem, orders, vendors, equipment, today),
+    ...serviceItems.flatMap((serviceItem) =>
+      serviceItemNotificationSeeds(serviceItem, orders, vendors, equipment, today),
     ),
     ...orders.flatMap((order) =>
-      orderNotificationSeeds(order, inspectionItemById, equipment, today),
+      orderNotificationSeeds(order, serviceItemById, equipment, today),
     ),
   ];
 };

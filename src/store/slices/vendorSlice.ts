@@ -15,7 +15,7 @@ export type VendorSlice = {
   addVendor: (input: Omit<Vendor, "id">) => string;
   updateVendor: (id: string, patch: Partial<Omit<Vendor, "id">>) => void;
   /**
-   * Equipment.manufacturerId / InspectionItem.vendorId / CalibrationOrder.vendorId の
+   * Equipment.manufacturerId / ServiceItem.vendorId / ServiceOrder.vendorId の
    * いずれかから参照されている場合は削除せず false を返す（store.md「アクション仕様」）。
    * @returns 削除できたら true
    */

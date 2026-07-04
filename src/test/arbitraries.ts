@@ -5,16 +5,16 @@
  */
 
 import {
-  type CalibrationOrder,
+  type ServiceOrder,
   CYCLE,
   type Cycle,
   type Equipment,
   EQUIPMENT_STATUS,
   EXECUTION,
-  type InspectionItem,
-  type InspectionRecord,
+  type ServiceItem,
+  type ServiceRecord,
   type IsoDateString,
-  INSPECTION_ITEM_TYPE,
+  SERVICE_ITEM_TYPE,
   NOTIFICATION_TARGET_TYPE,
   NOTIFICATION_TYPE,
   type Notification,
@@ -86,10 +86,10 @@ export const equipmentArb: fc.Arbitrary<Equipment> = fc.record({
   note: optionalArb(fc.string()),
 });
 
-export const inspectionItemArb: fc.Arbitrary<InspectionItem> = fc.record({
+export const serviceItemArb: fc.Arbitrary<ServiceItem> = fc.record({
   id: fc.uuid(),
   equipmentId: fc.uuid(),
-  type: fc.constantFrom(...Object.values(INSPECTION_ITEM_TYPE)),
+  type: fc.constantFrom(...Object.values(SERVICE_ITEM_TYPE)),
   name: fc.string({ minLength: 1 }),
   cycle: cycleArb,
   execution: fc.constantFrom(...Object.values(EXECUTION)),
@@ -103,9 +103,9 @@ export const inspectionItemArb: fc.Arbitrary<InspectionItem> = fc.record({
   isActive: fc.boolean(),
 });
 
-export const inspectionRecordArb: fc.Arbitrary<InspectionRecord> = fc.record({
+export const serviceRecordArb: fc.Arbitrary<ServiceRecord> = fc.record({
   id: fc.uuid(),
-  inspectionItemId: fc.uuid(),
+  serviceItemId: fc.uuid(),
   doneDate: isoDateArb,
   doneBy: fc.string({ minLength: 1 }),
   result: fc.constantFrom(...Object.values(RECORD_RESULT)),
@@ -113,9 +113,9 @@ export const inspectionRecordArb: fc.Arbitrary<InspectionRecord> = fc.record({
   note: optionalArb(fc.string()),
 });
 
-export const calibrationOrderArb: fc.Arbitrary<CalibrationOrder> = fc.record({
+export const serviceOrderArb: fc.Arbitrary<ServiceOrder> = fc.record({
   id: fc.uuid(),
-  inspectionItemId: fc.uuid(),
+  serviceItemId: fc.uuid(),
   vendorId: fc.uuid(),
   status: fc.constantFrom(...Object.values(ORDER_STATUS)),
   orderedDate: optionalArb(isoDateArb),

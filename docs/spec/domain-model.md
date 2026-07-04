@@ -10,29 +10,31 @@
 | 機器            | Equipment              | 点検・校正の対象となる機器・設備                                            |
 | メーカー/取引先 | Vendor                 | 機器の製造元、または外部点検校正の依頼先。両方を兼ねる場合あり                    |
 | 担当者          | Person                 | 点検・校正の管理責任者。通知の宛先                                            |
-| 点検校正項目    | InspectionItem         | 機器に紐づく管理単位。「月次点検」「年次校正」など。周期と内部/外部区分を持つ |
-| 実施記録        | InspectionRecord       | 項目ごとの実施の記録。実施のたびに次回期限が更新される                              |
-| 点検校正外部案件    | CalibrationOrder       | 外部点検校正の発注1件。発注〜返却までの進捗と納期を追跡                           |
+| 点検校正項目    | ServiceItem         | 機器に紐づく管理単位。「月次点検」「年次校正」など。周期と内部/外部区分を持つ |
+| 実施記録        | ServiceRecord       | 項目ごとの実施の記録。実施のたびに次回期限が更新される                              |
+| 点検校正外部案件    | ServiceOrder       | 外部点検校正の発注1件。発注〜返却までの進捗と納期を追跡                           |
 | 通知            | Notification           | 期限接近・発注推奨などのアプリ内通知                                          |
 | 周期            | Cycle                  | 点検・校正の間隔。1/3/6ヶ月、1/2/3/5/10年                                     |
 | 標準納期        | Standard Lead Time     | 外部点検校正の依頼先ごとの標準的な所要日数                                        |
 | 発注推奨日      | Recommended Order Date | 期限から納期と余裕日数を逆算した、発注すべき日                                |
 
-日本語名はこの表の表記に統一する。Vendor は「メーカー/取引先」(中黒「メーカー・取引先」は使わない)、CalibrationOrder は「点検校正外部案件」、InspectionRecord は一覧表示も含め「実施記録」(「実施履歴」は使わない)で統一する(D-038)。
+日本語名はこの表の表記に統一する。Vendor は「メーカー/取引先」(中黒「メーカー・取引先」は使わない)、ServiceOrder は「点検校正外部案件」、ServiceRecord は一覧表示も含め「実施記録」(「実施履歴」は使わない)で統一する(D-038)。
+
+エンティティ英語名は Service 系(ServiceItem / ServiceRecord / ServiceOrder)で統一する。総称の Service は点検・校正の両種別を包含する傘の語であり、種別を表す enum 値(`inspection` / `calibration`)や案件状態の `inCalibration` とは役割が異なるため衝突しない。旧名 InspectionItem / InspectionRecord / CalibrationOrder は接頭辞が種別 enum と衝突し「点検項目の種別が校正」のような矛盾した読みを生むため廃止(旧永続化データはスキーマ v3 マイグレーションで無損失変換。旧ヘッダ `inspectionItemId` を含む既エクスポートCSVはインポート互換なし、要再エクスポート)(D-045)。
 
 ## 2. エンティティ関連図
 
 ```mermaid
 erDiagram
     Vendor ||--o{ Equipment : "製造(メーカーとして)"
-    Vendor ||--o{ InspectionItem : "校正依頼先(外部の場合)"
-    Equipment ||--o{ InspectionItem : "持つ(1機器に複数項目)"
-    Person ||--o{ InspectionItem : "担当する(項目ごと)"
-    InspectionItem ||--o{ InspectionRecord : "実施記録"
-    InspectionItem ||--o{ CalibrationOrder : "点検校正外部案件(外部のみ)"
-    Vendor ||--o{ CalibrationOrder : "依頼先"
-    InspectionItem ||--o{ Notification : "対象"
-    CalibrationOrder ||--o{ Notification : "対象"
+    Vendor ||--o{ ServiceItem : "校正依頼先(外部の場合)"
+    Equipment ||--o{ ServiceItem : "持つ(1機器に複数項目)"
+    Person ||--o{ ServiceItem : "担当する(項目ごと)"
+    ServiceItem ||--o{ ServiceRecord : "実施記録"
+    ServiceItem ||--o{ ServiceOrder : "点検校正外部案件(外部のみ)"
+    Vendor ||--o{ ServiceOrder : "依頼先"
+    ServiceItem ||--o{ Notification : "対象"
+    ServiceOrder ||--o{ Notification : "対象"
     Person ||--o{ Notification : "宛先"
 ```
 
@@ -83,7 +85,7 @@ erDiagram
 - 機器の削除は論理削除(`retired`)を基本とし、履歴を保持する。
 - 休止 → 稼働の復帰時、配下項目の `nextDueDate` は据え置き(リセットしない)。休止中に期限超過していれば復帰後 overdue として表示される(D-002)。
 
-### 3.4 InspectionItem(点検校正項目)— 中核エンティティ
+### 3.4 ServiceItem(点検校正項目)— 中核エンティティ
 
 1機器に複数登録可能(例: 「月次点検」+「年次校正」)。
 
@@ -104,30 +106,30 @@ erDiagram
 | nextDueDate      | date          | ○       | 次回期限(初回は手入力、以降は実施記録から自動計算)       |
 | isActive         | boolean       | ○       | 項目の有効フラグ                                         |
 
-### 3.5 InspectionRecord(実施記録)
+### 3.5 ServiceRecord(実施記録)
 
 | 属性     | 型            | 必須 | 説明                                                     |
 | -------- | ------------- | ---- | -------------------------------------------------------- |
 | id       | string (uuid) | ○    |                                                          |
-| inspectionItemId   | string        | ○    | InspectionItem参照                                       |
+| serviceItemId   | string        | ○    | ServiceItem参照                                       |
 | doneDate | date          | ○    | 実施日                                                   |
 | doneBy   | string        | ○    | 実施者名(外部の場合は業者名)                             |
 | result   | enum          | ○    | `pass`(合格) / `fail`(不合格) / `adjusted`(調整の上合格) |
-| orderId  | string        |      | 外部点検校正の場合、元になったCalibrationOrder参照           |
+| orderId  | string        |      | 外部点検校正の場合、元になったServiceOrder参照           |
 | note     | string        |      | 備考(校正証明書番号など)                                 |
 
-- 記録登録時に `inspectionItem.lastDoneDate = doneDate`、`inspectionItem.nextDueDate = doneDate + cycle` を自動更新。
+- 記録登録時に `serviceItem.lastDoneDate = doneDate`、`serviceItem.nextDueDate = doneDate + cycle` を自動更新。
 - `fail` の場合は次回期限を更新せず、要対応状態として扱う。
 - 校正値・合格基準の数値記録はスコープ外。記録は `result`(pass/fail/adjusted)とメモ(`note`)のみで、数値入力・判定機能は持たない(D-004)。
 
-### 3.6 CalibrationOrder(点検校正外部案件)
+### 3.6 ServiceOrder(点検校正外部案件)
 
 外部項目の発注1回分。発注前の推奨日逆算(標準納期)と、発注後の個別納期追跡の両方を担う。
 
 | 属性         | 型            | 必須 | 説明                           |
 | ------------ | ------------- | ---- | ------------------------------ |
 | id           | string (uuid) | ○    |                                |
-| inspectionItemId       | string        | ○    | InspectionItem参照             |
+| serviceItemId       | string        | ○    | ServiceItem参照             |
 | vendorId     | string        | ○    | 依頼先                         |
 | status       | enum          | ○    | 下記の状態遷移参照             |
 | orderedDate  | date          |      | 発注日                         |
@@ -143,7 +145,7 @@ planned(発注準備) → ordered(発注済) → inCalibration(校正中) → re
                                                               ↘ cancelled(中止)
 ```
 
-- `returned` 後、InspectionRecordを登録すると `completed` になり、項目の次回期限が更新される。
+- `returned` 後、ServiceRecordを登録すると `completed` になり、項目の次回期限が更新される。
 - 遷移は上図の隣接遷移のみ(飛び越し不可)。加えて `planned`〜`returned` の各段階から `cancelled`(中止)へ遷移できる(図は代表経路のみ図示)。`completed` / `cancelled` からの再遷移は不可。
 
 ### 3.7 Notification(通知)
@@ -155,7 +157,7 @@ planned(発注準備) → ordered(発注済) → inCalibration(校正中) → re
 | ----------- | ------------- | ---- | ------------------ |
 | id          | string (uuid) | ○    |                    |
 | type        | enum          | ○    | 下記の通知種別参照 |
-| targetType  | enum          | ○    | `inspectionItem` / `order`   |
+| targetType  | enum          | ○    | `serviceItem` / `order`   |
 | targetId    | string        | ○    | 対象のID           |
 | personId    | string        | ○    | 宛先担当者         |
 | message     | string        | ○    | 通知文             |
@@ -190,7 +192,7 @@ nextDueDate = lastDoneDate + cycle
 ### 4.2 発注推奨日(外部のみ)
 
 ```
-leadTime = inspectionItem.leadTimeDays ?? vendor.standardLeadTimeDays
+leadTime = serviceItem.leadTimeDays ?? vendor.standardLeadTimeDays
 発注推奨日 = nextDueDate − leadTime − bufferDays
 ```
 

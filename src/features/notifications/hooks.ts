@@ -3,12 +3,12 @@
  * UI（index.tsx）を薄いビューに保つため純関数へ切り出す（coding-standards.md §2）。
  *
  * - 各タブ内は createdDate 降順、同日は id 昇順で決定的に並べる（10-notifications.md「表示ルール」）。
- * - 行クリックの遷移先は D-027 に従い解決する。inspectionItem が dangling（削除済み）なら null を返し、
+ * - 行クリックの遷移先は D-027 に従い解決する。serviceItem が dangling（削除済み）なら null を返し、
  *   呼び出し側は既読化のみで遷移しない。
  */
 
 import { equipmentDetailPath, ROUTES } from "@/constants/routes";
-import { NOTIFICATION_TARGET_TYPE, type InspectionItem, type Notification } from "@/store/types";
+import { NOTIFICATION_TARGET_TYPE, type ServiceItem, type Notification } from "@/store/types";
 import { recordValue } from "@/utils/record";
 
 /** 通知センターのタブ（画面ローカルUI状態）。既定は未読（10-notifications.md「操作・アクション」） */
@@ -49,16 +49,16 @@ export const selectTabNotifications = (
 /**
  * 行クリック時の遷移先パスを解決する（D-027）。
  * - targetType=order → 案件一覧。
- * - targetType=inspectionItem → 項目から機器を辿り機器詳細。項目が dangling なら null（遷移しない）。
+ * - targetType=serviceItem → 項目から機器を辿り機器詳細。項目が dangling なら null（遷移しない）。
  */
 export const resolveNotificationTarget = (
   notification: Notification,
-  inspectionItems: Record<string, InspectionItem>,
+  serviceItems: Record<string, ServiceItem>,
 ): string | null => {
   if (notification.targetType === NOTIFICATION_TARGET_TYPE.ORDER) {
     return ROUTES.ORDER_LIST;
   }
-  const inspectionItem = recordValue(inspectionItems, notification.targetId);
-  if (!inspectionItem) return null;
-  return equipmentDetailPath(inspectionItem.equipmentId);
+  const serviceItem = recordValue(serviceItems, notification.targetId);
+  if (!serviceItem) return null;
+  return equipmentDetailPath(serviceItem.equipmentId);
 };

@@ -31,27 +31,27 @@ Lint/Format は **oxlint + oxfmt**（ESLint/Prettier ではない）。多くは
     Y10: "10Y",
   } as const;
   export type Cycle = (typeof CYCLE)[keyof typeof CYCLE];
-  export const INSPECTION_ITEM_STATUS = {
+  export const SERVICE_ITEM_STATUS = {
     OVERDUE: "overdue",
     ORDER_NOW: "orderNow",
     IN_PROGRESS: "inProgress",
     DUE_SOON: "dueSoon",
     OK: "ok",
   } as const;
-  export type InspectionItemStatus = (typeof INSPECTION_ITEM_STATUS)[keyof typeof INSPECTION_ITEM_STATUS];
+  export type ServiceItemStatus = (typeof SERVICE_ITEM_STATUS)[keyof typeof SERVICE_ITEM_STATUS];
   ```
   根拠: 値と型を 1 箇所で同期。`NOTIFICATION_TYPE`/`ORDER_STATUS`/`EQUIPMENT_STATUS`/`ROUTES` 等で一貫。
 - **zustand スライス**: 型 `XxxSlice` + ファクトリ `createXxxSlice`（例: `EquipmentSlice` / `createEquipmentSlice`）。初期値は独立した定数にせずファクトリ内に直接書く。
-- **selector 関数**: `xxxOf` 形（`inspectionItemsOf`, `ordersOf`, `recordsOf`）。件数系は `unreadNotificationCount` のように用途を綴る。`src/store/selectors.ts`。
+- **selector 関数**: `xxxOf` 形（`serviceItemsOf`, `ordersOf`, `recordsOf`）。件数系は `unreadNotificationCount` のように用途を綴る。`src/store/selectors.ts`。
 - **省略形を使わない**: 識別子（変数・引数・関数・プロパティ・型）は完全な英単語で綴る。短縮形・頭文字省略・単文字いずれも不可。
   - 多文字省略形: `idx`→`index` / `eid`→`equipmentId` / `cfg`→`config` / `prev`→`previous` / `msg`→`message` / `btn`→`button` / `el`→`element` / `info`→説明的な完全名（`errorInfo` 等）。
-  - **単文字のコールバック/selector 引数も不可**。`.map((i) => ...)` ではなく `.map((inspectionItem) => ...)`、zustand は `(s) => s.inspectionItems` ではなく `(state) => state.inspectionItems`、イベントは `(e) => ...` ではなく `(event) => ...`、ループ index は `i` ではなく `index`。
+  - **単文字のコールバック/selector 引数も不可**。`.map((i) => ...)` ではなく `.map((serviceItem) => ...)`、zustand は `(s) => s.serviceItems` ではなく `(state) => state.serviceItems`、イベントは `(e) => ...` ではなく `(event) => ...`、ループ index は `i` ではなく `index`。
     ```ts
     // 不可
-    const inspectionItems = useAppStore((s) => s.inspectionItems);
+    const serviceItems = useAppStore((s) => s.serviceItems);
     options.find((o) => o.value === value);
     // 可
-    const inspectionItems = useAppStore((state) => state.inspectionItems);
+    const serviceItems = useAppStore((state) => state.serviceItems);
     options.find((option) => option.value === value);
     ```
   - 根拠: 現場担当者中心の小規模アプリで保守者が限られる→可読性最優先。`docs/` も含め「なぜ」を綴る文化と整合（タイプ数より明瞭さ）。
@@ -60,9 +60,9 @@ Lint/Format は **oxlint + oxfmt**（ESLint/Prettier ではない）。多くは
 ## 2. ディレクトリ/ファイル構成
 
 - `src/features/**/` の基本: `index.tsx`（薄いビュー本体）+ `hooks.ts`（ロジック）+ `schema.ts`（RHF 用 zod）+ `components/`。
-  - feature 例: `dashboard`（ダッシュボード） / `equipment`（機器一覧・詳細） / `inspectionItems`（点検校正項目一覧）/ `inspectionOrder`（点検校正外部案件） / `vendors`・`persons`（メーカー/取引先・担当者マスタ） / `notifications`（通知センター） / `settings`（設定・バックアップ）。
+  - feature 例: `dashboard`（ダッシュボード） / `equipment`（機器一覧・詳細） / `serviceItems`（点検校正項目一覧）/ `serviceOrder`（点検校正外部案件） / `vendors`・`persons`（メーカー/取引先・担当者マスタ） / `notifications`（通知センター） / `settings`（設定・バックアップ）。
 - **`index.tsx` は barrel ではなく公開コンポーネント本体**。`App.tsx` は `import { Dashboard } from "@/features/dashboard"` のように named export を直接参照。feature にバレル専用ファイルは作らない。
-- **`schema.ts`（RHF 用 zod）はフォームを持つ場所に colocate する**（D-043）。feature 内フォームは `features/**/schema.ts`（`equipment/form/shared`、`inspectionOrder`）、`components/domain/` の各モーダルはモーダルディレクトリ内 `schema.ts`。必須ではない（フォームがなければ置かない）。
+- **`schema.ts`（RHF 用 zod）はフォームを持つ場所に colocate する**（D-043）。feature 内フォームは `features/**/schema.ts`（`equipment/form/shared`、`serviceOrder`）、`components/domain/` の各モーダルはモーダルディレクトリ内 `schema.ts`。必須ではない（フォームがなければ置かない）。
 - **`hooks.ts` は全 feature に置く**（ロジックは hooks に寄せ index.tsx を薄く保つ）。
 - サブコンポーネントが 1 個だけなら feature 直下に置いてよい（複数になったら `components/` へ）。
 - **複数 feature で共有する汎用 React フックは `src/utils/` に他ユーティリティ同様サブディレクトリを切って置く**（D-044。例: `src/utils/navigation/` の `useSafeNavigate` — navigate() の戻り値を無視する共通ラッパー。画面遷移はこれを使い、`Promise.resolve(navigate(...)).catch(...)` を各所に書かない）。
@@ -80,7 +80,7 @@ Lint/Format は **oxlint + oxfmt**（ESLint/Prettier ではない）。多くは
 - **React props 型はコンポーネント内ローカルに `type Props = { ... }`**。HTML 要素拡張は交差型（`ButtonHTMLAttributes<HTMLButtonElement> & { ... }`）。
 - **React 19 流儀**: `forwardRef` を使わず `ref?: Ref<T>` を props に含める。
 - 単一 prop の `View` はインライン注釈可（`({ equipmentId }: { equipmentId: string })`）。複数 prop は `type Props`。
-- **型のみ import は必ず `type` 修飾**（`import { INSPECTION_ITEM_STATUS, type InspectionItem } from ...` の混在形も可）。
+- **型のみ import は必ず `type` 修飾**（`import { SERVICE_ITEM_STATUS, type ServiceItem } from ...` の混在形も可）。
 
 ## 4. React / コンポーネント
 
@@ -102,12 +102,12 @@ Lint/Format は **oxlint + oxfmt**（ESLint/Prettier ではない）。多くは
 - **Immer ドラフトを直接破壊的変更**（spread で新オブジェクトを返さない）:
   ```ts
   set((state) => {
-    state.inspectionItems[id] = inspectionItem;
-  }); // delete state.inspectionItems[id] / Object.assign(...) も
+    state.serviceItems[id] = serviceItem;
+  }); // delete state.serviceItems[id] / Object.assign(...) も
   ```
-- **action 内ガードは early-return**（`const inspectionItem = state.inspectionItems[id]; if (!inspectionItem) return;`）。
+- **action 内ガードは early-return**（`const serviceItem = state.serviceItems[id]; if (!serviceItem) return;`）。
 - **横断 selector（複数エンティティ導出）は `src/store/selectors.ts` に純関数で**（store を引数に取りテスト可能に）。
-- **ローカル state vs store**: 永続化対象（equipment/inspection-items/records/orders/vendors/persons/notifications 等、`partialize` で限定）は store。UI 一時状態（編集中 id・モーダル開閉・選択 Set）は `useState`。項目ステータス（`deriveInspectionItemStatus`）・発注推奨日は**永続化せず純関数で派生**（ドメインモデル §4）。
+- **ローカル state vs store**: 永続化対象（equipment/service-items/records/orders/vendors/persons/notifications 等、`partialize` で限定）は store。UI 一時状態（編集中 id・モーダル開閉・選択 Set）は `useState`。項目ステータス（`deriveServiceItemStatus`）・発注推奨日は**永続化せず純関数で派生**（ドメインモデル §4）。
 
 ## 6. import
 
@@ -129,8 +129,8 @@ Lint/Format は **oxlint + oxfmt**（ESLint/Prettier ではない）。多くは
 ## 8. ドメインロジック
 
 - `src/domain/` は**純粋関数のみ**（`export const fn = (args): RetType => ...`、明示戻り値型）。副作用・this・I/O なし。
-  - 例: `dateCycle.ts`（`addCycle`: 次回期限計算）、`leadTime.ts`（発注推奨日逆算）、`inspectionItemStatus.ts`（`deriveInspectionItemStatus`）、`notificationRules.ts`（通知生成判定）、`orderStatus.ts`（状態遷移テーブル）、`statusBadge.ts`（バッジ色マッピング）。
-- **不変スタイル**: 入力を変更せず `{ ...inspectionItem, ... }` で新値を返す。
+  - 例: `dateCycle.ts`（`addCycle`: 次回期限計算）、`leadTime.ts`（発注推奨日逆算）、`serviceItemStatus.ts`（`deriveServiceItemStatus`）、`notificationRules.ts`（通知生成判定）、`orderStatus.ts`（状態遷移テーブル）、`statusBadge.ts`（バッジ色マッピング）。
+- **不変スタイル**: 入力を変更せず `{ ...serviceItem, ... }` で新値を返す。
 - **マジックナンバーは `src/domain/constants.ts` に JSDoc 付き定数で集約**（`DEFAULT_BUFFER_DAYS`（発注余裕日数デフォルト14）、`DEFAULT_NOTICE_DAYS_BEFORE`（通知開始日数デフォルト30）等）。
 - **例外を投げない**: 失敗・不在は `null` 返却 or early-return ガードで表現。zod は `parse` でなく `safeParse`。store の堅牢化も例外でなく「サルベージ → 空状態フォールバック」+ `console.warn`。CSVインポートも同様に、不正行は例外にせずエラー表示用の結果値として返す（例外: `src/main.tsx` のルート要素不在ガードのみ throw 可。復帰不能なブートストラップ失敗の fail-fast のため）。
 

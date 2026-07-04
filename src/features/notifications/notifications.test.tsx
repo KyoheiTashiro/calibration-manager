@@ -1,7 +1,7 @@
 /**
  * NotificationCenter（/notifications、screen-design/10-notifications.md）の検証。
  * タブ切替・並び順（createdDate 降順/同日 id 昇順）・種別バッジ・全て既読・
- * 行クリック遷移（order/inspectionItem/dangling, D-027）・空状態2種を扱う。
+ * 行クリック遷移（order/serviceItem/dangling, D-027）・空状態2種を扱う。
  */
 
 import { ROUTES } from "@/constants/routes";
@@ -10,11 +10,11 @@ import {
   CYCLE,
   EQUIPMENT_STATUS,
   EXECUTION,
-  INSPECTION_ITEM_TYPE,
+  SERVICE_ITEM_TYPE,
   NOTIFICATION_TARGET_TYPE,
   NOTIFICATION_TYPE,
   type Equipment,
-  type InspectionItem,
+  type ServiceItem,
   type Notification,
 } from "@/store/types";
 import { renderWithStore, seedStore, setupStoreIsolation } from "@/test/renderWithStore";
@@ -38,10 +38,10 @@ const equipment1: Equipment = {
   status: EQUIPMENT_STATUS.ACTIVE,
 };
 
-const item1: InspectionItem = {
+const item1: ServiceItem = {
   id: "item-1",
   equipmentId: "equipment-1",
-  type: INSPECTION_ITEM_TYPE.INSPECTION,
+  type: SERVICE_ITEM_TYPE.INSPECTION,
   name: "定期点検",
   cycle: CYCLE.Y1,
   execution: EXECUTION.INTERNAL,
@@ -54,7 +54,7 @@ const item1: InspectionItem = {
 
 const makeNotif = (overrides: Partial<Notification> & Pick<Notification, "id">): Notification => ({
   type: NOTIFICATION_TYPE.OVERDUE,
-  targetType: NOTIFICATION_TARGET_TYPE.INSPECTION_ITEM,
+  targetType: NOTIFICATION_TARGET_TYPE.SERVICE_ITEM,
   targetId: "item-1",
   personId: "person-1",
   message: "通知メッセージ",
@@ -205,11 +205,11 @@ describe("NotificationCenter: 行クリック遷移（D-027）", () => {
     expect(screen.getByText("案件一覧画面")).toBeInTheDocument();
   });
 
-  it("targetType=inspectionItem の行クリックで機器詳細へ遷移する", async () => {
+  it("targetType=serviceItem の行クリックで機器詳細へ遷移する", async () => {
     const user = userEvent.setup();
     seedStore({
       equipment: { [equipment1.id]: equipment1 },
-      inspectionItems: { [item1.id]: item1 },
+      serviceItems: { [item1.id]: item1 },
       notifications: {
         i1: makeNotif({ id: "i1", targetId: "item-1", message: "項目通知" }),
       },
@@ -221,7 +221,7 @@ describe("NotificationCenter: 行クリック遷移（D-027）", () => {
     expect(screen.getByText("機器詳細:equipment-1")).toBeInTheDocument();
   });
 
-  it("dangling inspectionItem（項目削除済み）の行クリックは既読化のみで遷移しない", async () => {
+  it("dangling serviceItem（項目削除済み）の行クリックは既読化のみで遷移しない", async () => {
     const user = userEvent.setup();
     seedStore({
       notifications: {

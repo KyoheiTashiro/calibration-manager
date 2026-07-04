@@ -4,10 +4,10 @@
  * スライス実装とは型のみの相互参照であり、実行時の循環importは発生しない。
  */
 
-import type { CalibrationOrderSlice } from "@/store/slices/calibrationOrderSlice";
+import type { ServiceOrderSlice } from "@/store/slices/serviceOrderSlice";
 import type { EquipmentSlice } from "@/store/slices/equipmentSlice";
-import type { InspectionItemSlice } from "@/store/slices/inspectionItemSlice";
-import type { InspectionRecordSlice } from "@/store/slices/inspectionRecordSlice";
+import type { ServiceItemSlice } from "@/store/slices/serviceItemSlice";
+import type { ServiceRecordSlice } from "@/store/slices/serviceRecordSlice";
 import type { NotificationSlice } from "@/store/slices/notificationSlice";
 import type { PersonSlice } from "@/store/slices/personSlice";
 import type { VendorSlice } from "@/store/slices/vendorSlice";
@@ -17,9 +17,9 @@ import type { StateCreator } from "zustand";
 export type StoreState = VendorSlice &
   PersonSlice &
   EquipmentSlice &
-  InspectionItemSlice &
-  InspectionRecordSlice &
-  CalibrationOrderSlice &
+  ServiceItemSlice &
+  ServiceRecordSlice &
+  ServiceOrderSlice &
   NotificationSlice & {
     /** 全エンティティを初期状態に戻す（設定画面の全削除・テスト分離用） */
     resetAll: () => void;

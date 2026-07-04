@@ -45,7 +45,7 @@
 | `/equipment/create`      | 機器登録                   | [§3](./03-equipment-form.md)   | フォーム画面                       |
 | `/equipment/:id`      | 機器詳細(項目・記録含む)   | [§4](./04-equipment-detail.md) |                                    |
 | `/equipment/:id/edit` | 機器編集                   | [§3](./03-equipment-form.md)   | フォーム画面                       |
-| `/inspection-items`              | 点検校正項目一覧(中核)     | [§5](./05-inspection-item-list.md)        | クエリでステータスフィルタ受け取り |
+| `/service-items`              | 点検校正項目一覧(中核)     | [§5](./05-service-item-list.md)        | クエリでステータスフィルタ受け取り |
 | `/orders`             | 点検校正外部案件(かんばん) | [§8](./08-orders.md)           |                                    |
 | `/vendors`            | メーカー/取引先マスタ      | [§9](./09-masters.md)          |                                    |
 | `/persons`            | 担当者マスタ               | [§9](./09-masters.md)          |                                    |
@@ -59,8 +59,8 @@
 - [2. 機器一覧](./02-equipment-list.md)
 - [3. 機器登録・編集](./03-equipment-form.md)
 - [4. 機器詳細](./04-equipment-detail.md)
-- [5. 点検校正項目一覧(中核画面)](./05-inspection-item-list.md)
-- [6. 点検校正項目モーダル](./06-inspection-item-modal.md)
+- [5. 点検校正項目一覧(中核画面)](./05-service-item-list.md)
+- [6. 点検校正項目モーダル](./06-service-item-modal.md)
 - [7. 実施記録登録モーダル](./07-record-modal.md)
 - [8. 点検校正外部案件](./08-orders.md)
 - [9. マスタ管理(メーカー/取引先・担当者)](./09-masters.md)
@@ -68,7 +68,7 @@
 - [11. 設定・バックアップ](./11-settings.md)
 - [12. 利用マニュアル](./12-manual.md)
 
-**モーダルで行う操作(ページ遷移しない)**: 点検校正項目の登録・編集([§6](./06-inspection-item-modal.md))、実施記録登録([§7](./07-record-modal.md))、点検校正外部案件の作成・状態更新([§8](./08-orders.md))、Vendor/Person の追加・編集([§9](./09-masters.md))。これらは機器詳細・点検校正項目一覧・案件一覧などから起動する。
+**モーダルで行う操作(ページ遷移しない)**: 点検校正項目の登録・編集([§6](./06-service-item-modal.md))、実施記録登録([§7](./07-record-modal.md))、点検校正外部案件の作成・状態更新([§8](./08-orders.md))、Vendor/Person の追加・編集([§9](./09-masters.md))。これらは機器詳細・点検校正項目一覧・案件一覧などから起動する。
 
 ### 0.3 ステータスバッジ色(共通定義)
 
@@ -82,7 +82,7 @@
 | `dueSoon`    | 期限接近 | 🟡 黄 |
 | `ok`         | 正常     | 🟢 緑 |
 
-- 判定は上表の優先度順(上が優先)。判定条件・優先度の詳細は [domain-model.md §4.3](../domain-model.md) を参照。導出関数は1箇所(例: `deriveInspectionItemStatus(inspectionItem, orders, today)`)に集約し、全画面がこれを利用する。
+- 判定は上表の優先度順(上が優先)。判定条件・優先度の詳細は [domain-model.md §4.3](../domain-model.md) を参照。導出関数は1箇所(例: `deriveServiceItemStatus(serviceItem, orders, today)`)に集約し、全画面がこれを利用する。
 - 色トークンはTailwindのユーティリティ(例: `bg-red-100 text-red-800` 等)へマッピングし、`statusBadgeClass(status)` の単一ヘルパで供給する。
 
 ### 0.4 日付表示形式
@@ -114,18 +114,18 @@
 
 ```mermaid
 flowchart TD
-    Dash[ダッシュボード /] -->|サマリーカード| InspectionItems[点検校正項目一覧 /inspection-items]
+    Dash[ダッシュボード /] -->|サマリーカード| ServiceItems[点検校正項目一覧 /service-items]
     Dash -->|通知| Notice[通知センター /notifications]
-    Sidebar((サイドバー)) --> Dash & EqList[機器一覧 /equipment] & InspectionItems & Orders[案件一覧 /orders] & Vendors[メーカー /vendors] & Persons[担当者 /persons] & Notice & Settings[設定 /settings] & Manual[利用マニュアル /manual]
+    Sidebar((サイドバー)) --> Dash & EqList[機器一覧 /equipment] & ServiceItems & Orders[案件一覧 /orders] & Vendors[メーカー /vendors] & Persons[担当者 /persons] & Notice & Settings[設定 /settings] & Manual[利用マニュアル /manual]
     EqList -->|行クリック| EqDetail[機器詳細 /equipment/:id]
     EqList -->|追加| EqCreate[機器登録 /equipment/create]
     EqDetail -->|編集| EqEdit[機器編集 /equipment/:id/edit]
-    EqDetail -.項目追加/編集.-> InspectionItemModal[[点検校正項目モーダル]]
+    EqDetail -.項目追加/編集.-> ServiceItemModal[[点検校正項目モーダル]]
     EqDetail -.実施記録.-> RecModal[[実施記録登録モーダル]]
-    InspectionItems -.実施記録.-> RecModal
-    InspectionItems -.案件作成.-> OrderModal[[案件作成モーダル]]
-    InspectionItems -.項目編集.-> InspectionItemModal
+    ServiceItems -.実施記録.-> RecModal
+    ServiceItems -.案件作成.-> OrderModal[[案件作成モーダル]]
+    ServiceItems -.項目編集.-> ServiceItemModal
     Orders -.状態遷移/記録.-> RecModal
-    Notice -->|対象へ遷移| InspectionItems
+    Notice -->|対象へ遷移| ServiceItems
     Notice -->|対象へ遷移| Orders
 ```

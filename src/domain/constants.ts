@@ -4,13 +4,13 @@
  */
 
 /**
- * 発注余裕日数のデフォルト（domain-model.md §3.4 InspectionItem.bufferDays）。
+ * 発注余裕日数のデフォルト（domain-model.md §3.4 ServiceItem.bufferDays）。
  * 発注推奨日 = nextDueDate − leadTime − bufferDays の余裕分。
  */
 export const DEFAULT_BUFFER_DAYS = 14;
 
 /**
- * 通知開始日数のデフォルト（domain-model.md §3.4 InspectionItem.noticeDaysBefore）。
+ * 通知開始日数のデフォルト（domain-model.md §3.4 ServiceItem.noticeDaysBefore）。
  * 期限の何日前から dueSoon 通知・ステータスを出すか。
  */
 export const DEFAULT_NOTICE_DAYS_BEFORE = 30;

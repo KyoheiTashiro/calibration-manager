@@ -1,19 +1,19 @@
 /**
- * 実施記録（InspectionRecord）の登録モーダル（screen-design/07-record-modal.md）。RHF + zodResolver。
+ * 実施記録（ServiceRecord）の登録モーダル（screen-design/07-record-modal.md）。RHF + zodResolver。
  * 対象項目は常に確定した状態で起動元から渡される。登録時の期限更新・案件完了カスケードは
- * ストア層 addRecord が担う（inspectionRecordSlice.ts）。
+ * ストア層 addRecord が担う（serviceRecordSlice.ts）。
  * 呼び出し元は閉時アンマウント（条件マウント）必須。defaultValues はマウント時にのみ評価されるため、
  * 常時マウントで open をトグルする使い方ではプリフィルされない。
  */
 
 import { recordFormSchema, type RecordFormValues } from "@/components/domain/RecordModal/schema";
 import { Button, DateField, Modal, RadioGroup, TextField } from "@/components/ui";
-import { RECORD_RESULT_OPTIONS } from "@/features/inspectionItems/constants";
+import { RECORD_RESULT_OPTIONS } from "@/features/serviceItems/constants";
 import {
   EXECUTION,
   RECORD_RESULT,
-  type CalibrationOrder,
-  type InspectionItem,
+  type ServiceOrder,
+  type ServiceItem,
   type Vendor,
 } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
@@ -25,7 +25,7 @@ import { useForm, useWatch, type DefaultValues } from "react-hook-form";
 type Props = {
   open: boolean;
   /** 対象項目。起動元で常に確定した状態で渡す */
-  inspectionItemId: string;
+  serviceItemId: string;
   /** 案件経由起動時のみ指定(returned 案件)。記録に紐付き completed 連鎖する */
   orderId?: string;
   onClose: () => void;
@@ -41,13 +41,13 @@ const pickRecord = <Value,>(record: Record<string, Value>, key: string): Value |
  * ③internal または Vendor 解決不能 → 空欄。
  */
 const resolvePrefillDoneBy = (
-  inspectionItem: InspectionItem | undefined,
-  order: CalibrationOrder | undefined,
+  serviceItem: ServiceItem | undefined,
+  order: ServiceOrder | undefined,
   vendors: Record<string, Vendor>,
 ): string => {
   if (order) return pickRecord(vendors, order.vendorId)?.name ?? "";
-  if (inspectionItem !== undefined && inspectionItem.execution === EXECUTION.EXTERNAL) {
-    const { vendorId } = inspectionItem;
+  if (serviceItem !== undefined && serviceItem.execution === EXECUTION.EXTERNAL) {
+    const { vendorId } = serviceItem;
     if (vendorId !== undefined && vendorId !== "") {
       return pickRecord(vendors, vendorId)?.name ?? "";
     }
@@ -55,12 +55,12 @@ const resolvePrefillDoneBy = (
   return "";
 };
 
-export const RecordModal = ({ open, inspectionItemId, orderId, onClose }: Props): ReactElement => {
-  const inspectionItem = useAppStore((state) =>
-    pickRecord(state.inspectionItems, inspectionItemId),
+export const RecordModal = ({ open, serviceItemId, orderId, onClose }: Props): ReactElement => {
+  const serviceItem = useAppStore((state) =>
+    pickRecord(state.serviceItems, serviceItemId),
   );
   const equipment = useAppStore((state) =>
-    inspectionItem ? pickRecord(state.equipment, inspectionItem.equipmentId) : undefined,
+    serviceItem ? pickRecord(state.equipment, serviceItem.equipmentId) : undefined,
   );
   const vendors = useAppStore((state) => state.vendors);
   const hasOrderId = orderId !== undefined && orderId !== "";
@@ -76,7 +76,7 @@ export const RecordModal = ({ open, inspectionItemId, orderId, onClose }: Props)
   // なぜ result を undefined か: 既定選択なし（未選択で送信すると zod エラー）とするため。
   const defaultValues: DefaultValues<RecordFormValues> = {
     doneDate: todayIsoDate(),
-    doneBy: resolvePrefillDoneBy(inspectionItem, order, vendors),
+    doneBy: resolvePrefillDoneBy(serviceItem, order, vendors),
     result: undefined,
     note: "",
   };
@@ -91,7 +91,7 @@ export const RecordModal = ({ open, inspectionItemId, orderId, onClose }: Props)
     defaultValues,
   });
 
-  // なぜ watch() ではなく useWatch か: InspectionItemModal の execution 監視と同じ理由（react-compiler lint対策）。
+  // なぜ watch() ではなく useWatch か: ServiceItemModal の execution 監視と同じ理由（react-compiler lint対策）。
   const result = useWatch({ control, name: "result" });
   const doneDate = useWatch({ control, name: "doneDate" });
 
@@ -99,8 +99,8 @@ export const RecordModal = ({ open, inspectionItemId, orderId, onClose }: Props)
   const orderVendorName = order ? (pickRecord(vendors, order.vendorId)?.name ?? "") : "";
 
   const targetLabel =
-    inspectionItem && equipment
-      ? `対象:${equipment.managementNo} ${equipment.name} / ${inspectionItem.name}`
+    serviceItem && equipment
+      ? `対象:${equipment.managementNo} ${equipment.name} / ${serviceItem.name}`
       : "対象:(項目情報が見つかりません)";
 
   // なぜ: submitFailed を閉時にリセットし、同一対象で開き直した際の残留エラー表示を防ぐ
@@ -112,7 +112,7 @@ export const RecordModal = ({ open, inspectionItemId, orderId, onClose }: Props)
 
   const onSubmit = (values: RecordFormValues): void => {
     const recordId = addRecord({
-      inspectionItemId,
+      serviceItemId,
       doneDate: values.doneDate,
       doneBy: values.doneBy,
       result: values.result,

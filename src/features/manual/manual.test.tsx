@@ -1,4 +1,4 @@
-import { INSPECTION_ITEM_STATUS } from "@/domain/inspectionItemStatus";
+import { SERVICE_ITEM_STATUS } from "@/domain/serviceItemStatus";
 import { statusBadgeLabel } from "@/domain/statusBadge";
 import { Manual } from "@/features/manual";
 import { renderWithStore, setupStoreIsolation } from "@/test/renderWithStore";
@@ -29,10 +29,10 @@ describe("Manual", () => {
     expect(screen.getByRole("heading", { level: 2, name: heading })).toBeInTheDocument();
   });
 
-  it("全ステータスのバッジ日本語ラベルが表示される(INSPECTION_ITEM_STATUS定義順=優先度順)", () => {
+  it("全ステータスのバッジ日本語ラベルが表示される(SERVICE_ITEM_STATUS定義順=優先度順)", () => {
     renderWithStore(<Manual />);
 
-    for (const status of Object.values(INSPECTION_ITEM_STATUS)) {
+    for (const status of Object.values(SERVICE_ITEM_STATUS)) {
       expect(screen.getAllByText(statusBadgeLabel(status)).length).toBeGreaterThan(0);
     }
   });

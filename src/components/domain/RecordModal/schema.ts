@@ -1,12 +1,12 @@
 /**
  * RecordModal のフォームスキーマ（RHF + zodResolver 用、screen-design/07-record-modal.md）。
  * 入力体験向けの検証（必須・日付形式・結果 enum）をここで担う。
- * 永続化データの構造検証は `src/store/schema.ts` の inspectionRecordSchema が別途担う
+ * 永続化データの構造検証は `src/store/schema.ts` の serviceRecordSchema が別途担う
  * （coding-standards.md §3）。
  *
  * なぜフォーム値をすべて string ベースに保つか: HTML input/radio の値は本質的に文字列であり、
  * defaultValues/reset に渡す型と register 対象の型を一致させ、preprocess/transform による
- * resolver の入出力型ズレを避ける（InspectionItemModal/schema.ts と同方針）。
+ * resolver の入出力型ズレを避ける（ServiceItemModal/schema.ts と同方針）。
  */
 
 import { RECORD_RESULT } from "@/store/types";

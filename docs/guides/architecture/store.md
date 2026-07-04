@@ -20,20 +20,20 @@ useAppStore = create<StoreState>()(
 - ミドルウェア順は `persist(immer(...))`。`immer` を内側に置くことで、各スライスの `set` はImmerドラフトを直接変更する記法で書ける。
 - 単一ストア構成とし、Context Providerは設けない。コンポーネントは `useAppStore(selector)` で購読する。
 - 永続化はLocalStorageのみとし、サーバ同期は行わない（単一端末ローカル運用）。
-- calibration-managerの7エンティティ（Vendor / Person / Equipment / InspectionItem / InspectionRecord / CalibrationOrder / Notification）にそれぞれ1対1対応する7スライスのみでストアを構成する。画面専用の `uiSlice`（フォントサイズ等）は設けない。サイドバーの開閉状態など、ドメインに属さないUI状態は各コンポーネントのローカルstateで完結させ、ストアはドメイン状態のみを保持する。
+- calibration-managerの7エンティティ（Vendor / Person / Equipment / ServiceItem / ServiceRecord / ServiceOrder / Notification）にそれぞれ1対1対応する7スライスのみでストアを構成する。画面専用の `uiSlice`（フォントサイズ等）は設けない。サイドバーの開閉状態など、ドメインに属さないUI状態は各コンポーネントのローカルstateで完結させ、ストアはドメイン状態のみを保持する。
 
 ## スライス構成
 
-`StoreState = VendorSlice & PersonSlice & EquipmentSlice & InspectionItemSlice & InspectionRecordSlice & CalibrationOrderSlice & NotificationSlice`。各スライスは `StateCreator` として定義し、ルートで合成する。
+`StoreState = VendorSlice & PersonSlice & EquipmentSlice & ServiceItemSlice & ServiceRecordSlice & ServiceOrderSlice & NotificationSlice`。各スライスは `StateCreator` として定義し、ルートで合成する。
 
 | スライス                | 状態                                          | 主なアクション                                            | 実装パス                      |
 | ----------------------- | --------------------------------------------- | --------------------------------------------------------- | --------------------------------- |
 | `vendorSlice`           | `vendors: Record<string, Vendor>`             | `addVendor` / `updateVendor` / `removeVendor`             | `slices/vendorSlice.ts`           |
 | `personSlice`           | `persons: Record<string, Person>`             | `addPerson` / `updatePerson` / `setPersonActive`          | `slices/personSlice.ts`           |
 | `equipmentSlice`        | `equipment: Record<string, Equipment>`        | `addEquipment` / `updateEquipment` / `setEquipmentStatus` | `slices/equipmentSlice.ts`        |
-| `inspectionItemSlice`   | `inspectionItems: Record<string, InspectionItem>`       | `addInspectionItem` / `updateInspectionItem` / `setInspectionItemActive`                | `slices/inspectionItemSlice.ts`   |
-| `inspectionRecordSlice` | `records: Record<string, InspectionRecord>`   | `addRecord`                                               | `slices/inspectionRecordSlice.ts` |
-| `calibrationOrderSlice` | `orders: Record<string, CalibrationOrder>`    | `addOrder` / `updateOrder` / `updateOrderStatus`          | `slices/calibrationOrderSlice.ts` |
+| `serviceItemSlice`   | `serviceItems: Record<string, ServiceItem>`       | `addServiceItem` / `updateServiceItem` / `setServiceItemActive`                | `slices/serviceItemSlice.ts`   |
+| `serviceRecordSlice` | `records: Record<string, ServiceRecord>`   | `addRecord`                                               | `slices/serviceRecordSlice.ts` |
+| `serviceOrderSlice` | `orders: Record<string, ServiceOrder>`    | `addOrder` / `updateOrder` / `updateOrderStatus`          | `slices/serviceOrderSlice.ts` |
 | `notificationSlice`     | `notifications: Record<string, Notification>` | `generateNotifications` / `markAsRead` / `markAllAsRead`  | `slices/notificationSlice.ts`     |
 
 - スライスは互いの状態へ `StoreState` 経由で到達可能（`set` は全ストアのドラフト、`get()` は全状態を参照できる）。カスケード処理（後述）はこの前提で成立する。
@@ -43,28 +43,28 @@ useAppStore = create<StoreState>()(
 
 データ整合は各アクションが手続き的に維持する。参照を壊さない設計とする。
 
-- `removeVendor(id)`: Equipment.manufacturerId / InspectionItem.vendorId / CalibrationOrder.vendorId のいずれかから参照されている場合は削除不可とし、no-op（真偽値を返す）とする。UIは事前に確認ダイアログ（screen-design §0.6）を出し、参照が残っている場合はエラー表示する。
+- `removeVendor(id)`: Equipment.manufacturerId / ServiceItem.vendorId / ServiceOrder.vendorId のいずれかから参照されている場合は削除不可とし、no-op（真偽値を返す）とする。UIは事前に確認ダイアログ（screen-design §0.6）を出し、参照が残っている場合はエラー表示する。
 - `setPersonActive(id, isActive)`: Personは物理削除しない（domain-model.md §3.2）。無効化はscreen-design §0.6の確認ダイアログ対象。
 - `setEquipmentStatus(id, status)`: 機器は論理削除のみ（`retired`）。`retired`への変更は確認ダイアログ対象（screen-design §0.6）。`suspended`/`retired`は期限計算・通知の対象外（domain-model.md §3.3）。休止からの再稼働時の期限リセットは据え置き（リセットしない）で確定（D-002）。
-- `setInspectionItemActive(id, isActive)`: 他エンティティと整合を取り、物理削除は行わずisActiveで無効化する（実装判断）。
-- `addRecord(inspectionItemId, doneDate, doneBy, result, orderId?, note?)`: InspectionRecordを追加した上で、
-  - `inspectionItem.lastDoneDate = doneDate` は `result` に関わらず無条件で更新する（D-015）。
-  - `result !== 'fail'` の場合のみ `inspectionItem.nextDueDate = addCycle(doneDate, inspectionItem.cycle)`（暦月ベース加算。domain-model.md §4.1）に更新する。`result === 'fail'` の場合は次回期限のみ据え置く（domain-model.md §3.5、D-015）。
-  - `orderId` が指定されている場合: 対象の `CalibrationOrder.status` を `completed` に更新する（domain-model.md §3.6）。
+- `setServiceItemActive(id, isActive)`: 他エンティティと整合を取り、物理削除は行わずisActiveで無効化する（実装判断）。
+- `addRecord(serviceItemId, doneDate, doneBy, result, orderId?, note?)`: ServiceRecordを追加した上で、
+  - `serviceItem.lastDoneDate = doneDate` は `result` に関わらず無条件で更新する（D-015）。
+  - `result !== 'fail'` の場合のみ `serviceItem.nextDueDate = addCycle(doneDate, serviceItem.cycle)`（暦月ベース加算。domain-model.md §4.1）に更新する。`result === 'fail'` の場合は次回期限のみ据え置く（domain-model.md §3.5、D-015）。
+  - `orderId` が指定されている場合: 対象の `ServiceOrder.status` を `completed` に更新する（domain-model.md §3.6）。
 - `updateOrderStatus(id, nextStatus)`: 状態遷移はdomain-model.md §3.6の状態遷移図に従い、`domain/orderStatus.ts` の許可テーブルで検証する（許可されない遷移はno-op）。`completed`への遷移は上記`addRecord`のカスケード経由のみとし、本アクションから直接指定はしない。
-- `generateNotifications(today)`: 全ての有効な項目（`inspectionItem.isActive` かつ 紐づくEquipmentが `active`）・案件をスキャンし、domain-model.md §3.7の5種別の発生条件を判定する。判定は `domain/notificationRules.ts`（純粋関数。ストアに依存しない）が担い、本アクションは判定結果と現在の `notifications` を突き合わせて、同一 `(targetType, targetId, type)` の**未読**通知が既に存在する場合は生成をスキップする（domain-model.md §3.7「同一対象・同一種別の未読通知は重複生成しない」）。CalibrationOrder起点の通知（`deliveryDueSoon`/`deliveryOverdue`）はCalibrationOrderにpersonId属性がないため、`order.inspectionItemId` からInspectionItemを辿って `inspectionItem.personId` を宛先とする。
+- `generateNotifications(today)`: 全ての有効な項目（`serviceItem.isActive` かつ 紐づくEquipmentが `active`）・案件をスキャンし、domain-model.md §3.7の5種別の発生条件を判定する。判定は `domain/notificationRules.ts`（純粋関数。ストアに依存しない）が担い、本アクションは判定結果と現在の `notifications` を突き合わせて、同一 `(targetType, targetId, type)` の**未読**通知が既に存在する場合は生成をスキップする（domain-model.md §3.7「同一対象・同一種別の未読通知は重複生成しない」）。ServiceOrder起点の通知（`deliveryDueSoon`/`deliveryOverdue`）はServiceOrderにpersonId属性がないため、`order.serviceItemId` からServiceItemを辿って `serviceItem.personId` を宛先とする。
 - `markAsRead(id)` / `markAllAsRead()`: 対象が無ければno-opとする。
 
 ## 永続化（zustand persist）
 
 - ストアキー（`name`）: `calibration-manager:v1`（キー文字列中の `v1` は歴史的な識別子でありスキーマ `version` とは独立。リネームしない）
-- スキーマ `version`: `2`。v1→v2 は `migrateV1ToV2`（`persistence.ts`）が item→inspectionItem 全域リネーム（D-036）を無損失変換し、`MIGRATIONS[1]` に登録済み。`migrations: Record<number, Migration>` によるバージョン間ステップ変換の仕組みを用意しており、将来のスキーマ変更でも同じ仕組みで対応する。
-- `partialize`: 永続化対象は7エンティティの `Record`（vendors / persons / equipment / inspectionItems / records / orders / notifications）のみ。アクション関数・派生値は保存しない。
+- スキーマ `version`: `3`。v1→v2 は `migrateV1ToV2`（item→inspectionItem 全域リネーム、D-036）、v2→v3 は `migrateV2ToV3`（inspectionItem→serviceItem 全域リネーム、D-045）が無損失変換し、いずれも `MIGRATIONS`（`persistence.ts`）に登録済み。`migrations: Record<number, Migration>` によるバージョン間ステップ変換の仕組みを用意しており、将来のスキーマ変更でも同じ仕組みで対応する。
+- `partialize`: 永続化対象は7エンティティの `Record`（vendors / persons / equipment / serviceItems / records / orders / notifications）のみ。アクション関数・派生値は保存しない。
 - 読込パイプライン: LocalStorage → `migrate`（バージョン変換）→ `merge`（検証・サニタイズ・結合）→ ストア、という流れを採用する。
 
 ### migrate
 
-`migratePersistedState(persisted, fromVersion)`（`persistence.ts`）は「version N→N+1」のステップ変換テーブル `MIGRATIONS` を順に適用する。現状 `MIGRATIONS = { 1: migrateV1ToV2 }`（v1→v2、D-036の item→inspectionItem リネーム）。将来のスキーマ変更時には `migrateVNToVN+1` を追加してテーブルへ登録し、`STORAGE_VERSION` をインクリメントする運用。
+`migratePersistedState(persisted, fromVersion)`（`persistence.ts`）は「version N→N+1」のステップ変換テーブル `MIGRATIONS` を順に適用する。現状 `MIGRATIONS = { 1: migrateV1ToV2, 2: migrateV2ToV3 }`（v1→v2 = D-036 の item→inspectionItem リネーム、v2→v3 = D-045 の inspectionItem→serviceItem リネーム）。各ステップは「変換先バージョン当時の形式」を出力し、最終形式への変換は後続ステップの積み重ねで行う。将来のスキーマ変更時には `migrateVNToVN+1` を追加してテーブルへ登録し、`STORAGE_VERSION` をインクリメントする運用。
 
 ### merge（サルベージ戦略）
 
@@ -74,26 +74,26 @@ useAppStore = create<StoreState>()(
 2. **部分破損**: 全体のパースに失敗した場合、7エンティティそれぞれを1レコードずつ `store/schema.ts` のzodスキーマで `safeParse` し、成功分のみ保持する。
 3. **最終手段**: 永続化データがオブジェクトですらない場合は初期状態を採用する。
 
-最後に `sanitizeAppState` で参照整合（Equipment/Person/Vendorなどへの dangling FK を持つ InspectionItem/InspectionRecord/CalibrationOrder/Notification の扱い）を行う。ユーザー入力データ（vendors/persons/equipment/inspection-items/records/orders）は dangling FK でも保持し、表示側で「参照先なし」として扱う。Notification のみ、targetId（inspectionItem/order）または personId が dangling のものを除去する（再生成可能な導出データのため。D-003）。
+最後に `sanitizeAppState` で参照整合（Equipment/Person/Vendorなどへの dangling FK を持つ ServiceItem/ServiceRecord/ServiceOrder/Notification の扱い）を行う。ユーザー入力データ（vendors/persons/equipment/service-items/records/orders）は dangling FK でも保持し、表示側で「参照先なし」として扱う。Notification のみ、targetId（serviceItem/order）または personId が dangling のものを除去する（再生成可能な導出データのため。D-003）。
 
 ## 派生（永続化しない）
 
 ストアに置かず、`domain/` の純粋関数または `store/selectors.ts` で導出する値。
 
-- `deriveInspectionItemStatus(inspectionItem, orders, today)`（`domain/inspectionItemStatus.ts`）— domain-model.md §4.3の優先度付き5ステータス
-- `recommendedOrderDate(inspectionItem, vendor)` / `resolveLeadTime(inspectionItem, vendor)`（`domain/leadTime.ts`）— domain-model.md §4.2
+- `deriveServiceItemStatus(serviceItem, orders, today)`（`domain/serviceItemStatus.ts`）— domain-model.md §4.3の優先度付き5ステータス
+- `recommendedOrderDate(serviceItem, vendor)` / `resolveLeadTime(serviceItem, vendor)`（`domain/leadTime.ts`）— domain-model.md §4.2
 - `addCycle(date, cycle)`（`domain/dateCycle.ts`）— 暦月ベースの次回期限計算（domain-model.md §4.1）
 - `statusBadgeClass(status)`（`domain/statusBadge.ts`）— screen-design §0.3のバッジ色マッピング
-- `computeExpectedNotifications(inspectionItems, orders, vendors, equipment, today)`（`domain/notificationRules.ts`）— 上記`generateNotifications`が使う純粋判定ロジック。dangling equipment（参照先なし）を許容しつつ機器情報を通知文へ解決するため `equipment` を引数に取る
-- `inspectionItemsOf(equipmentId)` / `ordersOf(inspectionItemId)` / `recordsOf(inspectionItemId)` / `unreadNotificationCount()`（`store/selectors.ts`）
+- `computeExpectedNotifications(serviceItems, orders, vendors, equipment, today)`（`domain/notificationRules.ts`）— 上記`generateNotifications`が使う純粋判定ロジック。dangling equipment（参照先なし）を許容しつつ機器情報を通知文へ解決するため `equipment` を引数に取る
+- `serviceItemsOf(equipmentId)` / `ordersOf(serviceItemId)` / `recordsOf(serviceItemId)` / `unreadNotificationCount()`（`store/selectors.ts`）
 
 ## テスト
 
 以下のテストファイル構成。
 
 - `useAppStore.test.ts` — アクション・カスケードの検証
-- `merge.test.ts` — migrate（`migrateV1ToV2` 含む）/ merge 3段構えのサルベージ挙動の検証
+- `merge.test.ts` — migrate（`migrateV1ToV2` / `migrateV2ToV3` 含む）/ merge 3段構えのサルベージ挙動の検証
 - `schema.test.ts` — zodスキーマ（`store/schema.ts`）の検証
 - `slices/*.test.ts` — スライス単体の検証
 - `selectors.test.ts` — 導出ロジックの検証
-- `domain/*.test.ts` — 純粋関数群の検証。一部は `*.proptest.test.ts` としてfast-checkによるproperty testを行う。特に `addCycle` の月末補正や `deriveInspectionItemStatus` の優先度判定は境界値・優先順位が絡むロジックであり、property testと相性が良い。
+- `domain/*.test.ts` — 純粋関数群の検証。一部は `*.proptest.test.ts` としてfast-checkによるproperty testを行う。特に `addCycle` の月末補正や `deriveServiceItemStatus` の優先度判定は境界値・優先順位が絡むロジックであり、property testと相性が良い。

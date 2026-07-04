@@ -2,7 +2,7 @@
  * vendorSlice の検証。removeVendor の参照ガードは store.md「アクション仕様」準拠。
  */
 
-import type { CalibrationOrder, Equipment, InspectionItem, Vendor } from "@/store/types";
+import type { ServiceOrder, Equipment, ServiceItem, Vendor } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
 import { seedStore, setupStoreIsolation } from "@/test/renderWithStore";
 import { beforeEach, describe, expect, it } from "vitest";
@@ -14,7 +14,7 @@ const equipment: Equipment = {
   name: "ノギス",
   status: "active",
 };
-const inspectionItem: InspectionItem = {
+const serviceItem: ServiceItem = {
   id: "item-1",
   equipmentId: "equipment-1",
   type: "calibration",
@@ -28,9 +28,9 @@ const inspectionItem: InspectionItem = {
   nextDueDate: "2026-07-15",
   isActive: true,
 };
-const order: CalibrationOrder = {
+const order: ServiceOrder = {
   id: "order-1",
-  inspectionItemId: "item-1",
+  serviceItemId: "item-1",
   vendorId: "vendor-1",
   status: "returned",
 };
@@ -76,15 +76,15 @@ describe("removeVendor: 参照ガード", () => {
     expect(useAppStore.getState().vendors[vendor.id]).toEqual(vendor);
   });
 
-  it("InspectionItem.vendorId から参照中は no-op（false）", () => {
+  it("ServiceItem.vendorId から参照中は no-op（false）", () => {
     seedStore({
       vendors: { [vendor.id]: vendor },
-      inspectionItems: { [inspectionItem.id]: inspectionItem },
+      serviceItems: { [serviceItem.id]: serviceItem },
     });
     expect(useAppStore.getState().removeVendor(vendor.id)).toBe(false);
   });
 
-  it("CalibrationOrder.vendorId から参照中は no-op（false）", () => {
+  it("ServiceOrder.vendorId から参照中は no-op（false）", () => {
     seedStore({ vendors: { [vendor.id]: vendor }, orders: { [order.id]: order } });
     expect(useAppStore.getState().removeVendor(vendor.id)).toBe(false);
   });

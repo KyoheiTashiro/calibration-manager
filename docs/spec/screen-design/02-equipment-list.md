@@ -23,7 +23,7 @@
 
 ## 表示項目
 
-Equipment を主体とし各行に: `管理番号`(managementNo)、`機器名`(name)、`型式`(model)、`メーカー名`(manufacturerId → Vendor.name)、`設置場所`(location)、`状態`(status: active=稼働 / suspended=休止 / retired=廃棄)、`項目数`(当該機器の InspectionItem 件数)、`最も近い次回期限`(有効項目の nextDueDate 最小値。項目なし・非稼働は `—`)。
+Equipment を主体とし各行に: `管理番号`(managementNo)、`機器名`(name)、`型式`(model)、`メーカー名`(manufacturerId → Vendor.name)、`設置場所`(location)、`状態`(status: active=稼働 / suspended=休止 / retired=廃棄)、`項目数`(当該機器の ServiceItem 件数)、`最も近い次回期限`(有効項目の nextDueDate 最小値。項目なし・非稼働は `—`)。
 
 ## 操作・アクション
 

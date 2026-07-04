@@ -25,9 +25,9 @@
 └───────────────────────────────────────────────────────────┘
 ```
 
-## 表示項目(カード = CalibrationOrder §3.6)
+## 表示項目(カード = ServiceOrder §3.6)
 
-各カード: `管理番号`(inspectionItem→equipment.managementNo)、`機器名`、`項目名`(inspectionItem.name)、`校正依頼先`(vendorId→Vendor.name)、`発注日`(orderedDate)、`返却予定日`(dueDate)、`費用`(cost)。列は status で分類(planned/ordered/inCalibration/returned)。
+各カード: `管理番号`(serviceItem→equipment.managementNo)、`機器名`、`項目名`(serviceItem.name)、`校正依頼先`(vendorId→Vendor.name)、`発注日`(orderedDate)、`返却予定日`(dueDate)、`費用`(cost)。列は status で分類(planned/ordered/inCalibration/returned)。
 
 ## 操作・アクション(状態遷移。ドメインモデル §3.6 に厳密準拠)
 
@@ -45,8 +45,8 @@ planned → ordered → inCalibration → returned → completed
 
 ## 案件作成モーダル(planned新規作成)
 
-- 起動元: [点検校正項目一覧](./05-inspection-item-list.md)の「案件」アクション(外部・有効案件なしの項目)。
-- 入力: `inspectionItemId`(プリセット)、`vendorId`(既定=inspectionItem.vendorId、`isCalibrator=true`)、任意で dueDate・cost・note。作成時 `status=planned`。
+- 起動元: [点検校正項目一覧](./05-service-item-list.md)の「案件」アクション(外部・有効案件なしの項目)。
+- 入力: `serviceItemId`(プリセット)、`vendorId`(既定=serviceItem.vendorId、`isCalibrator=true`)、任意で dueDate・cost・note。作成時 `status=planned`。
 
 ## 表示ルール・バリデーション(zod)
 
@@ -58,5 +58,5 @@ planned → ordered → inCalibration → returned → completed
 
 ## 空状態
 
-- 全列0件: 「点検校正外部案件はありません。点検校正項目一覧から案件を追加できます」+ `/inspection-items` 導線。
+- 全列0件: 「点検校正外部案件はありません。点検校正項目一覧から案件を追加できます」+ `/service-items` 導線。
 - 個別列0件: 各列に薄い「なし」プレースホルダ。

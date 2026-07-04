@@ -17,7 +17,7 @@ const duplicationKey = (seed: Pick<NotificationSeed, "targetType" | "targetId" |
 export type NotificationSlice = {
   notifications: Record<string, Notification>;
   /**
-   * 有効な項目（inspectionItem.isActive かつ 紐づく機器が active）と全案件をスキャンし、
+   * 有効な項目（serviceItem.isActive かつ 紐づく機器が active）と全案件をスキャンし、
    * 発生条件を満たす通知を生成する。同一（targetType, targetId, type）の未読通知が
    * 既に存在する場合は生成をスキップする（store.md「アクション仕様」）。
    */
@@ -31,14 +31,14 @@ export const createNotificationSlice: AppSliceCreator<NotificationSlice> = (set,
   notifications: {},
 
   generateNotifications: (today): void => {
-    const { inspectionItems, orders, vendors, equipment, notifications } = get();
-    const targetInspectionItems = Object.values(inspectionItems).filter(
-      (inspectionItem) =>
-        inspectionItem.isActive &&
-        recordValue(equipment, inspectionItem.equipmentId)?.status === EQUIPMENT_STATUS.ACTIVE,
+    const { serviceItems, orders, vendors, equipment, notifications } = get();
+    const targetServiceItems = Object.values(serviceItems).filter(
+      (serviceItem) =>
+        serviceItem.isActive &&
+        recordValue(equipment, serviceItem.equipmentId)?.status === EQUIPMENT_STATUS.ACTIVE,
     );
     const seeds = computeExpectedNotifications(
-      targetInspectionItems,
+      targetServiceItems,
       Object.values(orders),
       vendors,
       equipment,

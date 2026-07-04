@@ -1,5 +1,5 @@
 import { StatusBadge } from "@/components/domain/StatusBadge";
-import { INSPECTION_ITEM_STATUS, type InspectionItemStatus } from "@/domain/inspectionItemStatus";
+import { SERVICE_ITEM_STATUS, type ServiceItemStatus } from "@/domain/serviceItemStatus";
 import { statusBadgeClass, statusBadgeLabel } from "@/domain/statusBadge";
 import { render, screen } from "@testing-library/react";
 // なぜ: tsc -b はプロジェクト参照ごとに独立したプログラムのため、テストファイル側でも
@@ -7,7 +7,7 @@ import { render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
 import { describe, expect, it } from "vitest";
 
-const ALL_STATUSES: InspectionItemStatus[] = Object.values(INSPECTION_ITEM_STATUS);
+const ALL_STATUSES: ServiceItemStatus[] = Object.values(SERVICE_ITEM_STATUS);
 
 describe("StatusBadge", () => {
   it("5ステータスすべてで日本語ラベルと配色クラスを表示する", () => {

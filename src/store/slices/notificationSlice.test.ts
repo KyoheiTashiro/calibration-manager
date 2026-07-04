@@ -4,7 +4,7 @@
  * ストア側の責務（対象絞り込み・重複抑止・id/日付付与・既読操作）を検証する。
  */
 
-import type { CalibrationOrder, Equipment, InspectionItem, Person } from "@/store/types";
+import type { ServiceOrder, Equipment, ServiceItem, Person } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
 import { seedStore, setupStoreIsolation } from "@/test/renderWithStore";
 import { beforeEach, describe, expect, it } from "vitest";
@@ -21,7 +21,7 @@ const equipment: Equipment = {
   name: "ノギス",
   status: "active",
 };
-const inspectionItem: InspectionItem = {
+const serviceItem: ServiceItem = {
   id: "item-1",
   equipmentId: "equipment-1",
   type: "calibration",
@@ -36,25 +36,25 @@ const inspectionItem: InspectionItem = {
   nextDueDate: "2026-07-15",
   isActive: true,
 };
-const order: CalibrationOrder = {
+const order: ServiceOrder = {
   id: "order-1",
-  inspectionItemId: "item-1",
+  serviceItemId: "item-1",
   vendorId: "vendor-1",
   status: "ordered",
 };
 
-const seedBase = (overrides?: { inspectionItems?: Record<string, InspectionItem> }): void => {
+const seedBase = (overrides?: { serviceItems?: Record<string, ServiceItem> }): void => {
   seedStore({
     persons: { [person.id]: person },
     equipment: { [equipment.id]: equipment },
-    inspectionItems: overrides?.inspectionItems ?? { [inspectionItem.id]: inspectionItem },
+    serviceItems: overrides?.serviceItems ?? { [serviceItem.id]: serviceItem },
   });
 };
 
 beforeEach(setupStoreIsolation);
 
 describe("generateNotifications", () => {
-  it("期限超過の項目に overdue 通知を生成する（宛先は inspectionItem.personId）", () => {
+  it("期限超過の項目に overdue 通知を生成する（宛先は serviceItem.personId）", () => {
     seedBase();
     useAppStore.getState().generateNotifications("2026-08-01");
 
@@ -62,8 +62,8 @@ describe("generateNotifications", () => {
     expect(notifications).toHaveLength(2); // overdue + 発注推奨（有効案件なしの外部項目）
     const overdue = notifications.find((entry) => entry.type === "overdue");
     expect(overdue).toMatchObject({
-      targetType: "inspectionItem",
-      targetId: inspectionItem.id,
+      targetType: "serviceItem",
+      targetId: serviceItem.id,
       personId: person.id,
       createdDate: "2026-08-01",
       isRead: false,
@@ -91,10 +91,10 @@ describe("generateNotifications", () => {
 
   it("無効な項目・稼働中でない機器の項目は対象外", () => {
     seedBase({
-      inspectionItems: {
-        "item-inactive": { ...inspectionItem, id: "item-inactive", isActive: false },
+      serviceItems: {
+        "item-inactive": { ...serviceItem, id: "item-inactive", isActive: false },
         "item-suspended": {
-          ...inspectionItem,
+          ...serviceItem,
           id: "item-suspended",
           equipmentId: "equipment-suspended",
         },
@@ -111,9 +111,9 @@ describe("generateNotifications", () => {
     expect(useAppStore.getState().notifications).toEqual({});
   });
 
-  it("返却予定超過の案件に deliveryOverdue 通知を inspectionItem.personId 宛で生成する", () => {
+  it("返却予定超過の案件に deliveryOverdue 通知を serviceItem.personId 宛で生成する", () => {
     seedBase({
-      inspectionItems: { [inspectionItem.id]: { ...inspectionItem, nextDueDate: "2099-01-01" } },
+      serviceItems: { [serviceItem.id]: { ...serviceItem, nextDueDate: "2099-01-01" } },
     });
     seedStore({ orders: { [order.id]: { ...order, dueDate: "2026-07-01" } } });
 

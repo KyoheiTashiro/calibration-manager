@@ -9,12 +9,12 @@ import {
   CYCLE,
   EQUIPMENT_STATUS,
   EXECUTION,
-  INSPECTION_ITEM_TYPE,
+  SERVICE_ITEM_TYPE,
   ORDER_STATUS,
   RECORD_RESULT,
-  type CalibrationOrder,
+  type ServiceOrder,
   type Equipment,
-  type InspectionItem,
+  type ServiceItem,
   type Person,
   type Vendor,
 } from "@/store/types";
@@ -34,7 +34,7 @@ const equipment: Equipment = {
 };
 
 /** 項目の校正依頼先（external プリフィルの検証用） */
-const inspectionItemVendor: Vendor = {
+const serviceItemVendor: Vendor = {
   id: "vendor-item",
   name: "ミツトヨ校正センター",
   isManufacturer: false,
@@ -42,7 +42,7 @@ const inspectionItemVendor: Vendor = {
   standardLeadTimeDays: 20,
 };
 
-/** 案件の依頼先（order 経由プリフィルが inspectionItem 側でなく order 側の業者名になることの検証用） */
+/** 案件の依頼先（order 経由プリフィルが serviceItem 側でなく order 側の業者名になることの検証用） */
 const orderVendor: Vendor = {
   id: "vendor-order",
   name: "校正ラボ東京",
@@ -58,15 +58,15 @@ const person: Person = {
   isActive: true,
 };
 
-/** 外部項目（doneBy プリフィルが inspectionItem の業者名になる） */
-const inspectionItemExternal: InspectionItem = {
+/** 外部項目（doneBy プリフィルが serviceItem の業者名になる） */
+const serviceItemExternal: ServiceItem = {
   id: "item-external",
   equipmentId: equipment.id,
-  type: INSPECTION_ITEM_TYPE.CALIBRATION,
+  type: SERVICE_ITEM_TYPE.CALIBRATION,
   name: "年次校正",
   cycle: CYCLE.Y1,
   execution: EXECUTION.EXTERNAL,
-  vendorId: inspectionItemVendor.id,
+  vendorId: serviceItemVendor.id,
   leadTimeDays: 20,
   bufferDays: 10,
   personId: person.id,
@@ -76,10 +76,10 @@ const inspectionItemExternal: InspectionItem = {
 };
 
 /** 内部項目（doneBy プリフィルが空欄になる） */
-const inspectionItemInternal: InspectionItem = {
+const serviceItemInternal: ServiceItem = {
   id: "item-internal",
   equipmentId: equipment.id,
-  type: INSPECTION_ITEM_TYPE.INSPECTION,
+  type: SERVICE_ITEM_TYPE.INSPECTION,
   name: "月次点検",
   cycle: CYCLE.M1,
   execution: EXECUTION.INTERNAL,
@@ -91,17 +91,17 @@ const inspectionItemInternal: InspectionItem = {
 };
 
 /** returned 案件（completed へ遷移可能）。order 経由起動の正常系 */
-const orderReturned: CalibrationOrder = {
+const orderReturned: ServiceOrder = {
   id: "order-returned",
-  inspectionItemId: inspectionItemExternal.id,
+  serviceItemId: serviceItemExternal.id,
   vendorId: orderVendor.id,
   status: ORDER_STATUS.RETURNED,
 };
 
 /** planned 案件（completed へ遷移不可）。addRecord が null を返す異常系の検証用 */
-const orderPlanned: CalibrationOrder = {
+const orderPlanned: ServiceOrder = {
   id: "order-planned",
-  inspectionItemId: inspectionItemExternal.id,
+  serviceItemId: serviceItemExternal.id,
   vendorId: orderVendor.id,
   status: ORDER_STATUS.PLANNED,
 };
@@ -111,13 +111,13 @@ const seedRecordModalStore = (): void => {
   seedStore({
     equipment: { [equipment.id]: equipment },
     vendors: {
-      [inspectionItemVendor.id]: inspectionItemVendor,
+      [serviceItemVendor.id]: serviceItemVendor,
       [orderVendor.id]: orderVendor,
     },
     persons: { [person.id]: person },
-    inspectionItems: {
-      [inspectionItemExternal.id]: inspectionItemExternal,
-      [inspectionItemInternal.id]: inspectionItemInternal,
+    serviceItems: {
+      [serviceItemExternal.id]: serviceItemExternal,
+      [serviceItemInternal.id]: serviceItemInternal,
     },
     orders: {
       [orderReturned.id]: orderReturned,
@@ -139,7 +139,7 @@ describe("RecordModal", () => {
     renderWithStore(
       <RecordModal
         open
-        inspectionItemId={inspectionItemExternal.id}
+        serviceItemId={serviceItemExternal.id}
         onClose={vi.fn<() => void>()}
       />,
     );
@@ -147,7 +147,7 @@ describe("RecordModal", () => {
   });
 
   it("項目が解決できない場合でも例外を投げず defensive 表示になる", () => {
-    renderWithStore(<RecordModal open inspectionItemId="missing" onClose={vi.fn<() => void>()} />);
+    renderWithStore(<RecordModal open serviceItemId="missing" onClose={vi.fn<() => void>()} />);
     expect(screen.getByText("対象:(項目情報が見つかりません)")).toBeInTheDocument();
   });
 
@@ -155,7 +155,7 @@ describe("RecordModal", () => {
     renderWithStore(
       <RecordModal
         open
-        inspectionItemId={inspectionItemExternal.id}
+        serviceItemId={serviceItemExternal.id}
         onClose={vi.fn<() => void>()}
       />,
     );
@@ -166,7 +166,7 @@ describe("RecordModal", () => {
     renderWithStore(
       <RecordModal
         open
-        inspectionItemId={inspectionItemExternal.id}
+        serviceItemId={serviceItemExternal.id}
         orderId={orderReturned.id}
         onClose={vi.fn<() => void>()}
       />,
@@ -178,12 +178,12 @@ describe("RecordModal", () => {
     renderWithStore(
       <RecordModal
         open
-        inspectionItemId={inspectionItemExternal.id}
+        serviceItemId={serviceItemExternal.id}
         onClose={vi.fn<() => void>()}
       />,
     );
     expect(screen.getByLabelText("実施者", { exact: false })).toHaveValue(
-      inspectionItemVendor.name,
+      serviceItemVendor.name,
     );
   });
 
@@ -191,7 +191,7 @@ describe("RecordModal", () => {
     renderWithStore(
       <RecordModal
         open
-        inspectionItemId={inspectionItemInternal.id}
+        serviceItemId={serviceItemInternal.id}
         onClose={vi.fn<() => void>()}
       />,
     );
@@ -202,7 +202,7 @@ describe("RecordModal", () => {
     renderWithStore(
       <RecordModal
         open
-        inspectionItemId={inspectionItemExternal.id}
+        serviceItemId={serviceItemExternal.id}
         orderId={orderReturned.id}
         onClose={vi.fn<() => void>()}
       />,
@@ -216,7 +216,7 @@ describe("RecordModal", () => {
     renderWithStore(
       <RecordModal
         open
-        inspectionItemId={inspectionItemExternal.id}
+        serviceItemId={serviceItemExternal.id}
         onClose={vi.fn<() => void>()}
       />,
     );
@@ -230,7 +230,7 @@ describe("RecordModal", () => {
     const user = userEvent.setup();
     const onClose = vi.fn<() => void>();
     renderWithStore(
-      <RecordModal open inspectionItemId={inspectionItemExternal.id} onClose={onClose} />,
+      <RecordModal open serviceItemId={serviceItemExternal.id} onClose={onClose} />,
     );
 
     const doneDateField = screen.getByLabelText("実施日", { exact: false });
@@ -249,7 +249,7 @@ describe("RecordModal", () => {
     const user = userEvent.setup();
     const onClose = vi.fn<() => void>();
     renderWithStore(
-      <RecordModal open inspectionItemId={inspectionItemExternal.id} onClose={onClose} />,
+      <RecordModal open serviceItemId={serviceItemExternal.id} onClose={onClose} />,
     );
 
     await user.click(screen.getByLabelText("合格"));
@@ -259,9 +259,9 @@ describe("RecordModal", () => {
     const records = Object.values(recordsOf());
     expect(records).toHaveLength(1);
     expect(records[0]).toMatchObject({
-      inspectionItemId: inspectionItemExternal.id,
+      serviceItemId: serviceItemExternal.id,
       doneDate: todayIsoDate(),
-      doneBy: inspectionItemVendor.name,
+      doneBy: serviceItemVendor.name,
       result: RECORD_RESULT.PASS,
       note: "証明書#A-102",
     });
@@ -275,7 +275,7 @@ describe("RecordModal", () => {
     renderWithStore(
       <RecordModal
         open
-        inspectionItemId={inspectionItemExternal.id}
+        serviceItemId={serviceItemExternal.id}
         orderId={orderPlanned.id}
         onClose={onClose}
       />,
@@ -296,7 +296,7 @@ describe("RecordModal", () => {
     renderWithStore(
       <RecordModal
         open
-        inspectionItemId={inspectionItemInternal.id}
+        serviceItemId={serviceItemInternal.id}
         onClose={vi.fn<() => void>()}
       />,
     );
@@ -313,7 +313,7 @@ describe("RecordModal", () => {
     renderWithStore(
       <RecordModal
         open
-        inspectionItemId={inspectionItemExternal.id}
+        serviceItemId={serviceItemExternal.id}
         onClose={vi.fn<() => void>()}
       />,
     );

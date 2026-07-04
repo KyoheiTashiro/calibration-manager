@@ -8,11 +8,11 @@ import { ROUTES } from "@/constants/routes";
 import { EquipmentList } from "@/features/equipment/list";
 import {
   EQUIPMENT_STATUS,
-  INSPECTION_ITEM_TYPE,
+  SERVICE_ITEM_TYPE,
   CYCLE,
   EXECUTION,
   type Equipment,
-  type InspectionItem,
+  type ServiceItem,
   type Vendor,
 } from "@/store/types";
 import { renderWithStore, seedStore, setupStoreIsolation } from "@/test/renderWithStore";
@@ -75,10 +75,10 @@ const retiredEquipment: Equipment = {
   status: EQUIPMENT_STATUS.RETIRED,
 };
 
-const makeInspectionItem = (
-  overrides: Partial<InspectionItem> & Pick<InspectionItem, "id" | "equipmentId">,
-): InspectionItem => ({
-  type: INSPECTION_ITEM_TYPE.INSPECTION,
+const makeServiceItem = (
+  overrides: Partial<ServiceItem> & Pick<ServiceItem, "id" | "equipmentId">,
+): ServiceItem => ({
+  type: SERVICE_ITEM_TYPE.INSPECTION,
   name: "定期点検",
   cycle: CYCLE.Y1,
   execution: EXECUTION.INTERNAL,
@@ -108,13 +108,13 @@ describe("EquipmentList: 一覧表示", () => {
         [activeEquipmentWithDue.id]: activeEquipmentWithDue,
         [activeEquipmentNoVendor.id]: activeEquipmentNoVendor,
       },
-      inspectionItems: {
-        "item-1": makeInspectionItem({
+      serviceItems: {
+        "item-1": makeServiceItem({
           id: "item-1",
           equipmentId: activeEquipmentWithDue.id,
           nextDueDate: "2026-09-01",
         }),
-        "item-2": makeInspectionItem({
+        "item-2": makeServiceItem({
           id: "item-2",
           equipmentId: activeEquipmentWithDue.id,
           nextDueDate: "2026-08-15",
@@ -144,8 +144,8 @@ describe("EquipmentList: 非稼働機器の期限", () => {
   it("suspended機器は有効項目があっても期限が—になる", () => {
     seedStore({
       equipment: { [suspendedEquipment.id]: suspendedEquipment },
-      inspectionItems: {
-        "item-1": makeInspectionItem({
+      serviceItems: {
+        "item-1": makeServiceItem({
           id: "item-1",
           equipmentId: suspendedEquipment.id,
           nextDueDate: "2026-08-15",
@@ -163,8 +163,8 @@ describe("EquipmentList: 非稼働機器の期限", () => {
     const user = userEvent.setup();
     seedStore({
       equipment: { [retiredEquipment.id]: retiredEquipment },
-      inspectionItems: {
-        "item-1": makeInspectionItem({
+      serviceItems: {
+        "item-1": makeServiceItem({
           id: "item-1",
           equipmentId: retiredEquipment.id,
           nextDueDate: "2026-08-15",
@@ -186,8 +186,8 @@ describe("EquipmentList: active機器でisActive項目のみ", () => {
   it("isActive=falseの項目しかなければ期限は—になる", () => {
     seedStore({
       equipment: { [activeEquipmentNoVendor.id]: activeEquipmentNoVendor },
-      inspectionItems: {
-        "item-1": makeInspectionItem({
+      serviceItems: {
+        "item-1": makeServiceItem({
           id: "item-1",
           equipmentId: activeEquipmentNoVendor.id,
           nextDueDate: "2026-08-15",

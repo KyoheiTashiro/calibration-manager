@@ -3,7 +3,7 @@
  * UI（index.tsx）を薄いビューに保つため切り出す（coding-standards.md §2）。
  */
 
-import { inspectionItemsOf } from "@/store/selectors";
+import { serviceItemsOf } from "@/store/selectors";
 import { EQUIPMENT_STATUS, type Equipment, type EquipmentStatus } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
 import { useMemo, useState } from "react";
@@ -76,7 +76,7 @@ type UseEquipmentListResult = {
   /** メーカー名（未設定・不明は undefined） */
   manufacturerNameOf: (target: Equipment) => string | undefined;
   /** 機器に紐づく点検項目数 */
-  inspectionItemCountOf: (target: Equipment) => number;
+  serviceItemCountOf: (target: Equipment) => number;
   /** 機器の最も近い次回期限（非稼働は無条件で— / 有効項目なしも—。screen-design §2「最も近い次回期限」） */
   nearestDueDateOf: (target: Equipment) => string;
 };
@@ -85,7 +85,7 @@ type UseEquipmentListResult = {
 export const useEquipmentList = (): UseEquipmentListResult => {
   const equipment = useAppStore((state) => state.equipment);
   const vendors = useAppStore((state) => state.vendors);
-  const inspectionItems = useAppStore((state) => state.inspectionItems);
+  const serviceItems = useAppStore((state) => state.serviceItems);
 
   const [searchText, setSearchText] = useState("");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>(
@@ -105,14 +105,14 @@ export const useEquipmentList = (): UseEquipmentListResult => {
   const manufacturerNameOf = (target: Equipment): string | undefined =>
     target.manufacturerId === undefined ? undefined : vendors[target.manufacturerId]?.name;
 
-  const inspectionItemCountOf = (target: Equipment): number =>
-    inspectionItemsOf({ inspectionItems }, target.id).length;
+  const serviceItemCountOf = (target: Equipment): number =>
+    serviceItemsOf({ serviceItems }, target.id).length;
 
   const nearestDueDateOf = (target: Equipment): string => {
     if (target.status !== EQUIPMENT_STATUS.ACTIVE) return "—";
-    const dueDates = inspectionItemsOf({ inspectionItems }, target.id)
-      .filter((inspectionItem) => inspectionItem.isActive)
-      .map((inspectionItem) => inspectionItem.nextDueDate);
+    const dueDates = serviceItemsOf({ serviceItems }, target.id)
+      .filter((serviceItem) => serviceItem.isActive)
+      .map((serviceItem) => serviceItem.nextDueDate);
     if (dueDates.length === 0) return "—";
     return dueDates.toSorted((left, right) => left.localeCompare(right))[0] ?? "—";
   };
@@ -125,7 +125,7 @@ export const useEquipmentList = (): UseEquipmentListResult => {
     statusFilter,
     setStatusFilter,
     manufacturerNameOf,
-    inspectionItemCountOf,
+    serviceItemCountOf,
     nearestDueDateOf,
   };
 };

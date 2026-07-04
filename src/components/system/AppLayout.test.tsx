@@ -20,7 +20,7 @@ const renderAppLayout = (): ReturnType<typeof renderWithStore> =>
 const buildNotification = (isRead: boolean): Notification => ({
   id: "notification-1",
   type: NOTIFICATION_TYPE.DUE_SOON,
-  targetType: NOTIFICATION_TARGET_TYPE.INSPECTION_ITEM,
+  targetType: NOTIFICATION_TARGET_TYPE.SERVICE_ITEM,
   targetId: "item-1",
   personId: "person-1",
   message: "テスト通知",

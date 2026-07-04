@@ -9,10 +9,10 @@ import {
   CYCLE,
   EQUIPMENT_STATUS,
   EXECUTION,
-  INSPECTION_ITEM_TYPE,
+  SERVICE_ITEM_TYPE,
   ORDER_STATUS,
   type Equipment,
-  type InspectionItem,
+  type ServiceItem,
   type Vendor,
 } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
@@ -45,10 +45,10 @@ const manufacturerOnlyVendor: Vendor = {
   isCalibrator: false,
 };
 
-const externalInspectionItem: InspectionItem = {
+const externalServiceItem: ServiceItem = {
   id: "item-1",
   equipmentId: equipment.id,
-  type: INSPECTION_ITEM_TYPE.CALIBRATION,
+  type: SERVICE_ITEM_TYPE.CALIBRATION,
   name: "年次校正",
   cycle: CYCLE.Y1,
   execution: EXECUTION.EXTERNAL,
@@ -68,7 +68,7 @@ const seedBaseMasters = (): void => {
       [calibratorVendor.id]: calibratorVendor,
       [manufacturerOnlyVendor.id]: manufacturerOnlyVendor,
     },
-    inspectionItems: { [externalInspectionItem.id]: externalInspectionItem },
+    serviceItems: { [externalServiceItem.id]: externalServiceItem },
   });
 };
 
@@ -78,7 +78,7 @@ describe("OrderModal", () => {
     renderWithStore(
       <OrderModal
         open
-        inspectionItemId={externalInspectionItem.id}
+        serviceItemId={externalServiceItem.id}
         onClose={vi.fn<() => void>()}
       />,
     );
@@ -86,12 +86,12 @@ describe("OrderModal", () => {
     expect(screen.getByText("対象:EQ-001 ノギス / 年次校正")).toBeInTheDocument();
   });
 
-  it("依頼先の既定値がinspectionItem.vendorId(isCalibratorの選択肢に存在する場合)になる", () => {
+  it("依頼先の既定値がserviceItem.vendorId(isCalibratorの選択肢に存在する場合)になる", () => {
     seedBaseMasters();
     renderWithStore(
       <OrderModal
         open
-        inspectionItemId={externalInspectionItem.id}
+        serviceItemId={externalServiceItem.id}
         onClose={vi.fn<() => void>()}
       />,
     );
@@ -104,7 +104,7 @@ describe("OrderModal", () => {
     renderWithStore(
       <OrderModal
         open
-        inspectionItemId={externalInspectionItem.id}
+        serviceItemId={externalServiceItem.id}
         onClose={vi.fn<() => void>()}
       />,
     );
@@ -120,7 +120,7 @@ describe("OrderModal", () => {
     const user = userEvent.setup();
     const onClose = vi.fn<() => void>();
     renderWithStore(
-      <OrderModal open inspectionItemId={externalInspectionItem.id} onClose={onClose} />,
+      <OrderModal open serviceItemId={externalServiceItem.id} onClose={onClose} />,
     );
 
     await user.type(screen.getByLabelText("返却予定日", { exact: false }), "2026-08-10");
@@ -131,7 +131,7 @@ describe("OrderModal", () => {
     const createdOrders = Object.values(useAppStore.getState().orders);
     expect(createdOrders).toHaveLength(1);
     expect(createdOrders[0]).toMatchObject({
-      inspectionItemId: externalInspectionItem.id,
+      serviceItemId: externalServiceItem.id,
       vendorId: calibratorVendor.id,
       status: ORDER_STATUS.PLANNED,
       dueDate: "2026-08-10",
@@ -147,7 +147,7 @@ describe("OrderModal", () => {
       orders: {
         "order-existing": {
           id: "order-existing",
-          inspectionItemId: externalInspectionItem.id,
+          serviceItemId: externalServiceItem.id,
           vendorId: calibratorVendor.id,
           status: ORDER_STATUS.ORDERED,
         },
@@ -156,7 +156,7 @@ describe("OrderModal", () => {
     const user = userEvent.setup();
     const onClose = vi.fn<() => void>();
     renderWithStore(
-      <OrderModal open inspectionItemId={externalInspectionItem.id} onClose={onClose} />,
+      <OrderModal open serviceItemId={externalServiceItem.id} onClose={onClose} />,
     );
 
     await user.click(screen.getByRole("button", { name: "保存" }));
@@ -170,12 +170,12 @@ describe("OrderModal", () => {
     seedStore({
       equipment: { [equipment.id]: equipment },
       vendors: { [manufacturerOnlyVendor.id]: manufacturerOnlyVendor },
-      inspectionItems: { [externalInspectionItem.id]: externalInspectionItem },
+      serviceItems: { [externalServiceItem.id]: externalServiceItem },
     });
     renderWithStore(
       <OrderModal
         open
-        inspectionItemId={externalInspectionItem.id}
+        serviceItemId={externalServiceItem.id}
         onClose={vi.fn<() => void>()}
       />,
     );
@@ -195,15 +195,15 @@ describe("OrderModal", () => {
         [calibratorVendor.id]: calibratorVendor,
         [manufacturerOnlyVendor.id]: manufacturerOnlyVendor,
       },
-      inspectionItems: {
-        [externalInspectionItem.id]: { ...externalInspectionItem, vendorId: undefined },
+      serviceItems: {
+        [externalServiceItem.id]: { ...externalServiceItem, vendorId: undefined },
       },
     });
     const user = userEvent.setup();
     renderWithStore(
       <OrderModal
         open
-        inspectionItemId={externalInspectionItem.id}
+        serviceItemId={externalServiceItem.id}
         onClose={vi.fn<() => void>()}
       />,
     );
@@ -220,7 +220,7 @@ describe("OrderModal", () => {
     renderWithStore(
       <OrderModal
         open
-        inspectionItemId={externalInspectionItem.id}
+        serviceItemId={externalServiceItem.id}
         onClose={vi.fn<() => void>()}
       />,
     );

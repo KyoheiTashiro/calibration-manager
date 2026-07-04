@@ -1,7 +1,7 @@
 /**
  * 機器スライス（store.md「スライス構成」）。
  * 機器の削除は論理削除のみ（status=retired）。suspended/retired は期限計算・通知の
- * 対象外（domain-model.md §3.3）だが、その除外は派生側（inspectionItemStatus / generateNotifications）の責務。
+ * 対象外（domain-model.md §3.3）だが、その除外は派生側（serviceItemStatus / generateNotifications）の責務。
  */
 
 import type { AppSliceCreator } from "@/store/storeState";

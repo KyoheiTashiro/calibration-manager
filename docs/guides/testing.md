@@ -20,7 +20,7 @@
   - `renderWithStore(ui, { initialEntries, routePath })`: RTL render を `MemoryRouter` で包む。`routePath` 指定で `<Routes><Route>` 囲み（`useParams` 解決用）
   - `seedStore(partial)`: zustand `setState` で state を部分上書き（persist 汚染なし）
   - `setupStoreIsolation()`: 各テストファイルの `beforeEach(setupStoreIsolation)` で呼ぶ。`resetAll()` + `localStorage.clear()`
-- `arbitraries.ts`: fast-check の Arbitrary 定義（`equipmentArb` / `inspectionItemArb` / `inspectionRecordArb` / `calibrationOrderArb` / `vendorArb` など）
+- `arbitraries.ts`: fast-check の Arbitrary 定義（`equipmentArb` / `serviceItemArb` / `serviceRecordArb` / `serviceOrderArb` / `vendorArb` など）
 
 ## domain層（必須）
 
@@ -31,10 +31,10 @@
   - 月単位の加算は暦月ベース。月末日の繰り上がり調整を検証する（例: 1/31 + 1M → 2/28）
   - `cycle` の全パターン（`1M` `3M` `6M` `1Y` `2Y` `3Y` `5Y` `10Y`）を境界値として網羅
 - **`leadTime.ts`（`resolveLeadTime` / `recommendedOrderDate`: 発注推奨日の逆算、ドメインモデル §4.2）**
-  - `leadTime = inspectionItem.leadTimeDays ?? vendor.standardLeadTimeDays`
+  - `leadTime = serviceItem.leadTimeDays ?? vendor.standardLeadTimeDays`
   - `発注推奨日 = nextDueDate − leadTime − bufferDays`
-  - `inspectionItem.leadTimeDays` 未設定時に `vendor.standardLeadTimeDays` へフォールバックするケースを検証
-- **`inspectionItemStatus.ts`（`deriveInspectionItemStatus`。判定条件・優先度は[domain-model.md §4.3](../spec/domain-model.md)を参照）**
+  - `serviceItem.leadTimeDays` 未設定時に `vendor.standardLeadTimeDays` へフォールバックするケースを検証
+- **`serviceItemStatus.ts`（`deriveServiceItemStatus`。判定条件・優先度は[domain-model.md §4.3](../spec/domain-model.md)を参照）**
   - 優先度順（5段階）で判定することを検証する
   - 優先度の逆転がないこと（例: `overdue` かつ `orderNow` の条件を両方満たす場合に `overdue` が勝つ）を境界ケースで確認
 - **`notificationRules.ts`（`computeExpectedNotifications`: 通知生成判定。発生条件は[domain-model.md §3.7](../spec/domain-model.md)を参照）**
@@ -50,8 +50,8 @@
 
 - `@testing-library/react` でコンポーネント・feature 単位のテスト
   - 共通 UI（`src/components/ui/<ComponentName>/<ComponentName>.test.tsx`）: Badge / Button / Checkbox / ConfirmModal / DateField / EmptyState / Modal / RadioGroup / Select / Table / Tabs / TextField / Textarea（+ `hooks/useDialog`）
-  - ドメイン固有 UI（`src/components/domain/<ComponentName>/<ComponentName>.test.tsx`）: StatusBadge（`deriveInspectionItemStatus` の表示）
-  - feature（`src/features/**/*.test.tsx`）: dashboard / equipment（一覧・詳細・登録編集） / inspectionItems（点検校正項目一覧・点検校正項目モーダル・実施記録登録モーダル） / inspectionOrder（案件一覧） / vendors・persons（メーカー/取引先・担当者マスタ） / notifications（通知センター） / settings（CSVエクスポート/インポート）
+  - ドメイン固有 UI（`src/components/domain/<ComponentName>/<ComponentName>.test.tsx`）: StatusBadge（`deriveServiceItemStatus` の表示）
+  - feature（`src/features/**/*.test.tsx`）: dashboard / equipment（一覧・詳細・登録編集） / serviceItems（点検校正項目一覧・点検校正項目モーダル・実施記録登録モーダル） / serviceOrder（案件一覧） / vendors・persons（メーカー/取引先・担当者マスタ） / notifications（通知センター） / settings（CSVエクスポート/インポート）
 - **Storybook** でコンポーネント単位の見た目・状態を確認
   - 起動: `npm run storybook`（dev・ポート6006） / ビルド: `npm run build-storybook`
   - story配置: 各コンポーネント隣に `*.stories.tsx`（`src/**/*.stories.@(tsx|mdx)`）
@@ -65,7 +65,7 @@
 
 以下は最終確定した値（実測に対し数%の余白を残す。D-032）。
 
-- `src/domain/**`（`dateCycle.ts` / `leadTime.ts` / `inspectionItemStatus.ts` / `notificationRules.ts` 等）: lines 98 / functions 100 / branches 98 / statements 98
+- `src/domain/**`（`dateCycle.ts` / `leadTime.ts` / `serviceItemStatus.ts` / `notificationRules.ts` 等）: lines 98 / functions 100 / branches 98 / statements 98
 - `src/store/**`: lines 97 / functions 96 / branches 92 / statements 97
 - `src/utils/id/index.ts`: 100 / 100 / 100 / 100
 - `src/utils/csv/index.ts`: lines 97 / functions 95 / branches 90 / statements 97

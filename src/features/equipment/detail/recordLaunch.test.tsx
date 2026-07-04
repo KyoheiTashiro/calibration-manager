@@ -9,8 +9,8 @@ import { ROUTES, equipmentDetailPath } from "@/constants/routes";
 import { EquipmentDetail } from "@/features/equipment/detail";
 import {
   equipmentFull,
-  inspectionItemExternal,
-  seedEquipmentFullInspectionItemsAndRecords,
+  serviceItemExternal,
+  seedEquipmentFullServiceItemsAndRecords,
   seedEquipmentFullMasters,
 } from "@/features/equipment/detail/detailFixtures";
 import { useAppStore } from "@/store/useAppStore";
@@ -35,10 +35,10 @@ const getOpenDialog = (title: string): HTMLElement => {
 };
 
 /** 項目テーブル(1つ目のtable)の行を取得する。項目名は実施記録テーブルにも出現するためスコープする */
-const getInspectionItemRow = (name: RegExp): HTMLElement => {
-  const inspectionItemTable = screen.getAllByRole("table").at(0);
-  if (!inspectionItemTable) throw new Error("項目テーブルが見つかりません");
-  return within(inspectionItemTable).getByRole("row", { name });
+const getServiceItemRow = (name: RegExp): HTMLElement => {
+  const serviceItemTable = screen.getAllByRole("table").at(0);
+  if (!serviceItemTable) throw new Error("項目テーブルが見つかりません");
+  return within(serviceItemTable).getByRole("row", { name });
 };
 
 /** 実施記録テーブル(2つ目のtable)のデータ行を返す */
@@ -52,7 +52,7 @@ const getHistoryRows = (): HTMLElement[] => {
 beforeEach(() => {
   setupStoreIsolation();
   seedEquipmentFullMasters();
-  seedEquipmentFullInspectionItemsAndRecords();
+  seedEquipmentFullServiceItemsAndRecords();
 });
 
 describe("EquipmentDetail: RecordModal起動", () => {
@@ -61,12 +61,12 @@ describe("EquipmentDetail: RecordModal起動", () => {
     renderDetail();
 
     await user.click(
-      within(getInspectionItemRow(/年次校正/u)).getByRole("button", { name: "記録" }),
+      within(getServiceItemRow(/年次校正/u)).getByRole("button", { name: "記録" }),
     );
 
     const dialogElement = getOpenDialog("実施記録を登録");
     expect(
-      within(dialogElement).getByText(`対象:EQ-001 ノギス / ${inspectionItemExternal.name}`),
+      within(dialogElement).getByText(`対象:EQ-001 ノギス / ${serviceItemExternal.name}`),
     ).toBeInTheDocument();
   });
 
@@ -78,7 +78,7 @@ describe("EquipmentDetail: RecordModal起動", () => {
     const historyRowsBefore = getHistoryRows().length;
 
     await user.click(
-      within(getInspectionItemRow(/年次校正/u)).getByRole("button", { name: "記録" }),
+      within(getServiceItemRow(/年次校正/u)).getByRole("button", { name: "記録" }),
     );
     const dialogElement = getOpenDialog("実施記録を登録");
     await user.click(within(dialogElement).getByLabelText("合格"));

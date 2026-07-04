@@ -7,12 +7,12 @@
 import { StatusBadge } from "@/components/domain";
 import { EmptyState, Table, TableBody, TableHead } from "@/components/ui";
 import { equipmentDetailPath } from "@/constants/routes";
-import { INSPECTION_ITEM_TYPE_LABELS } from "@/features/inspectionItems/constants";
-import type { InspectionItemRow } from "@/store/selectors";
+import { SERVICE_ITEM_TYPE_LABELS } from "@/features/serviceItems/constants";
+import type { ServiceItemRow } from "@/store/selectors";
 import type { KeyboardEvent, ReactElement } from "react";
 
 type Props = {
-  rows: readonly InspectionItemRow[];
+  rows: readonly ServiceItemRow[];
   /** 遷移実行(useNavigate をそのまま渡す)。機器詳細への実パスを渡す */
   onNavigate: (path: string) => void;
 };
@@ -59,7 +59,7 @@ export const ActionRequiredList = ({ rows, onNavigate }: Props): ReactElement =>
       <TableBody>
         {rows.map((row) => (
           <tr
-            key={row.inspectionItem.id}
+            key={row.serviceItem.id}
             tabIndex={0}
             onClick={() => {
               activate(row.equipment.id);
@@ -74,10 +74,10 @@ export const ActionRequiredList = ({ rows, onNavigate }: Props): ReactElement =>
             </td>
             <td className="px-3 py-2">{row.equipment.managementNo}</td>
             <td className="px-3 py-2">{row.equipment.name}</td>
-            <td className="px-3 py-2">{row.inspectionItem.name}</td>
-            <td className="px-3 py-2">{INSPECTION_ITEM_TYPE_LABELS[row.inspectionItem.type]}</td>
+            <td className="px-3 py-2">{row.serviceItem.name}</td>
+            <td className="px-3 py-2">{SERVICE_ITEM_TYPE_LABELS[row.serviceItem.type]}</td>
             <td className="px-3 py-2">{row.personLabel}</td>
-            <td className="px-3 py-2">{row.inspectionItem.nextDueDate}</td>
+            <td className="px-3 py-2">{row.serviceItem.nextDueDate}</td>
           </tr>
         ))}
       </TableBody>

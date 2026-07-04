@@ -7,19 +7,19 @@
 
 import { StatusBadge } from "@/components/domain";
 import { ROUTES } from "@/constants/routes";
-import { INSPECTION_ITEM_STATUS, type InspectionItemStatus } from "@/domain/inspectionItemStatus";
+import { SERVICE_ITEM_STATUS, type ServiceItemStatus } from "@/domain/serviceItemStatus";
 import type { ReactElement } from "react";
 import { Link } from "react-router-dom";
 
 /** ステータスの意味を平易な日本語で言い換えたもの(domain-model.md §4.3 の条件に対応) */
 const STATUS_DESCRIPTIONS = {
-  [INSPECTION_ITEM_STATUS.OVERDUE]: "次回期限を過ぎています",
-  [INSPECTION_ITEM_STATUS.ORDER_NOW]:
+  [SERVICE_ITEM_STATUS.OVERDUE]: "次回期限を過ぎています",
+  [SERVICE_ITEM_STATUS.ORDER_NOW]:
     "外部点検校正の発注推奨日を過ぎていて、まだ進行中の点検校正外部案件がありません",
-  [INSPECTION_ITEM_STATUS.IN_PROGRESS]: "外部点検校正で発注済み・校正中の案件があります",
-  [INSPECTION_ITEM_STATUS.DUE_SOON]: "次回期限が近づいています(通知開始日数に到達)",
-  [INSPECTION_ITEM_STATUS.OK]: "上記のいずれにも当てはまりません",
-} as const satisfies Record<InspectionItemStatus, string>;
+  [SERVICE_ITEM_STATUS.IN_PROGRESS]: "外部点検校正で発注済み・校正中の案件があります",
+  [SERVICE_ITEM_STATUS.DUE_SOON]: "次回期限が近づいています(通知開始日数に到達)",
+  [SERVICE_ITEM_STATUS.OK]: "上記のいずれにも当てはまりません",
+} as const satisfies Record<ServiceItemStatus, string>;
 
 export const Manual = (): ReactElement => (
   <div className="flex flex-col gap-4">
@@ -71,14 +71,14 @@ export const Manual = (): ReactElement => (
         </li>
         <li>
           点検・校正を実施したら、
-          <Link to={ROUTES.INSPECTION_ITEM_LIST} className="text-primary underline">
+          <Link to={ROUTES.SERVICE_ITEM_LIST} className="text-primary underline">
             点検校正項目一覧
           </Link>
           から実施記録を登録します。記録を登録すると、次回期限が自動で更新されます。
         </li>
         <li>
           外部の点検・校正が必要な項目は、
-          <Link to={ROUTES.INSPECTION_ITEM_LIST} className="text-primary underline">
+          <Link to={ROUTES.SERVICE_ITEM_LIST} className="text-primary underline">
             点検校正項目一覧
           </Link>
           の各行にある「案件」ボタンから案件を作成します(「案件」ボタンは外部の点検・校正の項目で、
@@ -97,7 +97,7 @@ export const Manual = (): ReactElement => (
     <section className="flex flex-col gap-3 rounded border border-slate-200 p-4">
       <h2 className="border-b border-slate-200 pb-2 text-lg font-semibold">ステータスの見方</h2>
       <ul className="flex flex-col gap-2">
-        {Object.values(INSPECTION_ITEM_STATUS).map((status) => (
+        {Object.values(SERVICE_ITEM_STATUS).map((status) => (
           <li key={status} className="flex items-center gap-2">
             <StatusBadge status={status} />
             <span>{STATUS_DESCRIPTIONS[status]}</span>
@@ -174,7 +174,7 @@ export const Manual = (): ReactElement => (
 
       <div>
         <h3 className="font-semibold">
-          <Link to={ROUTES.INSPECTION_ITEM_LIST} className="text-primary underline">
+          <Link to={ROUTES.SERVICE_ITEM_LIST} className="text-primary underline">
             点検校正項目一覧
           </Link>
         </h3>

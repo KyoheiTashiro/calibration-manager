@@ -9,7 +9,7 @@ export const ROUTES = {
   EQUIPMENT_CREATE: "/equipment/create",
   EQUIPMENT_DETAIL: "/equipment/:id",
   EQUIPMENT_EDIT: "/equipment/:id/edit",
-  INSPECTION_ITEM_LIST: "/inspection-items",
+  SERVICE_ITEM_LIST: "/service-items",
   ORDER_LIST: "/orders",
   VENDOR_LIST: "/vendors",
   PERSON_LIST: "/persons",

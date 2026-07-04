@@ -37,7 +37,7 @@ export const EquipmentList = (): ReactElement => {
     statusFilter,
     setStatusFilter,
     manufacturerNameOf,
-    inspectionItemCountOf,
+    serviceItemCountOf,
     nearestDueDateOf,
   } = useEquipmentList();
 
@@ -153,7 +153,7 @@ export const EquipmentList = (): ReactElement => {
                       </Badge>
                     </td>
                     <td className="px-3 py-2 text-right tabular-nums">
-                      {inspectionItemCountOf(entry)}
+                      {serviceItemCountOf(entry)}
                     </td>
                     <td className="px-3 py-2">{nearestDueDateOf(entry)}</td>
                   </tr>

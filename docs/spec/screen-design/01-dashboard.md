@@ -33,13 +33,13 @@
 
 ## 表示項目
 
-- **サマリーカード4枚**: `overdue` / `orderNow` / `dueSoon` / `inProgress` それぞれの該当項目件数。件数は全 `InspectionItem`(`isActive=true` かつ機器 `status=active`)に対し [§0.3](./README.md#03-ステータスバッジ色共通定義) の導出ステータスを集計。カード色は [§0.3](./README.md#03-ステータスバッジ色共通定義) に準拠。
-- **要対応項目リスト**: 各行に InspectionItem の `管理番号`(Equipment.managementNo)、`機器名`(Equipment.name)、`項目名`(InspectionItem.name)、`種別`(type)、`担当者`(Person.name via personId)、`次回期限`(nextDueDate)、ステータスバッジ。
+- **サマリーカード4枚**: `overdue` / `orderNow` / `dueSoon` / `inProgress` それぞれの該当項目件数。件数は全 `ServiceItem`(`isActive=true` かつ機器 `status=active`)に対し [§0.3](./README.md#03-ステータスバッジ色共通定義) の導出ステータスを集計。カード色は [§0.3](./README.md#03-ステータスバッジ色共通定義) に準拠。
+- **要対応項目リスト**: 各行に ServiceItem の `管理番号`(Equipment.managementNo)、`機器名`(Equipment.name)、`項目名`(ServiceItem.name)、`種別`(type)、`担当者`(Person.name via personId)、`次回期限`(nextDueDate)、ステータスバッジ。
 - **最新の通知5件**: Notification の `type` / `message` / `createdDate`(未読を優先、新しい順)。
 
 ## 操作・アクション
 
-- サマリーカードクリック → `/inspection-items?status=<overdue|orderNow|dueSoon|inProgress>` へ遷移(該当ステータスでプリフィルタ)。
+- サマリーカードクリック → `/service-items?status=<overdue|orderNow|dueSoon|inProgress>` へ遷移(該当ステータスでプリフィルタ)。
 - 要対応項目リストの行クリック → 該当機器の詳細 `/equipment/:id` へ遷移(D-026)。
 - 「通知センターへ」→ `/notifications`。
 

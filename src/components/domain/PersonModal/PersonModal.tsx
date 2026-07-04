@@ -1,6 +1,6 @@
 /**
  * 担当者の追加/編集モーダル（screen-design/09-masters.md §9-B）。
- * 削除の代わりに isActive=false への無効化を行い、有効な InspectionItem に
+ * 削除の代わりに isActive=false への無効化を行い、有効な ServiceItem に
  * 割り当てられている場合は確認ダイアログで警告する（README.md §0.6 の確認ダイアログポリシー）。
  */
 
@@ -33,7 +33,7 @@ const buildDefaultValues = (person?: Person): PersonFormValues => ({
 /** 無効化確認待ちの状態。確定時に使う保存値と、警告文に埋め込む割り当て件数を保持する */
 type PendingDeactivation = {
   values: PersonFormValues;
-  assignedInspectionItemCount: number;
+  assignedServiceItemCount: number;
 };
 
 export const PersonModal = ({ open, person, onClose }: PersonModalProps): ReactElement => {
@@ -77,12 +77,12 @@ export const PersonModal = ({ open, person, onClose }: PersonModalProps): ReactE
   // 避けるため（coding-standards.md §5「1値1呼び出しで分割購読」の趣旨に沿ったスナップショット取得）。
   const onSubmit = (values: PersonFormValues): void => {
     if (person?.isActive === true && !values.isActive) {
-      const assignedInspectionItemCount = Object.values(
-        useAppStore.getState().inspectionItems,
+      const assignedServiceItemCount = Object.values(
+        useAppStore.getState().serviceItems,
       ).filter(
-        (inspectionItem) => inspectionItem.personId === person.id && inspectionItem.isActive,
+        (serviceItem) => serviceItem.personId === person.id && serviceItem.isActive,
       ).length;
-      setPendingDeactivation({ values, assignedInspectionItemCount });
+      setPendingDeactivation({ values, assignedServiceItemCount });
       return;
     }
     savePerson(values);
@@ -106,8 +106,8 @@ export const PersonModal = ({ open, person, onClose }: PersonModalProps): ReactE
   };
 
   const confirmMessage =
-    pendingDeactivation && pendingDeactivation.assignedInspectionItemCount > 0
-      ? `この担当者は現役の点検校正項目 ${pendingDeactivation.assignedInspectionItemCount} 件に割り当てられています。通知が届かなくなる可能性があります。無効化しますか?`
+    pendingDeactivation && pendingDeactivation.assignedServiceItemCount > 0
+      ? `この担当者は現役の点検校正項目 ${pendingDeactivation.assignedServiceItemCount} 件に割り当てられています。通知が届かなくなる可能性があります。無効化しますか?`
       : "この担当者を無効化しますか?";
 
   return (

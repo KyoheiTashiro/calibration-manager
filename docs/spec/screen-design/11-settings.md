@@ -36,7 +36,7 @@
 
 ## 表示項目 / 機能
 
-- **CSVエクスポート**: エンティティ(Equipment / InspectionItem / InspectionRecord / CalibrationOrder / Vendor / Person / Notification)ごとに個別ダウンロードボタン。文字コード **UTF-8 BOM付き**(Excel互換、ドメインモデル §5)。ファイル名例 `equipment_YYYY-MM-DD.csv`。
+- **CSVエクスポート**: エンティティ(Equipment / ServiceItem / ServiceRecord / ServiceOrder / Vendor / Person / Notification)ごとに個別ダウンロードボタン。文字コード **UTF-8 BOM付き**(Excel互換、ドメインモデル §5)。ファイル名例 `equipment_YYYY-MM-DD.csv`。
   - **CSV列仕様(D-028)**: 各エンティティの列 = `store/types.ts` のフィールド宣言順、ヘッダ行 = フィールド名(英語キー)そのまま。boolean は `true`/`false`、optional 未設定は空セル。エクスポート・インポートで同一仕様(ラウンドトリップ保証)。改行コードは CRLF、引用は RFC 4180 準拠(`"` 囲み + `""` エスケープ)。
 - **CSVインポート**:
   1. 対象エンティティ選択 + ファイル選択。
@@ -52,7 +52,7 @@
 
 ## 表示ルール・バリデーション(zod)
 
-- インポート各行を対応エンティティの zod スキーマで検証。必須列欠落・enum不正・日付形式(`YYYY-MM-DD`)不正・数値変換不可・ユニーク重複(managementNo 等)・参照先不存在(manufacturerId/personId/vendor/inspectionItemId 等)をエラーとして行単位で報告。
+- インポート各行を対応エンティティの zod スキーマで検証。必須列欠落・enum不正・日付形式(`YYYY-MM-DD`)不正・数値変換不可・ユニーク重複(managementNo 等)・参照先不存在(manufacturerId/personId/vendor/serviceItemId 等)をエラーとして行単位で報告。
 - エラー行が1件でもあれば「確定」は非活性(D-030、中断のみ・スキップ取り込みは不実装)。1件もエラーがなければ確認後そのまま取り込み。
 
 ## 空状態

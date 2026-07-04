@@ -24,15 +24,15 @@
 
 ## 表示項目(Notification §3.7)
 
-各行: `type`(種別アイコン+ラベル)、`message`、`createdDate`、既読状態。対象は `targetType`(inspectionItem/order)+ `targetId`。
+各行: `type`(種別アイコン+ラベル)、`message`、`createdDate`、既読状態。対象は `targetType`(serviceItem/order)+ `targetId`。
 
 **通知種別のアイコン/色**:
 
 | type               | ラベル   | 色        | 対象       |
 | ------------------ | -------- | --------- | ---------- |
-| `dueSoon`          | 期限接近 | 🟡 黄     | inspectionItem       |
-| `overdue`          | 期限超過 | 🔴 赤     | inspectionItem       |
-| `orderRecommended` | 要発注   | 🟠 橙     | inspectionItem(外部) |
+| `dueSoon`          | 期限接近 | 🟡 黄     | serviceItem       |
+| `overdue`          | 期限超過 | 🔴 赤     | serviceItem       |
+| `orderRecommended` | 要発注   | 🟠 橙     | serviceItem(外部) |
 | `deliveryDueSoon`  | 納期接近 | 🟣 紫     | order      |
 | `deliveryOverdue`  | 納期超過 | 🔴 赤(濃) | order      |
 
@@ -41,7 +41,7 @@
 - タブ: `未読`(件数バッジ)/ `既読`。
 - 行クリック → まず `markAsRead`(`isRead=true`)、次に遷移(D-027):
   - `targetType=order` → `/orders`(カードのハイライトは不実装)。
-  - `targetType=inspectionItem` → 項目から機器を辿り機器詳細 `/equipment/:id` へ遷移。
+  - `targetType=serviceItem` → 項目から機器を辿り機器詳細 `/equipment/:id` へ遷移。
   - 対象が dangling(参照先削除済み)の場合は既読化のみで遷移しない。
 - 「全て既読」→ 未読すべてを `isRead=true`。
 

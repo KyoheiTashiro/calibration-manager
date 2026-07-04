@@ -7,11 +7,11 @@ import {
   CYCLE,
   EQUIPMENT_STATUS,
   EXECUTION,
-  INSPECTION_ITEM_TYPE,
+  SERVICE_ITEM_TYPE,
   RECORD_RESULT,
   type Equipment,
-  type InspectionItem,
-  type InspectionRecord,
+  type ServiceItem,
+  type ServiceRecord,
   type Person,
   type Vendor,
 } from "@/store/types";
@@ -76,10 +76,10 @@ export const inactivePerson: Person = {
 };
 
 /** 期限切れ(overdue)。nextDueDateを固定日にしてtodayIsoDate依存のflakinessを避ける */
-export const inspectionItemOverdue: InspectionItem = {
+export const serviceItemOverdue: ServiceItem = {
   id: "item-overdue",
   equipmentId: equipmentFull.id,
-  type: INSPECTION_ITEM_TYPE.INSPECTION,
+  type: SERVICE_ITEM_TYPE.INSPECTION,
   name: "月次点検",
   cycle: CYCLE.M1,
   execution: EXECUTION.INTERNAL,
@@ -91,10 +91,10 @@ export const inspectionItemOverdue: InspectionItem = {
 };
 
 /** 期限に余裕がある(ok)項目。担当者を無効化済みpersonにして「(無効)」注記を検証する */
-export const inspectionItemOkInactivePerson: InspectionItem = {
+export const serviceItemOkInactivePerson: ServiceItem = {
   id: "item-ok",
   equipmentId: equipmentFull.id,
-  type: INSPECTION_ITEM_TYPE.INSPECTION,
+  type: SERVICE_ITEM_TYPE.INSPECTION,
   name: "外観点検",
   cycle: CYCLE.M3,
   execution: EXECUTION.INTERNAL,
@@ -106,10 +106,10 @@ export const inspectionItemOkInactivePerson: InspectionItem = {
 };
 
 /** isActive=false の項目（末尾ソート・淡色表示を検証する） */
-export const inspectionItemDeactivated: InspectionItem = {
+export const serviceItemDeactivated: ServiceItem = {
   id: "item-deactivated",
   equipmentId: equipmentFull.id,
-  type: INSPECTION_ITEM_TYPE.INSPECTION,
+  type: SERVICE_ITEM_TYPE.INSPECTION,
   name: "廃止予定項目",
   cycle: CYCLE.Y1,
   execution: EXECUTION.INTERNAL,
@@ -121,10 +121,10 @@ export const inspectionItemDeactivated: InspectionItem = {
 };
 
 /** 外部・校正の項目(種別/内外ラベル、実施記録の項目横断マージ検証用) */
-export const inspectionItemExternal: InspectionItem = {
+export const serviceItemExternal: ServiceItem = {
   id: "item-external",
   equipmentId: equipmentFull.id,
-  type: INSPECTION_ITEM_TYPE.CALIBRATION,
+  type: SERVICE_ITEM_TYPE.CALIBRATION,
   name: "年次校正",
   cycle: CYCLE.Y1,
   execution: EXECUTION.EXTERNAL,
@@ -138,10 +138,10 @@ export const inspectionItemExternal: InspectionItem = {
 };
 
 /** 休止機器(equipmentSuspended)配下の項目。期限切れだがD-014でバッジ非表示になることを検証する */
-export const inspectionItemOfSuspendedEquipment: InspectionItem = {
+export const serviceItemOfSuspendedEquipment: ServiceItem = {
   id: "item-suspended",
   equipmentId: equipmentSuspended.id,
-  type: INSPECTION_ITEM_TYPE.INSPECTION,
+  type: SERVICE_ITEM_TYPE.INSPECTION,
   name: "定期点検",
   cycle: CYCLE.M6,
   execution: EXECUTION.INTERNAL,
@@ -153,25 +153,25 @@ export const inspectionItemOfSuspendedEquipment: InspectionItem = {
 };
 
 /** 同一doneDateのレコードを含め、id昇順タイブレークを検証する */
-export const recordOverdueInspectionItem: InspectionRecord = {
+export const recordOverdueServiceItem: ServiceRecord = {
   id: "record-a",
-  inspectionItemId: inspectionItemOverdue.id,
+  serviceItemId: serviceItemOverdue.id,
   doneDate: "2026-06-25",
   doneBy: "鈴木",
   result: RECORD_RESULT.PASS,
 };
 
-export const recordExternalInspectionItemSameDay: InspectionRecord = {
+export const recordExternalServiceItemSameDay: ServiceRecord = {
   id: "record-b",
-  inspectionItemId: inspectionItemExternal.id,
+  serviceItemId: serviceItemExternal.id,
   doneDate: "2026-06-25",
   doneBy: "田中",
   result: RECORD_RESULT.FAIL,
 };
 
-export const recordExternalInspectionItemOlder: InspectionRecord = {
+export const recordExternalServiceItemOlder: ServiceRecord = {
   id: "record-c",
-  inspectionItemId: inspectionItemExternal.id,
+  serviceItemId: serviceItemExternal.id,
   doneDate: "2025-06-18",
   doneBy: "ミツトヨ校正センター",
   result: RECORD_RESULT.ADJUSTED,
@@ -194,18 +194,18 @@ export const seedEquipmentFullMasters = (): void => {
 };
 
 /** equipmentFull配下の全項目・全実施記録をストアへ投入する */
-export const seedEquipmentFullInspectionItemsAndRecords = (): void => {
+export const seedEquipmentFullServiceItemsAndRecords = (): void => {
   seedStore({
-    inspectionItems: {
-      [inspectionItemOverdue.id]: inspectionItemOverdue,
-      [inspectionItemOkInactivePerson.id]: inspectionItemOkInactivePerson,
-      [inspectionItemDeactivated.id]: inspectionItemDeactivated,
-      [inspectionItemExternal.id]: inspectionItemExternal,
+    serviceItems: {
+      [serviceItemOverdue.id]: serviceItemOverdue,
+      [serviceItemOkInactivePerson.id]: serviceItemOkInactivePerson,
+      [serviceItemDeactivated.id]: serviceItemDeactivated,
+      [serviceItemExternal.id]: serviceItemExternal,
     },
     records: {
-      [recordOverdueInspectionItem.id]: recordOverdueInspectionItem,
-      [recordExternalInspectionItemSameDay.id]: recordExternalInspectionItemSameDay,
-      [recordExternalInspectionItemOlder.id]: recordExternalInspectionItemOlder,
+      [recordOverdueServiceItem.id]: recordOverdueServiceItem,
+      [recordExternalServiceItemSameDay.id]: recordExternalServiceItemSameDay,
+      [recordExternalServiceItemOlder.id]: recordExternalServiceItemOlder,
     },
   });
 };

@@ -1,0 +1,139 @@
+/**
+ * 点検校正外部案件（かんばん、screen-design/08-orders.md）。
+ * 状態別の4列（発注準備/発注済/校正中/返却済）でカードを表示し、隣接遷移のみをアクションで提供する。
+ * トグル「完了/中止も表示」ON で記録登録済/中止の2列を右側に追加（D-018）。案件作成の導線は本画面には持たず、
+ * 起動元は項目一覧（Phase 8）。状態遷移・属性更新はストア（updateOrderStatus / updateOrder）が最終検証する。
+ */
+
+import { RecordModal } from "@/components/domain";
+import { Button, Checkbox, ConfirmModal, EmptyState } from "@/components/ui";
+import { ROUTES } from "@/constants/routes";
+import { OrderCard } from "@/features/serviceOrder/components/OrderCard";
+import { OrderDialog, ReturnDialog } from "@/features/serviceOrder/components/TransitionDialogs";
+import { ORDER_STATUS_LABELS } from "@/features/serviceOrder/constants";
+import { DIALOG_TYPE, useOrderKanban } from "@/features/serviceOrder/hooks";
+import { ORDER_STATUS, type OrderStatus } from "@/store/types";
+import { useSafeNavigate } from "@/utils/navigation";
+import type { ReactElement } from "react";
+
+/** 列ヘッダの状態別アクセント色（色 + 日本語ラベル併記の規約に沿う視覚区別） */
+const COLUMN_ACCENT_CLASS = {
+  [ORDER_STATUS.PLANNED]: "border-t-slate-400",
+  [ORDER_STATUS.ORDERED]: "border-t-blue-400",
+  [ORDER_STATUS.IN_CALIBRATION]: "border-t-amber-400",
+  [ORDER_STATUS.RETURNED]: "border-t-emerald-500",
+  [ORDER_STATUS.COMPLETED]: "border-t-slate-300",
+  [ORDER_STATUS.CANCELLED]: "border-t-red-300",
+} as const satisfies Record<OrderStatus, string>;
+
+export const OrderList = (): ReactElement => {
+  const safeNavigate = useSafeNavigate();
+  const {
+    serviceItems,
+    equipment,
+    vendors,
+    showClosed,
+    setShowClosed,
+    displayedColumns,
+    ordersByStatus,
+    totalOrderCount,
+    dialog,
+    closeDialog,
+    handleOrder,
+    handleReturn,
+    handleCancelRequest,
+    handleRecord,
+    handleAdvance,
+    handleConfirmCancel,
+  } = useOrderKanban();
+
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="flex items-center justify-between">
+        <h1 className="text-xl font-bold">点検校正外部案件</h1>
+        <Checkbox
+          label="完了/中止も表示"
+          checked={showClosed}
+          onChange={(event) => {
+            setShowClosed(event.target.checked);
+          }}
+        />
+      </div>
+
+      {totalOrderCount === 0 ? (
+        <EmptyState
+          message="点検校正外部案件はありません。点検校正項目一覧から案件を追加できます"
+          action={
+            <Button
+              onClick={() => {
+                safeNavigate(ROUTES.SERVICE_ITEM_LIST);
+              }}
+            >
+              点検校正項目一覧へ
+            </Button>
+          }
+        />
+      ) : (
+        <div className="flex gap-4 overflow-x-auto pb-2">
+          {displayedColumns.map((status) => {
+            const columnOrders = ordersByStatus[status];
+            return (
+              <section key={status} className="w-64 shrink-0">
+                <header
+                  className={`rounded-t border-t-4 bg-slate-50 px-3 py-2 text-sm font-semibold ${COLUMN_ACCENT_CLASS[status]}`}
+                >
+                  {ORDER_STATUS_LABELS[status]}
+                  <span className="ml-1 font-normal text-slate-500">({columnOrders.length})</span>
+                </header>
+                <div className="flex flex-col gap-2 py-2">
+                  {columnOrders.length === 0 ? (
+                    <p className="px-1 py-4 text-center text-xs text-slate-400">なし</p>
+                  ) : (
+                    columnOrders.map((order) => (
+                      <OrderCard
+                        key={order.id}
+                        order={order}
+                        serviceItems={serviceItems}
+                        equipment={equipment}
+                        vendors={vendors}
+                        onOrder={handleOrder}
+                        onAdvance={handleAdvance}
+                        onReturn={handleReturn}
+                        onCancel={handleCancelRequest}
+                        onRecord={handleRecord}
+                      />
+                    ))
+                  )}
+                </div>
+              </section>
+            );
+          })}
+        </div>
+      )}
+
+      {dialog?.type === DIALOG_TYPE.ORDER ? (
+        <OrderDialog order={dialog.order} onClose={closeDialog} />
+      ) : null}
+      {dialog?.type === DIALOG_TYPE.RETURN ? (
+        <ReturnDialog order={dialog.order} onClose={closeDialog} />
+      ) : null}
+      {dialog?.type === DIALOG_TYPE.RECORD ? (
+        <RecordModal
+          open
+          serviceItemId={dialog.order.serviceItemId}
+          orderId={dialog.order.id}
+          onClose={closeDialog}
+        />
+      ) : null}
+      <ConfirmModal
+        open={dialog?.type === DIALOG_TYPE.CANCEL}
+        title="案件を中止しますか?"
+        message="この案件を中止して終了します。この操作は取り消せません。"
+        confirmLabel="中止"
+        danger
+        onConfirm={handleConfirmCancel}
+        onCancel={closeDialog}
+      />
+    </div>
+  );
+};

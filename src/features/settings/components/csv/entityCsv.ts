@@ -6,10 +6,10 @@
  */
 
 import {
-  calibrationOrderSchema,
+  serviceOrderSchema,
   equipmentSchema,
-  inspectionItemSchema,
-  inspectionRecordSchema,
+  serviceItemSchema,
+  serviceRecordSchema,
   notificationSchema,
   personSchema,
   vendorSchema,
@@ -24,7 +24,7 @@ export type CsvEntityKind = keyof AppState;
 /** インポート/エクスポート対象の種別一覧(§11 のボタン・セレクトの表示順) */
 export const CSV_ENTITY_KINDS = [
   "equipment",
-  "inspectionItems",
+  "serviceItems",
   "records",
   "orders",
   "vendors",
@@ -77,7 +77,7 @@ export const ENTITY_CSV_SPECS: { [Kind in CsvEntityKind]: EntityCsvSpec<Kind> } 
     schema: equipmentSchema,
     uniqueKeys: ["managementNo"],
   },
-  inspectionItems: {
+  serviceItems: {
     label: "点検校正項目",
     columns: [
       { key: "id", kind: CSV_COLUMN_KIND.STRING },
@@ -95,28 +95,28 @@ export const ENTITY_CSV_SPECS: { [Kind in CsvEntityKind]: EntityCsvSpec<Kind> } 
       { key: "nextDueDate", kind: CSV_COLUMN_KIND.STRING },
       { key: "isActive", kind: CSV_COLUMN_KIND.BOOLEAN },
     ],
-    schema: inspectionItemSchema,
+    schema: serviceItemSchema,
     uniqueKeys: [],
   },
   records: {
     label: "実施記録",
     columns: [
       { key: "id", kind: CSV_COLUMN_KIND.STRING },
-      { key: "inspectionItemId", kind: CSV_COLUMN_KIND.STRING },
+      { key: "serviceItemId", kind: CSV_COLUMN_KIND.STRING },
       { key: "doneDate", kind: CSV_COLUMN_KIND.STRING },
       { key: "doneBy", kind: CSV_COLUMN_KIND.STRING },
       { key: "result", kind: CSV_COLUMN_KIND.STRING },
       { key: "orderId", kind: CSV_COLUMN_KIND.OPTIONAL_STRING },
       { key: "note", kind: CSV_COLUMN_KIND.OPTIONAL_STRING },
     ],
-    schema: inspectionRecordSchema,
+    schema: serviceRecordSchema,
     uniqueKeys: [],
   },
   orders: {
     label: "点検校正外部案件",
     columns: [
       { key: "id", kind: CSV_COLUMN_KIND.STRING },
-      { key: "inspectionItemId", kind: CSV_COLUMN_KIND.STRING },
+      { key: "serviceItemId", kind: CSV_COLUMN_KIND.STRING },
       { key: "vendorId", kind: CSV_COLUMN_KIND.STRING },
       { key: "status", kind: CSV_COLUMN_KIND.STRING },
       { key: "orderedDate", kind: CSV_COLUMN_KIND.OPTIONAL_STRING },
@@ -125,7 +125,7 @@ export const ENTITY_CSV_SPECS: { [Kind in CsvEntityKind]: EntityCsvSpec<Kind> } 
       { key: "cost", kind: CSV_COLUMN_KIND.OPTIONAL_NUMBER },
       { key: "note", kind: CSV_COLUMN_KIND.OPTIONAL_STRING },
     ],
-    schema: calibrationOrderSchema,
+    schema: serviceOrderSchema,
     uniqueKeys: [],
   },
   vendors: {
