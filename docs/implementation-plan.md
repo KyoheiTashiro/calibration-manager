@@ -103,9 +103,9 @@
 担当実績: メイン = 仕様違反是正(D-015)・結合シナリオテスト・共有定数(orders/constants.ts、RECORD_RESULT_OPTIONS)先行作成・監査是正(submitFailed 残留・cost 整数統一 D-021)。委譲 = RecordModal班(Opus)∥ OrderModal班(Sonnet)→ かんばん班(Opus、RecordModal 依存のため後発)
 
 - [x] メイン是正: addRecord が fail 時に lastDoneDate まで据え置いていた仕様違反を修正(07 副作用2 は無条件更新。既存テストも仕様準拠へ是正、D-015)
-- [x] 結合シナリオテストをメインが先行作成: `features/orders/integration.test.tsx`(returned→記録登録→pass 期限再計算+orderId 紐付け+completed 連鎖 / fail 据え置き+completed 連鎖 / planned→ordered→inCalibration→returned 遷移チェーン)。委譲班への UI 契約を兼ねる
+- [x] 結合シナリオテストをメインが先行作成: `features/inspectionOrder/integration.test.tsx`(returned→記録登録→pass 期限再計算+orderId 紐付け+completed 連鎖 / fail 据え置き+completed 連鎖 / planned→ordered→inCalibration→returned 遷移チェーン)。委譲班への UI 契約を兼ねる
 - [x] **RecordModal班**: `components/domain/RecordModal/`(RHF+zod、実施日既定=今日、doneBy プリフィル3分岐 D-017、fail 注意書き、未来日警告 D-016、案件連携表示、addRecord null 時エラー維持)+ 機器詳細[記録]ボタン接続(Phase 6 先行設置の disabled 解除、recordLaunch.test.tsx)
-- [x] **かんばん班**: `features/orders/`(index.tsx / OrderCard.tsx / TransitionDialogs.tsx / schema.ts)。4列+「完了/中止も表示」トグルで終端2列追加(D-018、グレー調・アクションなし)、隣接遷移のみ(発注ダイアログ=発注日必須・整合警告 D-019 / 校正中へ即時 / 返却ダイアログ=実返却日 / 中止 ConfirmModal)、updateOrderStatus true 時のみ updateOrder patch、returned→RecordModal 起動、dangling「(参照先なし)」(D-003)、空状態2種、列内 dueDate 昇順→id 昇順
+- [x] **かんばん班**: `features/inspectionOrder/`(index.tsx / OrderCard.tsx / TransitionDialogs.tsx / schema.ts)。4列+「完了/中止も表示」トグルで終端2列追加(D-018、グレー調・アクションなし)、隣接遷移のみ(発注ダイアログ=発注日必須・整合警告 D-019 / 校正中へ即時 / 返却ダイアログ=実返却日 / 中止 ConfirmModal)、updateOrderStatus true 時のみ updateOrder patch、returned→RecordModal 起動、dangling「(参照先なし)」(D-003)、空状態2種、列内 dueDate 昇順→id 昇順
 - [x] **OrderModal班**: `components/domain/OrderModal/`(planned 新規作成、依頼先既定=inspectionItem.vendorId・isCalibrator 限定、D-006 no-op 時「進行中の案件が既に存在します」)。起動元接続は Phase 8(D-020)
 - [x] メイン監査是正: 両モーダルの submitFailed を閉時リセット(残留エラー防止)、発注ダイアログ cost を整数粒度へ統一(D-021)+ schema.test.ts 追加
 - ゲート実績: tsc 0 / oxlint 0 / テスト452件全緑(+44件増)/ カバレッジ閾値維持

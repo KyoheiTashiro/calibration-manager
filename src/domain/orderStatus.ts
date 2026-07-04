@@ -1,5 +1,5 @@
 /**
- * 校正案件の状態遷移テーブル（domain-model.md §3.6）。
+ * 点検校正外部案件の状態遷移テーブル（domain-model.md §3.6）。
  *
  * ```
  * planned → ordered → inCalibration → returned → completed

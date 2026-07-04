@@ -1,5 +1,5 @@
 /**
- * 校正案件の表示定数(screen-design/08-orders.md、domain-model.md §3.6)。
+ * 点検校正外部案件の表示定数(screen-design/08-orders.md、domain-model.md §3.6)。
  * 状態ラベルをここに一元化し、かんばん・記録モーダル・通知等で重複定義しない
  * (features/equipment/constants.ts / features/inspectionItems/constants.ts と同じ運用)。
  */

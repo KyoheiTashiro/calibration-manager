@@ -15,7 +15,7 @@ import { Link } from "react-router-dom";
 const STATUS_DESCRIPTIONS = {
   [INSPECTION_ITEM_STATUS.OVERDUE]: "次回期限を過ぎています",
   [INSPECTION_ITEM_STATUS.ORDER_NOW]:
-    "外部校正の発注推奨日を過ぎていて、まだ進行中の校正案件がありません",
+    "外部校正の発注推奨日を過ぎていて、まだ進行中の点検校正外部案件がありません",
   [INSPECTION_ITEM_STATUS.IN_PROGRESS]: "外部校正で発注済み・校正中の案件があります",
   [INSPECTION_ITEM_STATUS.DUE_SOON]: "次回期限が近づいています(通知開始日数に到達)",
   [INSPECTION_ITEM_STATUS.OK]: "上記のいずれにも当てはまりません",
@@ -85,10 +85,16 @@ export const Manual = (): ReactElement => (
         <li>
           外部校正が必要な項目は、
           {/* oxlint-disable-next-line react/forbid-component-props -- Linkはclassnameでリンク色を渡す設計(Badgeと同様) */}
-          <Link to={ROUTES.ORDER_LIST} className="text-primary underline">
-            校正案件
+          <Link to={ROUTES.INSPECTION_ITEM_LIST} className="text-primary underline">
+            点検校正項目一覧
           </Link>
-          画面で、発注から返却・記録の登録までの進み具合を管理します。
+          の各行にある「案件」ボタンから案件を作成します(「案件」ボタンは外部校正の項目で、
+          まだ進行中の案件がないときに表示されます)。作成した案件は
+          {/* oxlint-disable-next-line react/forbid-component-props -- Linkはclassnameでリンク色を渡す設計(Badgeと同様) */}
+          <Link to={ROUTES.ORDER_LIST} className="text-primary underline">
+            点検校正外部案件
+          </Link>
+          画面のボードに表示され、発注から返却・記録の登録までの進み具合を管理できます。
         </li>
       </ol>
     </section>
@@ -164,7 +170,7 @@ export const Manual = (): ReactElement => (
         <h3 className="font-semibold">
           {/* oxlint-disable-next-line react/forbid-component-props -- Linkはclassnameでリンク色を渡す設計(Badgeと同様) */}
           <Link to={ROUTES.ORDER_LIST} className="text-primary underline">
-            校正案件
+            点検校正外部案件
           </Link>
         </h3>
         <p>

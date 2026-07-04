@@ -1,5 +1,5 @@
 /**
- * 校正案件かんばんの遷移ダイアログ用フォームスキーマ（RHF + zodResolver、screen-design/08-orders.md）。
+ * 点検校正外部案件かんばんの遷移ダイアログ用フォームスキーマ（RHF + zodResolver、screen-design/08-orders.md）。
  * 形式検証（必須・YYYY-MM-DD・0以上数値）はここで担いブロックする。日付整合（orderedDate ≤ dueDate 等）は
  * 警告表示のみでブロックしない（decisions.md D-019）ため zod では扱わずコンポーネント側で判定する。
  *

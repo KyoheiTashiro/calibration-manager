@@ -10,7 +10,7 @@ import { InspectionItemList } from "@/features/inspectionItems/list";
 import { Manual } from "@/features/manual";
 import { NotificationCenter } from "@/features/notifications";
 import { useNotificationScan } from "@/features/notifications/scan/useNotificationScan";
-import { OrderList } from "@/features/orders";
+import { OrderList } from "@/features/inspectionOrder";
 import { PersonList } from "@/features/persons";
 import { Settings } from "@/features/settings";
 import { VendorList } from "@/features/vendors";

@@ -16,7 +16,7 @@ import {
   returnDialogSchema,
   type OrderDialogValues,
   type ReturnDialogValues,
-} from "@/features/orders/schema";
+} from "@/features/inspectionOrder/schema";
 import { ORDER_STATUS, type CalibrationOrder } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
 import { isIsoDateString, todayIsoDate } from "@/utils/time";

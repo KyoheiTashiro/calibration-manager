@@ -1,5 +1,5 @@
 /**
- * 校正案件一覧（かんばん、screen-design/08-orders.md）。
+ * 点検校正外部案件一覧（かんばん、screen-design/08-orders.md）。
  * 状態別の4列（発注準備/発注済/校正中/返却済）でカードを表示し、隣接遷移のみをアクションで提供する。
  * トグル「完了/中止も表示」ON で記録登録済/中止の2列を右側に追加（D-018）。案件作成の導線は本画面には持たず、
  * 起動元は項目一覧（Phase 8）。状態遷移・属性更新はストア（updateOrderStatus / updateOrder）が最終検証する。
@@ -8,13 +8,13 @@
 import { RecordModal } from "@/components/domain";
 import { Button, Checkbox, ConfirmModal, EmptyState } from "@/components/ui";
 import { ROUTES } from "@/constants/routes";
-import { OrderCard } from "@/features/orders/components/OrderCard";
-import { OrderDialog, ReturnDialog } from "@/features/orders/components/TransitionDialogs";
+import { OrderCard } from "@/features/inspectionOrder/components/OrderCard";
+import { OrderDialog, ReturnDialog } from "@/features/inspectionOrder/components/TransitionDialogs";
 import {
   KANBAN_ACTIVE_COLUMNS,
   KANBAN_CLOSED_COLUMNS,
   ORDER_STATUS_LABELS,
-} from "@/features/orders/constants";
+} from "@/features/inspectionOrder/constants";
 import { ORDER_STATUS, type CalibrationOrder, type OrderStatus } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
 import { useMemo, useState, type ReactElement } from "react";
@@ -124,7 +124,7 @@ export const OrderList = (): ReactElement => {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold">校正案件</h1>
+        <h1 className="text-xl font-bold">点検校正外部案件</h1>
         <Checkbox
           label="完了/中止も表示"
           checked={showClosed}
@@ -134,7 +134,7 @@ export const OrderList = (): ReactElement => {
 
       {totalOrderCount === 0 ? (
         <EmptyState
-          message="校正案件はありません。点検校正項目一覧から案件を追加できます"
+          message="点検校正外部案件はありません。点検校正項目一覧から案件を追加できます"
           action={
             <Button onClick={() => navigate(ROUTES.INSPECTION_ITEM_LIST)}>
               点検校正項目一覧へ
