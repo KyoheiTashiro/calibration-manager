@@ -6,7 +6,7 @@
 export const ROUTES = {
   DASHBOARD: "/",
   EQUIPMENT_LIST: "/equipment",
-  EQUIPMENT_NEW: "/equipment/new",
+  EQUIPMENT_CREATE: "/equipment/create",
   EQUIPMENT_DETAIL: "/equipment/:id",
   EQUIPMENT_EDIT: "/equipment/:id/edit",
   INSPECTION_ITEM_LIST: "/inspection-items",

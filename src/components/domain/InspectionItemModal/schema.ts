@@ -15,7 +15,7 @@ import { isIsoDateString } from "@/utils/time";
 import { z } from "zod";
 
 /** 空欄不可・0以上の整数文字列（発注余裕日・通知開始日数向け） */
-// なぜ戻り値の型注釈を付けないか: equipment/form/schema.ts の createEquipmentFormSchema と同じ理由で、
+// なぜ戻り値の型注釈を付けないか: equipment/form/shared/schema.ts の createEquipmentFormSchema と同じ理由で、
 // refine() 済みの具体的なZodスキーマ形状をTypeScriptの推論に委ねる必要があるため。
 // oxlint-disable-next-line typescript/explicit-function-return-type, typescript/explicit-module-boundary-types -- 上記理由によりzodスキーマの戻り値型は推論に委ねる必要がある
 const requiredNonNegativeIntegerString = (requiredMessage: string, invalidMessage: string) =>

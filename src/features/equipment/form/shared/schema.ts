@@ -1,5 +1,6 @@
 /**
- * EquipmentForm のフォームスキーマ（RHF + zodResolver 用、screen-design/03-equipment-form.md）。
+ * 機器登録・編集フォーム（create/edit 共通、form/shared/schema.ts）のスキーマ（RHF + zodResolver 用、
+ * screen-design/03-equipment-form.md）。
  * 入力体験向けの厳密検証（管理番号のユニークチェック等）はここで担う。
  * 永続化データの構造検証は `src/store/schema.ts` の equipmentSchema が別途担う（coding-standards.md §3）。
  *
@@ -48,3 +49,15 @@ export const createEquipmentFormSchema = (existingManagementNumbers: string[], v
   });
 
 export type EquipmentFormValues = z.infer<ReturnType<typeof createEquipmentFormSchema>>;
+
+/** 新規登録時の初期フォーム値（すべて string ベース、status のみ既定「稼働中」） */
+export const emptyFormValues: EquipmentFormValues = {
+  managementNo: "",
+  name: "",
+  model: "",
+  serialNo: "",
+  manufacturerId: "",
+  location: "",
+  status: EQUIPMENT_STATUS.ACTIVE,
+  note: "",
+};

@@ -5,7 +5,7 @@
  * (e) アンマウント後は発火しない、を fake timers + setSystemTime で確認する。
  */
 
-import { useNotificationScan } from "@/features/notifications/useNotificationScan";
+import { useNotificationScan } from "@/features/notifications/scan/useNotificationScan";
 import { useAppStore } from "@/store/useAppStore";
 import { setupStoreIsolation } from "@/test/renderWithStore";
 import { renderHook } from "@testing-library/react";

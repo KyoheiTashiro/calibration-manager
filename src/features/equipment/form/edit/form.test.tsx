@@ -1,11 +1,11 @@
 /**
- * EquipmentForm（/equipment/new・/equipment/:id/edit）の検証（screen-design/03-equipment-form.md）。
- * 新規登録・編集プリフィル/更新・管理番号ユニーク検証（自己除外含む）・必須エラー・
- * メーカーセレクト（フィルタ/空状態）・廃棄確認フロー・編集モードの存在しないid（リダイレクト）を扱う。
+ * EquipmentEditForm（/equipment/:id/edit）の検証（screen-design/03-equipment-form.md）。
+ * 編集プリフィル/更新・管理番号ユニーク検証（自己除外含む）・廃棄確認フロー・
+ * 編集モードの存在しないid（リダイレクト）を扱う。
  */
 
 import { ROUTES, equipmentDetailPath, equipmentEditPath } from "@/constants/routes";
-import { EquipmentForm } from "@/features/equipment/form";
+import { EquipmentEditForm } from "@/features/equipment/form/edit";
 import { EQUIPMENT_STATUS, type Equipment, type Vendor } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
 import { renderWithStore, seedStore, setupStoreIsolation } from "@/test/renderWithStore";
@@ -40,13 +40,6 @@ const mitutoyo: Vendor = {
   isCalibrator: false,
 };
 
-const nonManufacturerVendor: Vendor = {
-  id: "vendor-2",
-  name: "校正商事",
-  isManufacturer: false,
-  isCalibrator: true,
-};
-
 const existingEquipment: Equipment = {
   id: "equipment-1",
   managementNo: "EQ-001",
@@ -64,14 +57,8 @@ const otherEquipment: Equipment = {
   status: EQUIPMENT_STATUS.ACTIVE,
 };
 
-const renderNewForm = (): ReturnType<typeof renderWithStore> =>
-  renderWithStore(<EquipmentForm />, {
-    initialEntries: [ROUTES.EQUIPMENT_NEW],
-    routePath: ROUTES.EQUIPMENT_NEW,
-  });
-
 const renderEditForm = (id: string): ReturnType<typeof renderWithStore> =>
-  renderWithStore(<EquipmentForm />, {
+  renderWithStore(<EquipmentEditForm />, {
     initialEntries: [equipmentEditPath(id)],
     routePath: ROUTES.EQUIPMENT_EDIT,
   });
@@ -81,27 +68,7 @@ beforeEach(() => {
   navigateSpy.mockClear();
 });
 
-describe("EquipmentForm: 新規登録", () => {
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
-  it("必須項目を入力して保存すると Equipment が作成され詳細へ遷移する", async () => {
-    const user = userEvent.setup();
-    renderNewForm();
-
-    await user.type(screen.getByLabelText("管理番号", { exact: false }), "EQ-100");
-    await user.type(screen.getByLabelText("機器名", { exact: false }), "トルクレンチ");
-    await user.click(screen.getByRole("button", { name: "保存" }));
-
-    const created = Object.values(useAppStore.getState().equipment).find(
-      (entry) => entry.managementNo === "EQ-100",
-    );
-    expect(created).toBeDefined();
-    expect(created?.name).toBe("トルクレンチ");
-    expect(created?.status).toBe(EQUIPMENT_STATUS.ACTIVE);
-    expect(navigateSpy).toHaveBeenCalledWith(equipmentDetailPath(created?.id ?? ""));
-  });
-});
-
-describe("EquipmentForm: 編集プリフィル・更新", () => {
+describe("EquipmentEditForm: 編集プリフィル・更新", () => {
   it("既存値がプリフィルされる", () => {
     seedStore({ equipment: { [existingEquipment.id]: existingEquipment } });
     renderEditForm(existingEquipment.id);
@@ -134,29 +101,7 @@ describe("EquipmentForm: 編集プリフィル・更新", () => {
   });
 });
 
-describe("EquipmentForm: 管理番号ユニーク検証", () => {
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
-  it("他の機器と重複する管理番号では保存できずエラーが表示される", async () => {
-    const user = userEvent.setup();
-    seedStore({
-      equipment: {
-        [existingEquipment.id]: existingEquipment,
-        [otherEquipment.id]: otherEquipment,
-      },
-    });
-    renderNewForm();
-
-    await user.type(
-      screen.getByLabelText("管理番号", { exact: false }),
-      existingEquipment.managementNo,
-    );
-    await user.type(screen.getByLabelText("機器名", { exact: false }), "新しい機器");
-    await user.click(screen.getByRole("button", { name: "保存" }));
-
-    expect(screen.getByText("この管理番号は既に使用されています")).toBeInTheDocument();
-    expect(Object.keys(useAppStore.getState().equipment)).toHaveLength(2);
-  });
-
+describe("EquipmentEditForm: 管理番号ユニーク検証", () => {
   // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("編集時に自身の管理番号を変更せず再送信してもエラーにならない", async () => {
     const user = userEvent.setup();
@@ -180,68 +125,7 @@ describe("EquipmentForm: 管理番号ユニーク検証", () => {
   });
 });
 
-describe("EquipmentForm: 必須エラー", () => {
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
-  it("管理番号・機器名が空のまま保存すると両方のエラーが表示されストアは変化しない", async () => {
-    const user = userEvent.setup();
-    renderNewForm();
-
-    await user.click(screen.getByRole("button", { name: "保存" }));
-
-    expect(screen.getByText("管理番号は必須です")).toBeInTheDocument();
-    expect(screen.getByText("機器名は必須です")).toBeInTheDocument();
-    expect(Object.keys(useAppStore.getState().equipment)).toHaveLength(0);
-  });
-});
-
-describe("EquipmentForm: メーカーセレクト", () => {
-  it("isManufacturer=true の Vendor のみ選択肢に表示される", () => {
-    seedStore({
-      vendors: {
-        [mitutoyo.id]: mitutoyo,
-        [nonManufacturerVendor.id]: nonManufacturerVendor,
-      },
-    });
-    renderNewForm();
-
-    const select = screen.getByRole("combobox", { name: "メーカー" });
-    const optionLabels = within(select)
-      .getAllByRole("option")
-      .map((option) => option.textContent);
-    expect(optionLabels).toContain(mitutoyo.name);
-    expect(optionLabels).not.toContain(nonManufacturerVendor.name);
-  });
-
-  // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
-  it("メーカーが0件の場合は空状態文言とリンクを表示し、空のまま保存できる", async () => {
-    const user = userEvent.setup();
-    renderNewForm();
-
-    expect(
-      screen.getByText("メーカーが未登録です。マスタから追加してください"),
-    ).toBeInTheDocument();
-    expect(screen.queryByRole("combobox", { name: "メーカー" })).not.toBeInTheDocument();
-    const link = screen.getByRole("link");
-    expect(link).toHaveAttribute("href", ROUTES.VENDOR_LIST);
-
-    await user.type(screen.getByLabelText("管理番号", { exact: false }), "EQ-200");
-    await user.type(screen.getByLabelText("機器名", { exact: false }), "新規機器");
-    await user.click(screen.getByRole("button", { name: "保存" }));
-
-    const created = Object.values(useAppStore.getState().equipment).find(
-      (entry) => entry.managementNo === "EQ-200",
-    );
-    expect(created).toBeDefined();
-  });
-});
-
-describe("EquipmentForm: 廃棄ボタン", () => {
-  it("新規登録モードでは廃棄にするボタンが表示されない", () => {
-    renderNewForm();
-
-    expect(screen.queryByRole("button", { name: "廃棄にする" })).not.toBeInTheDocument();
-  });
-
+describe("EquipmentEditForm: 廃棄ボタン", () => {
   it("編集モードでは廃棄にするボタンが表示される", () => {
     seedStore({ equipment: { [existingEquipment.id]: existingEquipment } });
     renderEditForm(existingEquipment.id);
@@ -269,12 +153,12 @@ describe("EquipmentForm: 廃棄ボタン", () => {
   });
 });
 
-describe("EquipmentForm: 編集モードで存在しないid", () => {
+describe("EquipmentEditForm: 編集モードで存在しないid", () => {
   it("一覧画面へリダイレクトする", () => {
     render(
       <MemoryRouter initialEntries={[equipmentEditPath("does-not-exist")]}>
         <Routes>
-          <Route path={ROUTES.EQUIPMENT_EDIT} element={<EquipmentForm />} />
+          <Route path={ROUTES.EQUIPMENT_EDIT} element={<EquipmentEditForm />} />
           <Route path={ROUTES.EQUIPMENT_LIST} element={<div>機器一覧（テスト用マーカー）</div>} />
         </Routes>
       </MemoryRouter>,
