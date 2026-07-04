@@ -1,7 +1,7 @@
 /**
  * CSV の直列化・パース(RFC 4180 準拠、D-028)。
  * 区切りはカンマ、引用は `"` 囲み + `""` エスケープ、行末は CRLF。
- * エンティティとの相互変換(列仕様)は features/settings/entityCsv.ts が担い、
+ * エンティティとの相互変換(列仕様)は features/settings/components/csv/entityCsv.ts が担い、
  * ここは文字列 ⇔ セル二次元配列の変換のみを扱う。
  */
 

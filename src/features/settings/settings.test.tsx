@@ -6,7 +6,7 @@
  */
 
 import { Settings } from "@/features/settings";
-import { buildEntityCsv, CSV_ENTITY_KINDS, ENTITY_CSV_SPECS } from "@/features/settings/entityCsv";
+import { buildEntityCsv, CSV_ENTITY_KINDS, ENTITY_CSV_SPECS } from "@/features/settings/components/csv/entityCsv";
 import { EQUIPMENT_STATUS, type Equipment, type Vendor } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
 import { renderWithStore, seedStore, setupStoreIsolation } from "@/test/renderWithStore";

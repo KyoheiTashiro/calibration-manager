@@ -3,7 +3,7 @@
  * ヘッダ一致・行単位 zod・ファイル内ユニーク・参照整合・件数集計を検証する。
  */
 
-import { validateEntityCsv } from "@/features/settings/importValidation";
+import { validateEntityCsv } from "@/features/settings/components/csv/importValidation";
 import { emptyAppState } from "@/store/persistence";
 import type {
   AppState,

@@ -8,7 +8,7 @@ import { Button, Checkbox, Modal } from "@/components/ui";
 import { useAppStore } from "@/store/useAppStore";
 import { type ChangeEvent, type ReactElement, useState } from "react";
 
-export const DangerSection = (): ReactElement => {
+export const ResetSection = (): ReactElement => {
   const resetAll = useAppStore((store) => store.resetAll);
   const [open, setOpen] = useState(false);
   const [understood, setUnderstood] = useState(false);
