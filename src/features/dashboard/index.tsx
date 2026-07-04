@@ -42,11 +42,28 @@ export const Dashboard = (): ReactElement => {
     <div className="flex flex-col gap-6">
       <h1 className="text-xl font-bold">ダッシュボード</h1>
 
-      <SummaryCards counts={counts} onNavigate={navigate} />
+      <SummaryCards
+        counts={counts}
+        onNavigate={(path) => {
+          // なぜ Promise.resolve().catch() か: navigate() は react-router 7 で
+          // `void | Promise<void>` を返す。遷移完了を待つ必要はなく、失敗時も
+          // 画面表示に影響しないため、両方の戻り値を統一的に無視する。
+          Promise.resolve(navigate(path)).catch(() => {
+            // 遷移エラーは無視する
+          });
+        }}
+      />
 
       <section className="flex flex-col gap-2">
         <h2 className="text-lg font-semibold">要対応項目</h2>
-        <ActionRequiredList rows={actionRows} onNavigate={navigate} />
+        <ActionRequiredList
+          rows={actionRows}
+          onNavigate={(path) => {
+            Promise.resolve(navigate(path)).catch(() => {
+              // 遷移エラーは無視する
+            });
+          }}
+        />
       </section>
 
       <NotificationList notifications={latest} />

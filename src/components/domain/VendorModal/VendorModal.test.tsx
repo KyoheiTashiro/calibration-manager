@@ -28,7 +28,7 @@ beforeEach(setupStoreIsolation);
 
 describe("VendorModal: 新規追加", () => {
   it("タイトルが「取引先を追加」になる", () => {
-    render(<VendorModal open onClose={vi.fn()} />);
+    render(<VendorModal open onClose={vi.fn<() => void>()} />);
 
     expect(screen.getByText("取引先を追加")).toBeInTheDocument();
   });
@@ -36,7 +36,7 @@ describe("VendorModal: 新規追加", () => {
   // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("必須項目を入力して保存するとaddVendorが呼ばれストアに追加される", async () => {
     const user = userEvent.setup();
-    const onClose = vi.fn();
+    const onClose = vi.fn<() => void>();
     render(<VendorModal open onClose={onClose} />);
 
     await user.type(screen.getByLabelText("名称", { exact: false }), "新規機器メーカー");
@@ -56,7 +56,7 @@ describe("VendorModal: 新規追加", () => {
   // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("名称が空のまま保存するとエラー文言が表示され保存されない", async () => {
     const user = userEvent.setup();
-    render(<VendorModal open onClose={vi.fn()} />);
+    render(<VendorModal open onClose={vi.fn<() => void>()} />);
 
     await user.click(screen.getByRole("button", { name: "保存" }));
 
@@ -67,7 +67,7 @@ describe("VendorModal: 新規追加", () => {
   // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("メール形式が不正だとエラー文言が表示される", async () => {
     const user = userEvent.setup();
-    render(<VendorModal open onClose={vi.fn()} />);
+    render(<VendorModal open onClose={vi.fn<() => void>()} />);
 
     await user.type(screen.getByLabelText("名称", { exact: false }), "業者A");
     await user.type(screen.getByLabelText("メール"), "not-an-email");
@@ -78,13 +78,13 @@ describe("VendorModal: 新規追加", () => {
   });
 
   it("メーカー・校正業者ともに未チェックだと警告文が表示される（submitは可能）", () => {
-    render(<VendorModal open onClose={vi.fn()} />);
+    render(<VendorModal open onClose={vi.fn<() => void>()} />);
 
     expect(screen.getByText("メーカー・校正業者のどちらにも該当しません")).toBeInTheDocument();
   });
 
   it("isCalibrator未チェックの間は標準納期(日)フィールドが表示されない", () => {
-    render(<VendorModal open onClose={vi.fn()} />);
+    render(<VendorModal open onClose={vi.fn<() => void>()} />);
 
     expect(screen.queryByLabelText("標準納期(日)")).not.toBeInTheDocument();
   });
@@ -92,7 +92,7 @@ describe("VendorModal: 新規追加", () => {
   // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("校正業者をチェックすると標準納期(日)フィールドが表示される", async () => {
     const user = userEvent.setup();
-    render(<VendorModal open onClose={vi.fn()} />);
+    render(<VendorModal open onClose={vi.fn<() => void>()} />);
 
     await user.click(screen.getByLabelText("校正業者"));
 
@@ -102,7 +102,7 @@ describe("VendorModal: 新規追加", () => {
   // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("校正業者をチェックしてから外すと標準納期(日)の入力値がクリアされ保存値に含まれない", async () => {
     const user = userEvent.setup();
-    const onClose = vi.fn();
+    const onClose = vi.fn<() => void>();
     render(<VendorModal open onClose={onClose} />);
 
     await user.type(screen.getByLabelText("名称", { exact: false }), "業者B");
@@ -122,7 +122,7 @@ describe("VendorModal: 新規追加", () => {
 
 describe("VendorModal: 編集", () => {
   it("既存値がプリフィルされる", () => {
-    render(<VendorModal open vendor={vendor} onClose={vi.fn()} />);
+    render(<VendorModal open vendor={vendor} onClose={vi.fn<() => void>()} />);
 
     expect(screen.getByText("取引先を編集")).toBeInTheDocument();
     expect(screen.getByLabelText("名称", { exact: false })).toHaveValue("機器メーカー");
@@ -138,7 +138,7 @@ describe("VendorModal: 編集", () => {
   // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("変更して保存するとupdateVendorが反映される", async () => {
     const user = userEvent.setup();
-    const onClose = vi.fn();
+    const onClose = vi.fn<() => void>();
     useAppStore.setState({ vendors: { [vendor.id]: vendor } });
     render(<VendorModal open vendor={vendor} onClose={onClose} />);
 

@@ -80,7 +80,7 @@ export const OrderList = (): ReactElement => {
     for (const order of Object.values(orders)) {
       grouped[order.status].push(order);
     }
-    for (const status of Object.keys(grouped) as OrderStatus[]) {
+    for (const status of Object.values(ORDER_STATUS)) {
       grouped[status] = grouped[status].toSorted(compareOrdersForColumn);
     }
     return grouped;
@@ -128,7 +128,9 @@ export const OrderList = (): ReactElement => {
         <Checkbox
           label="完了/中止も表示"
           checked={showClosed}
-          onChange={(event) => setShowClosed(event.target.checked)}
+          onChange={(event) => {
+            setShowClosed(event.target.checked);
+          }}
         />
       </div>
 
@@ -136,7 +138,16 @@ export const OrderList = (): ReactElement => {
         <EmptyState
           message="点検校正外部案件はありません。点検校正項目一覧から案件を追加できます"
           action={
-            <Button onClick={() => navigate(ROUTES.INSPECTION_ITEM_LIST)}>
+            <Button
+              onClick={() => {
+                // なぜ Promise.resolve().catch() か: navigate() は react-router 7 で
+                // `void | Promise<void>` を返す。遷移完了を待つ必要はなく、失敗時も
+                // 画面表示に影響しないため、両方の戻り値を統一的に無視する。
+                Promise.resolve(navigate(ROUTES.INSPECTION_ITEM_LIST)).catch(() => {
+                  // 遷移エラーは無視する
+                });
+              }}
+            >
               点検校正項目一覧へ
             </Button>
           }

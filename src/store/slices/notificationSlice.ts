@@ -62,8 +62,8 @@ export const createNotificationSlice: AppSliceCreator<NotificationSlice> = (set,
 
   markAsRead: (id): void => {
     set((state) => {
-      const notification = state.notifications[id];
-      if (!notification) return;
+      const notification = recordValue(state.notifications, id);
+      if (notification === undefined) return;
       notification.isRead = true;
     });
   },

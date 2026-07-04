@@ -60,11 +60,15 @@ export const EquipmentDetail = (): ReactElement => {
     return <Navigate to={ROUTES.EQUIPMENT_LIST} replace />;
   }
 
-  const handleAddInspectionItemClick = (): void =>
+  const handleAddInspectionItemClick = (): void => {
     setModalState({ open: true, inspectionItem: undefined });
-  const handleEditInspectionItemClick = (inspectionItem: InspectionItem): void =>
+  };
+  const handleEditInspectionItemClick = (inspectionItem: InspectionItem): void => {
     setModalState({ open: true, inspectionItem });
-  const handleModalClose = (): void => setModalState({ open: false, inspectionItem: undefined });
+  };
+  const handleModalClose = (): void => {
+    setModalState({ open: false, inspectionItem: undefined });
+  };
 
   const inspectionItemList = sortedInspectionItemsOf(inspectionItems, currentEquipment.id);
   const historyRows = historyRowsOf(inspectionItems, records, currentEquipment.id);
@@ -75,18 +79,29 @@ export const EquipmentDetail = (): ReactElement => {
         <h1 className="text-xl font-bold">
           {currentEquipment.managementNo} {currentEquipment.name}
         </h1>
-        <Button onClick={() => navigate(equipmentEditPath(currentEquipment.id))}>編集</Button>
+        <Button
+          onClick={() => {
+            // なぜ Promise.resolve().catch() か: navigate() は react-router 7 で
+            // `void | Promise<void>` を返す。遷移完了を待つ必要はなく、失敗時も
+            // 画面表示に影響しないため、両方の戻り値を統一的に無視する。
+            Promise.resolve(navigate(equipmentEditPath(currentEquipment.id))).catch(() => {
+              // 遷移エラーは無視する
+            });
+          }}
+        >
+          編集
+        </Button>
       </div>
 
       <div className="rounded border border-slate-200 p-4">
         <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm sm:grid-cols-3">
           <div>
             <dt className="text-slate-500">型式</dt>
-            <dd>{currentEquipment.model || "—"}</dd>
+            <dd>{currentEquipment.model ?? "—"}</dd>
           </div>
           <div>
             <dt className="text-slate-500">S/N</dt>
-            <dd>{currentEquipment.serialNo || "—"}</dd>
+            <dd>{currentEquipment.serialNo ?? "—"}</dd>
           </div>
           <div>
             <dt className="text-slate-500">メーカー</dt>
@@ -98,7 +113,7 @@ export const EquipmentDetail = (): ReactElement => {
           </div>
           <div>
             <dt className="text-slate-500">設置場所</dt>
-            <dd>{currentEquipment.location || "—"}</dd>
+            <dd>{currentEquipment.location ?? "—"}</dd>
           </div>
           <div>
             <dt className="text-slate-500">状態</dt>
@@ -111,7 +126,7 @@ export const EquipmentDetail = (): ReactElement => {
           </div>
           <div>
             <dt className="text-slate-500">備考</dt>
-            <dd>{currentEquipment.note || "—"}</dd>
+            <dd>{currentEquipment.note ?? "—"}</dd>
           </div>
         </dl>
       </div>
@@ -189,16 +204,18 @@ export const EquipmentDetail = (): ReactElement => {
                       <Button
                         variant="secondary"
                         size="sm"
-                        onClick={() =>
-                          setRecordModalState({ open: true, inspectionItemId: inspectionItem.id })
-                        }
+                        onClick={() => {
+                          setRecordModalState({ open: true, inspectionItemId: inspectionItem.id });
+                        }}
                       >
                         記録
                       </Button>
                       <Button
                         variant="secondary"
                         size="sm"
-                        onClick={() => handleEditInspectionItemClick(inspectionItem)}
+                        onClick={() => {
+                          handleEditInspectionItemClick(inspectionItem);
+                        }}
                       >
                         編集
                       </Button>
@@ -244,7 +261,7 @@ export const EquipmentDetail = (): ReactElement => {
                   <td className="px-3 py-2">{inspectionItemName}</td>
                   <td className="px-3 py-2">{record.doneBy}</td>
                   <td className="px-3 py-2">{RECORD_RESULT_LABELS[record.result]}</td>
-                  <td className="px-3 py-2">{record.note || "—"}</td>
+                  <td className="px-3 py-2">{record.note ?? "—"}</td>
                 </tr>
               ))}
             </TableBody>
@@ -264,7 +281,9 @@ export const EquipmentDetail = (): ReactElement => {
           key={recordModalState.inspectionItemId}
           open={recordModalState.open}
           inspectionItemId={recordModalState.inspectionItemId}
-          onClose={() => setRecordModalState({ open: false, inspectionItemId: undefined })}
+          onClose={() => {
+            setRecordModalState({ open: false, inspectionItemId: undefined });
+          }}
         />
       )}
     </div>

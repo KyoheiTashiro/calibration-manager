@@ -19,16 +19,20 @@ export const vendorFormSchema = z.object({
   email: z
     .string()
     .optional()
-    .refine((value) => !value || z.email().safeParse(value).success, {
+    .refine((value) => value === undefined || value === "" || z.email().safeParse(value).success, {
       message: "メールアドレスの形式が不正です",
     }),
   phone: z.string().optional(),
   standardLeadTimeDays: z
     .string()
     .optional()
-    .refine((value) => !value || (!Number.isNaN(Number(value)) && Number(value) >= 0), {
-      message: "0以上の数値を入力してください",
-    }),
+    .refine(
+      (value) =>
+        value === undefined || value === "" || (!Number.isNaN(Number(value)) && Number(value) >= 0),
+      {
+        message: "0以上の数値を入力してください",
+      },
+    ),
   note: z.string().optional(),
 });
 

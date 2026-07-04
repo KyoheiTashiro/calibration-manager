@@ -30,6 +30,14 @@ export const STATUS_FILTER_OPTIONS: { value: StatusFilter; label: string }[] = [
   { value: STATUS_FILTER.RETIRED, label: "廃棄" },
 ];
 
+/**
+ * 文字列が StatusFilter か判定する実行時型ガード。<select> の onChange イベント値は
+ * 型上ただの string のため、Select の options（STATUS_FILTER_OPTIONS）に実在する値かを
+ * 検証してから安全に絞り込む（as によるアサーションを避けるため）。
+ */
+export const isStatusFilter = (value: string): value is StatusFilter =>
+  STATUS_FILTER_OPTIONS.some((option) => option.value === value);
+
 /** 状態フィルタの選択値が機器の状態に一致するか（screen-design/02-equipment-list.md「操作・アクション」） */
 const matchesStatusFilter = (status: EquipmentStatus, filter: StatusFilter): boolean => {
   switch (filter) {

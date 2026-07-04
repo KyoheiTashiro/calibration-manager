@@ -27,10 +27,16 @@ type Props = {
   onClose: () => void;
 };
 
+// なぜ: noUncheckedIndexedAccess無効下でも実行時欠落(削除済み参照等)の可能性を型に反映するため
+const pickRecord = <Value,>(record: Record<string, Value>, key: string): Value | undefined =>
+  record[key];
+
 export const OrderModal = ({ open, inspectionItemId, onClose }: Props): ReactElement => {
-  const inspectionItem = useAppStore((state) => state.inspectionItems[inspectionItemId]);
+  const inspectionItem = useAppStore((state) =>
+    pickRecord(state.inspectionItems, inspectionItemId),
+  );
   const equipment = useAppStore((state) =>
-    inspectionItem ? state.equipment[inspectionItem.equipmentId] : undefined,
+    inspectionItem ? pickRecord(state.equipment, inspectionItem.equipmentId) : undefined,
   );
   const vendors = useAppStore((state) => state.vendors);
   const addOrder = useAppStore((state) => state.addOrder);
@@ -71,12 +77,15 @@ export const OrderModal = ({ open, inspectionItemId, onClose }: Props): ReactEle
   };
 
   const onSubmit = (values: OrderFormValues): void => {
+    const hasDueDate = values.dueDate !== undefined && values.dueDate !== "";
+    const hasCost = values.cost !== undefined && values.cost !== "";
+    const hasNote = values.note !== undefined && values.note !== "";
     const orderId = addOrder({
       inspectionItemId,
       vendorId: values.vendorId,
-      dueDate: values.dueDate || undefined,
-      cost: values.cost ? Number(values.cost) : undefined,
-      note: values.note || undefined,
+      dueDate: hasDueDate ? values.dueDate : undefined,
+      cost: hasCost ? Number(values.cost) : undefined,
+      note: hasNote ? values.note : undefined,
     });
     // なぜここで setState か: react-compiler(EffectSetState) が effect 内での同期 setState を
     // 禁則とするため、submitFailed はイベントハンドラ側（onSubmit）に一本化し（RecordModal.tsx
@@ -86,6 +95,13 @@ export const OrderModal = ({ open, inspectionItemId, onClose }: Props): ReactEle
     handleClose();
   };
 
+  // なぜcatchで終端するか: no-void下でfloating promiseを残さないため(onSubmitは例外を投げない設計)。
+  const handleSave = (): void => {
+    handleSubmit(onSubmit)().catch(() => {
+      // onSubmitは例外を投げない設計のため到達しない想定
+    });
+  };
+
   return (
     <Modal
       open={open}
@@ -93,7 +109,7 @@ export const OrderModal = ({ open, inspectionItemId, onClose }: Props): ReactEle
       onClose={handleClose}
       isDirty={isDirty}
       footer={
-        <Button type="button" onClick={handleSubmit(onSubmit)}>
+        <Button type="button" onClick={handleSave}>
           保存
         </Button>
       }

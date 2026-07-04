@@ -15,7 +15,7 @@ import {
   vendorSchema,
 } from "@/store/schema";
 import { type AppState, NOTIFICATION_TARGET_TYPE } from "@/store/types";
-import { recordValue } from "@/utils/record";
+import { isRecord, recordValue } from "@/utils/record";
 import type { z } from "zod";
 
 export const emptyAppState = (): AppState => ({
@@ -33,11 +33,11 @@ export type MigrationStep = (persisted: unknown) => unknown;
 
 /** v1 各エントリのフィールド名を変更する。非オブジェクトはそのまま残し merge のサルベージに委ねる */
 const renameFieldInRecord = (value: unknown, from: string, to: string): unknown => {
-  if (typeof value !== "object" || value === null) return value;
+  if (!isRecord(value)) return value;
   return Object.fromEntries(
     Object.entries(value).map(([key, entry]) => {
-      if (typeof entry !== "object" || entry === null || !(from in entry)) return [key, entry];
-      const { [from]: renamed, ...rest } = entry as Record<string, unknown>;
+      if (!isRecord(entry) || !(from in entry)) return [key, entry];
+      const { [from]: renamed, ...rest } = entry;
       return [key, { ...rest, [to]: renamed }];
     }),
   );
@@ -51,23 +51,21 @@ const renameFieldInRecord = (value: unknown, from: string, to: string): unknown 
  * 比較の "item" は v1 の歴史的リテラル値（現行列挙に存在しない）のため直書き。
  */
 export const migrateV1ToV2: MigrationStep = (persisted) => {
-  if (typeof persisted !== "object" || persisted === null) return persisted;
-  const { items, records, orders, notifications, ...rest } = persisted as Record<string, unknown>;
-  const migratedNotifications =
-    typeof notifications === "object" && notifications !== null
-      ? Object.fromEntries(
-          Object.entries(notifications).map(([key, entry]) => {
-            if (typeof entry !== "object" || entry === null) return [key, entry];
-            const notification = entry as Record<string, unknown>;
-            return [
-              key,
-              notification["targetType"] === "item"
-                ? { ...notification, targetType: NOTIFICATION_TARGET_TYPE.INSPECTION_ITEM }
-                : notification,
-            ];
-          }),
-        )
-      : notifications;
+  if (!isRecord(persisted)) return persisted;
+  const { items, records, orders, notifications, ...rest } = persisted;
+  const migratedNotifications = isRecord(notifications)
+    ? Object.fromEntries(
+        Object.entries(notifications).map(([key, entry]) => {
+          if (!isRecord(entry)) return [key, entry];
+          return [
+            key,
+            entry.targetType === "item"
+              ? { ...entry, targetType: NOTIFICATION_TARGET_TYPE.INSPECTION_ITEM }
+              : entry,
+          ];
+        }),
+      )
+    : notifications;
   return {
     ...rest,
     inspectionItems: items,
@@ -94,7 +92,10 @@ export const migratePersistedState = (
 ): unknown => {
   let state = persisted;
   for (let version = fromVersion; version < STORAGE_VERSION; version += 1) {
-    const step = migrations[version];
+    // Record<number, MigrationStep> の bracket access は型上 MigrationStep になるが、
+    // 実際には未登録バージョンキーで undefined になり得るため hasOwn で存在確認してから読む
+    // （recordValue と同じ考え方。キー型が number のためヘルパは使わずここに書く）
+    const step = Object.hasOwn(migrations, version) ? migrations[version] : undefined;
     // 未登録バージョンはそのまま通し、後段 merge のサルベージに委ねる（例外を投げない）
     if (step !== undefined) state = step(state);
   }
@@ -116,13 +117,13 @@ const salvageRecords = <Entity>(
 };
 
 const salvageAppStatePerRecord = (persisted: Record<string, unknown>): AppState => ({
-  vendors: salvageRecords(persisted["vendors"], vendorSchema),
-  persons: salvageRecords(persisted["persons"], personSchema),
-  equipment: salvageRecords(persisted["equipment"], equipmentSchema),
-  inspectionItems: salvageRecords(persisted["inspectionItems"], inspectionItemSchema),
-  records: salvageRecords(persisted["records"], inspectionRecordSchema),
-  orders: salvageRecords(persisted["orders"], calibrationOrderSchema),
-  notifications: salvageRecords(persisted["notifications"], notificationSchema),
+  vendors: salvageRecords(persisted.vendors, vendorSchema),
+  persons: salvageRecords(persisted.persons, personSchema),
+  equipment: salvageRecords(persisted.equipment, equipmentSchema),
+  inspectionItems: salvageRecords(persisted.inspectionItems, inspectionItemSchema),
+  records: salvageRecords(persisted.records, inspectionRecordSchema),
+  orders: salvageRecords(persisted.orders, calibrationOrderSchema),
+  notifications: salvageRecords(persisted.notifications, notificationSchema),
 });
 
 /**
@@ -153,8 +154,6 @@ export const sanitizeAppState = (state: AppState): AppState => {
 export const salvagePersistedState = (persisted: unknown): AppState => {
   const whole = appStateSchema.safeParse(persisted);
   if (whole.success) return sanitizeAppState(whole.data);
-  if (typeof persisted === "object" && persisted !== null) {
-    return sanitizeAppState(salvageAppStatePerRecord(persisted as Record<string, unknown>));
-  }
+  if (isRecord(persisted)) return sanitizeAppState(salvageAppStatePerRecord(persisted));
   return emptyAppState();
 };

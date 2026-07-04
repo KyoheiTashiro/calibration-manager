@@ -32,9 +32,15 @@ const optionalNonNegativeIntegerString = (invalidMessage: string) =>
   z
     .string()
     .optional()
-    .refine((value) => !value || (Number.isInteger(Number(value)) && Number(value) >= 0), {
-      message: invalidMessage,
-    });
+    .refine(
+      (value) =>
+        value === undefined ||
+        value === "" ||
+        (Number.isInteger(Number(value)) && Number(value) >= 0),
+      {
+        message: invalidMessage,
+      },
+    );
 
 export const inspectionItemFormSchema = z
   .object({

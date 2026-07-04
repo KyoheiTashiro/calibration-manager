@@ -76,7 +76,7 @@ export const PersonModal = ({ open, person, onClose }: PersonModalProps): ReactE
   // なぜ getState() で件数を都度取得するか: 送信時点でしか使わない値を毎レンダー購読するのを
   // 避けるため（coding-standards.md §5「1値1呼び出しで分割購読」の趣旨に沿ったスナップショット取得）。
   const onSubmit = (values: PersonFormValues): void => {
-    if (person && person.isActive && !values.isActive) {
+    if (person?.isActive === true && !values.isActive) {
       const assignedInspectionItemCount = Object.values(
         useAppStore.getState().inspectionItems,
       ).filter(
@@ -98,6 +98,13 @@ export const PersonModal = ({ open, person, onClose }: PersonModalProps): ReactE
     setPendingDeactivation(null);
   };
 
+  // なぜcatchで終端するか: no-void下でfloating promiseを残さないため(onSubmitは例外を投げない設計)。
+  const handleSave = (): void => {
+    handleSubmit(onSubmit)().catch(() => {
+      // onSubmitは例外を投げない設計のため到達しない想定
+    });
+  };
+
   const confirmMessage =
     pendingDeactivation && pendingDeactivation.assignedInspectionItemCount > 0
       ? `この担当者は現役の点検校正項目 ${pendingDeactivation.assignedInspectionItemCount} 件に割り当てられています。通知が届かなくなる可能性があります。無効化しますか?`
@@ -111,7 +118,7 @@ export const PersonModal = ({ open, person, onClose }: PersonModalProps): ReactE
         onClose={handleClose}
         isDirty={isDirty}
         footer={
-          <Button type="button" onClick={handleSubmit(onSubmit)}>
+          <Button type="button" onClick={handleSave}>
             保存
           </Button>
         }

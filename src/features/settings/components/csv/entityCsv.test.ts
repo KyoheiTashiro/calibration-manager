@@ -1,4 +1,8 @@
-import { buildEntityCsv, CSV_ENTITY_KINDS, ENTITY_CSV_SPECS } from "@/features/settings/components/csv/entityCsv";
+import {
+  buildEntityCsv,
+  CSV_ENTITY_KINDS,
+  ENTITY_CSV_SPECS,
+} from "@/features/settings/components/csv/entityCsv";
 import type { Equipment, Vendor } from "@/store/types";
 import { describe, expect, it } from "vitest";
 

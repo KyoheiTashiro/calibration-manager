@@ -76,7 +76,11 @@ describe("OrderModal", () => {
   it("対象が「対象:EQ-001 ノギス / 年次校正」の形式で固定表示される", () => {
     seedBaseMasters();
     renderWithStore(
-      <OrderModal open inspectionItemId={externalInspectionItem.id} onClose={vi.fn()} />,
+      <OrderModal
+        open
+        inspectionItemId={externalInspectionItem.id}
+        onClose={vi.fn<() => void>()}
+      />,
     );
 
     expect(screen.getByText("対象:EQ-001 ノギス / 年次校正")).toBeInTheDocument();
@@ -85,7 +89,11 @@ describe("OrderModal", () => {
   it("依頼先の既定値がinspectionItem.vendorId(isCalibratorの選択肢に存在する場合)になる", () => {
     seedBaseMasters();
     renderWithStore(
-      <OrderModal open inspectionItemId={externalInspectionItem.id} onClose={vi.fn()} />,
+      <OrderModal
+        open
+        inspectionItemId={externalInspectionItem.id}
+        onClose={vi.fn<() => void>()}
+      />,
     );
 
     expect(screen.getByLabelText("校正依頼先", { exact: false })).toHaveValue(calibratorVendor.id);
@@ -94,7 +102,11 @@ describe("OrderModal", () => {
   it("依頼先の選択肢がisCalibrator=trueのVendorのみ", () => {
     seedBaseMasters();
     renderWithStore(
-      <OrderModal open inspectionItemId={externalInspectionItem.id} onClose={vi.fn()} />,
+      <OrderModal
+        open
+        inspectionItemId={externalInspectionItem.id}
+        onClose={vi.fn<() => void>()}
+      />,
     );
 
     expect(screen.getByRole("option", { name: calibratorVendor.name })).toBeInTheDocument();
@@ -107,7 +119,7 @@ describe("OrderModal", () => {
   it("有効な入力で「保存」を押すとaddOrderが呼ばれstatus=plannedの案件が追加されonCloseが呼ばれる", async () => {
     seedBaseMasters();
     const user = userEvent.setup();
-    const onClose = vi.fn();
+    const onClose = vi.fn<() => void>();
     renderWithStore(
       <OrderModal open inspectionItemId={externalInspectionItem.id} onClose={onClose} />,
     );
@@ -144,7 +156,7 @@ describe("OrderModal", () => {
       },
     });
     const user = userEvent.setup();
-    const onClose = vi.fn();
+    const onClose = vi.fn<() => void>();
     renderWithStore(
       <OrderModal open inspectionItemId={externalInspectionItem.id} onClose={onClose} />,
     );
@@ -163,7 +175,11 @@ describe("OrderModal", () => {
       inspectionItems: { [externalInspectionItem.id]: externalInspectionItem },
     });
     renderWithStore(
-      <OrderModal open inspectionItemId={externalInspectionItem.id} onClose={vi.fn()} />,
+      <OrderModal
+        open
+        inspectionItemId={externalInspectionItem.id}
+        onClose={vi.fn<() => void>()}
+      />,
     );
 
     expect(screen.getByText("校正業者が未登録です")).toBeInTheDocument();
@@ -188,7 +204,11 @@ describe("OrderModal", () => {
     });
     const user = userEvent.setup();
     renderWithStore(
-      <OrderModal open inspectionItemId={externalInspectionItem.id} onClose={vi.fn()} />,
+      <OrderModal
+        open
+        inspectionItemId={externalInspectionItem.id}
+        onClose={vi.fn<() => void>()}
+      />,
     );
 
     await user.click(screen.getByRole("button", { name: "保存" }));
@@ -202,7 +222,11 @@ describe("OrderModal", () => {
     seedBaseMasters();
     const user = userEvent.setup();
     renderWithStore(
-      <OrderModal open inspectionItemId={externalInspectionItem.id} onClose={vi.fn()} />,
+      <OrderModal
+        open
+        inspectionItemId={externalInspectionItem.id}
+        onClose={vi.fn<() => void>()}
+      />,
     );
 
     await user.type(screen.getByLabelText("費用", { exact: false }), "-100");

@@ -10,3 +10,6 @@ storybook-static
 
 # vite-plugin-pwa devOptions が生成する開発用SW（生成物のためコミット対象外）
 dev-dist
+
+# Claude Code が権限承認で自動生成するローカル設定（oxfmt 対象からも除外される）
+.claude/settings.local.json

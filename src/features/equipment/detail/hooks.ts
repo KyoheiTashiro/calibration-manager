@@ -73,7 +73,10 @@ export const displayedInspectionItemStatus = (
   vendors: Record<string, Vendor>,
 ): InspectionItemStatus | null => {
   if (equipmentStatus !== EQUIPMENT_STATUS.ACTIVE) return null;
-  const vendor = inspectionItem.vendorId ? (vendors[inspectionItem.vendorId] ?? null) : null;
+  const vendor =
+    inspectionItem.vendorId !== undefined && inspectionItem.vendorId !== ""
+      ? (vendors[inspectionItem.vendorId] ?? null)
+      : null;
   return deriveInspectionItemStatus(
     inspectionItem,
     ordersOf({ orders }, inspectionItem.id),

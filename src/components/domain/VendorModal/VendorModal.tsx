@@ -9,7 +9,7 @@ import { vendorFormSchema, type VendorFormValues } from "@/features/vendors/sche
 import type { Vendor } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { ReactElement } from "react";
+import type { ChangeEvent, ReactElement } from "react";
 import { useForm, useWatch } from "react-hook-form";
 
 type Props = {
@@ -77,18 +77,24 @@ export const VendorModal = ({ open, vendor, onClose }: Props): ReactElement => {
   };
 
   const onSubmit = (values: VendorFormValues): void => {
+    const hasContactPerson = values.contactPerson !== undefined && values.contactPerson !== "";
+    const hasEmail = values.email !== undefined && values.email !== "";
+    const hasPhone = values.phone !== undefined && values.phone !== "";
+    const hasStandardLeadTimeDays =
+      values.standardLeadTimeDays !== undefined && values.standardLeadTimeDays !== "";
+    const hasNote = values.note !== undefined && values.note !== "";
     const payload = {
       name: values.name,
       isManufacturer: values.isManufacturer,
       isCalibrator: values.isCalibrator,
-      contactPerson: values.contactPerson || undefined,
-      email: values.email || undefined,
-      phone: values.phone || undefined,
+      contactPerson: hasContactPerson ? values.contactPerson : undefined,
+      email: hasEmail ? values.email : undefined,
+      phone: hasPhone ? values.phone : undefined,
       standardLeadTimeDays:
-        values.isCalibrator && values.standardLeadTimeDays
+        values.isCalibrator && hasStandardLeadTimeDays
           ? Number(values.standardLeadTimeDays)
           : undefined,
-      note: values.note || undefined,
+      note: hasNote ? values.note : undefined,
     };
     if (vendor) {
       updateVendor(vendor.id, payload);
@@ -98,6 +104,13 @@ export const VendorModal = ({ open, vendor, onClose }: Props): ReactElement => {
     handleClose();
   };
 
+  // なぜcatchで終端するか: no-void下でfloating promiseを残さないため(onSubmitは例外を投げない設計)。
+  const handleSave = (): void => {
+    handleSubmit(onSubmit)().catch(() => {
+      // onSubmitは例外を投げない設計のため到達しない想定
+    });
+  };
+
   return (
     <Modal
       open={open}
@@ -105,7 +118,7 @@ export const VendorModal = ({ open, vendor, onClose }: Props): ReactElement => {
       onClose={handleClose}
       isDirty={isDirty}
       footer={
-        <Button type="button" onClick={handleSubmit(onSubmit)}>
+        <Button type="button" onClick={handleSave}>
           保存
         </Button>
       }
@@ -130,7 +143,7 @@ export const VendorModal = ({ open, vendor, onClose }: Props): ReactElement => {
           // state 変化に反応する effect ではなくユーザー操作イベントで直接処理する。
           // oxlint-disable-next-line react/jsx-props-no-spreading -- register()のname/onChange/onBlur等を素通しするため必須
           {...register("isCalibrator", {
-            onChange: (event) => {
+            onChange: (event: ChangeEvent<HTMLInputElement>) => {
               if (!event.target.checked) {
                 setValue("standardLeadTimeDays", "", { shouldDirty: false });
               }

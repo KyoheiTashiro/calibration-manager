@@ -20,16 +20,22 @@ const optionalNonNegativeIntegerString = (invalidMessage: string) =>
   z
     .string()
     .optional()
-    .refine((value) => !value || (Number.isInteger(Number(value)) && Number(value) >= 0), {
-      message: invalidMessage,
-    });
+    .refine(
+      (value) =>
+        value === undefined ||
+        value === "" ||
+        (Number.isInteger(Number(value)) && Number(value) >= 0),
+      {
+        message: invalidMessage,
+      },
+    );
 
 export const orderFormSchema = z.object({
   vendorId: z.string().min(1, "校正依頼先を選択してください"),
   dueDate: z
     .string()
     .optional()
-    .refine((value) => !value || isIsoDateString(value), {
+    .refine((value) => value === undefined || value === "" || isIsoDateString(value), {
       message: "返却予定日の形式が不正です",
     }),
   cost: optionalNonNegativeIntegerString("費用は0以上の数値で入力してください"),

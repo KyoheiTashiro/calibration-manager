@@ -14,8 +14,8 @@ describe("ConfirmModal", () => {
         title="削除の確認"
         message="この機器を削除しますか?"
         confirmLabel="削除"
-        onConfirm={vi.fn()}
-        onCancel={vi.fn()}
+        onConfirm={vi.fn<() => void>()}
+        onCancel={vi.fn<() => void>()}
       />,
     );
 
@@ -28,8 +28,8 @@ describe("ConfirmModal", () => {
         title="削除の確認"
         message="この機器を削除しますか?"
         confirmLabel="削除"
-        onConfirm={vi.fn()}
-        onCancel={vi.fn()}
+        onConfirm={vi.fn<() => void>()}
+        onCancel={vi.fn<() => void>()}
       />,
     );
 
@@ -43,8 +43,8 @@ describe("ConfirmModal", () => {
         title="削除の確認"
         message="この機器を削除しますか?"
         confirmLabel="削除"
-        onConfirm={vi.fn()}
-        onCancel={vi.fn()}
+        onConfirm={vi.fn<() => void>()}
+        onCancel={vi.fn<() => void>()}
       />,
     );
 
@@ -52,7 +52,7 @@ describe("ConfirmModal", () => {
   });
 
   it("実行ボタンクリックでonConfirmが呼ばれる", () => {
-    const onConfirm = vi.fn();
+    const onConfirm = vi.fn<() => void>();
     render(
       <ConfirmModal
         open
@@ -60,7 +60,7 @@ describe("ConfirmModal", () => {
         message="この機器を削除しますか?"
         confirmLabel="削除"
         onConfirm={onConfirm}
-        onCancel={vi.fn()}
+        onCancel={vi.fn<() => void>()}
       />,
     );
 
@@ -70,14 +70,14 @@ describe("ConfirmModal", () => {
   });
 
   it("キャンセルボタンクリックでonCancelが呼ばれる", () => {
-    const onCancel = vi.fn();
+    const onCancel = vi.fn<() => void>();
     render(
       <ConfirmModal
         open
         title="削除の確認"
         message="この機器を削除しますか?"
         confirmLabel="削除"
-        onConfirm={vi.fn()}
+        onConfirm={vi.fn<() => void>()}
         onCancel={onCancel}
       />,
     );
@@ -88,14 +88,14 @@ describe("ConfirmModal", () => {
   });
 
   it("cancelイベント（Esc相当）が起きるとonCancelが呼ばれる", () => {
-    const onCancel = vi.fn();
+    const onCancel = vi.fn<() => void>();
     const { container } = render(
       <ConfirmModal
         open
         title="削除の確認"
         message="この機器を削除しますか?"
         confirmLabel="削除"
-        onConfirm={vi.fn()}
+        onConfirm={vi.fn<() => void>()}
         onCancel={onCancel}
       />,
     );
@@ -108,14 +108,14 @@ describe("ConfirmModal", () => {
   });
 
   it("オーバーレイクリックでonCancelが呼ばれる", () => {
-    const onCancel = vi.fn();
+    const onCancel = vi.fn<() => void>();
     const { container } = render(
       <ConfirmModal
         open
         title="削除の確認"
         message="この機器を削除しますか?"
         confirmLabel="削除"
-        onConfirm={vi.fn()}
+        onConfirm={vi.fn<() => void>()}
         onCancel={onCancel}
       />,
     );
@@ -134,8 +134,8 @@ describe("ConfirmModal", () => {
         title="削除の確認"
         message="この機器を削除しますか?"
         confirmLabel="削除"
-        onConfirm={vi.fn()}
-        onCancel={vi.fn()}
+        onConfirm={vi.fn<() => void>()}
+        onCancel={vi.fn<() => void>()}
       />,
     );
 

@@ -6,10 +6,7 @@
 
 import { equipmentDetailPath } from "@/constants/routes";
 import { toEquipmentPayload, type SelectOption } from "@/features/equipment/form/shared/mapping";
-import {
-  emptyFormValues,
-  type EquipmentFormValues,
-} from "@/features/equipment/form/shared/schema";
+import { emptyFormValues, type EquipmentFormValues } from "@/features/equipment/form/shared/schema";
 import { useEquipmentFormCore } from "@/features/equipment/form/shared/useFormCore";
 import { EQUIPMENT_STATUS, type Equipment } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
@@ -76,14 +73,21 @@ export const useEditEquipmentForm = (): UseEditEquipmentFormResult => {
   const onSubmit = (values: EquipmentFormValues): void => {
     if (currentEquipment === undefined) return;
     updateEquipment(currentEquipment.id, toEquipmentPayload(values));
-    navigate(equipmentDetailPath(currentEquipment.id));
+    // なぜ Promise.resolve().catch() か: navigate() は react-router 7 で
+    // `void | Promise<void>` を返す。遷移完了を待つ必要はなく、失敗時も
+    // 画面表示に影響しないため、両方の戻り値を統一的に無視する。
+    Promise.resolve(navigate(equipmentDetailPath(currentEquipment.id))).catch(() => {
+      // 遷移エラーは無視する
+    });
   };
 
   const handleRetireConfirm = (): void => {
     if (currentEquipment === undefined) return;
     setEquipmentStatus(currentEquipment.id, EQUIPMENT_STATUS.RETIRED);
     setRetireConfirmOpen(false);
-    navigate(equipmentDetailPath(currentEquipment.id));
+    Promise.resolve(navigate(equipmentDetailPath(currentEquipment.id))).catch(() => {
+      // 遷移エラーは無視する
+    });
   };
 
   return {
@@ -96,11 +100,17 @@ export const useEditEquipmentForm = (): UseEditEquipmentFormResult => {
     onFormSubmit: handleSubmit(onSubmit),
     manufacturerOptions,
     retireConfirmOpen,
-    openRetireConfirm: (): void => setRetireConfirmOpen(true),
-    closeRetireConfirm: (): void => setRetireConfirmOpen(false),
+    openRetireConfirm: (): void => {
+      setRetireConfirmOpen(true);
+    },
+    closeRetireConfirm: (): void => {
+      setRetireConfirmOpen(false);
+    },
     handleRetireConfirm,
     handleCancel: (): void => {
-      navigate(-1);
+      Promise.resolve(navigate(-1)).catch(() => {
+        // 遷移エラーは無視する
+      });
     },
   };
 };

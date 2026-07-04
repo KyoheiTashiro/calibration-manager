@@ -78,8 +78,9 @@ describe("AppLayout", () => {
     await user.click(screen.getByRole("button", { name: "メニューを開く" }));
     const backdrop = container.querySelector('[class*="bg-black/50"]');
     expect(backdrop).not.toBeNull();
+    if (backdrop === null) throw new Error("backdrop要素が見つかりません");
 
-    await user.click(backdrop as Element);
+    await user.click(backdrop);
 
     expect(container.querySelector('[class*="bg-black/50"]')).toBeNull();
   });

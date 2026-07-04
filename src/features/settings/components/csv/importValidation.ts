@@ -162,7 +162,10 @@ const preflightCsv = <Kind extends CsvEntityKind>(
   }
   const [header, ...dataRows] = parsed;
   const expectedHeader = spec.columns.map((column) => column.key).join(",");
-  if (header === undefined || header.join(",") !== expectedHeader) {
+  // なぜ parsed.length === 0 を先にみるか: 空文字列は parseCsv が [] を返すため、
+  // 分割代入の header は実行時に undefined になり得る。noUncheckedIndexedAccess を
+  // 無効化しているため型上は string[] だが、header.join を呼ぶ前にこの分岐で弾く。
+  if (parsed.length === 0 || header.join(",") !== expectedHeader) {
     return { errors: [{ line: 1, message: `ヘッダが不正です(${spec.label}のCSVではありません)` }] };
   }
   return { dataRows };
@@ -268,6 +271,9 @@ export const validateEntityCsv = <Kind extends CsvEntityKind>(
     validCount,
     errorRowCount: new Set(errors.map((error) => error.line)).size,
     errors,
+    // Kind が未解決ジェネリックのため Record<string, EntityOf<Kind>> と AppState[Kind] の
+    // 同値性を TS は証明できない(correlated union 制限)。具体化された各 Kind では構造的に一致する。
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- 上記 correlated union 制限のため
     entities: errors.length === 0 ? (entities as AppState[Kind]) : null,
   };
 };

@@ -20,7 +20,9 @@ type Props = {
 export const ActionRequiredList = ({ rows, onNavigate }: Props): ReactElement => {
   if (rows.length === 0) return <EmptyState message="対応が必要な項目はありません" />;
 
-  const activate = (equipmentId: string): void => onNavigate(equipmentDetailPath(equipmentId));
+  const activate = (equipmentId: string): void => {
+    onNavigate(equipmentDetailPath(equipmentId));
+  };
   const handleKeyDown = (event: KeyboardEvent<HTMLTableRowElement>, equipmentId: string): void => {
     if (event.key !== "Enter" && event.key !== " ") return;
     event.preventDefault();
@@ -59,8 +61,12 @@ export const ActionRequiredList = ({ rows, onNavigate }: Props): ReactElement =>
           <tr
             key={row.inspectionItem.id}
             tabIndex={0}
-            onClick={() => activate(row.equipment.id)}
-            onKeyDown={(event) => handleKeyDown(event, row.equipment.id)}
+            onClick={() => {
+              activate(row.equipment.id);
+            }}
+            onKeyDown={(event) => {
+              handleKeyDown(event, row.equipment.id);
+            }}
             className="cursor-pointer hover:bg-slate-50"
           >
             <td className="px-3 py-2">

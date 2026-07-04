@@ -161,7 +161,7 @@ describe("中止フロー", () => {
     const dialog = screen.getByRole("dialog");
     await user.click(within(dialog).getByRole("button", { name: "中止" }));
 
-    expect((useAppStore.getState().orders["order-1"] as CalibrationOrder).status).toBe("cancelled");
+    expect(useAppStore.getState().orders["order-1"].status).toBe("cancelled");
     // cancelled はトグルOFFで非表示
     expect(screen.queryByText("EQ-001")).not.toBeInTheDocument();
   });
@@ -240,10 +240,8 @@ describe("発注ダイアログの整合警告（D-019）", () => {
 
     // 警告があっても確定できる（ブロックしない）
     await user.click(screen.getByRole("button", { name: "確定" }));
-    expect((useAppStore.getState().orders["order-1"] as CalibrationOrder).status).toBe("ordered");
-    expect((useAppStore.getState().orders["order-1"] as CalibrationOrder).dueDate).toBe(
-      "2020-01-01",
-    );
+    expect(useAppStore.getState().orders["order-1"].status).toBe("ordered");
+    expect(useAppStore.getState().orders["order-1"].dueDate).toBe("2020-01-01");
   });
 });
 

@@ -36,7 +36,7 @@ const getOpenDialog = (title: string): HTMLElement => {
 
 /** 項目テーブル(1つ目のtable)の行を取得する。項目名は実施記録テーブルにも出現するためスコープする */
 const getInspectionItemRow = (name: RegExp): HTMLElement => {
-  const [inspectionItemTable] = screen.getAllByRole("table");
+  const inspectionItemTable = screen.getAllByRole("table").at(0);
   if (!inspectionItemTable) throw new Error("項目テーブルが見つかりません");
   return within(inspectionItemTable).getByRole("row", { name });
 };

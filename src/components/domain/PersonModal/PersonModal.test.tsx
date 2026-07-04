@@ -48,7 +48,7 @@ describe("PersonModal", () => {
       persons: { "person-1": person },
       inspectionItems: { "item-1": buildInspectionItem({ personId: "person-1", isActive: true }) },
     });
-    const onClose = vi.fn();
+    const onClose = vi.fn<() => void>();
 
     renderWithStore(<PersonModal open person={person} onClose={onClose} />);
 
@@ -75,7 +75,7 @@ describe("PersonModal", () => {
       persons: { "person-1": person },
       inspectionItems: {},
     });
-    const onClose = vi.fn();
+    const onClose = vi.fn<() => void>();
 
     renderWithStore(<PersonModal open person={person} onClose={onClose} />);
 
@@ -97,7 +97,7 @@ describe("PersonModal", () => {
       persons: { "person-1": person },
       inspectionItems: {},
     });
-    const onClose = vi.fn();
+    const onClose = vi.fn<() => void>();
 
     renderWithStore(<PersonModal open person={person} onClose={onClose} />);
 
@@ -116,7 +116,7 @@ describe("PersonModal", () => {
   // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("氏名・メールのバリデーションエラーが表示され、エラー時も保存ボタンは無効化されない", async () => {
     const user = userEvent.setup();
-    const onClose = vi.fn();
+    const onClose = vi.fn<() => void>();
 
     renderWithStore(<PersonModal open onClose={onClose} />);
 

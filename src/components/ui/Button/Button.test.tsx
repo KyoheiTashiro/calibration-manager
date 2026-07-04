@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/Button";
-import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import { fireEvent, render, screen } from "@testing-library/react";
 // なぜ: tsc -b はプロジェクト参照ごとに独立したプログラムのため、vitest.setup.ts
 // （tsconfig.node.json側）の副作用importだけではtsconfig.app.json側の型解決に
 // jest-domのmatcher拡張が伝播しない。テストファイル側でも明示的にimportし型を解決する
@@ -51,30 +50,25 @@ describe("Button", () => {
     expect(button.className).toContain("h-8");
   });
 
-  // なぜ async/await ではなく then チェーンか: oxc/no-async-await（restrictionカテゴリ、全カテゴリerror
-  // 設定によりプロジェクト全体で有効）が async キーワードを禁止するため、Promise チェーンで待機する。
-  // it に返した Promise は vitest が自動で await する。
   it("クリック時に onClick が呼ばれる", () => {
-    const user = userEvent.setup();
-    const handleClick = vi.fn();
+    const handleClick = vi.fn<() => void>();
     render(<Button onClick={handleClick}>保存</Button>);
 
-    return user.click(screen.getByRole("button", { name: "保存" })).then(() => {
-      expect(handleClick).toHaveBeenCalledTimes(1);
-    });
+    fireEvent.click(screen.getByRole("button", { name: "保存" }));
+
+    expect(handleClick).toHaveBeenCalledTimes(1);
   });
 
   it("disabled 時はクリックしても onClick が呼ばれない", () => {
-    const user = userEvent.setup();
-    const handleClick = vi.fn();
+    const handleClick = vi.fn<() => void>();
     render(
       <Button onClick={handleClick} disabled>
         保存
       </Button>,
     );
 
-    return user.click(screen.getByRole("button", { name: "保存" })).then(() => {
-      expect(handleClick).not.toHaveBeenCalled();
-    });
+    fireEvent.click(screen.getByRole("button", { name: "保存" }));
+
+    expect(handleClick).not.toHaveBeenCalled();
   });
 });

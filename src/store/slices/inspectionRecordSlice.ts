@@ -53,14 +53,14 @@ export const createInspectionRecordSlice: AppSliceCreator<InspectionRecordSlice>
     const id = createId();
     set((state) => {
       state.records[id] = { ...input, id };
-      const draftInspectionItem = state.inspectionItems[input.inspectionItemId];
-      if (draftInspectionItem) {
+      const draftInspectionItem = recordValue(state.inspectionItems, input.inspectionItemId);
+      if (draftInspectionItem !== undefined) {
         draftInspectionItem.lastDoneDate = input.doneDate;
         if (nextDueDate !== null) draftInspectionItem.nextDueDate = nextDueDate;
       }
       if (input.orderId !== undefined) {
-        const draftOrder = state.orders[input.orderId];
-        if (draftOrder) draftOrder.status = ORDER_STATUS.COMPLETED;
+        const draftOrder = recordValue(state.orders, input.orderId);
+        if (draftOrder !== undefined) draftOrder.status = ORDER_STATUS.COMPLETED;
       }
     });
     return id;

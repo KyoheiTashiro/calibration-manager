@@ -101,8 +101,6 @@ describe("PwaInstallSection", () => {
 
     render(<PwaInstallSection />);
 
-    expect(
-      screen.getByRole("button", { name: "アプリとしてインストール" }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "アプリとしてインストール" })).toBeInTheDocument();
   });
 });

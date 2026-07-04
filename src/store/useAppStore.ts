@@ -57,10 +57,14 @@ export const useAppStore = create<StoreState>()(
       name: STORAGE_KEY,
       version: STORAGE_VERSION,
       partialize: partializeAppState,
-      // migrate の戻りはこの時点では未検証データ。検証・救済は merge が担うため、
-      // ここでの型主張は「後段が必ず検証する」前提の受け渡しに過ぎない。
+      // migrate はバージョン変換のみ担い、戻り値はこの時点では未検証データ（unknown）。
+      // persist の型定義上 migrate は PersistedState（＝AppState）を返す必要があるため、
+      // unknown→AppState の危険なアサーションを避け、ここで salvagePersistedState を通して
+      // 型を確定させる。merge は自分に渡された値（＝ここでの戻り値）に対して再度
+      // salvagePersistedState を適用するが、既に検証済みの AppState を safeParse するのは
+      // 冪等（成功しそのまま通る）なため、二重適用しても実行結果は変わらない。
       migrate: (persisted, fromVersion) =>
-        migratePersistedState(persisted, fromVersion) as AppState,
+        salvagePersistedState(migratePersistedState(persisted, fromVersion)),
       merge: (persisted, current) => ({ ...current, ...salvagePersistedState(persisted) }),
     },
   ),

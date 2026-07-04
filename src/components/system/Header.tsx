@@ -15,8 +15,11 @@ export const Header = ({ onMenuClick }: Props): ReactElement => {
   // store/selectors.ts の純関数へ集約する(coding-standards.md §5)。
   const unreadCount = useAppStore((state) => unreadNotificationCount(state));
 
+  // なぜcatchで終端するか: no-void下でfloating promiseを残さないため(navigateは基本的に例外を投げない設計)。
   const handleBellClick = (): void => {
-    navigate(ROUTES.NOTIFICATION_LIST);
+    navigate(ROUTES.NOTIFICATION_LIST)?.catch(() => {
+      // navigateは基本的に例外を投げない設計のため到達しない想定
+    });
   };
 
   return (

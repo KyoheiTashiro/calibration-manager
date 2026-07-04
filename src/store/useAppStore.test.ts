@@ -53,9 +53,7 @@ const returnedOrder: CalibrationOrder = {
 };
 
 /** 上記フィクスチャ一式を store へ投入する（inspectionItems のみ差し替え可） */
-const seedBase = (overrides?: {
-  inspectionItems?: Record<string, InspectionItem>;
-}): void => {
+const seedBase = (overrides?: { inspectionItems?: Record<string, InspectionItem> }): void => {
   seedStore({
     vendors: { [vendor.id]: vendor },
     persons: { [person.id]: person },
@@ -103,13 +101,14 @@ describe("addRecord: 期限更新カスケード", () => {
       });
 
       expect(id).not.toBeNull();
+      if (id === null) throw new Error("id should not be null");
       const state = useAppStore.getState();
-      expect(state.records[id as string]).toMatchObject({
+      expect(state.records[id]).toMatchObject({
         inspectionItemId: inspectionItem.id,
         doneDate: "2026-07-10",
         result,
       });
-      const updated = state.inspectionItems[inspectionItem.id] as InspectionItem;
+      const updated = state.inspectionItems[inspectionItem.id];
       expect(updated.lastDoneDate).toBe("2026-07-10");
       expect(updated.nextDueDate).toBe("2027-07-10"); // 1Y 周期の暦月加算
     },
@@ -125,7 +124,7 @@ describe("addRecord: 期限更新カスケード", () => {
     });
 
     expect(id).not.toBeNull();
-    const updated = useAppStore.getState().inspectionItems[inspectionItem.id] as InspectionItem;
+    const updated = useAppStore.getState().inspectionItems[inspectionItem.id];
     expect(updated.lastDoneDate).toBe("2026-07-10");
     expect(updated.nextDueDate).toBe("2026-07-15");
   });
@@ -152,9 +151,9 @@ describe("addRecord: 期限更新カスケード", () => {
     });
     expect(id).toBeNull();
     expect(useAppStore.getState().records).toEqual({});
-    expect(
-      (useAppStore.getState().inspectionItems[inspectionItem.id] as InspectionItem).nextDueDate,
-    ).toBe("2026-07-15");
+    expect(useAppStore.getState().inspectionItems[inspectionItem.id].nextDueDate).toBe(
+      "2026-07-15",
+    );
   });
 });
 
@@ -172,9 +171,10 @@ describe("addRecord: 案件完了カスケード", () => {
     });
 
     expect(id).not.toBeNull();
+    if (id === null) throw new Error("id should not be null");
     const state = useAppStore.getState();
-    expect((state.orders[returnedOrder.id] as CalibrationOrder).status).toBe("completed");
-    expect(state.records[id as string]?.orderId).toBe(returnedOrder.id);
+    expect(state.orders[returnedOrder.id].status).toBe("completed");
+    expect(state.records[id].orderId).toBe(returnedOrder.id);
   });
 
   it.each(["planned", "ordered", "inCalibration", "completed", "cancelled"] as const)(
@@ -194,10 +194,8 @@ describe("addRecord: 案件完了カスケード", () => {
       expect(id).toBeNull();
       const state = useAppStore.getState();
       expect(state.records).toEqual({});
-      expect((state.orders[returnedOrder.id] as CalibrationOrder).status).toBe(status);
-      expect((state.inspectionItems[inspectionItem.id] as InspectionItem).nextDueDate).toBe(
-        "2026-07-15",
-      );
+      expect(state.orders[returnedOrder.id].status).toBe(status);
+      expect(state.inspectionItems[inspectionItem.id].nextDueDate).toBe("2026-07-15");
     },
   );
 
@@ -222,7 +220,8 @@ describe("addOrder: 1項目1有効案件（D-006）", () => {
       .getState()
       .addOrder({ inspectionItemId: inspectionItem.id, vendorId: vendor.id });
     expect(id).not.toBeNull();
-    expect(useAppStore.getState().orders[id as string]).toMatchObject({
+    if (id === null) throw new Error("id should not be null");
+    expect(useAppStore.getState().orders[id]).toMatchObject({
       inspectionItemId: inspectionItem.id,
       status: "planned",
     });
@@ -275,7 +274,7 @@ describe("updateOrderStatus: 遷移テーブル検証", () => {
   ] as const)("隣接遷移 %s → %s を許可する", (from, to) => {
     seedOrderWith(from);
     expect(useAppStore.getState().updateOrderStatus(returnedOrder.id, to)).toBe(true);
-    expect((useAppStore.getState().orders[returnedOrder.id] as CalibrationOrder).status).toBe(to);
+    expect(useAppStore.getState().orders[returnedOrder.id].status).toBe(to);
   });
 
   it.each([
@@ -286,15 +285,13 @@ describe("updateOrderStatus: 遷移テーブル検証", () => {
   ] as const)("許可されない遷移 %s → %s は no-op（false）", (from, to) => {
     seedOrderWith(from);
     expect(useAppStore.getState().updateOrderStatus(returnedOrder.id, to)).toBe(false);
-    expect((useAppStore.getState().orders[returnedOrder.id] as CalibrationOrder).status).toBe(from);
+    expect(useAppStore.getState().orders[returnedOrder.id].status).toBe(from);
   });
 
   it("completed への直接遷移は returned からでも拒否する（addRecord 経由のみ）", () => {
     seedOrderWith("returned");
     expect(useAppStore.getState().updateOrderStatus(returnedOrder.id, "completed")).toBe(false);
-    expect((useAppStore.getState().orders[returnedOrder.id] as CalibrationOrder).status).toBe(
-      "returned",
-    );
+    expect(useAppStore.getState().orders[returnedOrder.id].status).toBe("returned");
   });
 
   it("存在しない案件は false", () => {

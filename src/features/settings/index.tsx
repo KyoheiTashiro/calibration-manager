@@ -5,10 +5,10 @@
  * (oxlint の依存数上限・max-statements 対策、dashboard と同じ分割イディオム)。
  */
 
-import { ResetSection } from "@/features/settings/components/reset/ResetSection";
 import { ExportSection } from "@/features/settings/components/csv/ExportSection";
 import { ImportSection } from "@/features/settings/components/csv/ImportSection";
 import { PwaInstallSection } from "@/features/settings/components/pwa/PwaInstallSection";
+import { ResetSection } from "@/features/settings/components/reset/ResetSection";
 import type { AppState } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
 import type { ReactElement } from "react";

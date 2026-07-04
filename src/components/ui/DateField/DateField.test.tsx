@@ -70,7 +70,7 @@ describe("DateField", () => {
   // oxlint-disable-next-line oxc/no-async-await -- user-eventの操作はPromiseを返すためawaitが必須
   it("value/onChange/ref/name 等のネイティブ props がそのまま素通しされる", async () => {
     const user = userEvent.setup();
-    const handleChange = vi.fn();
+    const handleChange = vi.fn<() => void>();
     const ref = createRef<HTMLInputElement>();
     render(
       <DateField label="次回期限" name="nextDueDate" value="" onChange={handleChange} ref={ref} />,

@@ -25,7 +25,7 @@ export const VendorList = (): ReactElement => {
   const vendorList = useVendorList();
 
   const { modalState, handleAddClick, handleEditClick, handleModalClose } = useVendorModal();
-  
+
   const {
     deleteTargetId,
     referencedErrorOpen,
@@ -96,17 +96,29 @@ export const VendorList = (): ReactElement => {
                     ? "—"
                     : `${vendor.standardLeadTimeDays}日`}
                 </td>
-                <td className="px-3 py-2">{vendor.contactPerson || "—"}</td>
-                <td className="px-3 py-2">{vendor.phone || "—"}</td>
+                <td className="px-3 py-2">{vendor.contactPerson ?? "—"}</td>
+                <td className="px-3 py-2">{vendor.phone ?? "—"}</td>
                 {/* なぜ td 直下に Button を並べるか: div でラップして1階層深くすると
                     jsx-a11y(control-has-associated-label) の既定探索深度(2)を超えて
                     ボタン内テキストを検出できず誤検知するため、td を flex コンテナ化して
                     ラッパーを1段省く。 */}
                 <td className="flex gap-2 px-3 py-2">
-                  <Button variant="secondary" size="sm" onClick={() => handleEditClick(vendor)}>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => {
+                      handleEditClick(vendor);
+                    }}
+                  >
                     編集
                   </Button>
-                  <Button variant="danger" size="sm" onClick={() => handleDeleteClick(vendor.id)}>
+                  <Button
+                    variant="danger"
+                    size="sm"
+                    onClick={() => {
+                      handleDeleteClick(vendor.id);
+                    }}
+                  >
                     削除
                   </Button>
                 </td>

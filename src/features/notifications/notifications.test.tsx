@@ -73,7 +73,7 @@ const renderCenter = (): void => {
 const rowMessages = (): string[] =>
   within(screen.getByRole("list"))
     .getAllByRole("listitem")
-    .map((inspectionItem) => inspectionItem.textContent ?? "");
+    .map((inspectionItem) => inspectionItem.textContent);
 
 describe("NotificationCenter: タブと並び順", () => {
   beforeEach(setupStoreIsolation);

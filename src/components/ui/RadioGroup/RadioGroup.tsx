@@ -22,15 +22,16 @@ export const RadioGroup = ({
 }: Props): ReactElement => {
   const groupId = useId();
   const errorId = `${groupId}-error`;
+  const hasError = error !== undefined && error !== "";
 
   return (
     <fieldset
-      aria-describedby={error ? errorId : undefined}
-      aria-invalid={error ? "true" : undefined}
+      aria-describedby={hasError ? errorId : undefined}
+      aria-invalid={hasError ? "true" : undefined}
     >
       <legend className="block text-sm text-slate-700">
         {label}
-        {required && <span className="text-red-600">*</span>}
+        {required === true && <span className="text-red-600">*</span>}
       </legend>
       <div className="flex items-center gap-4">
         {options.map((option) => {
@@ -55,7 +56,7 @@ export const RadioGroup = ({
           );
         })}
       </div>
-      {error && (
+      {hasError && (
         <p id={errorId} className="text-xs text-red-600">
           {error}
         </p>

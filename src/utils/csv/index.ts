@@ -54,9 +54,12 @@ const consumeQuotedChar = (state: CsvParseState): boolean => {
     state.index += 2;
     return true;
   }
-  // 閉じ引用の直後はカンマ・改行・終端のみ許す(`"a"b` は不正)
+  // 閉じ引用の直後はカンマ・改行・終端のみ許す(`"a"b` は不正)。
+  // 文字列の添字アクセスは範囲外でも型上 string になる(noUncheckedIndexedAccess とは無関係の
+  // TS の仕様)ため、`next !== undefined` は型上つねに true。終端かどうかは長さで判定する。
+  const hasNext = state.index + 1 < state.content.length;
   const next = state.content[state.index + 1];
-  if (next !== undefined && next !== "," && next !== "\r" && next !== "\n") return false;
+  if (hasNext && next !== "," && next !== "\r" && next !== "\n") return false;
   state.inQuotes = false;
   state.index += 1;
   return true;

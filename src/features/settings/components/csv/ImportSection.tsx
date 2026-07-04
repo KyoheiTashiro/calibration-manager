@@ -23,6 +23,10 @@ const ENTITY_OPTIONS = CSV_ENTITY_KINDS.map((kind) => ({
   label: ENTITY_CSV_SPECS[kind].label,
 }));
 
+/** Select の onChange が渡す string を CsvEntityKind へ型ガードする */
+const isCsvEntityKind = (value: string): value is CsvEntityKind =>
+  CSV_ENTITY_KINDS.some((kind) => kind === value);
+
 type Props = {
   /** 参照整合の突合先となる現在のストア全状態(D-029) */
   state: AppState;
@@ -53,7 +57,9 @@ export const ImportSection = ({ state }: Props): ReactElement => {
   };
 
   const handleKindChange = (event: ChangeEvent<HTMLSelectElement>): void => {
-    setKind(event.target.value as CsvEntityKind);
+    const { value } = event.target;
+    if (!isCsvEntityKind(value)) return;
+    setKind(value);
     setDoneMessage(undefined);
     clearSelection();
   };
@@ -151,7 +157,12 @@ export const ImportSection = ({ state }: Props): ReactElement => {
         <Button variant="secondary" onClick={handleCancel}>
           キャンセル
         </Button>
-        <Button disabled={!canConfirm} onClick={() => setConfirmOpen(true)}>
+        <Button
+          disabled={!canConfirm}
+          onClick={() => {
+            setConfirmOpen(true);
+          }}
+        >
           確定
         </Button>
       </div>
@@ -163,7 +174,9 @@ export const ImportSection = ({ state }: Props): ReactElement => {
         confirmLabel="取り込み"
         danger
         onConfirm={handleConfirmImport}
-        onCancel={() => setConfirmOpen(false)}
+        onCancel={() => {
+          setConfirmOpen(false);
+        }}
       />
     </section>
   );

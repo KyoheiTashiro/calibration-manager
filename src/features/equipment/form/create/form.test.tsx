@@ -22,15 +22,12 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 // なぜ: このテストファイルに閉じてnavigate呼び出しをスパイに差し替える。
 // MemoryRouter/Route/Routes/useParams/Navigate/Link 等の実実装は importOriginal 経由で維持する
 // （renderWithStore・本テストファイルの両方が実物のこれらを必要とするため）。
-// なぜ .then() で繋ぐか: oxc/no-async-await（このリポジトリの規約）を避けつつ
-// importOriginal（Promise）で実実装を維持したまま useNavigate だけ差し替えるため。
 const navigateSpy = vi.hoisted(() => vi.fn());
-vi.mock("react-router-dom", (importOriginal) =>
-  importOriginal<typeof ReactRouterDomModule>().then((actual) => ({
-    ...actual,
-    useNavigate: (): typeof navigateSpy => navigateSpy,
-  })),
-);
+// oxlint-disable-next-line oxc/no-async-await -- importOriginal(Promise)の解決が必要で、.then() 連鎖は typescript/promise-function-async と衝突するため
+vi.mock("react-router-dom", async (importOriginal) => {
+  const actual = await importOriginal<typeof ReactRouterDomModule>();
+  return { ...actual, useNavigate: (): typeof navigateSpy => navigateSpy };
+});
 
 const mitutoyo: Vendor = {
   id: "vendor-1",

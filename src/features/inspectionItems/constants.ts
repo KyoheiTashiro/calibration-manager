@@ -46,15 +46,15 @@ export const CYCLE_OPTIONS: readonly { value: Cycle; label: string }[] = Object.
 
 /** 種別ラジオ(点検/校正)の選択肢(06-inspection-item-modal.md) */
 export const INSPECTION_ITEM_TYPE_OPTIONS: readonly { value: InspectionItemType; label: string }[] =
-  Object.entries(INSPECTION_ITEM_TYPE_LABELS).map(([value, label]) => ({
-    value: value as InspectionItemType,
-    label,
+  Object.values(INSPECTION_ITEM_TYPE).map((type) => ({
+    value: type,
+    label: INSPECTION_ITEM_TYPE_LABELS[type],
   }));
 
 /** 実施区分ラジオ(内部/外部)の選択肢(06-inspection-item-modal.md) */
-export const EXECUTION_OPTIONS: readonly { value: Execution; label: string }[] = Object.entries(
-  EXECUTION_LABELS,
-).map(([value, label]) => ({ value: value as Execution, label }));
+export const EXECUTION_OPTIONS: readonly { value: Execution; label: string }[] = Object.values(
+  EXECUTION,
+).map((execution) => ({ value: execution, label: EXECUTION_LABELS[execution] }));
 
 /** 実施記録の結果 → 日本語ラベル(domain-model.md §3.5、04-equipment-detail.md 実施記録) */
 export const RECORD_RESULT_LABELS = {
@@ -65,7 +65,7 @@ export const RECORD_RESULT_LABELS = {
 
 /** 結果ラジオ(合格/不合格/調整合格)の選択肢(07-record-modal.md モック準拠の並び) */
 export const RECORD_RESULT_OPTIONS: readonly { value: RecordResult; label: string }[] =
-  Object.entries(RECORD_RESULT_LABELS).map(([value, label]) => ({
-    value: value as RecordResult,
-    label,
+  Object.values(RECORD_RESULT).map((result) => ({
+    value: result,
+    label: RECORD_RESULT_LABELS[result],
   }));

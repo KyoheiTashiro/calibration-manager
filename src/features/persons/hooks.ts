@@ -33,8 +33,14 @@ export const usePersonModal = (): UsePersonModalResult => {
 
   return {
     modalState,
-    handleAddClick: (): void => setModalState({ open: true, person: undefined }),
-    handleEditClick: (person: Person): void => setModalState({ open: true, person }),
-    handleModalClose: (): void => setModalState({ open: false, person: undefined }),
+    handleAddClick: (): void => {
+      setModalState({ open: true, person: undefined });
+    },
+    handleEditClick: (person: Person): void => {
+      setModalState({ open: true, person });
+    },
+    handleModalClose: (): void => {
+      setModalState({ open: false, person: undefined });
+    },
   };
 };

@@ -17,7 +17,7 @@ import {
 import { EXECUTION, type InspectionItem } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { ReactElement } from "react";
+import type { ChangeEvent, ReactElement } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { Link } from "react-router-dom";
 
@@ -30,13 +30,17 @@ type Props = {
   onClose: () => void;
 };
 
+// なぜ: noUncheckedIndexedAccess無効下でも実行時欠落(削除済み参照等)の可能性を型に反映するため
+const pickRecord = <Value,>(record: Record<string, Value>, key: string): Value | undefined =>
+  record[key];
+
 export const InspectionItemModal = ({
   open,
   equipmentId,
   inspectionItem,
   onClose,
 }: Props): ReactElement => {
-  const equipment = useAppStore((state) => state.equipment[equipmentId]);
+  const equipment = useAppStore((state) => pickRecord(state.equipment, equipmentId));
   const vendors = useAppStore((state) => state.vendors);
   const persons = useAppStore((state) => state.persons);
   const addInspectionItem = useAppStore((state) => state.addInspectionItem);
@@ -91,45 +95,41 @@ export const InspectionItemModal = ({
 
   const onSubmit = (values: InspectionItemFormValues): void => {
     const isExternal = values.execution === EXECUTION.EXTERNAL;
-    const vendorId = isExternal && values.vendorId ? values.vendorId : undefined;
-    const leadTimeDays =
-      isExternal && values.leadTimeDays ? Number(values.leadTimeDays) : undefined;
+    const hasVendorId = values.vendorId !== undefined && values.vendorId !== "";
+    const hasLeadTimeDays = values.leadTimeDays !== undefined && values.leadTimeDays !== "";
+    const vendorId = isExternal && hasVendorId ? values.vendorId : undefined;
+    const leadTimeDays = isExternal && hasLeadTimeDays ? Number(values.leadTimeDays) : undefined;
     const bufferDays = Number(values.bufferDays);
     const noticeDaysBefore = Number(values.noticeDaysBefore);
 
+    const payload = {
+      equipmentId,
+      type: values.type,
+      name: values.name,
+      cycle: values.cycle,
+      execution: values.execution,
+      vendorId,
+      leadTimeDays,
+      bufferDays,
+      personId: values.personId,
+      noticeDaysBefore,
+      nextDueDate: values.nextDueDate,
+      isActive: values.isActive,
+    };
+
     if (inspectionItem) {
-      updateInspectionItem(inspectionItem.id, {
-        equipmentId,
-        type: values.type,
-        name: values.name,
-        cycle: values.cycle,
-        execution: values.execution,
-        vendorId,
-        leadTimeDays,
-        bufferDays,
-        personId: values.personId,
-        noticeDaysBefore,
-        nextDueDate: values.nextDueDate,
-        isActive: values.isActive,
-      });
+      updateInspectionItem(inspectionItem.id, payload);
     } else {
-      addInspectionItem({
-        equipmentId,
-        type: values.type,
-        name: values.name,
-        cycle: values.cycle,
-        execution: values.execution,
-        vendorId,
-        leadTimeDays,
-        bufferDays,
-        personId: values.personId,
-        noticeDaysBefore,
-        lastDoneDate: undefined,
-        nextDueDate: values.nextDueDate,
-        isActive: values.isActive,
-      });
+      addInspectionItem({ ...payload, lastDoneDate: undefined });
     }
     handleClose();
+  };
+
+  // なぜcatchで終端するか: no-void下でfloating promiseを残さないため(onSubmitは例外を投げない設計)。
+  const handleSave = (): void => {
+    handleSubmit(onSubmit)().catch(() => {
+      // onSubmitは例外を投げない設計のため到達しない想定
+    });
   };
 
   return (
@@ -139,7 +139,7 @@ export const InspectionItemModal = ({
       onClose={handleClose}
       isDirty={isDirty}
       footer={
-        <Button type="button" onClick={handleSubmit(onSubmit)}>
+        <Button type="button" onClick={handleSave}>
           保存
         </Button>
       }
@@ -181,7 +181,7 @@ export const InspectionItemModal = ({
           // (You Might Not Need an Effect)。bufferDays は必須属性のためクリアしない。
           // oxlint-disable-next-line react/jsx-props-no-spreading -- register()のname/onChange/onBlur等を素通しするため必須
           {...register("execution", {
-            onChange: (event) => {
+            onChange: (event: ChangeEvent<HTMLInputElement>) => {
               if (event.target.value === EXECUTION.INTERNAL) {
                 setValue("vendorId", "", { shouldDirty: false });
                 setValue("leadTimeDays", "", { shouldDirty: false });

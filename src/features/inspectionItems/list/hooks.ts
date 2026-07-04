@@ -25,18 +25,24 @@ export type InspectionItemListFilters = {
   status: InspectionItemStatus | typeof FILTER_ALL;
   type: InspectionItemType | typeof FILTER_ALL;
   execution: Execution | typeof FILTER_ALL;
-  personId: string | typeof FILTER_ALL; // Person.id または "all"
+  personId: string; // Person.id または "all"("all" は string の部分集合のため union にしない)
 };
 
-const INSPECTION_ITEM_STATUS_VALUES = new Set<string>(Object.values(INSPECTION_ITEM_STATUS));
-const INSPECTION_ITEM_TYPE_VALUES = new Set<string>(Object.values(INSPECTION_ITEM_TYPE));
-const EXECUTION_VALUES = new Set<string>(Object.values(EXECUTION));
+const INSPECTION_ITEM_STATUS_VALUES: readonly InspectionItemStatus[] =
+  Object.values(INSPECTION_ITEM_STATUS);
+const INSPECTION_ITEM_TYPE_VALUES: readonly InspectionItemType[] =
+  Object.values(INSPECTION_ITEM_TYPE);
+const EXECUTION_VALUES: readonly Execution[] = Object.values(EXECUTION);
+
+/** raw が allowed の要素かどうかを判定しつつ Enum へ絞り込む型ガード(readEnumParam から利用) */
+const isEnumValue = <Enum extends string>(raw: string, allowed: readonly Enum[]): raw is Enum =>
+  allowed.some((value) => value === raw);
 
 /** クエリ値が許可集合に含まれればその値を、そうでなければ "all" を返す共通ヘルパ(D-022) */
 const readEnumParam = <Enum extends string>(
   raw: string | null,
-  allowed: ReadonlySet<string>,
-): Enum | typeof FILTER_ALL => (raw !== null && allowed.has(raw) ? (raw as Enum) : FILTER_ALL);
+  allowed: readonly Enum[],
+): Enum | typeof FILTER_ALL => (raw !== null && isEnumValue(raw, allowed) ? raw : FILTER_ALL);
 
 /**
  * URLクエリ(?status=&type=&execution=&personId=)を InspectionItemListFilters へ解釈する。

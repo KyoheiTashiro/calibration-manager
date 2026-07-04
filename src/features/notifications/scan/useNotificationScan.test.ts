@@ -6,10 +6,11 @@
  */
 
 import { useNotificationScan } from "@/features/notifications/scan/useNotificationScan";
+import type { IsoDateString } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
 import { setupStoreIsolation } from "@/test/renderWithStore";
 import { renderHook } from "@testing-library/react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi, type MockInstance } from "vitest";
 
 const SCAN_INTERVAL_MS = 60_000;
 
@@ -18,7 +19,7 @@ const localNoon = (isoDate: string): Date => new Date(`${isoDate}T10:00:00`);
 
 // generateNotifications を spy する。実処理は空ストアでは早期 return の無害な no-op のため
 // 差し替えずに呼び出し回数・引数のみを検証する。
-const spyGenerate = (): ReturnType<typeof vi.spyOn> =>
+const spyGenerate = (): MockInstance<(today: IsoDateString) => void> =>
   vi.spyOn(useAppStore.getState(), "generateNotifications");
 
 describe("useNotificationScan", () => {
@@ -35,7 +36,9 @@ describe("useNotificationScan", () => {
 
   it("マウント時に今日の日付で1回スキャンする", () => {
     const generateSpy = spyGenerate();
-    renderHook(() => useNotificationScan());
+    renderHook(() => {
+      useNotificationScan();
+    });
 
     expect(generateSpy).toHaveBeenCalledTimes(1);
     expect(generateSpy).toHaveBeenCalledWith("2026-07-03");
@@ -43,7 +46,9 @@ describe("useNotificationScan", () => {
 
   it("同日内はインターバルが発火してもスキャンしない", () => {
     const generateSpy = spyGenerate();
-    renderHook(() => useNotificationScan());
+    renderHook(() => {
+      useNotificationScan();
+    });
     generateSpy.mockClear();
 
     vi.advanceTimersByTime(SCAN_INTERVAL_MS * 3);
@@ -53,7 +58,9 @@ describe("useNotificationScan", () => {
 
   it("日付が変わるとインターバルで新しい日付でスキャンする", () => {
     const generateSpy = spyGenerate();
-    renderHook(() => useNotificationScan());
+    renderHook(() => {
+      useNotificationScan();
+    });
     generateSpy.mockClear();
 
     vi.setSystemTime(localNoon("2026-07-04"));
@@ -65,7 +72,9 @@ describe("useNotificationScan", () => {
 
   it("visibilitychange の可視復帰+日付変更でスキャンする", () => {
     const generateSpy = spyGenerate();
-    renderHook(() => useNotificationScan());
+    renderHook(() => {
+      useNotificationScan();
+    });
     generateSpy.mockClear();
 
     vi.setSystemTime(localNoon("2026-07-04"));
@@ -78,7 +87,9 @@ describe("useNotificationScan", () => {
 
   it("アンマウント後はインターバル・visibilitychange いずれでもスキャンしない", () => {
     const generateSpy = spyGenerate();
-    const { unmount } = renderHook(() => useNotificationScan());
+    const { unmount } = renderHook(() => {
+      useNotificationScan();
+    });
     generateSpy.mockClear();
     unmount();
 

@@ -83,7 +83,6 @@ describe("VendorList: 追加", () => {
 
     // なぜ先頭要素か: 0件時はヘッダと EmptyState CTA の2つの「+ 追加」があり、ヘッダ側を押す
     const [headerAddButton] = screen.getAllByRole("button", { name: "+ 追加" });
-    if (!headerAddButton) throw new Error("追加ボタンが見つかりません");
     await user.click(headerAddButton);
     const modalTitle = screen.getByText("取引先を追加");
     const dialogElement = modalTitle.closest("dialog");

@@ -34,14 +34,14 @@
 | 種別       | type                                                    | 点検/校正                    |
 | 内外       | execution                                               | 内部/外部                    |
 | 周期       | cycle                                                   | 1M〜10Y                      |
-| 担当者     | Person.name(personId)                                   |                              |
+| 担当       | Person.name(personId)                                   |                              |
 | 最終実施日 | lastDoneDate                                            | 未実施は `—`                 |
 | 次回期限   | nextDueDate                                             |                              |
 | 発注推奨日 | 導出(§4.2)                                              | **外部のみ**表示、内部は `—` |
 
 ## 操作・アクション
 
-- **フィルタ**: ステータス([§0.3](./README.md#03-ステータスバッジ色共通定義)の5値)/ 種別(inspection/calibration)/ 内外(internal/external)/ 担当者(Person)。ダッシュボードからの遷移時は `status` クエリで初期化。
+- **フィルタ**: ステータス([§0.3](./README.md#03-ステータスバッジ色共通定義)の5値)/ 種別(inspection/calibration)/ 内外(internal/external)/ 担当(Person)。ダッシュボードからの遷移時は `status` クエリで初期化。
   - フィルタ状態の真実源は URL クエリパラメータ(`useSearchParams`)とし、ローカル state と二重管理しない。変更は `setSearchParams(..., { replace: true })` で反映し履歴を汚さない。不正・未知のクエリ値は無視して「全て」扱い(エラーにしない)。「クリア」は全クエリ除去(D-022)。
 - 行アクション:
   - 「記録」→ **[実施記録登録モーダル](./07-record-modal.md)**。
@@ -57,4 +57,4 @@
 
 ## 空状態
 
-- 「表示できる項目がありません」。フィルタ適用中は「条件に一致する項目がありません」+「クリア」。
+- 「点検校正項目が未登録です」。フィルタ適用中は「条件に一致する項目はありません」+「クリア」。

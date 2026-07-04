@@ -6,7 +6,11 @@
  */
 
 import { Settings } from "@/features/settings";
-import { buildEntityCsv, CSV_ENTITY_KINDS, ENTITY_CSV_SPECS } from "@/features/settings/components/csv/entityCsv";
+import {
+  buildEntityCsv,
+  CSV_ENTITY_KINDS,
+  ENTITY_CSV_SPECS,
+} from "@/features/settings/components/csv/entityCsv";
 import { EQUIPMENT_STATUS, type Equipment, type Vendor } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
 import { renderWithStore, seedStore, setupStoreIsolation } from "@/test/renderWithStore";
@@ -49,7 +53,7 @@ beforeEach(() => {
   setupStoreIsolation();
   capture = {};
   vi.spyOn(URL, "createObjectURL").mockImplementation((blob) => {
-    capture.blob = blob as Blob;
+    if (blob instanceof Blob) capture.blob = blob;
     return "blob:mock";
   });
   vi.spyOn(URL, "revokeObjectURL").mockImplementation(() => {
@@ -84,10 +88,11 @@ describe("エクスポート(§11)", () => {
 
     await userEvent.click(screen.getByRole("button", { name: "機器" }));
 
-    expect(capture.blob).toBeDefined();
+    expect(capture.blob).toBeInstanceOf(Blob);
     // なぜ ignoreBOM か: Blob.text() は UTF-8 デコード仕様で先頭 BOM を除去するため、
     // BOM 付与を検証するには生バイトを BOM 保持デコードで読む必要がある。
-    const buffer = await (capture.blob as Blob).arrayBuffer();
+    if (!(capture.blob instanceof Blob)) throw new Error("blob が Blob ではありません");
+    const buffer = await capture.blob.arrayBuffer();
     const text = new TextDecoder("utf-8", { ignoreBOM: true }).decode(buffer);
     expect(text.startsWith(CSV_BOM)).toBe(true);
     expect(text).toContain(
@@ -101,7 +106,9 @@ describe("エクスポート(§11)", () => {
   it("データ0件でもヘッダ行のみの CSV を出力する", async () => {
     renderWithStore(<Settings />);
     await userEvent.click(screen.getByRole("button", { name: "機器" }));
-    const buffer = await (capture.blob as Blob).arrayBuffer();
+    expect(capture.blob).toBeInstanceOf(Blob);
+    if (!(capture.blob instanceof Blob)) throw new Error("blob が Blob ではありません");
+    const buffer = await capture.blob.arrayBuffer();
     const text = new TextDecoder("utf-8", { ignoreBOM: true }).decode(buffer);
     expect(text).toContain("id,managementNo,name");
     expect(text).not.toContain("M-001");

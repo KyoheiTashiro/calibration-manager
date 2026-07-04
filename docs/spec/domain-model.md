@@ -144,6 +144,7 @@ planned(発注準備) → ordered(発注済) → inCalibration(校正中) → re
 ```
 
 - `returned` 後、InspectionRecordを登録すると `completed` になり、項目の次回期限が更新される。
+- 遷移は上図の隣接遷移のみ(飛び越し不可)。加えて `planned`〜`returned` の各段階から `cancelled`(中止)へ遷移できる(図は代表経路のみ図示)。`completed` / `cancelled` からの再遷移は不可。
 
 ### 3.7 Notification(通知)
 
@@ -172,6 +173,8 @@ planned(発注準備) → ordered(発注済) → inCalibration(校正中) → re
 | `deliveryOverdue`  | 発注済案件 | 今日 > 返却予定日 かつ 未返却       |
 
 - 同一対象・同一種別の未読通知は重複生成しない。
+- `overdue` と `dueSoon` の条件は重なるため、期限超過後はより深刻な `overdue` のみを生成し `dueSoon` は生成しない(`deliveryOverdue` / `deliveryDueSoon` も同様)。同一項目への二重通知はノイズになるため(D-041)。
+- `orderRecommended` の「未発注」は「有効な案件(`planned`〜`returned`)が1件もない」と解釈する。`planned` の案件があれば発注準備は着手済みであり再通知は不要なため(§4.3 orderNow の「有効な案件なし」と同じ判定。D-042)。
 - 担当者(Person)を無効化しても宛先はフォールバックせず元 personId のまま。無効化後も通知は生成・表示し続ける(D-001)。
 
 ## 4. 期限計算ロジック

@@ -24,12 +24,13 @@ export const Select = ({
   const generatedId = useId();
   const selectId = rest.id ?? generatedId;
   const errorId = `${selectId}-error`;
+  const hasError = error !== undefined && error !== "";
 
   return (
     <div>
       <label htmlFor={selectId} className="block text-sm text-slate-700">
         {label}
-        {required && <span className="text-red-600">*</span>}
+        {required === true && <span className="text-red-600">*</span>}
       </label>
       <select
         // oxlint-disable-next-line react/jsx-props-no-spreading -- register()のname/onChange/onBlur等を素通しするため必須
@@ -37,10 +38,10 @@ export const Select = ({
         ref={ref}
         id={selectId}
         required={required}
-        aria-invalid={error ? "true" : undefined}
-        aria-describedby={error ? errorId : undefined}
+        aria-invalid={hasError ? "true" : undefined}
+        aria-describedby={hasError ? errorId : undefined}
         className={`w-full rounded border px-3 py-2 text-sm ${
-          error ? "border-red-500" : "border-slate-300"
+          hasError ? "border-red-500" : "border-slate-300"
         }`}
       >
         {placeholder !== undefined && <option value="">{placeholder}</option>}
@@ -50,7 +51,7 @@ export const Select = ({
           </option>
         ))}
       </select>
-      {error && (
+      {hasError && (
         <p id={errorId} className="text-xs text-red-600">
           {error}
         </p>
