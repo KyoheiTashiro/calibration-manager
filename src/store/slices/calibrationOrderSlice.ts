@@ -16,7 +16,7 @@ export type CalibrationOrderSlice = {
   /**
    * 案件を初期状態 planned で追加する。1項目1有効案件の制約をストア層で強制し、
    * 対象項目が存在しない・有効案件（planned〜returned）が既にある場合は no-op
-   * （decisions.md D-006）。
+   * （D-006）。
    * @returns 生成した案件のid。no-op 時は null
    */
   addOrder: (input: AddOrderInput) => string | null;

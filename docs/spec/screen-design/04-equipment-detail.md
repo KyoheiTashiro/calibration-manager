@@ -35,15 +35,15 @@
 ## 表示項目
 
 - **基本情報カード**: Equipment 全属性(§3.3)。manufacturerId は Vendor.name で表示。
-- **項目一覧**(この機器の InspectionItem): ステータスバッジ([§0.3](./README.md#03-ステータスバッジ色共通定義))、`項目名`(name)、`種別`(type)、`内外`(execution)、`周期`(cycle)、`担当者`(Person.name)、`次回期限`(nextDueDate)。
+- **項目一覧**(この機器の InspectionItem): ステータスバッジ([§0.3](./README.md#03-ステータスバッジ色共通定義))、`項目名`(name)、`種別`(type)、`内外`(execution)、`周期`(cycle)、`担当者`(Person.name)、`次回期限`(nextDueDate)。ステータスバッジは機器が `active` のときのみ表示し、`suspended`/`retired` ではステータス欄を「—」表示する(nextDueDate 等の保存値はそのまま表示する。D-014)。
 - **実施記録**(InspectionRecord。項目横断): `実施日`(doneDate)、`項目名`(inspectionItem.name)、`実施者`(doneBy)、`結果`(result: pass=合格/fail=不合格/adjusted=調整合格)、`備考`(note)。
 
 ## 操作・アクション
 
 - 「編集」→ `/equipment/:id/edit`。
-- 「+ 項目を追加」→ **[項目編集モーダル](./06-inspection-item-modal.md)** を新規モードで起動(equipmentId をプリセット)。
+- 「+ 項目を追加」→ **[点検校正項目モーダル](./06-inspection-item-modal.md)** を新規モードで起動(equipmentId をプリセット)。
 - 各項目行「記録」→ **[実施記録登録モーダル](./07-record-modal.md)** を起動(inspectionItemId プリセット)。
-- 各項目行「編集」→ **[項目編集モーダル](./06-inspection-item-modal.md)** を編集モードで起動。
+- 各項目行「編集」→ **[点検校正項目モーダル](./06-inspection-item-modal.md)** を編集モードで起動。
 
 ## 表示ルール・バリデーション
 

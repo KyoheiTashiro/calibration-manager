@@ -4,12 +4,11 @@
 
 ## 真実源(優先順)
 
-1. `docs/decisions.md` — 確定済み実装判断(docs と食い違ったらこちらが勝つ)
-2. `docs/domain-model.md` — ドメイン仕様。一言一句矛盾させない
-3. `docs/screen-design/*.md` — 画面仕様
-4. `docs/implementation-plan.md` — フェーズ計画・担当・進捗
+1. `docs/spec/domain-model.md` — ドメイン仕様。一言一句矛盾させない
+2. `docs/spec/screen-design/*.md` — 画面仕様
+3. `docs/guides/` — 規約・アーキテクチャ・インフラ
 
-実装前に必ず該当節を読む。仕様が曖昧・矛盾していたら実装せず報告。
+実装前に必ず該当節を読む。仕様が曖昧・矛盾していたら実装せず報告。コード・docs 中の「(D-xxx)」は確定済み実装判断のタグで、実質は docs 本文に反映済み(索引は `docs/README.md`)。
 
 ## 変更禁止(サブエージェント厳守)
 
@@ -27,12 +26,12 @@
 
 ## 規約要点
 
-- 詳細は `docs/coding-standards.md` / `docs/testing.md`
+- 詳細は `docs/guides/coding-standards.md` / `docs/guides/testing.md`
 - UI文言・ラベルは日本語。ステータスは色 + 日本語ラベル併記必須
 - 列挙は as const + 派生union(`src/domain/constants.ts` 参照)。文字列リテラル直書き禁止
 - 日付は YYYY-MM-DD 文字列(`src/utils/time.ts` 経由)。`new Date()` 直接比較禁止
 - ルーティングは `src/constants/routes.ts` の ROUTES 経由
 
-## フェーズ運用
+## 運用
 
-フェーズ完了 = 完了条件 + メイン監査 + `docs/implementation-plan.md` チェック更新 + コミット。判断が発生したら `docs/decisions.md` に追記。
+タスク完了 = 完了条件 + メイン監査 + コミット。実装判断が発生したら該当 docs へ直接反映し、「(D-xxx)」で採番タグ付け(最終番号は `docs/README.md` 参照)。

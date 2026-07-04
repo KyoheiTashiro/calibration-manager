@@ -17,12 +17,12 @@ export type InspectionRecordSlice = {
   records: Record<string, InspectionRecord>;
   /**
    * 実施記録を追加し、以下をカスケードする（store.md「アクション仕様」）:
-   * - 常に inspectionItem.lastDoneDate = doneDate（screen-design/07-record-modal.md 副作用2。decisions.md D-015）
+   * - 常に inspectionItem.lastDoneDate = doneDate（screen-design/07-record-modal.md 副作用2。D-015）
    * - result !== 'fail': nextDueDate = addCycle(doneDate, cycle)
    * - result === 'fail': 次回期限のみ据え置き（domain-model.md §3.5）
    * - orderId 指定時: 対象 CalibrationOrder を completed に遷移（domain-model.md §3.6）
    *
-   * 原子性優先で、以下は記録追加ごと no-op（decisions.md D-005）:
+   * 原子性優先で、以下は記録追加ごと no-op（D-005）:
    * - inspectionItemId が存在しない / doneDate から次回期限を計算できない
    * - orderId の案件が存在しない、または completed へ遷移不可（returned 以外）
    *

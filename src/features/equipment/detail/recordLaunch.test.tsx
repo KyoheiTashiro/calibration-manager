@@ -57,7 +57,7 @@ describe("EquipmentDetail: RecordModal起動", () => {
       within(getInspectionItemRow(/年次校正/u)).getByRole("button", { name: "記録" }),
     );
 
-    const dialogElement = getOpenDialog("実施記録を追加");
+    const dialogElement = getOpenDialog("実施記録を登録");
     expect(
       within(dialogElement).getByText(`対象:EQ-001 ノギス / ${inspectionItemExternal.name}`),
     ).toBeInTheDocument();
@@ -73,7 +73,7 @@ describe("EquipmentDetail: RecordModal起動", () => {
     await user.click(
       within(getInspectionItemRow(/年次校正/u)).getByRole("button", { name: "記録" }),
     );
-    const dialogElement = getOpenDialog("実施記録を追加");
+    const dialogElement = getOpenDialog("実施記録を登録");
     await user.click(within(dialogElement).getByLabelText("合格"));
     await user.click(within(dialogElement).getByRole("button", { name: "保存" }));
 

@@ -1,10 +1,10 @@
 # 機器点検・校正期限管理アプリ — 画面設計書
 
-本書は [`docs/domain-model.md`](../domain-model.md) に基づく画面設計書である。ドメインモデルで定義したエンティティ・属性・状態遷移・期限計算ロジックを画面へ落とし込むことを目的とし、モデルと矛盾する仕様は定義しない。
+本書は [`docs/spec/domain-model.md`](../domain-model.md) に基づく画面設計書である。ドメインモデルで定義したエンティティ・属性・状態遷移・期限計算ロジックを画面へ落とし込むことを目的とし、モデルと矛盾する仕様は定義しない。
 
 - **対象読者**: フロントエンド実装者、レビュアー。本書はコンポーネント分割・実装に着手できる粒度を目指す。
-- **前提技術**: React 19 + TypeScript / react-router-dom / Zustand(persist)/ zod / react-hook-form / Tailwind CSS 4。バックエンドなし・LocalStorage永続化。
-- ドメインモデル §8 の未決事項に影響される箇所には `※未決` を付す。
+- **前提技術**: 詳細は [tech-stack.md](../../guides/architecture/tech-stack.md) を参照。
+- 未決事項は [domain-model.md](../domain-model.md) の未決事項節を参照。
 
 ---
 
@@ -46,7 +46,7 @@
 | `/equipment/:id`      | 機器詳細(項目・記録含む)   | [§4](./04-equipment-detail.md) |                                    |
 | `/equipment/:id/edit` | 機器編集                   | [§3](./03-equipment-form.md)   | フォーム画面                       |
 | `/inspection-items`              | 点検校正項目一覧(中核)     | [§5](./05-inspection-item-list.md)        | クエリでステータスフィルタ受け取り |
-| `/orders`             | 点検校正外部案件一覧(かんばん) | [§8](./08-orders.md)           |                                    |
+| `/orders`             | 点検校正外部案件(かんばん) | [§8](./08-orders.md)           |                                    |
 | `/vendors`            | メーカー/取引先マスタ      | [§9](./09-masters.md)          |                                    |
 | `/persons`            | 担当者マスタ               | [§9](./09-masters.md)          |                                    |
 | `/notifications`      | 通知センター               | [§10](./10-notifications.md)   |                                    |
@@ -60,9 +60,9 @@
 - [3. 機器登録・編集](./03-equipment-form.md)
 - [4. 機器詳細](./04-equipment-detail.md)
 - [5. 点検校正項目一覧(中核画面)](./05-inspection-item-list.md)
-- [6. 項目編集モーダル](./06-inspection-item-modal.md)
+- [6. 点検校正項目モーダル](./06-inspection-item-modal.md)
 - [7. 実施記録登録モーダル](./07-record-modal.md)
-- [8. 点検校正外部案件一覧](./08-orders.md)
+- [8. 点検校正外部案件](./08-orders.md)
 - [9. マスタ管理(メーカー/取引先・担当者)](./09-masters.md)
 - [10. 通知センター](./10-notifications.md)
 - [11. 設定・バックアップ](./11-settings.md)
@@ -74,15 +74,15 @@
 
 項目ステータス(ドメインモデル §4.3 の導出値。保存しない)の表示色を全画面で統一する。
 
-| ステータス   | ラベル   | 色    | 条件(要約)                                      |
-| ------------ | -------- | ----- | ----------------------------------------------- |
-| `overdue`    | 期限切れ | 🔴 赤 | 今日 > nextDueDate                              |
-| `orderNow`   | 要発注   | 🟠 橙 | 外部 かつ 今日 ≥ 発注推奨日 かつ 有効な案件なし |
-| `inProgress` | 校正中   | 🔵 青 | 外部 かつ ordered/inCalibration の案件あり      |
-| `dueSoon`    | 期限接近 | 🟡 黄 | 今日 ≥ nextDueDate − noticeDaysBefore           |
-| `ok`         | 正常     | 🟢 緑 | 上記以外                                        |
+| ステータス   | ラベル   | 色    |
+| ------------ | -------- | ----- |
+| `overdue`    | 期限切れ | 🔴 赤 |
+| `orderNow`   | 要発注   | 🟠 橙 |
+| `inProgress` | 校正中   | 🔵 青 |
+| `dueSoon`    | 期限接近 | 🟡 黄 |
+| `ok`         | 正常     | 🟢 緑 |
 
-- 判定は上表の優先度順(上が優先)。導出関数は1箇所(例: `deriveInspectionItemStatus(inspectionItem, orders, today)`)に集約し、全画面がこれを利用する。
+- 判定は上表の優先度順(上が優先)。判定条件・優先度の詳細は [domain-model.md §4.3](../domain-model.md) を参照。導出関数は1箇所(例: `deriveInspectionItemStatus(inspectionItem, orders, today)`)に集約し、全画面がこれを利用する。
 - 色トークンはTailwindのユーティリティ(例: `bg-red-100 text-red-800` 等)へマッピングし、`statusBadgeClass(status)` の単一ヘルパで供給する。
 
 ### 0.4 日付表示形式
@@ -120,8 +120,8 @@ flowchart TD
     EqList -->|行クリック| EqDetail[機器詳細 /equipment/:id]
     EqList -->|追加| EqCreate[機器登録 /equipment/create]
     EqDetail -->|編集| EqEdit[機器編集 /equipment/:id/edit]
-    EqDetail -.項目追加/編集.-> InspectionItemModal[[項目編集モーダル]]
-    EqDetail -.実施記録.-> RecModal[[実施記録モーダル]]
+    EqDetail -.項目追加/編集.-> InspectionItemModal[[点検校正項目モーダル]]
+    EqDetail -.実施記録.-> RecModal[[実施記録登録モーダル]]
     InspectionItems -.実施記録.-> RecModal
     InspectionItems -.案件作成.-> OrderModal[[案件作成モーダル]]
     InspectionItems -.項目編集.-> InspectionItemModal
@@ -129,14 +129,3 @@ flowchart TD
     Notice -->|対象へ遷移| InspectionItems
     Notice -->|対象へ遷移| Orders
 ```
-
----
-
-## 付記:未決事項(ドメインモデル §8)と画面への影響
-
-| 未決事項                                 | 影響画面                                                                            | 現状の扱い                                          |
-| ---------------------------------------- | ----------------------------------------------------------------------------------- | --------------------------------------------------- |
-| 校正値・合格基準の記録                   | [§6 項目編集](./06-inspection-item-modal.md) / [§7 記録登録](./07-record-modal.md)             | result(enum)+ note のみ。数値記録欄は設けない ※未決 |
-| 通知宛先のフォールバック(担当者無効化時) | [§9-B 担当者](./09-masters.md#9-b-担当者マスタ) / [§10 通知](./10-notifications.md) | **確定(D-001)**: フォールバックしない。既存通知・項目の personId は元のまま保持し、無効化後も当該 personId 宛の通知を生成・表示し続ける。UI は担当者名に「(無効)」を注記        |
-| 期限起算(実施日 vs 予定日)               | [§7 記録登録](./07-record-modal.md)                                                 | 実施日基準(doneDate + cycle)※未決                   |
-| 休止機器 再稼働時の期限リセット          | [§3 機器編集](./03-equipment-form.md)                                               | **確定(D-002)**: 据え置き(リセットしない)。項目の nextDueDate は機器状態変更で書き換えず、再稼働すれば保存済み期限のまま再計算対象へ戻る         |

@@ -45,7 +45,7 @@ describe("InspectionItemList: モーダル起動", () => {
     renderList();
     await clickRowAction("記録");
 
-    const dialogElement = getOpenDialog("実施記録を追加");
+    const dialogElement = getOpenDialog("実施記録を登録");
     expect(within(dialogElement).getByText(/年次校正/u)).toBeInTheDocument();
   });
 
@@ -79,6 +79,6 @@ describe("InspectionItemList: モーダル起動", () => {
     expect(screen.queryByText("点検校正項目を編集")).not.toBeInTheDocument();
 
     await clickRowAction("記録");
-    expect(getOpenDialog("実施記録を追加")).toBeInTheDocument();
+    expect(getOpenDialog("実施記録を登録")).toBeInTheDocument();
   });
 });

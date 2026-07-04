@@ -1,10 +1,10 @@
 # デプロイ
 
-本書は [domain-model.md](../domain-model.md) §5・§6 に基づくインフラ設計書である。
+本書は [domain-model.md](../../spec/domain-model.md) §5、[tech-stack.md](../architecture/tech-stack.md) に基づくインフラ設計書である。
 
 ## GitHub Actions ワークフロー
 
-`.github/workflows/deploy.yml` の構成（設計値。実装後は実装が正）:
+`.github/workflows/deploy.yml` の構成:
 
 - **trigger**: `main` ブランチへの push + `workflow_dispatch`（手動実行）
 - **runner**: `ubuntu-slim`

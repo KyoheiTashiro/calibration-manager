@@ -1,6 +1,6 @@
 # PWA設計
 
-本書は [domain-model.md](../domain-model.md) §5・§6 に基づくインフラ設計書である。
+本書は [domain-model.md](../../spec/domain-model.md) §5、[tech-stack.md](../architecture/tech-stack.md) に基づくインフラ設計書である。
 
 ## 1. 構成
 

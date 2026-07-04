@@ -18,7 +18,7 @@ type Props = {
 };
 
 export const ActionRequiredList = ({ rows, onNavigate }: Props): ReactElement => {
-  if (rows.length === 0) return <EmptyState message="対応が必要な項目はありません 🎉" />;
+  if (rows.length === 0) return <EmptyState message="対応が必要な項目はありません" />;
 
   const activate = (equipmentId: string): void => onNavigate(equipmentDetailPath(equipmentId));
   const handleKeyDown = (event: KeyboardEvent<HTMLTableRowElement>, equipmentId: string): void => {

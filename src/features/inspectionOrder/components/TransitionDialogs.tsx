@@ -3,7 +3,7 @@
  * - OrderDialog: planned → ordered（発注日・返却予定日・費用）
  * - ReturnDialog: inCalibration → returned（実返却日）
  * updateOrderStatus が true のときのみ属性を updateOrder で patch する。false（遷移不可・競合）なら
- * patch せず閉じる（silent no-op）。日付整合の不一致は警告表示のみでブロックしない（decisions.md D-019）。
+ * patch せず閉じる（silent no-op）。日付整合の不一致は警告表示のみでブロックしない（D-019）。
  */
 
 // oxlint-disable react/no-multi-comp -- OrderDialog/ReturnDialog はかんばんの入力付き遷移ダイアログを
