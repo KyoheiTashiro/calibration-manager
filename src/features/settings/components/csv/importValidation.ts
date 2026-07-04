@@ -12,7 +12,7 @@ import {
   type CsvEntityKind,
   ENTITY_CSV_SPECS,
   type EntityCsvSpec,
-} from "@/features/settings/entityCsv";
+} from "@/features/settings/components/csv/entityCsv";
 import { type AppState, NOTIFICATION_TARGET_TYPE } from "@/store/types";
 import { parseCsv } from "@/utils/csv";
 import { recordValue } from "@/utils/record";

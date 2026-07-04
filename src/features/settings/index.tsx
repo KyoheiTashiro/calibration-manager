@@ -1,14 +1,14 @@
 /**
  * 設定・バックアップ画面(screen-design/11-settings.md §11)。
  * アプリのインストール(PWA) / CSV エクスポート / インポート / データ全削除の4セクションを束ねる薄いビュー。
- * 各セクションの手続きは DangerSection / ExportSection / ImportSection / PwaInstallSection に分割する
+ * 各セクションの手続きは ResetSection / ExportSection / ImportSection / PwaInstallSection に分割する
  * (oxlint の依存数上限・max-statements 対策、dashboard と同じ分割イディオム)。
  */
 
-import { DangerSection } from "@/features/settings/components/DangerSection";
-import { ExportSection } from "@/features/settings/components/ExportSection";
-import { ImportSection } from "@/features/settings/components/ImportSection";
-import { PwaInstallSection } from "@/features/settings/components/PwaInstallSection";
+import { ResetSection } from "@/features/settings/components/reset/ResetSection";
+import { ExportSection } from "@/features/settings/components/csv/ExportSection";
+import { ImportSection } from "@/features/settings/components/csv/ImportSection";
+import { PwaInstallSection } from "@/features/settings/components/pwa/PwaInstallSection";
 import type { AppState } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
 import type { ReactElement } from "react";
@@ -31,7 +31,7 @@ export const Settings = (): ReactElement => {
       <ExportSection state={state} />
       <ImportSection state={state} />
       <PwaInstallSection />
-      <DangerSection />
+      <ResetSection />
     </div>
   );
 };

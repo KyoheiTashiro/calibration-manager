@@ -10,7 +10,7 @@ import {
   CSV_ENTITY_KINDS,
   type CsvEntityKind,
   ENTITY_CSV_SPECS,
-} from "@/features/settings/entityCsv";
+} from "@/features/settings/components/csv/entityCsv";
 import type { AppState } from "@/store/types";
 import { CSV_BOM } from "@/utils/csv";
 import { todayIsoDate } from "@/utils/time";

@@ -5,8 +5,8 @@
  * optional 文字列の空文字は CSV 上で「未設定」と区別できないため undefined へ正規化して比較する。
  */
 
-import { buildEntityCsv } from "@/features/settings/entityCsv";
-import { validateEntityCsv } from "@/features/settings/importValidation";
+import { buildEntityCsv } from "@/features/settings/components/csv/entityCsv";
+import { validateEntityCsv } from "@/features/settings/components/csv/importValidation";
 import { emptyAppState } from "@/store/persistence";
 import type { Person, Vendor } from "@/store/types";
 import { personArb, vendorArb } from "@/test/arbitraries";

@@ -3,7 +3,7 @@
  * beforeinstallprompt / appinstalled の非標準イベントを疑似発火し、案内文・ボタンの出し分けを確認する。
  */
 
-import { PwaInstallSection } from "@/features/settings/components/PwaInstallSection";
+import { PwaInstallSection } from "@/features/settings/components/pwa/PwaInstallSection";
 import "@testing-library/jest-dom/vitest";
 import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
