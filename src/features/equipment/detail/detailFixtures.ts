@@ -1,8 +1,6 @@
 /**
- * index.test.tsx / inspectionItemTable.test.tsx / history.test.tsx / modalLaunch.test.tsx で共有する
- * テスト用フィクスチャ。なぜ分割するか: InspectionItemModal.test.tsx と同じ理由（inspectionItemModalFixtures.ts
- * 参照）で、全テストケースを1ファイルに収めると oxlint(max-lines) の300行上限を超過するため、
- * フィクスチャ部分をこのファイルへ切り出した。
+ * detail.test.tsx / recordLaunch.test.tsx の2テストファイルで共有するテスト用フィクスチャ。
+ * どちらか一方へ取り込むと他方がテストファイルをimportする形になるため、独立ファイルとして維持する。
  */
 
 import {
