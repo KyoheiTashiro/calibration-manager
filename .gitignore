@@ -5,7 +5,7 @@ coverage
 storybook-static
 *.local
 *.tsbuildinfo
-
+storybook-static
 .DS_Store
 
 # vite-plugin-pwa devOptions が生成する開発用SW（生成物のためコミット対象外）

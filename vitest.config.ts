@@ -35,8 +35,8 @@ export default defineConfig({
       thresholds: {
         "src/domain/**": { lines: 98, functions: 100, branches: 98, statements: 98 },
         "src/store/**": { lines: 97, functions: 96, branches: 92, statements: 97 },
-        "src/utils/id.ts": { lines: 100, functions: 100, branches: 100, statements: 100 },
-        "src/utils/csv.ts": { lines: 97, functions: 95, branches: 90, statements: 97 },
+        "src/utils/id/index.ts": { lines: 100, functions: 100, branches: 100, statements: 100 },
+        "src/utils/csv/index.ts": { lines: 97, functions: 95, branches: 90, statements: 97 },
       },
     },
   },
