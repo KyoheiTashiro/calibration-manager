@@ -1,7 +1,7 @@
 /**
  * 利用マニュアル画面(screen-design/12-manual.md)。
  * store を一切参照しない静的コンテンツページ。アプリの目的・基本操作の流れ・
- * ステータスの見方・期限計算式・各画面の説明・バックアップ方法を1画面にまとめ、
+ * ステータスの見方・期限計算式・各画面の説明・バックアップ方法・ライセンスを1画面にまとめ、
  * 他画面への導線は react-router-dom の `Link` + `ROUTES` 定数経由で提供する。
  */
 
@@ -262,6 +262,29 @@ export const Manual = (): ReactElement => (
       <p>
         端末の変更やブラウザーデータの消去でデータが失われる場合に備え、定期的にエクスポートして
         おくことをおすすめします。
+      </p>
+    </section>
+
+    <section className="flex flex-col gap-3 rounded border border-slate-200 p-4">
+      <h2 className="border-b border-slate-200 pb-2 text-lg font-semibold">
+        ライセンスとソースコード
+      </h2>
+      <p>
+        このアプリはMITライセンスで公開されているオープンソースソフトウェアです。ソースコードは
+        <a
+          href="https://github.com/KyoheiTashiro/calibration-manager"
+          target="_blank"
+          rel="noreferrer"
+          className="text-primary mx-1 underline"
+        >
+          GitHubリポジトリ
+        </a>
+        で公開しています。
+      </p>
+      <p>
+        ログイン機能やアカウントごとの権限管理、データベースサーバーを用意して複数人で同じデータを
+        共有するといった拡張は、このアプリでは提供していません。必要な場合は、MITライセンスの
+        範囲でソースコードを自由に改変・拡張してご利用ください。
       </p>
     </section>
   </div>

@@ -22,6 +22,7 @@ describe("Manual", () => {
     "期限と発注推奨日の計算",
     "各画面の説明",
     "バックアップと復元",
+    "ライセンスとソースコード",
   ])("見出し「%s」(h2)が表示される", (heading) => {
     renderWithStore(<Manual />);
 
@@ -57,5 +58,14 @@ describe("Manual", () => {
     );
     expect(screen.getAllByRole("link", { name: "担当者" }).length).toBeGreaterThanOrEqual(2);
     expect(screen.getAllByRole("link", { name: "設定画面" }).length).toBeGreaterThanOrEqual(2);
+  });
+
+  it("GitHubリポジトリへの外部リンクが新規タブで開く形で存在する", () => {
+    renderWithStore(<Manual />);
+
+    const link = screen.getByRole("link", { name: "GitHubリポジトリ" });
+    expect(link).toHaveAttribute("href", "https://github.com/KyoheiTashiro/calibration-manager");
+    expect(link).toHaveAttribute("target", "_blank");
+    expect(link).toHaveAttribute("rel", "noreferrer");
   });
 });
