@@ -118,7 +118,7 @@ export const Manual = (): ReactElement => (
       <h2 className="border-b border-slate-200 pb-2 text-lg font-semibold">
         期限と発注推奨日の計算
       </h2>
-      <h3 className="font-semibold">次回期限</h3>
+      <h3 className="border-primary border-l-4 pl-2 font-semibold">次回期限</h3>
       <p>
         次回期限は「前回実施日 + 周期」で自動計算されます。項目を登録した直後はまだ実施記録が
         ないため、初回の次回期限だけは手で入力します。以降は実施記録を登録するたびに、その実施日を
@@ -133,7 +133,9 @@ export const Manual = (): ReactElement => (
         その月の末日になります(例: 1/31 の1か月後は 2/28、うるう年なら 2/29)。
       </p>
 
-      <h3 className="font-semibold">発注推奨日(外部の点検・校正のみ)</h3>
+      <h3 className="border-primary border-l-4 pl-2 font-semibold">
+        発注推奨日(外部の点検・校正のみ)
+      </h3>
       <p>
         外部の点検・校正の項目には、期限に間に合うようにいつまでに発注すべきかの目安として発注推奨日が
         あり、「次回期限 − 納期(リードタイム) − 発注余裕日数」で計算されます。
