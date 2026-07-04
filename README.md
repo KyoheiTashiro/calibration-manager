@@ -15,7 +15,7 @@ npm install
 npm run dev
 ```
 
-ビルドは `npm run build`、テストは `npm test`。その他のスクリプトは [package.json](package.json) 参照。
+その他のスクリプトは [package.json](package.json) 参照。
 
 ## ドキュメント
 
