@@ -1,7 +1,6 @@
 /**
  * メーカー/取引先マスタ画面（screen-design/09-masters.md §9-A）。
- * 削除は参照ガード付き: Equipment.manufacturerId / InspectionItem.vendorId /
- * CalibrationOrder.vendorId のいずれかから参照されている Vendor は削除できない。
+ * 状態管理・削除参照ガードは hooks.ts に切り出し、本ファイルはビューに徹する。
  */
 
 import { VendorModal } from "@/components/domain/VendorModal";
@@ -15,65 +14,26 @@ import {
   TableBody,
   TableHead,
 } from "@/components/ui";
-import type { Vendor } from "@/store/types";
-import { useAppStore } from "@/store/useAppStore";
-import { useState, type ReactElement } from "react";
+import { useVendorDelete, useVendorList, useVendorModal } from "@/features/vendors/hooks";
+import type { ReactElement } from "react";
 
 // 種別バッジ: -100 背景 × -800 文字 × -300 枠線の組は statusBadge.ts と同じ WCAG AA 設計値
 const MANUFACTURER_BADGE_CLASS_NAME = "bg-blue-100 text-blue-800 border border-blue-300";
 const CALIBRATOR_BADGE_CLASS_NAME = "bg-emerald-100 text-emerald-800 border border-emerald-300";
 
-/** 参照されている Vendor は削除ガード対象（store の removeVendor と同じ判定条件） */
-const isVendorReferenced = (vendorId: string): boolean => {
-  const { equipment, inspectionItems, orders } = useAppStore.getState();
-  return (
-    Object.values(equipment).some((entry) => entry.manufacturerId === vendorId) ||
-    Object.values(inspectionItems).some((entry) => entry.vendorId === vendorId) ||
-    Object.values(orders).some((entry) => entry.vendorId === vendorId)
-  );
-};
-
-type ModalState = {
-  open: boolean;
-  vendor?: Vendor;
-};
-
 export const VendorList = (): ReactElement => {
-  const vendors = useAppStore((state) => state.vendors);
-  const removeVendor = useAppStore((state) => state.removeVendor);
+  const vendorList = useVendorList();
 
-  const [modalState, setModalState] = useState<ModalState>({ open: false });
-  const [deleteTargetId, setDeleteTargetId] = useState<string>();
-  const [referencedErrorOpen, setReferencedErrorOpen] = useState(false);
-
-  const vendorList = Object.values(vendors).toSorted((left, right) =>
-    left.name.localeCompare(right.name, "ja"),
-  );
-
-  const handleAddClick = (): void => setModalState({ open: true, vendor: undefined });
-  const handleEditClick = (vendor: Vendor): void => setModalState({ open: true, vendor });
-  const handleModalClose = (): void => setModalState({ open: false, vendor: undefined });
-
-  const handleDeleteClick = (vendorId: string): void => {
-    if (isVendorReferenced(vendorId)) {
-      setReferencedErrorOpen(true);
-      return;
-    }
-    setDeleteTargetId(vendorId);
-  };
-
-  const handleCancelDelete = (): void => setDeleteTargetId(undefined);
-
-  const handleConfirmDelete = (): void => {
-    if (deleteTargetId === undefined) return;
-    const succeeded = removeVendor(deleteTargetId);
-    setDeleteTargetId(undefined);
-    // なぜ: 確認ダイアログ表示中に別経路で参照が発生した競合等、false 返却時も
-    // 「参照されているため削除できません」表示にフォールバックする（タスク仕様）。
-    if (!succeeded) {
-      setReferencedErrorOpen(true);
-    }
-  };
+  const { modalState, handleAddClick, handleEditClick, handleModalClose } = useVendorModal();
+  
+  const {
+    deleteTargetId,
+    referencedErrorOpen,
+    handleDeleteClick,
+    handleConfirmDelete,
+    handleCancelDelete,
+    closeReferencedError,
+  } = useVendorDelete();
 
   return (
     <div className="flex flex-col gap-4">
@@ -168,16 +128,12 @@ export const VendorList = (): ReactElement => {
         onCancel={handleCancelDelete}
       />
 
-      <Modal
-        open={referencedErrorOpen}
-        title="削除できません"
-        onClose={() => setReferencedErrorOpen(false)}
-      >
+      <Modal open={referencedErrorOpen} title="削除できません" onClose={closeReferencedError}>
         <p role="alert" className="text-sm text-slate-700">
           この取引先は参照されているため削除できません
         </p>
         <div className="flex justify-end pt-4">
-          <Button onClick={() => setReferencedErrorOpen(false)}>OK</Button>
+          <Button onClick={closeReferencedError}>OK</Button>
         </div>
       </Modal>
     </div>

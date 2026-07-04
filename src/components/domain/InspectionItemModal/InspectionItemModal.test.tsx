@@ -7,22 +7,93 @@
 
 import { InspectionItemModal } from "@/components/domain/InspectionItemModal";
 import {
-  activePerson,
-  anotherInactivePerson,
-  calibratorVendor,
-  equipment,
-  existingInspectionItem,
-  inactivePerson,
-  manufacturerOnlyVendor,
-  seedBaseMasters,
-} from "@/components/domain/InspectionItemModal/inspectionItemModalFixtures";
-import { CYCLE, EXECUTION, INSPECTION_ITEM_TYPE, type InspectionItem } from "@/store/types";
+  CYCLE,
+  EQUIPMENT_STATUS,
+  EXECUTION,
+  INSPECTION_ITEM_TYPE,
+  type Equipment,
+  type InspectionItem,
+  type Person,
+  type Vendor,
+} from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
 import { renderWithStore, seedStore, setupStoreIsolation } from "@/test/renderWithStore";
 import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom/vitest";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+
+const equipment: Equipment = {
+  id: "equipment-1",
+  managementNo: "EQ-001",
+  name: "ノギス",
+  status: EQUIPMENT_STATUS.ACTIVE,
+};
+
+const calibratorVendor: Vendor = {
+  id: "vendor-1",
+  name: "ミツトヨ校正センター",
+  isManufacturer: false,
+  isCalibrator: true,
+  standardLeadTimeDays: 20,
+};
+
+const manufacturerOnlyVendor: Vendor = {
+  id: "vendor-2",
+  name: "メーカーのみ商事",
+  isManufacturer: true,
+  isCalibrator: false,
+};
+
+const activePerson: Person = {
+  id: "person-1",
+  name: "田中",
+  email: "tanaka@example.com",
+  isActive: true,
+};
+
+const inactivePerson: Person = {
+  id: "person-2",
+  name: "鈴木",
+  email: "suzuki@example.com",
+  isActive: false,
+};
+
+const anotherInactivePerson: Person = {
+  id: "person-3",
+  name: "佐藤",
+  email: "sato@example.com",
+  isActive: false,
+};
+
+const existingInspectionItem: InspectionItem = {
+  id: "item-1",
+  equipmentId: equipment.id,
+  type: INSPECTION_ITEM_TYPE.CALIBRATION,
+  name: "年次校正",
+  cycle: CYCLE.Y1,
+  execution: EXECUTION.EXTERNAL,
+  vendorId: calibratorVendor.id,
+  leadTimeDays: 20,
+  bufferDays: 10,
+  personId: activePerson.id,
+  noticeDaysBefore: 25,
+  lastDoneDate: "2025-06-01",
+  nextDueDate: "2026-06-01",
+  isActive: true,
+};
+
+/** 機器・校正業者/非校正業者Vendor・有効担当者をストアへ投入する共通シード */
+const seedBaseMasters = (): void => {
+  seedStore({
+    equipment: { [equipment.id]: equipment },
+    vendors: {
+      [calibratorVendor.id]: calibratorVendor,
+      [manufacturerOnlyVendor.id]: manufacturerOnlyVendor,
+    },
+    persons: { [activePerson.id]: activePerson },
+  });
+};
 
 beforeEach(setupStoreIsolation);
 
