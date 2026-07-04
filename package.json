@@ -21,7 +21,7 @@
   "dependencies": {
     "@fontsource/noto-sans-jp": "5.2.9",
     "@hookform/resolvers": "5.4.0",
-    "immer": "11.1.9",
+    "immer": "11.1.11",
     "react": "19.2.7",
     "react-dom": "19.2.7",
     "react-hook-form": "7.80.0",
