@@ -26,11 +26,12 @@ export const Manual = (): ReactElement => (
     <h1 className="text-xl font-bold">利用マニュアル</h1>
 
     <section className="flex flex-col gap-3 rounded border border-slate-200 p-4">
-      <h2 className="border-b border-slate-200 pb-2 text-lg font-semibold">このアプリについて</h2>
+      <h2 className="border-b border-slate-200 pb-2 text-lg font-semibold">ご利用にあたって</h2>
+      <p>このアプリは、機器の点検・校正の期限をまとめて管理するツールです。</p>
       <p>
-        このアプリは、機器の点検・校正の期限をまとめて管理するツールです。データはお使いの
-        ブラウザー内(LocalStorage)にのみ保存され、外部のサーバーには一切送信されません。その代わり、
-        別の端末やブラウザーからは同じデータを参照できず、データはそれぞれの環境ごとに別々に保持されます。
+        データはすべてお使いのブラウザー内(LocalStorage)に保存されます。外部のサーバーには
+        送信されないため、インターネット接続がなくても利用できます。一方で、データは端末・
+        ブラウザーごとに独立しており、別の環境から同じデータを見ることはできません。
       </p>
       <p>
         端末の故障やブラウザーデータの消去でデータが失われる可能性があるため、
@@ -66,13 +67,12 @@ export const Manual = (): ReactElement => (
           します。
         </li>
         <li>
-          機器に点検校正項目(周期・内外区分など)を追加します。項目の追加・編集には専用のページは
-          なく、
+          機器に点検校正項目(周期・内外区分など)を追加します。入力画面(モーダル)は、
           {/* oxlint-disable-next-line react/forbid-component-props -- Linkはclassnameでリンク色を渡す設計(Badgeと同様) */}
           <Link to={ROUTES.EQUIPMENT_LIST} className="text-primary underline">
             機器一覧
           </Link>
-          から対象機器の詳細を開くと表示される入力画面(モーダル)で行います。
+          から対象機器の詳細を開くと表示されます。
         </li>
         <li>
           点検・校正を実施したら、
@@ -80,16 +80,19 @@ export const Manual = (): ReactElement => (
           <Link to={ROUTES.INSPECTION_ITEM_LIST} className="text-primary underline">
             点検校正項目一覧
           </Link>
-          から実施記録を追加します(こちらも入力画面はモーダルで、追加すると次回期限が自動で更新されます)。
+          から実施記録を追加します。記録を追加すると、次回期限が自動で更新されます。
         </li>
         <li>
-          外部校正が必要な項目は、
+          外部の点検・校正が必要な項目は、
           {/* oxlint-disable-next-line react/forbid-component-props -- Linkはclassnameでリンク色を渡す設計(Badgeと同様) */}
           <Link to={ROUTES.INSPECTION_ITEM_LIST} className="text-primary underline">
             点検校正項目一覧
           </Link>
-          の各行にある「案件」ボタンから案件を作成します(「案件」ボタンは外部校正の項目で、
-          まだ進行中の案件がないときに表示されます)。作成した案件は
+          の各行にある「案件」ボタンから案件を作成します(「案件」ボタンは外部の点検・校正の項目で、
+          まだ進行中の案件がないときに表示されます)。
+        </li>
+        <li>
+          作成した案件は
           {/* oxlint-disable-next-line react/forbid-component-props -- Linkはclassnameでリンク色を渡す設計(Badgeと同様) */}
           <Link to={ROUTES.ORDER_LIST} className="text-primary underline">
             点検校正外部案件
@@ -115,15 +118,39 @@ export const Manual = (): ReactElement => (
       <h2 className="border-b border-slate-200 pb-2 text-lg font-semibold">
         期限と発注推奨日の計算
       </h2>
-      <p>次回期限は「前回実施日 + 周期」で自動計算されます。</p>
-      <p>月単位の周期は暦の月で計算します(例: 1/31 の1か月後は 2/28 になります)。</p>
+      <h3 className="font-semibold">次回期限</h3>
       <p>
-        外部校正の項目には発注推奨日もあり、「次回期限 − 納期(リードタイム) −
-        発注余裕日数」で計算されます。
+        次回期限は「前回実施日 + 周期」で自動計算されます。項目を登録した直後はまだ実施記録が
+        ないため、初回の次回期限だけは手で入力します。以降は実施記録を追加するたびに、その実施日を
+        起点に自動で更新されます。
+      </p>
+      <p>
+        ただし、結果が「不合格」の記録では次回期限は更新されません。合格するまで期限は据え置かれ、
+        要対応の状態として扱われます。
+      </p>
+      <p>
+        月単位・年単位の周期は暦の月で計算します。加算した先の月に同じ日付が存在しない場合は、
+        その月の末日になります(例: 1/31 の1か月後は 2/28、うるう年なら 2/29)。
+      </p>
+
+      <h3 className="font-semibold">発注推奨日(外部の点検・校正のみ)</h3>
+      <p>
+        外部の点検・校正の項目には、期限に間に合うようにいつまでに発注すべきかの目安として発注推奨日が
+        あり、「次回期限 − 納期(リードタイム) − 発注余裕日数」で計算されます。
       </p>
       <p>
         納期は、項目ごとに個別の設定があればそれを、なければ依頼先(メーカー/取引先)の標準納期を
-        使います。
+        使います。どちらも設定されていない場合は発注推奨日を計算できないため、「要発注」の判定や
+        発注をうながす通知は行われません。
+      </p>
+      <p>
+        発注余裕日数は、発注してから業者に機器を引き渡すまでの社内手続きなどを見込んだ余裕分で、
+        項目ごとに設定できます(はじめは14日)。
+      </p>
+      <p>
+        例: 次回期限が 9/30、納期が30日、発注余裕日数が14日の場合、発注推奨日は 9/30
+        から44日さかのぼった 8/17 になります。この日を過ぎても発注していない項目が「要発注」として
+        表示されます。
       </p>
     </section>
 
