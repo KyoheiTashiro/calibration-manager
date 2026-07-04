@@ -35,6 +35,9 @@ export default defineConfig({
       // なぜ: 開発環境でもSWの動作をデバッグできるようにする（docs/infra/pwa.md §1）。
       devOptions: {
         enabled: true,
+        // なぜ: dev では dev-dist/ に sw.js しか生成されず globPatterns が何もマッチしない。
+        // 本番ビルド（dist/ 対象）には無関係な dev 限定警告のため抑制する。
+        suppressWarnings: true,
       },
       // なぜ: docs/infra/pwa.md §2 のmanifest定義（正）と一言一句一致させる。
       // GH Pages対応のため `start_url`/`scope` は base と同じ `/calibration-manager/` を指す。
