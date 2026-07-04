@@ -62,14 +62,14 @@ export const toRecord = <Entry extends { id: string }>(
   list: readonly Entry[],
 ): Record<string, Entry> => Object.fromEntries(list.map((entry) => [entry.id, entry]));
 
-/** serviceItems / orders を渡して残りは固定機器・依頼先・担当者で埋めた state を作る */
+/** serviceItems / serviceOrders を渡して残りは固定機器・依頼先・担当者で埋めた state を作る */
 export const makeState = (
   serviceItems: readonly ServiceItem[],
-  orders: readonly ServiceOrder[] = [],
-): Pick<AppState, "serviceItems" | "equipment" | "orders" | "vendors" | "persons"> => ({
+  serviceOrders: readonly ServiceOrder[] = [],
+): Pick<AppState, "serviceItems" | "equipment" | "serviceOrders" | "vendors" | "persons"> => ({
   serviceItems: toRecord(serviceItems),
   equipment: toRecord([eqActive, eqSuspended, eqRetired]),
-  orders: toRecord(orders),
+  serviceOrders: toRecord(serviceOrders),
   vendors: toRecord([calibrator]),
   persons: toRecord([activePerson, inactivePerson]),
 });

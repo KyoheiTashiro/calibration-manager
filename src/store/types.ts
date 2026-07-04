@@ -52,9 +52,9 @@ export type RecordResult = (typeof RECORD_RESULT)[keyof typeof RECORD_RESULT];
 
 /**
  * 点検校正外部案件の状態（domain-model.md §3.6）。
- * 遷移の許可判定は {@link ../domain/orderStatus.ts} の遷移テーブルが正。
+ * 遷移の許可判定は {@link ../domain/serviceOrderStatus.ts} の遷移テーブルが正。
  */
-export const ORDER_STATUS = {
+export const SERVICE_ORDER_STATUS = {
   PLANNED: "planned",
   ORDERED: "ordered",
   IN_CALIBRATION: "inCalibration",
@@ -62,7 +62,7 @@ export const ORDER_STATUS = {
   COMPLETED: "completed",
   CANCELLED: "cancelled",
 } as const;
-export type OrderStatus = (typeof ORDER_STATUS)[keyof typeof ORDER_STATUS];
+export type ServiceOrderStatus = (typeof SERVICE_ORDER_STATUS)[keyof typeof SERVICE_ORDER_STATUS];
 
 /** 通知種別（domain-model.md §3.7）。発生条件は domain/notificationRules.ts が正 */
 export const NOTIFICATION_TYPE = {
@@ -77,7 +77,7 @@ export type NotificationType = (typeof NOTIFICATION_TYPE)[keyof typeof NOTIFICAT
 /** 通知の対象種別（domain-model.md §3.7） */
 export const NOTIFICATION_TARGET_TYPE = {
   SERVICE_ITEM: "serviceItem",
-  ORDER: "order",
+  SERVICE_ORDER: "serviceOrder",
 } as const;
 export type NotificationTargetType =
   (typeof NOTIFICATION_TARGET_TYPE)[keyof typeof NOTIFICATION_TARGET_TYPE];
@@ -161,7 +161,7 @@ export type ServiceRecord = {
   doneBy: string;
   result: RecordResult;
   /** 外部点検校正の場合、元になった ServiceOrder 参照 */
-  orderId?: string;
+  serviceOrderId?: string;
   note?: string;
 };
 
@@ -172,7 +172,7 @@ export type ServiceOrder = {
   serviceItemId: string;
   /** 依頼先（Vendor参照） */
   vendorId: string;
-  status: OrderStatus;
+  status: ServiceOrderStatus;
   orderedDate?: IsoDateString;
   /** 返却予定日（業者回答の個別納期） */
   dueDate?: IsoDateString;
@@ -186,7 +186,7 @@ export type Notification = {
   id: string;
   type: NotificationType;
   targetType: NotificationTargetType;
-  /** 対象のID（targetType=serviceItem なら ServiceItem、order なら ServiceOrder） */
+  /** 対象のID（targetType=serviceItem なら ServiceItem、serviceOrder なら ServiceOrder） */
   targetId: string;
   /** 宛先担当者（Person参照） */
   personId: string;
@@ -205,6 +205,6 @@ export type AppState = {
   equipment: Record<string, Equipment>;
   serviceItems: Record<string, ServiceItem>;
   records: Record<string, ServiceRecord>;
-  orders: Record<string, ServiceOrder>;
+  serviceOrders: Record<string, ServiceOrder>;
   notifications: Record<string, Notification>;
 };

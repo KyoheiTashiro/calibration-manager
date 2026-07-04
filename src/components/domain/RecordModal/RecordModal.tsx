@@ -27,7 +27,7 @@ type Props = {
   /** 対象項目。起動元で常に確定した状態で渡す */
   serviceItemId: string;
   /** 案件経由起動時のみ指定(returned 案件)。記録に紐付き completed 連鎖する */
-  orderId?: string;
+  serviceOrderId?: string;
   onClose: () => void;
 };
 
@@ -42,10 +42,10 @@ const pickRecord = <Value,>(record: Record<string, Value>, key: string): Value |
  */
 const resolvePrefillDoneBy = (
   serviceItem: ServiceItem | undefined,
-  order: ServiceOrder | undefined,
+  serviceOrder: ServiceOrder | undefined,
   vendors: Record<string, Vendor>,
 ): string => {
-  if (order) return pickRecord(vendors, order.vendorId)?.name ?? "";
+  if (serviceOrder) return pickRecord(vendors, serviceOrder.vendorId)?.name ?? "";
   if (serviceItem !== undefined && serviceItem.execution === EXECUTION.EXTERNAL) {
     const { vendorId } = serviceItem;
     if (vendorId !== undefined && vendorId !== "") {
@@ -55,7 +55,7 @@ const resolvePrefillDoneBy = (
   return "";
 };
 
-export const RecordModal = ({ open, serviceItemId, orderId, onClose }: Props): ReactElement => {
+export const RecordModal = ({ open, serviceItemId, serviceOrderId, onClose }: Props): ReactElement => {
   const serviceItem = useAppStore((state) =>
     pickRecord(state.serviceItems, serviceItemId),
   );
@@ -63,9 +63,9 @@ export const RecordModal = ({ open, serviceItemId, orderId, onClose }: Props): R
     serviceItem ? pickRecord(state.equipment, serviceItem.equipmentId) : undefined,
   );
   const vendors = useAppStore((state) => state.vendors);
-  const hasOrderId = orderId !== undefined && orderId !== "";
-  const order = useAppStore((state) =>
-    hasOrderId ? pickRecord(state.orders, orderId) : undefined,
+  const hasServiceOrderId = serviceOrderId !== undefined && serviceOrderId !== "";
+  const serviceOrder = useAppStore((state) =>
+    hasServiceOrderId ? pickRecord(state.serviceOrders, serviceOrderId) : undefined,
   );
   const addRecord = useAppStore((state) => state.addRecord);
 
@@ -76,7 +76,7 @@ export const RecordModal = ({ open, serviceItemId, orderId, onClose }: Props): R
   // なぜ result を undefined か: 既定選択なし（未選択で送信すると zod エラー）とするため。
   const defaultValues: DefaultValues<RecordFormValues> = {
     doneDate: todayIsoDate(),
-    doneBy: resolvePrefillDoneBy(serviceItem, order, vendors),
+    doneBy: resolvePrefillDoneBy(serviceItem, serviceOrder, vendors),
     result: undefined,
     note: "",
   };
@@ -96,7 +96,7 @@ export const RecordModal = ({ open, serviceItemId, orderId, onClose }: Props): R
   const doneDate = useWatch({ control, name: "doneDate" });
 
   const isFutureDoneDate = typeof doneDate === "string" && doneDate > todayIsoDate();
-  const orderVendorName = order ? (pickRecord(vendors, order.vendorId)?.name ?? "") : "";
+  const serviceOrderVendorName = serviceOrder ? (pickRecord(vendors, serviceOrder.vendorId)?.name ?? "") : "";
 
   const targetLabel =
     serviceItem && equipment
@@ -117,7 +117,7 @@ export const RecordModal = ({ open, serviceItemId, orderId, onClose }: Props): R
       doneBy: values.doneBy,
       result: values.result,
       note: values.note === "" ? undefined : values.note,
-      orderId,
+      serviceOrderId,
     });
     // なぜここで両分岐 setState か: 破棄確認を出さないため submitFailed はイベントハンドラで
     // 更新し（effect 内 setState を避ける）、再送信ごとに最新の結果へ更新する。
@@ -150,9 +150,9 @@ export const RecordModal = ({ open, serviceItemId, orderId, onClose }: Props): R
           <span className="block text-sm text-slate-700">対象</span>
           <p className="text-sm text-slate-800">{targetLabel}</p>
         </div>
-        {hasOrderId ? (
+        {hasServiceOrderId ? (
           <p className="text-primary text-sm">
-            案件連携:{orderVendorName} の案件と紐付けて登録します(登録で記録登録済になります)
+            案件連携:{serviceOrderVendorName} の案件と紐付けて登録します(登録で記録登録済になります)
           </p>
         ) : null}
         <div>

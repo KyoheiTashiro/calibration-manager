@@ -8,7 +8,7 @@
  * - モーダル起動は単一 state で kind を持ち、1度に開くのは1つ。閉じたら state をリセットする。
  */
 
-import { ServiceItemModal, OrderModal, RecordModal } from "@/components/domain";
+import { ServiceItemModal, ServiceOrderModal, RecordModal } from "@/components/domain";
 import { Button, EmptyState } from "@/components/ui";
 import { FilterBar } from "@/features/serviceItems/list/components/FilterBar";
 import { ServiceItemTable } from "@/features/serviceItems/list/components/ServiceItemTable";
@@ -37,7 +37,7 @@ export const ServiceItemList = (): ReactElement => {
   const [searchParams, setSearchParams] = useSearchParams();
   const serviceItems = useAppStore((state) => state.serviceItems);
   const equipment = useAppStore((state) => state.equipment);
-  const orders = useAppStore((state) => state.orders);
+  const serviceOrders = useAppStore((state) => state.serviceOrders);
   const vendors = useAppStore((state) => state.vendors);
   const persons = useAppStore((state) => state.persons);
 
@@ -48,10 +48,10 @@ export const ServiceItemList = (): ReactElement => {
   const rows = useMemo(
     () =>
       serviceItemRowsOf(
-        { serviceItems, equipment, orders, vendors, persons },
+        { serviceItems, equipment, serviceOrders, vendors, persons },
         todayIsoDate(),
       ),
-    [serviceItems, equipment, orders, vendors, persons],
+    [serviceItems, equipment, serviceOrders, vendors, persons],
   );
   const filteredRows = filterServiceItemRows(rows, filters);
 
@@ -116,7 +116,7 @@ export const ServiceItemList = (): ReactElement => {
         <RecordModal open serviceItemId={modal.row.serviceItem.id} onClose={closeModal} />
       ) : null}
       {modal?.kind === MODAL_KIND.ORDER ? (
-        <OrderModal open serviceItemId={modal.row.serviceItem.id} onClose={closeModal} />
+        <ServiceOrderModal open serviceItemId={modal.row.serviceItem.id} onClose={closeModal} />
       ) : null}
       {modal?.kind === MODAL_KIND.EDIT ? (
         <ServiceItemModal

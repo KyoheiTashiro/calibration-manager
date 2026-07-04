@@ -1,17 +1,17 @@
 /**
- * 点検校正外部案件（ServiceOrder）の新規作成モーダル（screen-design/08-orders.md「案件作成モーダル」）。
+ * 点検校正外部案件（ServiceOrder）の新規作成モーダル（screen-design/08-service-orders.md「案件作成モーダル」）。
  * RHF + zodResolver。起動元は項目一覧の「案件」アクション（外部・有効案件なしの項目）。
- * 新規作成専用（status は常に addOrder が
- * planned 固定で付与するため渡さない)。1項目1有効案件制約（D-006）はストア層 addOrder が最終防衛線。
+ * 新規作成専用（status は常に addServiceOrder が
+ * planned 固定で付与するため渡さない)。1項目1有効案件制約（D-006）はストア層 addServiceOrder が最終防衛線。
  * 呼び出し元は閉時アンマウント（条件マウント）必須。defaultValues はマウント時にのみ評価されるため、
  * 常時マウントで open をトグルする使い方ではプリフィルされない。
  */
 
 import {
-  defaultOrderFormValues,
-  orderFormSchema,
-  type OrderFormValues,
-} from "@/components/domain/OrderModal/schema";
+  defaultServiceOrderFormValues,
+  serviceOrderFormSchema,
+  type ServiceOrderFormValues,
+} from "@/components/domain/ServiceOrderModal/schema";
 import { Button, DateField, Modal, Select, TextField } from "@/components/ui";
 import { ROUTES } from "@/constants/routes";
 import { useAppStore } from "@/store/useAppStore";
@@ -31,7 +31,7 @@ type Props = {
 const pickRecord = <Value,>(record: Record<string, Value>, key: string): Value | undefined =>
   record[key];
 
-export const OrderModal = ({ open, serviceItemId, onClose }: Props): ReactElement => {
+export const ServiceOrderModal = ({ open, serviceItemId, onClose }: Props): ReactElement => {
   const serviceItem = useAppStore((state) =>
     pickRecord(state.serviceItems, serviceItemId),
   );
@@ -39,7 +39,7 @@ export const OrderModal = ({ open, serviceItemId, onClose }: Props): ReactElemen
     serviceItem ? pickRecord(state.equipment, serviceItem.equipmentId) : undefined,
   );
   const vendors = useAppStore((state) => state.vendors);
-  const addOrder = useAppStore((state) => state.addOrder);
+  const addServiceOrder = useAppStore((state) => state.addServiceOrder);
 
   const [submitFailed, setSubmitFailed] = useState(false);
 
@@ -47,15 +47,15 @@ export const OrderModal = ({ open, serviceItemId, onClose }: Props): ReactElemen
   const defaultVendorId =
     presetVendorId !== undefined && vendors[presetVendorId]?.isCalibrator ? presetVendorId : "";
 
-  // なぜ defaultValues 直書きで足りるか: OrderModal は起動元で常に条件マウント（閉時アンマウント）
+  // なぜ defaultValues 直書きで足りるか: ServiceOrderModal は起動元で常に条件マウント（閉時アンマウント）
   // されるため、defaultValues はマウント時に1度評価されれば足り、open のたびのプリフィルは不要。
   const {
     register,
     handleSubmit,
     formState: { errors, isDirty },
-  } = useForm<OrderFormValues>({
-    resolver: zodResolver(orderFormSchema),
-    defaultValues: { ...defaultOrderFormValues, vendorId: defaultVendorId },
+  } = useForm<ServiceOrderFormValues>({
+    resolver: zodResolver(serviceOrderFormSchema),
+    defaultValues: { ...defaultServiceOrderFormValues, vendorId: defaultVendorId },
   });
 
   const calibratorVendors = Object.values(vendors).filter((vendor) => vendor.isCalibrator);
@@ -76,11 +76,11 @@ export const OrderModal = ({ open, serviceItemId, onClose }: Props): ReactElemen
     onClose();
   };
 
-  const onSubmit = (values: OrderFormValues): void => {
+  const onSubmit = (values: ServiceOrderFormValues): void => {
     const hasDueDate = values.dueDate !== undefined && values.dueDate !== "";
     const hasCost = values.cost !== undefined && values.cost !== "";
     const hasNote = values.note !== undefined && values.note !== "";
-    const orderId = addOrder({
+    const serviceOrderId = addServiceOrder({
       serviceItemId,
       vendorId: values.vendorId,
       dueDate: hasDueDate ? values.dueDate : undefined,
@@ -90,8 +90,8 @@ export const OrderModal = ({ open, serviceItemId, onClose }: Props): ReactElemen
     // なぜここで setState か: react-compiler(EffectSetState) が effect 内での同期 setState を
     // 禁則とするため、submitFailed はイベントハンドラ側（onSubmit）に一本化し（RecordModal.tsx
     // と同方針）、再送信のたびに最新の結果へ更新する。
-    setSubmitFailed(orderId === null);
-    if (orderId === null) return;
+    setSubmitFailed(serviceOrderId === null);
+    if (serviceOrderId === null) return;
     handleClose();
   };
 

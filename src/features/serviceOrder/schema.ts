@@ -1,5 +1,5 @@
 /**
- * 点検校正外部案件かんばんの遷移ダイアログ用フォームスキーマ（RHF + zodResolver、screen-design/08-orders.md）。
+ * 点検校正外部案件かんばんの遷移ダイアログ用フォームスキーマ（RHF + zodResolver、screen-design/08-service-orders.md）。
  * 形式検証（必須・YYYY-MM-DD・0以上数値）はここで担いブロックする。日付整合（orderedDate ≤ dueDate 等）は
  * 警告表示のみでブロックしない（D-019）ため zod では扱わずコンポーネント側で判定する。
  *
@@ -11,7 +11,7 @@ import { isIsoDateString } from "@/utils/time";
 import { z } from "zod";
 
 /** 発注ダイアログ（planned → ordered）。orderedDate 必須、dueDate・cost 任意 */
-export const orderDialogSchema = z.object({
+export const serviceOrderDialogSchema = z.object({
   orderedDate: z
     .string()
     .min(1, "発注日は必須です")
@@ -19,14 +19,14 @@ export const orderDialogSchema = z.object({
   dueDate: z.string().refine((value) => value === "" || isIsoDateString(value), {
     message: "返却予定日の形式が不正です",
   }),
-  // なぜ整数限定か: D-021。OrderModal(案件作成)の費用検証と粒度を統一する。
+  // なぜ整数限定か: D-021。ServiceOrderModal(案件作成)の費用検証と粒度を統一する。
   cost: z
     .string()
     .refine((value) => value === "" || (Number.isInteger(Number(value)) && Number(value) >= 0), {
       message: "費用は0以上の数値で入力してください",
     }),
 });
-export type OrderDialogValues = z.infer<typeof orderDialogSchema>;
+export type ServiceOrderDialogValues = z.infer<typeof serviceOrderDialogSchema>;
 
 /** 返却ダイアログ（inCalibration → returned）。returnedDate 必須 */
 export const returnDialogSchema = z.object({

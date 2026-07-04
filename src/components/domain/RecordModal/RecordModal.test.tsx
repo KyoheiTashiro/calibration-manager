@@ -10,7 +10,7 @@ import {
   EQUIPMENT_STATUS,
   EXECUTION,
   SERVICE_ITEM_TYPE,
-  ORDER_STATUS,
+  SERVICE_ORDER_STATUS,
   RECORD_RESULT,
   type ServiceOrder,
   type Equipment,
@@ -42,8 +42,8 @@ const serviceItemVendor: Vendor = {
   standardLeadTimeDays: 20,
 };
 
-/** 案件の依頼先（order 経由プリフィルが serviceItem 側でなく order 側の業者名になることの検証用） */
-const orderVendor: Vendor = {
+/** 案件の依頼先（serviceOrder 経由プリフィルが serviceItem 側でなく serviceOrder 側の業者名になることの検証用） */
+const serviceOrderVendor: Vendor = {
   id: "vendor-order",
   name: "校正ラボ東京",
   isManufacturer: false,
@@ -90,20 +90,20 @@ const serviceItemInternal: ServiceItem = {
   isActive: true,
 };
 
-/** returned 案件（completed へ遷移可能）。order 経由起動の正常系 */
-const orderReturned: ServiceOrder = {
-  id: "order-returned",
+/** returned 案件（completed へ遷移可能）。serviceOrder 経由起動の正常系 */
+const serviceOrderReturned: ServiceOrder = {
+  id: "serviceOrder-returned",
   serviceItemId: serviceItemExternal.id,
-  vendorId: orderVendor.id,
-  status: ORDER_STATUS.RETURNED,
+  vendorId: serviceOrderVendor.id,
+  status: SERVICE_ORDER_STATUS.RETURNED,
 };
 
 /** planned 案件（completed へ遷移不可）。addRecord が null を返す異常系の検証用 */
-const orderPlanned: ServiceOrder = {
-  id: "order-planned",
+const serviceOrderPlanned: ServiceOrder = {
+  id: "serviceOrder-planned",
   serviceItemId: serviceItemExternal.id,
-  vendorId: orderVendor.id,
-  status: ORDER_STATUS.PLANNED,
+  vendorId: serviceOrderVendor.id,
+  status: SERVICE_ORDER_STATUS.PLANNED,
 };
 
 /** 機器・業者・担当者・両項目・両案件をストアへ投入する共通シード */
@@ -112,16 +112,16 @@ const seedRecordModalStore = (): void => {
     equipment: { [equipment.id]: equipment },
     vendors: {
       [serviceItemVendor.id]: serviceItemVendor,
-      [orderVendor.id]: orderVendor,
+      [serviceOrderVendor.id]: serviceOrderVendor,
     },
     persons: { [person.id]: person },
     serviceItems: {
       [serviceItemExternal.id]: serviceItemExternal,
       [serviceItemInternal.id]: serviceItemInternal,
     },
-    orders: {
-      [orderReturned.id]: orderReturned,
-      [orderPlanned.id]: orderPlanned,
+    serviceOrders: {
+      [serviceOrderReturned.id]: serviceOrderReturned,
+      [serviceOrderPlanned.id]: serviceOrderPlanned,
     },
   });
 };
@@ -162,19 +162,19 @@ describe("RecordModal", () => {
     expect(screen.getByLabelText("実施日", { exact: false })).toHaveValue(todayIsoDate());
   });
 
-  it("doneBy プリフィル: order 経由起動は案件の業者名", () => {
+  it("doneBy プリフィル: serviceOrder 経由起動は案件の業者名", () => {
     renderWithStore(
       <RecordModal
         open
         serviceItemId={serviceItemExternal.id}
-        orderId={orderReturned.id}
+        serviceOrderId={serviceOrderReturned.id}
         onClose={vi.fn<() => void>()}
       />,
     );
-    expect(screen.getByLabelText("実施者", { exact: false })).toHaveValue(orderVendor.name);
+    expect(screen.getByLabelText("実施者", { exact: false })).toHaveValue(serviceOrderVendor.name);
   });
 
-  it("doneBy プリフィル: external 項目(order なし)は項目の業者名", () => {
+  it("doneBy プリフィル: external 項目(serviceOrder なし)は項目の業者名", () => {
     renderWithStore(
       <RecordModal
         open
@@ -198,17 +198,17 @@ describe("RecordModal", () => {
     expect(screen.getByLabelText("実施者", { exact: false })).toHaveValue("");
   });
 
-  it("order 経由起動時は案件連携の説明が表示される", () => {
+  it("serviceOrder 経由起動時は案件連携の説明が表示される", () => {
     renderWithStore(
       <RecordModal
         open
         serviceItemId={serviceItemExternal.id}
-        orderId={orderReturned.id}
+        serviceOrderId={serviceOrderReturned.id}
         onClose={vi.fn<() => void>()}
       />,
     );
     expect(screen.getByText(/案件連携/u)).toBeInTheDocument();
-    expect(screen.getByText(new RegExp(orderVendor.name, "u"))).toBeInTheDocument();
+    expect(screen.getByText(new RegExp(serviceOrderVendor.name, "u"))).toBeInTheDocument();
   });
 
   it("fail 選択時に「次回期限は更新されません」の注意書きが表示される", async () => {
@@ -276,7 +276,7 @@ describe("RecordModal", () => {
       <RecordModal
         open
         serviceItemId={serviceItemExternal.id}
-        orderId={orderPlanned.id}
+        serviceOrderId={serviceOrderPlanned.id}
         onClose={onClose}
       />,
     );

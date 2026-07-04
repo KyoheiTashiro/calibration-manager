@@ -9,6 +9,7 @@ import {
   migratePersistedState,
   migrateV1ToV2,
   migrateV2ToV3,
+  migrateV3ToV4,
   salvagePersistedState,
   sanitizeAppState,
 } from "@/store/persistence";
@@ -58,7 +59,7 @@ const serviceItem: ServiceItem = {
   nextDueDate: "2026-07-31",
   isActive: true,
 };
-const order: ServiceOrder = {
+const serviceOrder: ServiceOrder = {
   id: "order-1",
   serviceItemId: "item-1",
   vendorId: "vendor-1",
@@ -81,7 +82,7 @@ const validState = (): AppState => ({
   equipment: { [equipment.id]: equipment },
   serviceItems: { [serviceItem.id]: serviceItem },
   records: {},
-  orders: { [order.id]: order },
+  serviceOrders: { [serviceOrder.id]: serviceOrder },
   notifications: { [serviceItemNotification.id]: serviceItemNotification },
 });
 
@@ -202,13 +203,37 @@ describe("migrateV1ToV2: item→inspectionItem リネーム（D-036）", () => {
   });
 });
 
+/** v3 形式の永続化データ（orders キー / orderId / targetType "order"） */
+const v3State = (): Record<string, unknown> => ({
+  vendors: { [vendor.id]: vendor },
+  persons: { [person.id]: person },
+  equipment: { [equipment.id]: equipment },
+  serviceItems: { [serviceItem.id]: serviceItem },
+  records: {
+    "record-1": {
+      id: "record-1",
+      serviceItemId: "item-1",
+      doneDate: "2026-06-01",
+      doneBy: "田中",
+      result: "pass",
+      orderId: "order-1",
+    },
+  },
+  orders: {
+    "order-1": { id: "order-1", serviceItemId: "item-1", vendorId: "vendor-1", status: "ordered" },
+  },
+  notifications: {
+    [serviceItemNotification.id]: serviceItemNotification,
+  },
+});
+
 describe("migrateV2ToV3: inspectionItem→serviceItem リネーム（D-045）", () => {
-  it("v2 データを v3 スキーマへ変換し、全体パースが成功する", () => {
-    const migrated = migrateV2ToV3(v2State());
+  it("v2 データを v3 形式へ変換し、後続 v4 ステップを経て全体パースが成功する", () => {
+    const migrated = migrateV3ToV4(migrateV2ToV3(v2State()));
     const salvaged = salvagePersistedState(migrated);
     expect(Object.keys(salvaged.serviceItems)).toEqual(["item-1"]);
     expect(salvaged.records["record-1"]?.serviceItemId).toBe("item-1");
-    expect(salvaged.orders["order-1"]?.serviceItemId).toBe("item-1");
+    expect(salvaged.serviceOrders["order-1"]?.serviceItemId).toBe("item-1");
     expect(salvaged.notifications["notification-1"]?.targetType).toBe("serviceItem");
   });
 
@@ -241,17 +266,68 @@ describe("migrateV2ToV3: inspectionItem→serviceItem リネーム（D-045）", 
   });
 });
 
+describe("migrateV3ToV4: order→serviceOrder リネーム（D-046）", () => {
+  it("v3 データを v4 スキーマへ変換し、全体パースが成功する", () => {
+    const migrated = migrateV3ToV4(v3State());
+    const salvaged = salvagePersistedState(migrated);
+    expect(Object.keys(salvaged.serviceOrders)).toEqual(["order-1"]);
+    expect(salvaged.serviceOrders["order-1"]?.serviceItemId).toBe("item-1");
+    expect(salvaged.records["record-1"]?.serviceOrderId).toBe("order-1");
+    if (!isRecord(migrated)) throw new Error("migrated should be a record");
+    expect(migrated.orders).toBeUndefined();
+  });
+
+  it("targetType が order の通知を serviceOrder へ変換する", () => {
+    const orderNotification = {
+      ...serviceItemNotification,
+      id: "notification-2",
+      targetType: "order",
+      targetId: "order-1",
+    };
+    const migrated = migrateV3ToV4({
+      ...v3State(),
+      notifications: { "notification-2": orderNotification },
+    });
+    if (!isRecord(migrated) || !isRecord(migrated.notifications)) {
+      throw new Error("migrated.notifications should be a record");
+    }
+    const migratedNotification = migrated.notifications["notification-2"];
+    if (!isRecord(migratedNotification)) throw new Error("notification-2 should be a record");
+    expect(migratedNotification.targetType).toBe("serviceOrder");
+  });
+
+  it("targetType が serviceItem の通知は変換しない", () => {
+    const migrated = migrateV3ToV4(v3State());
+    if (!isRecord(migrated) || !isRecord(migrated.notifications)) {
+      throw new Error("migrated.notifications should be a record");
+    }
+    const migratedNotification = migrated.notifications[serviceItemNotification.id];
+    if (!isRecord(migratedNotification)) throw new Error("notification-1 should be a record");
+    expect(migratedNotification.targetType).toBe("serviceItem");
+  });
+
+  it("非オブジェクトや欠損キーは例外を投げず通す（後段サルベージに委ねる）", () => {
+    expect(migrateV3ToV4(null)).toBeNull();
+    expect(migrateV3ToV4("broken")).toBe("broken");
+    const migrated = migrateV3ToV4({ vendors: 42, records: "broken" });
+    if (!isRecord(migrated)) throw new Error("migrated should be a record");
+    expect(migrated.records).toBe("broken");
+    expect(salvagePersistedState(migrated)).toEqual(emptyAppState());
+  });
+});
+
 describe("マイグレーションパイプライン（v1→現行版）", () => {
   it("MIGRATIONS に全ステップが登録されており、v1 データが現行スキーマまで変換される", () => {
     const result = migratePersistedState(v1State(), 1);
     const salvaged = salvagePersistedState(result);
     expect(Object.keys(salvaged.serviceItems)).toEqual(["item-1"]);
     expect(salvaged.records["record-1"]?.serviceItemId).toBe("item-1");
-    expect(salvaged.orders["order-1"]?.serviceItemId).toBe("item-1");
+    expect(salvaged.serviceOrders["order-1"]?.serviceItemId).toBe("item-1");
     expect(salvaged.notifications["notification-1"]?.targetType).toBe("serviceItem");
     if (!isRecord(result)) throw new Error("result should be a record");
     expect(result.items).toBeUndefined();
     expect(result.inspectionItems).toBeUndefined();
+    expect(result.orders).toBeUndefined();
   });
 });
 
@@ -303,16 +379,16 @@ describe("sanitizeAppState: 参照整合（D-003）", () => {
     expect(sanitizeAppState(state).notifications).toEqual({});
   });
 
-  it("target の案件を失った order 宛通知を除去する", () => {
-    const orderNotification: Notification = {
+  it("target の案件を失った serviceOrder 宛通知を除去する", () => {
+    const serviceOrderNotification: Notification = {
       ...serviceItemNotification,
       id: "notification-2",
-      targetType: "order",
+      targetType: "serviceOrder",
       targetId: "order-gone",
     };
     const state = {
       ...validState(),
-      notifications: { [orderNotification.id]: orderNotification },
+      notifications: { [serviceOrderNotification.id]: serviceOrderNotification },
     };
     expect(sanitizeAppState(state).notifications).toEqual({});
   });
@@ -326,7 +402,7 @@ describe("sanitizeAppState: 参照整合（D-003）", () => {
     const state = { ...validState(), equipment: {}, vendors: {} };
     const sanitized = sanitizeAppState(state);
     expect(sanitized.serviceItems).toEqual(validState().serviceItems); // equipmentId/vendorId が dangling でも残す
-    expect(sanitized.orders).toEqual(validState().orders);
+    expect(sanitized.serviceOrders).toEqual(validState().serviceOrders);
   });
 });
 
@@ -367,10 +443,10 @@ describe("persist 統合（LocalStorage → rehydrate）", () => {
     expect(Object.keys(parsed.state).toSorted()).toEqual([
       "equipment",
       "notifications",
-      "orders",
       "persons",
       "records",
       "serviceItems",
+      "serviceOrders",
       "vendors",
     ]);
   });

@@ -1,16 +1,16 @@
 /**
- * かんばん（screen-design/08-orders.md）のうち integration.test.tsx が覆わない観点:
+ * かんばん（screen-design/08-service-orders.md）のうち integration.test.tsx が覆わない観点:
  * 中止フロー・トグルON表示・カード表示解決・dangling参照・空状態2種・発注ダイアログの整合警告・列内ソート。
  */
 
-import { OrderList } from "@/features/serviceOrder";
-import { KANBAN_ACTIVE_COLUMNS, ORDER_STATUS_LABELS } from "@/features/serviceOrder/constants";
+import { ServiceOrderList } from "@/features/serviceOrder";
+import { KANBAN_ACTIVE_COLUMNS, SERVICE_ORDER_STATUS_LABELS } from "@/features/serviceOrder/constants";
 import {
   CYCLE,
   EQUIPMENT_STATUS,
   EXECUTION,
   SERVICE_ITEM_TYPE,
-  ORDER_STATUS,
+  SERVICE_ORDER_STATUS,
   type ServiceOrder,
   type Equipment,
   type ServiceItem,
@@ -62,12 +62,12 @@ const makeServiceItem = (id: string, equipmentId: string): ServiceItem => ({
   equipmentId,
 });
 
-const baseSeed = (orders: Record<string, ServiceOrder>): void => {
+const baseSeed = (serviceOrders: Record<string, ServiceOrder>): void => {
   seedStore({
     vendors: { [vendor.id]: vendor },
     equipment: { [equipment.id]: equipment },
     serviceItems: { [serviceItem.id]: serviceItem },
-    orders,
+    serviceOrders,
   });
 };
 
@@ -76,16 +76,16 @@ beforeEach(setupStoreIsolation);
 describe("カード表示", () => {
   it("依頼先名・費用を解決し、未設定属性は「—」で表示する", () => {
     baseSeed({
-      "order-1": {
-        id: "order-1",
+      "serviceOrder-1": {
+        id: "serviceOrder-1",
         serviceItemId: "item-1",
         vendorId: "vendor-1",
-        status: ORDER_STATUS.ORDERED,
+        status: SERVICE_ORDER_STATUS.ORDERED,
         orderedDate: "2026-06-01",
         cost: 12_000,
       },
     });
-    renderWithStore(<OrderList />);
+    renderWithStore(<ServiceOrderList />);
 
     expect(screen.getByText("EQ-001")).toBeInTheDocument();
     expect(screen.getByText("ノギス")).toBeInTheDocument();
@@ -98,16 +98,16 @@ describe("カード表示", () => {
 
   it("dangling 参照（serviceItem/vendor 不在）でも例外を投げず「(参照先なし)」で表示する", () => {
     seedStore({
-      orders: {
-        "order-1": {
-          id: "order-1",
+      serviceOrders: {
+        "serviceOrder-1": {
+          id: "serviceOrder-1",
           serviceItemId: "missing-item",
           vendorId: "missing-vendor",
-          status: ORDER_STATUS.PLANNED,
+          status: SERVICE_ORDER_STATUS.PLANNED,
         },
       },
     });
-    renderWithStore(<OrderList />);
+    renderWithStore(<ServiceOrderList />);
 
     // 管理番号・機器名・項目名・依頼先すべてが解決不能 → 複数の「(参照先なし)」
     expect(screen.getAllByText("(参照先なし)").length).toBeGreaterThanOrEqual(3);
@@ -118,14 +118,14 @@ describe("完了/中止も表示 トグル", () => {
   it("既定OFFでは記録登録済/中止の列は出ず、ONで右側に追加される", async () => {
     const user = userEvent.setup();
     baseSeed({
-      "order-c": {
-        id: "order-c",
+      "serviceOrder-c": {
+        id: "serviceOrder-c",
         serviceItemId: "item-1",
         vendorId: "vendor-1",
-        status: ORDER_STATUS.COMPLETED,
+        status: SERVICE_ORDER_STATUS.COMPLETED,
       },
     });
-    renderWithStore(<OrderList />);
+    renderWithStore(<ServiceOrderList />);
 
     // 既定OFF: 完了列は非表示だが、案件自体は存在する（completed 1件）ため空状態にはならず、
     // 進行中4列は描画され各列に「なし」が出る（空状態は全ステータス合計0件のときのみ）。
@@ -138,7 +138,7 @@ describe("完了/中止も表示 トグル", () => {
       screen.queryByText("点検校正外部案件はありません。点検校正項目一覧から案件を追加できます"),
     ).not.toBeInTheDocument();
     for (const status of KANBAN_ACTIVE_COLUMNS) {
-      expect(screen.getByText(ORDER_STATUS_LABELS[status])).toBeInTheDocument();
+      expect(screen.getByText(SERVICE_ORDER_STATUS_LABELS[status])).toBeInTheDocument();
     }
     expect(screen.getAllByText("なし")).toHaveLength(KANBAN_ACTIVE_COLUMNS.length);
 
@@ -155,21 +155,21 @@ describe("中止フロー", () => {
   it("中止 → 確認 → cancelled になり、トグルOFFでカードが消える", async () => {
     const user = userEvent.setup();
     baseSeed({
-      "order-1": {
-        id: "order-1",
+      "serviceOrder-1": {
+        id: "serviceOrder-1",
         serviceItemId: "item-1",
         vendorId: "vendor-1",
-        status: ORDER_STATUS.PLANNED,
+        status: SERVICE_ORDER_STATUS.PLANNED,
       },
     });
-    renderWithStore(<OrderList />);
+    renderWithStore(<ServiceOrderList />);
 
     await user.click(screen.getByRole("button", { name: "中止" }));
     // 確認ダイアログ
     const dialog = screen.getByRole("dialog");
     await user.click(within(dialog).getByRole("button", { name: "中止" }));
 
-    expect(useAppStore.getState().orders["order-1"].status).toBe(ORDER_STATUS.CANCELLED);
+    expect(useAppStore.getState().serviceOrders["serviceOrder-1"].status).toBe(SERVICE_ORDER_STATUS.CANCELLED);
     // cancelled はトグルOFFで非表示
     expect(screen.queryByText("EQ-001")).not.toBeInTheDocument();
   });
@@ -177,8 +177,8 @@ describe("中止フロー", () => {
 
 describe("空状態", () => {
   it("表示対象の全列が0件のときEmptyStateと点検校正項目一覧導線を出す", () => {
-    seedStore({ orders: {} });
-    renderWithStore(<OrderList />);
+    seedStore({ serviceOrders: {} });
+    renderWithStore(<ServiceOrderList />);
 
     expect(
       screen.getByText("点検校正外部案件はありません。点検校正項目一覧から案件を追加できます"),
@@ -188,14 +188,14 @@ describe("空状態", () => {
 
   it("個別列が0件のとき列内に「なし」プレースホルダを出す", () => {
     baseSeed({
-      "order-1": {
-        id: "order-1",
+      "serviceOrder-1": {
+        id: "serviceOrder-1",
         serviceItemId: "item-1",
         vendorId: "vendor-1",
-        status: ORDER_STATUS.PLANNED,
+        status: SERVICE_ORDER_STATUS.PLANNED,
       },
     });
-    renderWithStore(<OrderList />);
+    renderWithStore(<ServiceOrderList />);
 
     // planned 以外の3列（発注済/校正中/返却済）が空 → 「なし」3つ
     expect(screen.getAllByText("なし")).toHaveLength(3);
@@ -203,14 +203,14 @@ describe("空状態", () => {
 
   it("completed のみ1件でトグルOFF（既定）でもEmptyStateにならず進行中4列が「なし」で描画される", () => {
     baseSeed({
-      "order-c": {
-        id: "order-c",
+      "serviceOrder-c": {
+        id: "serviceOrder-c",
         serviceItemId: "item-1",
         vendorId: "vendor-1",
-        status: ORDER_STATUS.COMPLETED,
+        status: SERVICE_ORDER_STATUS.COMPLETED,
       },
     });
-    renderWithStore(<OrderList />);
+    renderWithStore(<ServiceOrderList />);
 
     // 案件は存在する（completed 1件）ため、全列0件の空状態メッセージは出ない
     expect(
@@ -218,7 +218,7 @@ describe("空状態", () => {
     ).not.toBeInTheDocument();
     // 進行中4列（発注準備/発注済/校正中/返却済）のヘッダーは表示される
     for (const status of KANBAN_ACTIVE_COLUMNS) {
-      expect(screen.getByText(ORDER_STATUS_LABELS[status])).toBeInTheDocument();
+      expect(screen.getByText(SERVICE_ORDER_STATUS_LABELS[status])).toBeInTheDocument();
     }
     // 4列とも0件のため「なし」が4つ
     expect(screen.getAllByText("なし")).toHaveLength(4);
@@ -229,14 +229,14 @@ describe("発注ダイアログの整合警告（D-019）", () => {
   it("発注日 > 返却予定日 で警告を出すが登録はブロックしない", async () => {
     const user = userEvent.setup();
     baseSeed({
-      "order-1": {
-        id: "order-1",
+      "serviceOrder-1": {
+        id: "serviceOrder-1",
         serviceItemId: "item-1",
         vendorId: "vendor-1",
-        status: ORDER_STATUS.PLANNED,
+        status: SERVICE_ORDER_STATUS.PLANNED,
       },
     });
-    renderWithStore(<OrderList />);
+    renderWithStore(<ServiceOrderList />);
 
     await user.click(screen.getByRole("button", { name: "発注する" }));
     const dueDateField = screen.getByLabelText("返却予定日", { exact: false });
@@ -247,8 +247,8 @@ describe("発注ダイアログの整合警告（D-019）", () => {
 
     // 警告があっても確定できる（ブロックしない）
     await user.click(screen.getByRole("button", { name: "確定" }));
-    expect(useAppStore.getState().orders["order-1"].status).toBe(ORDER_STATUS.ORDERED);
-    expect(useAppStore.getState().orders["order-1"].dueDate).toBe("2020-01-01");
+    expect(useAppStore.getState().serviceOrders["serviceOrder-1"].status).toBe(SERVICE_ORDER_STATUS.ORDERED);
+    expect(useAppStore.getState().serviceOrders["serviceOrder-1"].dueDate).toBe("2020-01-01");
   });
 });
 
@@ -266,30 +266,30 @@ describe("列内ソート", () => {
         "item-b": makeServiceItem("item-b", "eq-b"),
         "item-c": makeServiceItem("item-c", "eq-c"),
       },
-      orders: {
-        "order-a": {
-          id: "order-a",
+      serviceOrders: {
+        "serviceOrder-a": {
+          id: "serviceOrder-a",
           serviceItemId: "item-a",
           vendorId: "vendor-1",
-          status: ORDER_STATUS.PLANNED,
+          status: SERVICE_ORDER_STATUS.PLANNED,
           dueDate: "2026-08-01",
         },
-        "order-b": {
-          id: "order-b",
+        "serviceOrder-b": {
+          id: "serviceOrder-b",
           serviceItemId: "item-b",
           vendorId: "vendor-1",
-          status: ORDER_STATUS.PLANNED,
+          status: SERVICE_ORDER_STATUS.PLANNED,
           dueDate: "2026-06-01",
         },
-        "order-c": {
-          id: "order-c",
+        "serviceOrder-c": {
+          id: "serviceOrder-c",
           serviceItemId: "item-c",
           vendorId: "vendor-1",
-          status: ORDER_STATUS.PLANNED,
+          status: SERVICE_ORDER_STATUS.PLANNED,
         },
       },
     });
-    renderWithStore(<OrderList />);
+    renderWithStore(<ServiceOrderList />);
 
     const managementNos = screen.getAllByText(/^EQ-[ABC]$/u).map((element) => element.textContent);
     // dueDate 昇順: B(06-01) → A(08-01) → 未設定末尾 C

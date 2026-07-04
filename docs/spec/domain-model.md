@@ -22,6 +22,8 @@
 
 エンティティ英語名は Service 系(ServiceItem / ServiceRecord / ServiceOrder)で統一する。総称の Service は点検・校正の両種別を包含する傘の語であり、種別を表す enum 値(`inspection` / `calibration`)や案件状態の `inCalibration` とは役割が異なるため衝突しない。旧名 InspectionItem / InspectionRecord / CalibrationOrder は接頭辞が種別 enum と衝突し「点検項目の種別が校正」のような矛盾した読みを生むため廃止(旧永続化データはスキーマ v3 マイグレーションで無損失変換。旧ヘッダ `inspectionItemId` を含む既エクスポートCSVはインポート互換なし、要再エクスポート)(D-045)。
 
+ServiceOrder を指す略記の order 系命名も serviceOrder 系へ統一する: ルート `/orders` → `/service-orders`、永続化状態キー `orders` → `serviceOrders`、`ServiceRecord.orderId` → `serviceOrderId`、Notification の `targetType` 値 `order` → `serviceOrder`、コードの Order* 識別子 → ServiceOrder*。発注という行為を指す語(`orderedDate`、項目ステータス `orderNow`、通知種別 `orderRecommended`、発注推奨日)は ServiceOrder の略記ではないため対象外。旧永続化データはスキーマ v4 マイグレーションで無損失変換。旧ヘッダ `orderId` を含む records の既エクスポートCSVはインポート互換なし、要再エクスポート(D-046)。
+
 ## 2. エンティティ関連図
 
 ```mermaid
@@ -115,7 +117,7 @@ erDiagram
 | doneDate | date          | ○    | 実施日                                                   |
 | doneBy   | string        | ○    | 実施者名(外部の場合は業者名)                             |
 | result   | enum          | ○    | `pass`(合格) / `fail`(不合格) / `adjusted`(調整の上合格) |
-| orderId  | string        |      | 外部点検校正の場合、元になったServiceOrder参照           |
+| serviceOrderId | string   |      | 外部点検校正の場合、元になったServiceOrder参照           |
 | note     | string        |      | 備考(校正証明書番号など)                                 |
 
 - 記録登録時に `serviceItem.lastDoneDate = doneDate`、`serviceItem.nextDueDate = doneDate + cycle` を自動更新。
@@ -157,7 +159,7 @@ planned(発注準備) → ordered(発注済) → inCalibration(校正中) → re
 | ----------- | ------------- | ---- | ------------------ |
 | id          | string (uuid) | ○    |                    |
 | type        | enum          | ○    | 下記の通知種別参照 |
-| targetType  | enum          | ○    | `serviceItem` / `order`   |
+| targetType  | enum          | ○    | `serviceItem` / `serviceOrder`   |
 | targetId    | string        | ○    | 対象のID           |
 | personId    | string        | ○    | 宛先担当者         |
 | message     | string        | ○    | 通知文             |

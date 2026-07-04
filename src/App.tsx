@@ -7,7 +7,7 @@ import { EquipmentCreateForm } from "@/features/equipment/form/create";
 import { EquipmentEditForm } from "@/features/equipment/form/edit";
 import { EquipmentList } from "@/features/equipment/list";
 import { ServiceItemList } from "@/features/serviceItems/list";
-import { OrderList } from "@/features/serviceOrder";
+import { ServiceOrderList } from "@/features/serviceOrder";
 import { Manual } from "@/features/manual";
 import { NotificationCenter } from "@/features/notifications";
 import { useNotificationScan } from "@/features/notifications/scan/useNotificationScan";
@@ -37,7 +37,7 @@ function App(): ReactElement {
         <Route path={ROUTES.EQUIPMENT_DETAIL} element={<EquipmentDetail />} />
         <Route path={ROUTES.EQUIPMENT_EDIT} element={<EquipmentEditForm />} />
         <Route path={ROUTES.SERVICE_ITEM_LIST} element={<ServiceItemList />} />
-        <Route path={ROUTES.ORDER_LIST} element={<OrderList />} />
+        <Route path={ROUTES.SERVICE_ORDER_LIST} element={<ServiceOrderList />} />
         <Route path={ROUTES.VENDOR_LIST} element={<VendorList />} />
         <Route path={ROUTES.PERSON_LIST} element={<PersonList />} />
         <Route path={ROUTES.NOTIFICATION_LIST} element={<NotificationCenter />} />

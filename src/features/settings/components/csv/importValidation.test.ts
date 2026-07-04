@@ -10,7 +10,7 @@ import {
   EQUIPMENT_STATUS,
   EXECUTION,
   SERVICE_ITEM_TYPE,
-  ORDER_STATUS,
+  SERVICE_ORDER_STATUS,
   type AppState,
   type ServiceOrder,
   type Equipment,
@@ -47,11 +47,11 @@ const serviceItem: ServiceItem = {
   nextDueDate: "2026-07-15",
   isActive: true,
 };
-const order: ServiceOrder = {
-  id: "order-1",
+const serviceOrder: ServiceOrder = {
+  id: "serviceOrder-1",
   serviceItemId: "item-1",
   vendorId: "vendor-1",
-  status: ORDER_STATUS.ORDERED,
+  status: SERVICE_ORDER_STATUS.ORDERED,
 };
 
 /** 参照整合の突合先(D-029: 現在ストアのスナップショット相当) */
@@ -61,7 +61,7 @@ const stateWithReferences = (): AppState => ({
   persons: { [person.id]: person },
   equipment: { [equipment.id]: equipment },
   serviceItems: { [serviceItem.id]: serviceItem },
-  orders: { [order.id]: order },
+  serviceOrders: { [serviceOrder.id]: serviceOrder },
 });
 
 const EQUIPMENT_HEADER = "id,managementNo,name,model,serialNo,manufacturerId,location,status,note";
@@ -260,11 +260,11 @@ describe("validateEntityCsv: 参照整合(D-029: 現在ストアと突合)", () 
     expect(result.errorRowCount).toBe(1);
   });
 
-  it("notifications は targetType に応じて serviceItems / orders と突合する", () => {
-    // targetType=order だが targetId は serviceItem の id → orders に存在しないためエラー
+  it("notifications は targetType に応じて serviceItems / serviceOrders と突合する", () => {
+    // targetType=serviceOrder だが targetId は serviceItem の id → serviceOrders に存在しないためエラー
     const csv = joinCsv(
       NOTIFICATIONS_HEADER,
-      "nt-1,dueSoon,order,item-1,person-1,期限接近,2026-07-01,false",
+      "nt-1,dueSoon,serviceOrder,item-1,person-1,期限接近,2026-07-01,false",
       "nt-2,dueSoon,serviceItem,item-1,person-1,期限接近,2026-07-01,true",
     );
     const result = validateEntityCsv("notifications", csv, stateWithReferences());
@@ -274,15 +274,15 @@ describe("validateEntityCsv: 参照整合(D-029: 現在ストアと突合)", () 
     expect(result.validCount).toBe(1);
   });
 
-  it("records の orderId は指定時のみ突合する", () => {
+  it("records の serviceOrderId は指定時のみ突合する", () => {
     const csv = joinCsv(
-      "id,serviceItemId,doneDate,doneBy,result,orderId,note",
+      "id,serviceItemId,doneDate,doneBy,result,serviceOrderId,note",
       "rc-1,item-1,2026-07-01,田中,pass,,",
-      "rc-2,item-1,2026-07-01,校正社,pass,order-9,",
+      "rc-2,item-1,2026-07-01,校正社,pass,serviceOrder-9,",
     );
     const result = validateEntityCsv("records", csv, stateWithReferences());
     expect(result.errors).toEqual([
-      { line: 3, message: "orderId: 参照先が存在しません 'order-9'" },
+      { line: 3, message: "serviceOrderId: 参照先が存在しません 'serviceOrder-9'" },
     ]);
   });
 });

@@ -4,7 +4,7 @@
 
 **目的**: 外部点検校正の発注〜返却〜記録までの進捗を、状態別かんばんで管理する。
 
-**URL**: `/orders`
+**URL**: `/service-orders`
 
 ## 画面レイアウト
 
@@ -54,7 +54,7 @@ planned → ordered → inCalibration → returned → completed
 - `orderedDate`(発注時)/ `returnedDate`(返却時)は必須・`YYYY-MM-DD`。
 - `dueDate`・`returnedDate` が入力されている場合 `orderedDate ≤ dueDate`、`orderedDate ≤ returnedDate` の不整合は警告表示のみでブロックしない。形式検証(必須・`YYYY-MM-DD`)は zod でブロックする(D-019)。
 - `cost`: 任意・0以上の整数のみ(小数は検証エラー。D-021)。
-- 1つの項目に対し有効案件(`planned`〜`returned` の全状態)は同時に1件まで(D-006)。`addOrder` がストア層で強制し、既存の有効案件がある場合は no-op(null 返却)する。
+- 1つの項目に対し有効案件(`planned`〜`returned` の全状態)は同時に1件まで(D-006)。`addServiceOrder` がストア層で強制し、既存の有効案件がある場合は no-op(null 返却)する。
 
 ## 空状態
 

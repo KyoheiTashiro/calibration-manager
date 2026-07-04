@@ -48,15 +48,15 @@ export const selectTabNotifications = (
 
 /**
  * 行クリック時の遷移先パスを解決する（D-027）。
- * - targetType=order → 案件一覧。
+ * - targetType=serviceOrder → 案件一覧。
  * - targetType=serviceItem → 項目から機器を辿り機器詳細。項目が dangling なら null（遷移しない）。
  */
 export const resolveNotificationTarget = (
   notification: Notification,
   serviceItems: Record<string, ServiceItem>,
 ): string | null => {
-  if (notification.targetType === NOTIFICATION_TARGET_TYPE.ORDER) {
-    return ROUTES.ORDER_LIST;
+  if (notification.targetType === NOTIFICATION_TARGET_TYPE.SERVICE_ORDER) {
+    return ROUTES.SERVICE_ORDER_LIST;
   }
   const serviceItem = recordValue(serviceItems, notification.targetId);
   if (!serviceItem) return null;

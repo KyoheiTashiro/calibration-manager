@@ -1,16 +1,16 @@
 /**
- * OrderModal: 案件作成モーダルの検証（screen-design/08-orders.md「案件作成モーダル」）。
- * 対象表示・依頼先既定値/選択肢絞り込み・addOrder連携・D-006 no-op時のエラー表示・
+ * ServiceOrderModal: 案件作成モーダルの検証（screen-design/08-service-orders.md「案件作成モーダル」）。
+ * 対象表示・依頼先既定値/選択肢絞り込み・addServiceOrder連携・D-006 no-op時のエラー表示・
  * 校正業者0件の空状態・バリデーションを扱う。起動元(項目一覧)との結線は modalLaunch.test.tsx 側の責務。
  */
 
-import { OrderModal } from "@/components/domain/OrderModal";
+import { ServiceOrderModal } from "@/components/domain/ServiceOrderModal";
 import {
   CYCLE,
   EQUIPMENT_STATUS,
   EXECUTION,
   SERVICE_ITEM_TYPE,
-  ORDER_STATUS,
+  SERVICE_ORDER_STATUS,
   type Equipment,
   type ServiceItem,
   type Vendor,
@@ -72,11 +72,11 @@ const seedBaseMasters = (): void => {
   });
 };
 
-describe("OrderModal", () => {
+describe("ServiceOrderModal", () => {
   it("対象が「対象:EQ-001 ノギス / 年次校正」の形式で固定表示される", () => {
     seedBaseMasters();
     renderWithStore(
-      <OrderModal
+      <ServiceOrderModal
         open
         serviceItemId={externalServiceItem.id}
         onClose={vi.fn<() => void>()}
@@ -89,7 +89,7 @@ describe("OrderModal", () => {
   it("依頼先の既定値がserviceItem.vendorId(isCalibratorの選択肢に存在する場合)になる", () => {
     seedBaseMasters();
     renderWithStore(
-      <OrderModal
+      <ServiceOrderModal
         open
         serviceItemId={externalServiceItem.id}
         onClose={vi.fn<() => void>()}
@@ -102,7 +102,7 @@ describe("OrderModal", () => {
   it("依頼先の選択肢がisCalibrator=trueのVendorのみ", () => {
     seedBaseMasters();
     renderWithStore(
-      <OrderModal
+      <ServiceOrderModal
         open
         serviceItemId={externalServiceItem.id}
         onClose={vi.fn<() => void>()}
@@ -115,12 +115,12 @@ describe("OrderModal", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("有効な入力で「保存」を押すとaddOrderが呼ばれstatus=plannedの案件が追加されonCloseが呼ばれる", async () => {
+  it("有効な入力で「保存」を押すとaddServiceOrderが呼ばれstatus=plannedの案件が追加されonCloseが呼ばれる", async () => {
     seedBaseMasters();
     const user = userEvent.setup();
     const onClose = vi.fn<() => void>();
     renderWithStore(
-      <OrderModal open serviceItemId={externalServiceItem.id} onClose={onClose} />,
+      <ServiceOrderModal open serviceItemId={externalServiceItem.id} onClose={onClose} />,
     );
 
     await user.type(screen.getByLabelText("返却予定日", { exact: false }), "2026-08-10");
@@ -128,12 +128,12 @@ describe("OrderModal", () => {
     await user.type(screen.getByLabelText("備考", { exact: false }), "定期校正");
     await user.click(screen.getByRole("button", { name: "保存" }));
 
-    const createdOrders = Object.values(useAppStore.getState().orders);
-    expect(createdOrders).toHaveLength(1);
-    expect(createdOrders[0]).toMatchObject({
+    const createdServiceOrders = Object.values(useAppStore.getState().serviceOrders);
+    expect(createdServiceOrders).toHaveLength(1);
+    expect(createdServiceOrders[0]).toMatchObject({
       serviceItemId: externalServiceItem.id,
       vendorId: calibratorVendor.id,
-      status: ORDER_STATUS.PLANNED,
+      status: SERVICE_ORDER_STATUS.PLANNED,
       dueDate: "2026-08-10",
       cost: 5000,
       note: "定期校正",
@@ -141,29 +141,29 @@ describe("OrderModal", () => {
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
-  it("既に進行中の案件がある項目で作成するとaddOrderがnullを返しエラー表示・onClose不呼び出し・ストア件数不変", async () => {
+  it("既に進行中の案件がある項目で作成するとaddServiceOrderがnullを返しエラー表示・onClose不呼び出し・ストア件数不変", async () => {
     seedBaseMasters();
     seedStore({
-      orders: {
-        "order-existing": {
-          id: "order-existing",
+      serviceOrders: {
+        "serviceOrder-existing": {
+          id: "serviceOrder-existing",
           serviceItemId: externalServiceItem.id,
           vendorId: calibratorVendor.id,
-          status: ORDER_STATUS.ORDERED,
+          status: SERVICE_ORDER_STATUS.ORDERED,
         },
       },
     });
     const user = userEvent.setup();
     const onClose = vi.fn<() => void>();
     renderWithStore(
-      <OrderModal open serviceItemId={externalServiceItem.id} onClose={onClose} />,
+      <ServiceOrderModal open serviceItemId={externalServiceItem.id} onClose={onClose} />,
     );
 
     await user.click(screen.getByRole("button", { name: "保存" }));
 
     expect(await screen.findByText("この項目には進行中の案件が既に存在します")).toBeInTheDocument();
     expect(onClose).not.toHaveBeenCalled();
-    expect(Object.values(useAppStore.getState().orders)).toHaveLength(1);
+    expect(Object.values(useAppStore.getState().serviceOrders)).toHaveLength(1);
   });
 
   it("校正業者が0件のとき空状態が表示され校正依頼先Selectが表示されない", () => {
@@ -173,7 +173,7 @@ describe("OrderModal", () => {
       serviceItems: { [externalServiceItem.id]: externalServiceItem },
     });
     renderWithStore(
-      <OrderModal
+      <ServiceOrderModal
         open
         serviceItemId={externalServiceItem.id}
         onClose={vi.fn<() => void>()}
@@ -201,7 +201,7 @@ describe("OrderModal", () => {
     });
     const user = userEvent.setup();
     renderWithStore(
-      <OrderModal
+      <ServiceOrderModal
         open
         serviceItemId={externalServiceItem.id}
         onClose={vi.fn<() => void>()}
@@ -211,14 +211,14 @@ describe("OrderModal", () => {
     await user.click(screen.getByRole("button", { name: "保存" }));
 
     expect(await screen.findByText("校正依頼先を選択してください")).toBeInTheDocument();
-    expect(Object.values(useAppStore.getState().orders)).toHaveLength(0);
+    expect(Object.values(useAppStore.getState().serviceOrders)).toHaveLength(0);
   });
 
   it("費用に負数を入力すると検証エラーが出る", async () => {
     seedBaseMasters();
     const user = userEvent.setup();
     renderWithStore(
-      <OrderModal
+      <ServiceOrderModal
         open
         serviceItemId={externalServiceItem.id}
         onClose={vi.fn<() => void>()}
@@ -229,6 +229,6 @@ describe("OrderModal", () => {
     await user.click(screen.getByRole("button", { name: "保存" }));
 
     expect(await screen.findByText("費用は0以上の数値で入力してください")).toBeInTheDocument();
-    expect(Object.values(useAppStore.getState().orders)).toHaveLength(0);
+    expect(Object.values(useAppStore.getState().serviceOrders)).toHaveLength(0);
   });
 });

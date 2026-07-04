@@ -7,7 +7,7 @@
 
 import { DELIVERY_DUE_SOON_NOTICE_DAYS } from "@/domain/constants";
 import { recommendedOrderDate } from "@/domain/leadTime";
-import { isActiveOrderStatus } from "@/domain/orderStatus";
+import { isActiveServiceOrderStatus } from "@/domain/serviceOrderStatus";
 import {
   type ServiceOrder,
   type Equipment,
@@ -17,7 +17,7 @@ import {
   NOTIFICATION_TARGET_TYPE,
   NOTIFICATION_TYPE,
   type Notification,
-  ORDER_STATUS,
+  SERVICE_ORDER_STATUS,
   type Vendor,
 } from "@/store/types";
 import { recordValue } from "@/utils/record";
@@ -45,7 +45,7 @@ const messagePrefix = (
 /** 1項目に対する serviceItem 宛先通知（dueSoon / overdue / orderRecommended）を判定する */
 const serviceItemNotificationSeeds = (
   serviceItem: ServiceItem,
-  orders: readonly ServiceOrder[],
+  serviceOrders: readonly ServiceOrder[],
   vendors: Record<string, Vendor>,
   equipment: Record<string, Equipment>,
   today: IsoDateString,
@@ -81,10 +81,10 @@ const serviceItemNotificationSeeds = (
         ? null
         : (recordValue(vendors, serviceItem.vendorId) ?? null);
     const orderDate = recommendedOrderDate(serviceItem, vendor);
-    const hasActiveOrder = orders.some(
-      (order) => order.serviceItemId === serviceItem.id && isActiveOrderStatus(order.status),
+    const hasActiveServiceOrder = serviceOrders.some(
+      (serviceOrder) => serviceOrder.serviceItemId === serviceItem.id && isActiveServiceOrderStatus(serviceOrder.status),
     );
-    if (orderDate !== null && today >= orderDate && !hasActiveOrder) {
+    if (orderDate !== null && today >= orderDate && !hasActiveServiceOrder) {
       seeds.push({
         ...baseSeed,
         type: NOTIFICATION_TYPE.ORDER_RECOMMENDED,
@@ -97,31 +97,31 @@ const serviceItemNotificationSeeds = (
 };
 
 /**
- * 1案件に対する order 宛先通知（deliveryDueSoon / deliveryOverdue）を判定する。
+ * 1案件に対する serviceOrder 宛先通知（deliveryDueSoon / deliveryOverdue）を判定する。
  * 対象は発注済かつ未返却（ordered / inCalibration）で返却予定日が入力済みの案件のみ。
  * 宛先: ServiceOrder は personId を持たないため、serviceItemId から項目を辿って
  * serviceItem.personId を宛先とする（store.md「アクション仕様」）。項目を辿れない案件は対象外。
  */
-const orderNotificationSeeds = (
-  order: ServiceOrder,
+const serviceOrderNotificationSeeds = (
+  serviceOrder: ServiceOrder,
   serviceItemById: ReadonlyMap<string, ServiceItem>,
   equipment: Record<string, Equipment>,
   today: IsoDateString,
 ): NotificationSeed[] => {
   const isAwaitingReturn =
-    order.status === ORDER_STATUS.ORDERED || order.status === ORDER_STATUS.IN_CALIBRATION;
-  if (!isAwaitingReturn || order.dueDate === undefined) return [];
-  const serviceItem = serviceItemById.get(order.serviceItemId);
+    serviceOrder.status === SERVICE_ORDER_STATUS.ORDERED || serviceOrder.status === SERVICE_ORDER_STATUS.IN_CALIBRATION;
+  if (!isAwaitingReturn || serviceOrder.dueDate === undefined) return [];
+  const serviceItem = serviceItemById.get(serviceOrder.serviceItemId);
   if (!serviceItem) return [];
 
   const prefix = messagePrefix(serviceItem, equipment);
   const baseSeed = {
-    targetType: NOTIFICATION_TARGET_TYPE.ORDER,
-    targetId: order.id,
+    targetType: NOTIFICATION_TARGET_TYPE.SERVICE_ORDER,
+    targetId: serviceOrder.id,
     personId: serviceItem.personId,
   } as const;
 
-  if (today > order.dueDate) {
+  if (today > serviceOrder.dueDate) {
     return [
       {
         ...baseSeed,
@@ -131,7 +131,7 @@ const orderNotificationSeeds = (
     ];
   }
 
-  const noticeFrom = addDays(order.dueDate, -DELIVERY_DUE_SOON_NOTICE_DAYS);
+  const noticeFrom = addDays(serviceOrder.dueDate, -DELIVERY_DUE_SOON_NOTICE_DAYS);
   if (noticeFrom !== null && today >= noticeFrom) {
     return [
       {
@@ -166,14 +166,14 @@ const orderNotificationSeeds = (
  *
  * @param serviceItems 判定対象の項目。休止・廃棄機器の項目や無効項目の除外は呼び出し側
  *   （ストアの generateNotifications）の責務（store.md）
- * @param orders 全案件。項目との対応は serviceItemId で内部照合する。serviceItems に含まれない項目の
+ * @param serviceOrders 全案件。項目との対応は serviceItemId で内部照合する。serviceItems に含まれない項目の
  *   案件は判定対象外
  * @param vendors 発注推奨日の納期フォールバック解決に使用
  * @param equipment 通知文の管理番号表示に使用
  */
 export const computeExpectedNotifications = (
   serviceItems: readonly ServiceItem[],
-  orders: readonly ServiceOrder[],
+  serviceOrders: readonly ServiceOrder[],
   vendors: Record<string, Vendor>,
   equipment: Record<string, Equipment>,
   today: IsoDateString,
@@ -183,10 +183,10 @@ export const computeExpectedNotifications = (
   );
   return [
     ...serviceItems.flatMap((serviceItem) =>
-      serviceItemNotificationSeeds(serviceItem, orders, vendors, equipment, today),
+      serviceItemNotificationSeeds(serviceItem, serviceOrders, vendors, equipment, today),
     ),
-    ...orders.flatMap((order) =>
-      orderNotificationSeeds(order, serviceItemById, equipment, today),
+    ...serviceOrders.flatMap((serviceOrder) =>
+      serviceOrderNotificationSeeds(serviceOrder, serviceItemById, equipment, today),
     ),
   ];
 };

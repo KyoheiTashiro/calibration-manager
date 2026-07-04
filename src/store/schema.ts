@@ -22,7 +22,7 @@ import {
   NOTIFICATION_TARGET_TYPE,
   NOTIFICATION_TYPE,
   type Notification,
-  ORDER_STATUS,
+  SERVICE_ORDER_STATUS,
   type Person,
   RECORD_RESULT,
   type Vendor,
@@ -108,7 +108,7 @@ export const serviceRecordSchema = z.object({
   doneDate: isoDateStringSchema,
   doneBy: requiredStringSchema,
   result: z.enum(RECORD_RESULT),
-  orderId: z.string().optional(),
+  serviceOrderId: z.string().optional(),
   note: z.string().optional(),
 });
 
@@ -116,7 +116,7 @@ export const serviceOrderSchema = z.object({
   id: requiredStringSchema,
   serviceItemId: requiredStringSchema,
   vendorId: requiredStringSchema,
-  status: z.enum(ORDER_STATUS),
+  status: z.enum(SERVICE_ORDER_STATUS),
   orderedDate: isoDateStringSchema.optional(),
   dueDate: isoDateStringSchema.optional(),
   returnedDate: isoDateStringSchema.optional(),
@@ -142,7 +142,7 @@ export const appStateSchema = z.object({
   equipment: z.record(z.string(), equipmentSchema),
   serviceItems: z.record(z.string(), serviceItemSchema),
   records: z.record(z.string(), serviceRecordSchema),
-  orders: z.record(z.string(), serviceOrderSchema),
+  serviceOrders: z.record(z.string(), serviceOrderSchema),
   notifications: z.record(z.string(), notificationSchema),
 });
 

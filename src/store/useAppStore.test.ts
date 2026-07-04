@@ -45,8 +45,8 @@ const serviceItem: ServiceItem = {
   nextDueDate: "2026-07-15",
   isActive: true,
 };
-const returnedOrder: ServiceOrder = {
-  id: "order-1",
+const returnedServiceOrder: ServiceOrder = {
+  id: "serviceOrder-1",
   serviceItemId: "item-1",
   vendorId: "vendor-1",
   status: "returned",
@@ -63,9 +63,9 @@ const seedBase = (overrides?: { serviceItems?: Record<string, ServiceItem> }): v
 };
 
 /** 遷移テーブル検証用: 任意ステータスの案件を1件投入する */
-const seedOrderWith = (status: ServiceOrder["status"]): void => {
+const seedServiceOrderWith = (status: ServiceOrder["status"]): void => {
   seedBase();
-  seedStore({ orders: { [returnedOrder.id]: { ...returnedOrder, status } } });
+  seedStore({ serviceOrders: { [returnedServiceOrder.id]: { ...returnedServiceOrder, status } } });
 };
 
 describe("replaceEntities: CSVインポートの全置換(D-029)", () => {
@@ -158,70 +158,70 @@ describe("addRecord: 期限更新カスケード", () => {
 });
 
 describe("addRecord: 案件完了カスケード", () => {
-  it("returned の案件を orderId 指定で completed に遷移させる", () => {
+  it("returned の案件を serviceOrderId 指定で completed に遷移させる", () => {
     seedBase();
-    seedStore({ orders: { [returnedOrder.id]: returnedOrder } });
+    seedStore({ serviceOrders: { [returnedServiceOrder.id]: returnedServiceOrder } });
 
     const id = useAppStore.getState().addRecord({
       serviceItemId: serviceItem.id,
       doneDate: "2026-07-10",
       doneBy: "校正社",
       result: "pass",
-      orderId: returnedOrder.id,
+      serviceOrderId: returnedServiceOrder.id,
     });
 
     expect(id).not.toBeNull();
     if (id === null) throw new Error("id should not be null");
     const state = useAppStore.getState();
-    expect(state.orders[returnedOrder.id].status).toBe("completed");
-    expect(state.records[id].orderId).toBe(returnedOrder.id);
+    expect(state.serviceOrders[returnedServiceOrder.id].status).toBe("completed");
+    expect(state.records[id].serviceOrderId).toBe(returnedServiceOrder.id);
   });
 
   it.each(["planned", "ordered", "inCalibration", "completed", "cancelled"] as const)(
-    "%s の案件を orderId 指定すると全体 no-op（D-005: completed へ遷移不可）",
+    "%s の案件を serviceOrderId 指定すると全体 no-op（D-005: completed へ遷移不可）",
     (status) => {
       seedBase();
-      seedStore({ orders: { [returnedOrder.id]: { ...returnedOrder, status } } });
+      seedStore({ serviceOrders: { [returnedServiceOrder.id]: { ...returnedServiceOrder, status } } });
 
       const id = useAppStore.getState().addRecord({
         serviceItemId: serviceItem.id,
         doneDate: "2026-07-10",
         doneBy: "校正社",
         result: "pass",
-        orderId: returnedOrder.id,
+        serviceOrderId: returnedServiceOrder.id,
       });
 
       expect(id).toBeNull();
       const state = useAppStore.getState();
       expect(state.records).toEqual({});
-      expect(state.orders[returnedOrder.id].status).toBe(status);
+      expect(state.serviceOrders[returnedServiceOrder.id].status).toBe(status);
       expect(state.serviceItems[serviceItem.id].nextDueDate).toBe("2026-07-15");
     },
   );
 
-  it("存在しない案件を orderId 指定すると全体 no-op", () => {
+  it("存在しない案件を serviceOrderId 指定すると全体 no-op", () => {
     seedBase();
     const id = useAppStore.getState().addRecord({
       serviceItemId: serviceItem.id,
       doneDate: "2026-07-10",
       doneBy: "校正社",
       result: "pass",
-      orderId: "order-gone",
+      serviceOrderId: "serviceOrder-gone",
     });
     expect(id).toBeNull();
     expect(useAppStore.getState().records).toEqual({});
   });
 });
 
-describe("addOrder: 1項目1有効案件（D-006）", () => {
+describe("addServiceOrder: 1項目1有効案件（D-006）", () => {
   it("案件を初期状態 planned で追加する", () => {
     seedBase();
     const id = useAppStore
       .getState()
-      .addOrder({ serviceItemId: serviceItem.id, vendorId: vendor.id });
+      .addServiceOrder({ serviceItemId: serviceItem.id, vendorId: vendor.id });
     expect(id).not.toBeNull();
     if (id === null) throw new Error("id should not be null");
-    expect(useAppStore.getState().orders[id]).toMatchObject({
+    expect(useAppStore.getState().serviceOrders[id]).toMatchObject({
       serviceItemId: serviceItem.id,
       status: "planned",
     });
@@ -231,13 +231,13 @@ describe("addOrder: 1項目1有効案件（D-006）", () => {
     "有効な案件（%s）が既にある項目には no-op",
     (status) => {
       seedBase();
-      seedStore({ orders: { [returnedOrder.id]: { ...returnedOrder, status } } });
+      seedStore({ serviceOrders: { [returnedServiceOrder.id]: { ...returnedServiceOrder, status } } });
       expect(
         useAppStore
           .getState()
-          .addOrder({ serviceItemId: serviceItem.id, vendorId: vendor.id }),
+          .addServiceOrder({ serviceItemId: serviceItem.id, vendorId: vendor.id }),
       ).toBeNull();
-      expect(Object.keys(useAppStore.getState().orders)).toEqual([returnedOrder.id]);
+      expect(Object.keys(useAppStore.getState().serviceOrders)).toEqual([returnedServiceOrder.id]);
     },
   );
 
@@ -245,11 +245,11 @@ describe("addOrder: 1項目1有効案件（D-006）", () => {
     "終端状態（%s）の案件のみなら追加できる",
     (status) => {
       seedBase();
-      seedStore({ orders: { [returnedOrder.id]: { ...returnedOrder, status } } });
+      seedStore({ serviceOrders: { [returnedServiceOrder.id]: { ...returnedServiceOrder, status } } });
       expect(
         useAppStore
           .getState()
-          .addOrder({ serviceItemId: serviceItem.id, vendorId: vendor.id }),
+          .addServiceOrder({ serviceItemId: serviceItem.id, vendorId: vendor.id }),
       ).not.toBeNull();
     },
   );
@@ -257,12 +257,12 @@ describe("addOrder: 1項目1有効案件（D-006）", () => {
   it("存在しない項目には no-op", () => {
     seedBase();
     expect(
-      useAppStore.getState().addOrder({ serviceItemId: "item-gone", vendorId: vendor.id }),
+      useAppStore.getState().addServiceOrder({ serviceItemId: "item-gone", vendorId: vendor.id }),
     ).toBeNull();
   });
 });
 
-describe("updateOrderStatus: 遷移テーブル検証", () => {
+describe("updateServiceOrderStatus: 遷移テーブル検証", () => {
   it.each([
     ["planned", "ordered"],
     ["ordered", "inCalibration"],
@@ -272,9 +272,9 @@ describe("updateOrderStatus: 遷移テーブル検証", () => {
     ["inCalibration", "cancelled"],
     ["returned", "cancelled"],
   ] as const)("隣接遷移 %s → %s を許可する", (from, to) => {
-    seedOrderWith(from);
-    expect(useAppStore.getState().updateOrderStatus(returnedOrder.id, to)).toBe(true);
-    expect(useAppStore.getState().orders[returnedOrder.id].status).toBe(to);
+    seedServiceOrderWith(from);
+    expect(useAppStore.getState().updateServiceOrderStatus(returnedServiceOrder.id, to)).toBe(true);
+    expect(useAppStore.getState().serviceOrders[returnedServiceOrder.id].status).toBe(to);
   });
 
   it.each([
@@ -283,27 +283,27 @@ describe("updateOrderStatus: 遷移テーブル検証", () => {
     ["completed", "cancelled"], // 終端から
     ["cancelled", "planned"], // 終端から
   ] as const)("許可されない遷移 %s → %s は no-op（false）", (from, to) => {
-    seedOrderWith(from);
-    expect(useAppStore.getState().updateOrderStatus(returnedOrder.id, to)).toBe(false);
-    expect(useAppStore.getState().orders[returnedOrder.id].status).toBe(from);
+    seedServiceOrderWith(from);
+    expect(useAppStore.getState().updateServiceOrderStatus(returnedServiceOrder.id, to)).toBe(false);
+    expect(useAppStore.getState().serviceOrders[returnedServiceOrder.id].status).toBe(from);
   });
 
   it("completed への直接遷移は returned からでも拒否する（addRecord 経由のみ）", () => {
-    seedOrderWith("returned");
-    expect(useAppStore.getState().updateOrderStatus(returnedOrder.id, "completed")).toBe(false);
-    expect(useAppStore.getState().orders[returnedOrder.id].status).toBe("returned");
+    seedServiceOrderWith("returned");
+    expect(useAppStore.getState().updateServiceOrderStatus(returnedServiceOrder.id, "completed")).toBe(false);
+    expect(useAppStore.getState().serviceOrders[returnedServiceOrder.id].status).toBe("returned");
   });
 
   it("存在しない案件は false", () => {
     seedBase();
-    expect(useAppStore.getState().updateOrderStatus("order-gone", "ordered")).toBe(false);
+    expect(useAppStore.getState().updateServiceOrderStatus("serviceOrder-gone", "ordered")).toBe(false);
   });
 });
 
 describe("resetAll", () => {
   it("全エンティティを空に戻す", () => {
     seedBase();
-    seedStore({ orders: { [returnedOrder.id]: returnedOrder } });
+    seedStore({ serviceOrders: { [returnedServiceOrder.id]: returnedServiceOrder } });
     useAppStore.getState().resetAll();
 
     const state = useAppStore.getState();
@@ -312,7 +312,7 @@ describe("resetAll", () => {
     expect(state.equipment).toEqual({});
     expect(state.serviceItems).toEqual({});
     expect(state.records).toEqual({});
-    expect(state.orders).toEqual({});
+    expect(state.serviceOrders).toEqual({});
     expect(state.notifications).toEqual({});
   });
 });

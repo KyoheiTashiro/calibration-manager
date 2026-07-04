@@ -40,9 +40,9 @@ Lint/Format は **oxlint + oxfmt**（ESLint/Prettier ではない）。多くは
   } as const;
   export type ServiceItemStatus = (typeof SERVICE_ITEM_STATUS)[keyof typeof SERVICE_ITEM_STATUS];
   ```
-  根拠: 値と型を 1 箇所で同期。`NOTIFICATION_TYPE`/`ORDER_STATUS`/`EQUIPMENT_STATUS`/`ROUTES` 等で一貫。
+  根拠: 値と型を 1 箇所で同期。`NOTIFICATION_TYPE`/`SERVICE_ORDER_STATUS`/`EQUIPMENT_STATUS`/`ROUTES` 等で一貫。
 - **zustand スライス**: 型 `XxxSlice` + ファクトリ `createXxxSlice`（例: `EquipmentSlice` / `createEquipmentSlice`）。初期値は独立した定数にせずファクトリ内に直接書く。
-- **selector 関数**: `xxxOf` 形（`serviceItemsOf`, `ordersOf`, `recordsOf`）。件数系は `unreadNotificationCount` のように用途を綴る。`src/store/selectors.ts`。
+- **selector 関数**: `xxxOf` 形（`serviceItemsOf`, `serviceOrdersOf`, `recordsOf`）。件数系は `unreadNotificationCount` のように用途を綴る。`src/store/selectors.ts`。
 - **省略形を使わない**: 識別子（変数・引数・関数・プロパティ・型）は完全な英単語で綴る。短縮形・頭文字省略・単文字いずれも不可。
   - 多文字省略形: `idx`→`index` / `eid`→`equipmentId` / `cfg`→`config` / `prev`→`previous` / `msg`→`message` / `btn`→`button` / `el`→`element` / `info`→説明的な完全名（`errorInfo` 等）。
   - **単文字のコールバック/selector 引数も不可**。`.map((i) => ...)` ではなく `.map((serviceItem) => ...)`、zustand は `(s) => s.serviceItems` ではなく `(state) => state.serviceItems`、イベントは `(e) => ...` ではなく `(event) => ...`、ループ index は `i` ではなく `index`。
@@ -107,7 +107,7 @@ Lint/Format は **oxlint + oxfmt**（ESLint/Prettier ではない）。多くは
   ```
 - **action 内ガードは early-return**（`const serviceItem = state.serviceItems[id]; if (!serviceItem) return;`）。
 - **横断 selector（複数エンティティ導出）は `src/store/selectors.ts` に純関数で**（store を引数に取りテスト可能に）。
-- **ローカル state vs store**: 永続化対象（equipment/service-items/records/orders/vendors/persons/notifications 等、`partialize` で限定）は store。UI 一時状態（編集中 id・モーダル開閉・選択 Set）は `useState`。項目ステータス（`deriveServiceItemStatus`）・発注推奨日は**永続化せず純関数で派生**（ドメインモデル §4）。
+- **ローカル state vs store**: 永続化対象（equipment/service-items/records/service-orders/vendors/persons/notifications 等、`partialize` で限定）は store。UI 一時状態（編集中 id・モーダル開閉・選択 Set）は `useState`。項目ステータス（`deriveServiceItemStatus`）・発注推奨日は**永続化せず純関数で派生**（ドメインモデル §4）。
 
 ## 6. import
 
@@ -129,7 +129,7 @@ Lint/Format は **oxlint + oxfmt**（ESLint/Prettier ではない）。多くは
 ## 8. ドメインロジック
 
 - `src/domain/` は**純粋関数のみ**（`export const fn = (args): RetType => ...`、明示戻り値型）。副作用・this・I/O なし。
-  - 例: `dateCycle.ts`（`addCycle`: 次回期限計算）、`leadTime.ts`（発注推奨日逆算）、`serviceItemStatus.ts`（`deriveServiceItemStatus`）、`notificationRules.ts`（通知生成判定）、`orderStatus.ts`（状態遷移テーブル）、`statusBadge.ts`（バッジ色マッピング）。
+  - 例: `dateCycle.ts`（`addCycle`: 次回期限計算）、`leadTime.ts`（発注推奨日逆算）、`serviceItemStatus.ts`（`deriveServiceItemStatus`）、`notificationRules.ts`（通知生成判定）、`serviceOrderStatus.ts`（状態遷移テーブル）、`statusBadge.ts`（バッジ色マッピング）。
 - **不変スタイル**: 入力を変更せず `{ ...serviceItem, ... }` で新値を返す。
 - **マジックナンバーは `src/domain/constants.ts` に JSDoc 付き定数で集約**（`DEFAULT_BUFFER_DAYS`（発注余裕日数デフォルト14）、`DEFAULT_NOTICE_DAYS_BEFORE`（通知開始日数デフォルト30）等）。
 - **例外を投げない**: 失敗・不在は `null` 返却 or early-return ガードで表現。zod は `parse` でなく `safeParse`。store の堅牢化も例外でなく「サルベージ → 空状態フォールバック」+ `console.warn`。CSVインポートも同様に、不正行は例外にせずエラー表示用の結果値として返す（例外: `src/main.tsx` のルート要素不在ガードのみ throw 可。復帰不能なブートストラップ失敗の fail-fast のため）。

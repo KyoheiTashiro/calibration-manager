@@ -86,7 +86,7 @@ export const Manual = (): ReactElement => (
         </li>
         <li>
           作成した案件は
-          <Link to={ROUTES.ORDER_LIST} className="text-primary underline">
+          <Link to={ROUTES.SERVICE_ORDER_LIST} className="text-primary underline">
             点検校正外部案件
           </Link>
           画面のボードに表示され、発注から返却・記録の登録までの進み具合を管理できます。
@@ -186,7 +186,7 @@ export const Manual = (): ReactElement => (
 
       <div>
         <h3 className="font-semibold">
-          <Link to={ROUTES.ORDER_LIST} className="text-primary underline">
+          <Link to={ROUTES.SERVICE_ORDER_LIST} className="text-primary underline">
             点検校正外部案件
           </Link>
         </h3>

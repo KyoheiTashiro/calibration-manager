@@ -5,7 +5,7 @@ import { addDays } from "@/utils/time";
 import * as fc from "fast-check";
 import { describe, expect, it } from "vitest";
 
-const ordersArb = fc.array(serviceOrderArb, { maxLength: 5 });
+const serviceOrdersArb = fc.array(serviceOrderArb, { maxLength: 5 });
 const vendorOrNullArb = fc.option(vendorArb, { nil: null });
 
 describe("deriveServiceItemStatus（property）", () => {
@@ -13,11 +13,11 @@ describe("deriveServiceItemStatus（property）", () => {
     fc.assert(
       fc.property(
         serviceItemArb,
-        ordersArb,
+        serviceOrdersArb,
         vendorOrNullArb,
         isoDateArb,
-        (serviceItem, orders, vendor, today) => {
-          const status = deriveServiceItemStatus(serviceItem, orders, vendor, today);
+        (serviceItem, serviceOrders, vendor, today) => {
+          const status = deriveServiceItemStatus(serviceItem, serviceOrders, vendor, today);
           expect(Object.values(SERVICE_ITEM_STATUS)).toContain(status);
         },
       ),
@@ -28,12 +28,12 @@ describe("deriveServiceItemStatus（property）", () => {
     fc.assert(
       fc.property(
         serviceItemArb,
-        ordersArb,
+        serviceOrdersArb,
         vendorOrNullArb,
         isoDateArb,
-        (serviceItem, orders, vendor, today) => {
+        (serviceItem, serviceOrders, vendor, today) => {
           fc.pre(today > serviceItem.nextDueDate);
-          expect(deriveServiceItemStatus(serviceItem, orders, vendor, today)).toBe(
+          expect(deriveServiceItemStatus(serviceItem, serviceOrders, vendor, today)).toBe(
             SERVICE_ITEM_STATUS.OVERDUE,
           );
         },
@@ -45,12 +45,12 @@ describe("deriveServiceItemStatus（property）", () => {
     fc.assert(
       fc.property(
         serviceItemArb,
-        ordersArb,
+        serviceOrdersArb,
         vendorOrNullArb,
         isoDateArb,
-        (serviceItem, orders, vendor, today) => {
+        (serviceItem, serviceOrders, vendor, today) => {
           const internalServiceItem = { ...serviceItem, execution: EXECUTION.INTERNAL };
-          const status = deriveServiceItemStatus(internalServiceItem, orders, vendor, today);
+          const status = deriveServiceItemStatus(internalServiceItem, serviceOrders, vendor, today);
           expect(status).not.toBe(SERVICE_ITEM_STATUS.ORDER_NOW);
           expect(status).not.toBe(SERVICE_ITEM_STATUS.IN_PROGRESS);
         },

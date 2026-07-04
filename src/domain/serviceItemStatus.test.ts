@@ -4,8 +4,8 @@ import {
   EXECUTION,
   type ServiceItem,
   SERVICE_ITEM_TYPE,
-  ORDER_STATUS,
-  type OrderStatus,
+  SERVICE_ORDER_STATUS,
+  type ServiceOrderStatus,
 } from "@/store/types";
 import { describe, expect, it } from "vitest";
 
@@ -31,8 +31,8 @@ const buildServiceItem = (overrides: Partial<ServiceItem> = {}): ServiceItem => 
   ...overrides,
 });
 
-const buildOrder = (status: OrderStatus, serviceItemId = "item-1"): ServiceOrder => ({
-  id: `order-${status}`,
+const buildServiceOrder = (status: ServiceOrderStatus, serviceItemId = "item-1"): ServiceOrder => ({
+  id: `serviceOrder-${status}`,
   serviceItemId,
   vendorId: "vendor-1",
   status,
@@ -72,7 +72,7 @@ describe("deriveServiceItemStatus（優先度: overdue > orderNow > inProgress >
   });
 
   it("orderNow は有効な案件（planned 含む）があると成立しない", () => {
-    const planned = [buildOrder(ORDER_STATUS.PLANNED)];
+    const planned = [buildServiceOrder(SERVICE_ORDER_STATUS.PLANNED)];
     // planned は inProgress の対象でもないため dueSoon 窓内なら dueSoon まで落ちる
     expect(deriveServiceItemStatus(buildServiceItem(), planned, null, "2026-07-07")).toBe(
       SERVICE_ITEM_STATUS.DUE_SOON,
@@ -80,32 +80,32 @@ describe("deriveServiceItemStatus（優先度: overdue > orderNow > inProgress >
   });
 
   it("completed / cancelled の案件は「有効な案件」ではないので orderNow が成立する", () => {
-    const finished = [buildOrder(ORDER_STATUS.COMPLETED), buildOrder(ORDER_STATUS.CANCELLED)];
+    const finished = [buildServiceOrder(SERVICE_ORDER_STATUS.COMPLETED), buildServiceOrder(SERVICE_ORDER_STATUS.CANCELLED)];
     expect(deriveServiceItemStatus(buildServiceItem(), finished, null, "2026-07-07")).toBe(
       SERVICE_ITEM_STATUS.ORDER_NOW,
     );
   });
 
   it("外部・ordered の案件があれば inProgress", () => {
-    const orders = [buildOrder(ORDER_STATUS.ORDERED)];
-    expect(deriveServiceItemStatus(buildServiceItem(), orders, null, "2026-07-07")).toBe(
+    const serviceOrders = [buildServiceOrder(SERVICE_ORDER_STATUS.ORDERED)];
+    expect(deriveServiceItemStatus(buildServiceItem(), serviceOrders, null, "2026-07-07")).toBe(
       SERVICE_ITEM_STATUS.IN_PROGRESS,
     );
   });
 
   it("外部・inCalibration の案件があれば inProgress", () => {
-    const orders = [buildOrder(ORDER_STATUS.IN_CALIBRATION)];
-    expect(deriveServiceItemStatus(buildServiceItem(), orders, null, "2026-07-07")).toBe(
+    const serviceOrders = [buildServiceOrder(SERVICE_ORDER_STATUS.IN_CALIBRATION)];
+    expect(deriveServiceItemStatus(buildServiceItem(), serviceOrders, null, "2026-07-07")).toBe(
       SERVICE_ITEM_STATUS.IN_PROGRESS,
     );
   });
 
   it("他項目の案件は判定に影響しない（serviceItemId で絞り込む）", () => {
-    const otherServiceItemOrders = [buildOrder(ORDER_STATUS.ORDERED, "item-other")];
+    const otherItemServiceOrders = [buildServiceOrder(SERVICE_ORDER_STATUS.ORDERED, "item-other")];
     expect(
       deriveServiceItemStatus(
         buildServiceItem(),
-        otherServiceItemOrders,
+        otherItemServiceOrders,
         null,
         "2026-07-07",
       ),
@@ -147,8 +147,8 @@ describe("deriveServiceItemStatus（優先度: overdue > orderNow > inProgress >
       execution: EXECUTION.INTERNAL,
       vendorId: undefined,
     });
-    const orders = [buildOrder(ORDER_STATUS.ORDERED)];
-    expect(deriveServiceItemStatus(internalServiceItem, orders, null, "2026-07-07")).toBe(
+    const serviceOrders = [buildServiceOrder(SERVICE_ORDER_STATUS.ORDERED)];
+    expect(deriveServiceItemStatus(internalServiceItem, serviceOrders, null, "2026-07-07")).toBe(
       SERVICE_ITEM_STATUS.DUE_SOON,
     );
   });

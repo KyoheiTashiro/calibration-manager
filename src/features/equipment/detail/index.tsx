@@ -51,7 +51,7 @@ export const EquipmentDetail = (): ReactElement => {
   const vendors = useAppStore((state) => state.vendors);
   const persons = useAppStore((state) => state.persons);
   const serviceItems = useAppStore((state) => state.serviceItems);
-  const orders = useAppStore((state) => state.orders);
+  const serviceOrders = useAppStore((state) => state.serviceOrders);
   const records = useAppStore((state) => state.records);
 
   const [modal, setModal] = useState<ModalState | null>(null);
@@ -176,7 +176,7 @@ export const EquipmentDetail = (): ReactElement => {
                 const status = displayedServiceItemStatus(
                   serviceItem,
                   currentEquipment.status,
-                  orders,
+                  serviceOrders,
                   vendors,
                   today,
                 );

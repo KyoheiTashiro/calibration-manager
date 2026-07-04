@@ -31,7 +31,7 @@ export const createNotificationSlice: AppSliceCreator<NotificationSlice> = (set,
   notifications: {},
 
   generateNotifications: (today): void => {
-    const { serviceItems, orders, vendors, equipment, notifications } = get();
+    const { serviceItems, serviceOrders, vendors, equipment, notifications } = get();
     const targetServiceItems = Object.values(serviceItems).filter(
       (serviceItem) =>
         serviceItem.isActive &&
@@ -39,7 +39,7 @@ export const createNotificationSlice: AppSliceCreator<NotificationSlice> = (set,
     );
     const seeds = computeExpectedNotifications(
       targetServiceItems,
-      Object.values(orders),
+      Object.values(serviceOrders),
       vendors,
       equipment,
       today,

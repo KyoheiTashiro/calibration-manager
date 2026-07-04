@@ -76,19 +76,19 @@ describe("vendorSchema", () => {
 
 describe("serviceOrderSchema", () => {
   it("負の費用を拒否する", () => {
-    const order = {
+    const serviceOrder = {
       id: "o-1",
       serviceItemId: "i-1",
       vendorId: "v-1",
       status: "planned",
       cost: -100,
     };
-    expect(serviceOrderSchema.safeParse(order).success).toBe(false);
+    expect(serviceOrderSchema.safeParse(serviceOrder).success).toBe(false);
   });
 
   it("未知の status を拒否する", () => {
-    const order = { id: "o-1", serviceItemId: "i-1", vendorId: "v-1", status: "shipping" };
-    expect(serviceOrderSchema.safeParse(order).success).toBe(false);
+    const serviceOrder = { id: "o-1", serviceItemId: "i-1", vendorId: "v-1", status: "shipping" };
+    expect(serviceOrderSchema.safeParse(serviceOrder).success).toBe(false);
   });
 });
 
@@ -99,7 +99,7 @@ describe("appStateSchema", () => {
     equipment: {},
     serviceItems: {},
     records: {},
-    orders: {},
+    serviceOrders: {},
     notifications: {},
   };
 

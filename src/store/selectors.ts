@@ -9,7 +9,7 @@ import {
   type ServiceItemStatus,
 } from "@/domain/serviceItemStatus";
 import { recommendedOrderDate } from "@/domain/leadTime";
-import { isActiveOrderStatus } from "@/domain/orderStatus";
+import { isActiveServiceOrderStatus } from "@/domain/serviceOrderStatus";
 import {
   EQUIPMENT_STATUS,
   EXECUTION,
@@ -32,11 +32,11 @@ export const serviceItemsOf = (
   );
 
 /** 項目に紐づく案件の一覧 */
-export const ordersOf = (
-  state: Pick<AppState, "orders">,
+export const serviceOrdersOf = (
+  state: Pick<AppState, "serviceOrders">,
   serviceItemId: string,
 ): ServiceOrder[] =>
-  Object.values(state.orders).filter((order) => order.serviceItemId === serviceItemId);
+  Object.values(state.serviceOrders).filter((serviceOrder) => serviceOrder.serviceItemId === serviceItemId);
 
 /** 項目に紐づく実施記録の一覧（実施日の新しい順。同日はid辞書順で決定的に） */
 export const recordsOf = (
@@ -66,7 +66,7 @@ export const personLabelOf = (state: Pick<AppState, "persons">, personId: string
  * features/vendors 側の削除クリック時の事前チェックが同一判定を共用するための横断 selector。
  */
 export const isVendorReferenced = (
-  state: Pick<AppState, "equipment" | "serviceItems" | "orders">,
+  state: Pick<AppState, "equipment" | "serviceItems" | "serviceOrders">,
   vendorId: string,
 ): boolean =>
   Object.values(state.equipment).some(
@@ -75,7 +75,7 @@ export const isVendorReferenced = (
   Object.values(state.serviceItems).some(
     (serviceItemEntry) => serviceItemEntry.vendorId === vendorId,
   ) ||
-  Object.values(state.orders).some((orderEntry) => orderEntry.vendorId === vendorId);
+  Object.values(state.serviceOrders).some((serviceOrderEntry) => serviceOrderEntry.vendorId === vendorId);
 
 /** ヘッダーの通知ベルに出す未読件数（screen-design/README.md） */
 export const unreadNotificationCount = (state: Pick<AppState, "notifications">): number =>
@@ -88,7 +88,7 @@ export type ServiceItemRow = {
   status: ServiceItemStatus; // deriveServiceItemStatus による導出値
   personLabel: string; // personLabelOf(D-001: dangling「—」、無効「(無効)」注記)
   recommendedOrderDate: IsoDateString | null; // recommendedOrderDate(§4.2)。内部・算出不能は null
-  canCreateOrder: boolean; // external かつ 有効な案件(isActiveOrderStatus)なし
+  canCreateServiceOrder: boolean; // external かつ 有効な案件(isActiveServiceOrderStatus)なし
 };
 
 /** 表示順: nextDueDate 昇順、同値は serviceItem.id 昇順（§5 既定並び） */
@@ -104,7 +104,7 @@ const compareServiceItemRows = (left: ServiceItemRow, right: ServiceItemRow): nu
  * 横断導出を selectors.ts に純関数で置く規約(coding-standards.md §5、D-024)に従いここへ集約する。
  */
 export const serviceItemRowsOf = (
-  state: Pick<AppState, "serviceItems" | "equipment" | "orders" | "vendors" | "persons">,
+  state: Pick<AppState, "serviceItems" | "equipment" | "serviceOrders" | "vendors" | "persons">,
   today: IsoDateString,
 ): ServiceItemRow[] => {
   const rows: ServiceItemRow[] = [];
@@ -118,8 +118,8 @@ export const serviceItemRowsOf = (
       serviceItem.vendorId === undefined
         ? null
         : (state.vendors[serviceItem.vendorId] ?? null);
-    const serviceItemOrders: ServiceOrder[] = ordersOf(
-      { orders: state.orders },
+    const itemServiceOrders: ServiceOrder[] = serviceOrdersOf(
+      { serviceOrders: state.serviceOrders },
       serviceItem.id,
     );
     const isExternal = serviceItem.execution === EXECUTION.EXTERNAL;
@@ -127,11 +127,11 @@ export const serviceItemRowsOf = (
     rows.push({
       serviceItem,
       equipment,
-      status: deriveServiceItemStatus(serviceItem, serviceItemOrders, vendor, today),
+      status: deriveServiceItemStatus(serviceItem, itemServiceOrders, vendor, today),
       personLabel: personLabelOf({ persons: state.persons }, serviceItem.personId),
       recommendedOrderDate: recommendedOrderDate(serviceItem, vendor),
-      canCreateOrder:
-        isExternal && !serviceItemOrders.some((order) => isActiveOrderStatus(order.status)),
+      canCreateServiceOrder:
+        isExternal && !itemServiceOrders.some((serviceOrder) => isActiveServiceOrderStatus(serviceOrder.status)),
     });
   }
   return rows.toSorted(compareServiceItemRows);

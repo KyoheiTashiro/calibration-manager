@@ -58,7 +58,7 @@ const makeRow = (
   status,
   personLabel: "田中",
   recommendedOrderDate: null,
-  canCreateOrder: false,
+  canCreateServiceOrder: false,
 });
 
 const makeNotification = (

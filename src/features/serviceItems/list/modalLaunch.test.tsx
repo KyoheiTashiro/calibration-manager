@@ -1,6 +1,6 @@
 /**
  * ServiceItemList: 行アクションからのモーダル起動結節点の検証(screen-design/05-service-item-list.md「操作」)。
- * [記録]→RecordModal / [案件]→OrderModal / [編集]→ServiceItemModal が正しい対象で開くことを確認する。
+ * [記録]→RecordModal / [案件]→ServiceOrderModal / [編集]→ServiceItemModal が正しい対象で開くことを確認する。
  * モーダル内部の入力・検証は各モーダルの単体テストの責務。
  */
 
@@ -47,7 +47,7 @@ describe("ServiceItemList: モーダル起動", () => {
     expect(within(dialogElement).getByText(/年次校正/u)).toBeInTheDocument();
   });
 
-  it("[案件]で対象項目の OrderModal が開く", async () => {
+  it("[案件]で対象項目の ServiceOrderModal が開く", async () => {
     renderList();
     await clickRowAction("案件");
 

@@ -21,7 +21,7 @@ export const Dashboard = (): ReactElement => {
   const safeNavigate = useSafeNavigate();
   const serviceItems = useAppStore((state) => state.serviceItems);
   const equipment = useAppStore((state) => state.equipment);
-  const orders = useAppStore((state) => state.orders);
+  const serviceOrders = useAppStore((state) => state.serviceOrders);
   const vendors = useAppStore((state) => state.vendors);
   const persons = useAppStore((state) => state.persons);
   const notifications = useAppStore((state) => state.notifications);
@@ -29,10 +29,10 @@ export const Dashboard = (): ReactElement => {
   const rows = useMemo(
     () =>
       serviceItemRowsOf(
-        { serviceItems, equipment, orders, vendors, persons },
+        { serviceItems, equipment, serviceOrders, vendors, persons },
         todayIsoDate(),
       ),
-    [serviceItems, equipment, orders, vendors, persons],
+    [serviceItems, equipment, serviceOrders, vendors, persons],
   );
   const counts = useMemo(() => countByStatus(rows), [rows]);
   const actionRows = useMemo(() => actionRequiredRows(rows), [rows]);

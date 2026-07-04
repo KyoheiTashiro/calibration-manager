@@ -28,8 +28,8 @@ const serviceItem: ServiceItem = {
   nextDueDate: "2026-07-15",
   isActive: true,
 };
-const order: ServiceOrder = {
-  id: "order-1",
+const serviceOrder: ServiceOrder = {
+  id: "serviceOrder-1",
   serviceItemId: "item-1",
   vendorId: "vendor-1",
   status: "returned",
@@ -85,7 +85,7 @@ describe("removeVendor: 参照ガード", () => {
   });
 
   it("ServiceOrder.vendorId から参照中は no-op（false）", () => {
-    seedStore({ vendors: { [vendor.id]: vendor }, orders: { [order.id]: order } });
+    seedStore({ vendors: { [vendor.id]: vendor }, serviceOrders: { [serviceOrder.id]: serviceOrder } });
     expect(useAppStore.getState().removeVendor(vendor.id)).toBe(false);
   });
 

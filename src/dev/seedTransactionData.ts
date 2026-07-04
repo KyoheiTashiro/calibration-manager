@@ -1,5 +1,5 @@
 /**
- * 開発用シードデータ（トランザクション系: serviceItems/records/orders）。
+ * 開発用シードデータ（トランザクション系: serviceItems/records/serviceOrders）。
  * today からの相対日付で構成するため、today を引数に取る関数として提供する
  * （src/dev/seed.ts から呼び出される）。
  */
@@ -13,7 +13,7 @@ import {
   type ServiceRecord,
   type IsoDateString,
   SERVICE_ITEM_TYPE,
-  ORDER_STATUS,
+  SERVICE_ORDER_STATUS,
   RECORD_RESULT,
 } from "@/store/types";
 import { addDays } from "@/utils/time";
@@ -219,16 +219,16 @@ export const buildSeedRecords = (today: IsoDateString): Record<string, ServiceRe
     doneDate: addDays(today, -345) ?? today,
     doneBy: "東京計測サービス",
     result: RECORD_RESULT.PASS,
-    orderId: "seed-order-completed",
+    serviceOrderId: "seed-order-completed",
   },
 });
 
-export const buildSeedOrders = (today: IsoDateString): Record<string, ServiceOrder> => ({
+export const buildSeedServiceOrders = (today: IsoDateString): Record<string, ServiceOrder> => ({
   "seed-order-in-calib": {
     id: "seed-order-in-calib",
     serviceItemId: "seed-item-in-progress",
     vendorId: "seed-vendor-osaka",
-    status: ORDER_STATUS.IN_CALIBRATION,
+    status: SERVICE_ORDER_STATUS.IN_CALIBRATION,
     orderedDate: addDays(today, -5) ?? today,
     dueDate: addDays(today, 14) ?? today,
   },
@@ -236,13 +236,13 @@ export const buildSeedOrders = (today: IsoDateString): Record<string, ServiceOrd
     id: "seed-order-planned",
     serviceItemId: "seed-item-ok-external",
     vendorId: "seed-vendor-both",
-    status: ORDER_STATUS.PLANNED,
+    status: SERVICE_ORDER_STATUS.PLANNED,
   },
   "seed-order-returned": {
     id: "seed-order-returned",
     serviceItemId: "seed-item-suspended-eq",
     vendorId: "seed-vendor-tokyo",
-    status: ORDER_STATUS.RETURNED,
+    status: SERVICE_ORDER_STATUS.RETURNED,
     orderedDate: addDays(today, -20) ?? today,
     dueDate: addDays(today, -5) ?? today,
     returnedDate: addDays(today, -2) ?? today,
@@ -251,7 +251,7 @@ export const buildSeedOrders = (today: IsoDateString): Record<string, ServiceOrd
     id: "seed-order-completed",
     serviceItemId: "seed-item-order-now",
     vendorId: "seed-vendor-tokyo",
-    status: ORDER_STATUS.COMPLETED,
+    status: SERVICE_ORDER_STATUS.COMPLETED,
     orderedDate: addDays(today, -380) ?? today,
     dueDate: addDays(today, -359) ?? today,
     returnedDate: addDays(today, -350) ?? today,
@@ -261,7 +261,7 @@ export const buildSeedOrders = (today: IsoDateString): Record<string, ServiceOrd
     id: "seed-order-cancelled",
     serviceItemId: "seed-item-in-progress",
     vendorId: "seed-vendor-osaka",
-    status: ORDER_STATUS.CANCELLED,
+    status: SERVICE_ORDER_STATUS.CANCELLED,
     orderedDate: addDays(today, -40) ?? today,
     note: "納期調整のためキャンセルし再発注",
   },

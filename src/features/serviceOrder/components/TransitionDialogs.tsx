@@ -1,23 +1,23 @@
 /**
- * かんばんの入力付き遷移ダイアログ（screen-design/08-orders.md、README §0.5）。RHF + zodResolver。
- * - OrderDialog: planned → ordered（発注日・返却予定日・費用）
+ * かんばんの入力付き遷移ダイアログ（screen-design/08-service-orders.md、README §0.5）。RHF + zodResolver。
+ * - ServiceOrderDialog: planned → ordered（発注日・返却予定日・費用）
  * - ReturnDialog: inCalibration → returned（実返却日）
- * updateOrderStatus が true のときのみ属性を updateOrder で patch する。false（遷移不可・競合）なら
+ * updateServiceOrderStatus が true のときのみ属性を updateServiceOrder で patch する。false（遷移不可・競合）なら
  * patch せず閉じる（silent no-op）。日付整合の不一致は警告表示のみでブロックしない（D-019）。
  */
 
-// oxlint-disable react/no-multi-comp -- OrderDialog/ReturnDialog はかんばんの入力付き遷移ダイアログを
-// 対で扱う密結合コンポーネント（同一スキーマ設計・同一 updateOrderStatus→updateOrder パターン）であり、
+// oxlint-disable react/no-multi-comp -- ServiceOrderDialog/ReturnDialog はかんばんの入力付き遷移ダイアログを
+// 対で扱う密結合コンポーネント（同一スキーマ設計・同一 updateServiceOrderStatus→updateServiceOrder パターン）であり、
 // coding-standards.md §2「サブコンポーネントが複数なら…」の範囲内でこの1ファイルに集約する設計判断のため緩和する。
 
 import { Button, DateField, Modal, TextField } from "@/components/ui";
 import {
-  orderDialogSchema,
+  serviceOrderDialogSchema,
   returnDialogSchema,
-  type OrderDialogValues,
+  type ServiceOrderDialogValues,
   type ReturnDialogValues,
 } from "@/features/serviceOrder/schema";
-import { ORDER_STATUS, type ServiceOrder } from "@/store/types";
+import { SERVICE_ORDER_STATUS, type ServiceOrder } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
 import { isIsoDateString, todayIsoDate } from "@/utils/time";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -26,21 +26,21 @@ import { useForm, useWatch } from "react-hook-form";
 
 type Props = {
   /** 対象案件。id と現状態のみ参照する */
-  order: ServiceOrder;
+  serviceOrder: ServiceOrder;
   onClose: () => void;
 };
 
-export const OrderDialog = ({ order, onClose }: Props): ReactElement => {
-  const updateOrderStatus = useAppStore((state) => state.updateOrderStatus);
-  const updateOrder = useAppStore((state) => state.updateOrder);
+export const ServiceOrderDialog = ({ serviceOrder, onClose }: Props): ReactElement => {
+  const updateServiceOrderStatus = useAppStore((state) => state.updateServiceOrderStatus);
+  const updateServiceOrder = useAppStore((state) => state.updateServiceOrder);
 
   const {
     register,
     handleSubmit,
     control,
     formState: { errors, isDirty },
-  } = useForm<OrderDialogValues>({
-    resolver: zodResolver(orderDialogSchema),
+  } = useForm<ServiceOrderDialogValues>({
+    resolver: zodResolver(serviceOrderDialogSchema),
     defaultValues: { orderedDate: todayIsoDate(), dueDate: "", cost: "" },
   });
 
@@ -57,10 +57,10 @@ export const OrderDialog = ({ order, onClose }: Props): ReactElement => {
     isIsoDateString(dueDate) &&
     orderedDate > dueDate;
 
-  const onSubmit = (values: OrderDialogValues): void => {
-    const transitioned = updateOrderStatus(order.id, ORDER_STATUS.ORDERED);
+  const onSubmit = (values: ServiceOrderDialogValues): void => {
+    const transitioned = updateServiceOrderStatus(serviceOrder.id, SERVICE_ORDER_STATUS.ORDERED);
     if (transitioned) {
-      updateOrder(order.id, {
+      updateServiceOrder(serviceOrder.id, {
         orderedDate: values.orderedDate,
         dueDate: values.dueDate === "" ? undefined : values.dueDate,
         cost: values.cost === "" ? undefined : Number(values.cost),
@@ -105,9 +105,9 @@ export const OrderDialog = ({ order, onClose }: Props): ReactElement => {
   );
 };
 
-export const ReturnDialog = ({ order, onClose }: Props): ReactElement => {
-  const updateOrderStatus = useAppStore((state) => state.updateOrderStatus);
-  const updateOrder = useAppStore((state) => state.updateOrder);
+export const ReturnDialog = ({ serviceOrder, onClose }: Props): ReactElement => {
+  const updateServiceOrderStatus = useAppStore((state) => state.updateServiceOrderStatus);
+  const updateServiceOrder = useAppStore((state) => state.updateServiceOrder);
 
   const {
     register,
@@ -123,15 +123,15 @@ export const ReturnDialog = ({ order, onClose }: Props): ReactElement => {
 
   // D-019: 発注日 > 実返却日 は警告のみ。発注日は案件の保存値を使う。
   const showReturnWarning =
-    order.orderedDate !== undefined &&
+    serviceOrder.orderedDate !== undefined &&
     typeof returnedDate === "string" &&
     isIsoDateString(returnedDate) &&
-    order.orderedDate > returnedDate;
+    serviceOrder.orderedDate > returnedDate;
 
   const onSubmit = (values: ReturnDialogValues): void => {
-    const transitioned = updateOrderStatus(order.id, ORDER_STATUS.RETURNED);
+    const transitioned = updateServiceOrderStatus(serviceOrder.id, SERVICE_ORDER_STATUS.RETURNED);
     if (transitioned) {
-      updateOrder(order.id, { returnedDate: values.returnedDate });
+      updateServiceOrder(serviceOrder.id, { returnedDate: values.returnedDate });
     }
     onClose();
   };

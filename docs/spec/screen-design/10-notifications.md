@@ -24,7 +24,7 @@
 
 ## 表示項目(Notification §3.7)
 
-各行: `type`(種別アイコン+ラベル)、`message`、`createdDate`、既読状態。対象は `targetType`(serviceItem/order)+ `targetId`。
+各行: `type`(種別アイコン+ラベル)、`message`、`createdDate`、既読状態。対象は `targetType`(serviceItem/serviceOrder)+ `targetId`。
 
 **通知種別のアイコン/色**:
 
@@ -33,14 +33,14 @@
 | `dueSoon`          | 期限接近 | 🟡 黄     | serviceItem       |
 | `overdue`          | 期限超過 | 🔴 赤     | serviceItem       |
 | `orderRecommended` | 要発注   | 🟠 橙     | serviceItem(外部) |
-| `deliveryDueSoon`  | 納期接近 | 🟣 紫     | order      |
-| `deliveryOverdue`  | 納期超過 | 🔴 赤(濃) | order      |
+| `deliveryDueSoon`  | 納期接近 | 🟣 紫     | serviceOrder |
+| `deliveryOverdue`  | 納期超過 | 🔴 赤(濃) | serviceOrder |
 
 ## 操作・アクション
 
 - タブ: `未読`(件数バッジ)/ `既読`。
 - 行クリック → まず `markAsRead`(`isRead=true`)、次に遷移(D-027):
-  - `targetType=order` → `/orders`(カードのハイライトは不実装)。
+  - `targetType=serviceOrder` → `/service-orders`(カードのハイライトは不実装)。
   - `targetType=serviceItem` → 項目から機器を辿り機器詳細 `/equipment/:id` へ遷移。
   - 対象が dangling(参照先削除済み)の場合は既読化のみで遷移しない。
 - 「全て既読」→ 未読すべてを `isRead=true`。

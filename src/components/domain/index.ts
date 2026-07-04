@@ -3,7 +3,7 @@
  */
 
 export { ServiceItemModal } from "@/components/domain/ServiceItemModal";
-export { OrderModal } from "@/components/domain/OrderModal";
+export { ServiceOrderModal } from "@/components/domain/ServiceOrderModal";
 export { PersonModal } from "@/components/domain/PersonModal";
 export { RecordModal } from "@/components/domain/RecordModal";
 export { StatusBadge } from "@/components/domain/StatusBadge";

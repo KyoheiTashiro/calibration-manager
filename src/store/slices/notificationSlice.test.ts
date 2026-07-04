@@ -36,8 +36,8 @@ const serviceItem: ServiceItem = {
   nextDueDate: "2026-07-15",
   isActive: true,
 };
-const order: ServiceOrder = {
-  id: "order-1",
+const serviceOrder: ServiceOrder = {
+  id: "serviceOrder-1",
   serviceItemId: "item-1",
   vendorId: "vendor-1",
   status: "ordered",
@@ -115,15 +115,15 @@ describe("generateNotifications", () => {
     seedBase({
       serviceItems: { [serviceItem.id]: { ...serviceItem, nextDueDate: "2099-01-01" } },
     });
-    seedStore({ orders: { [order.id]: { ...order, dueDate: "2026-07-01" } } });
+    seedStore({ serviceOrders: { [serviceOrder.id]: { ...serviceOrder, dueDate: "2026-07-01" } } });
 
     useAppStore.getState().generateNotifications("2026-08-01");
     const notifications = Object.values(useAppStore.getState().notifications);
     expect(notifications).toHaveLength(1);
     expect(notifications[0]).toMatchObject({
       type: "deliveryOverdue",
-      targetType: "order",
-      targetId: order.id,
+      targetType: "serviceOrder",
+      targetId: serviceOrder.id,
       personId: person.id,
     });
   });

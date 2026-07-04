@@ -2,13 +2,13 @@ import { SERVICE_ITEM_STATUS } from "@/domain/serviceItemStatus";
 import {
   serviceItemRowsOf,
   serviceItemsOf,
-  ordersOf,
+  serviceOrdersOf,
   recordsOf,
   unreadNotificationCount,
 } from "@/store/selectors";
 import {
   EXECUTION,
-  ORDER_STATUS,
+  SERVICE_ORDER_STATUS,
   type ServiceOrder,
   type ServiceItem,
   type ServiceRecord,
@@ -67,28 +67,28 @@ describe("serviceItemsOf", () => {
   });
 });
 
-describe("ordersOf", () => {
+describe("serviceOrdersOf", () => {
   it("指定serviceItemIdに属する案件のみを抽出する", () => {
-    const orders: Record<string, ServiceOrder> = {
-      "order-1": {
-        id: "order-1",
+    const serviceOrders: Record<string, ServiceOrder> = {
+      "serviceOrder-1": {
+        id: "serviceOrder-1",
         serviceItemId: "item-1",
         vendorId: "vendor-1",
         status: "planned",
       },
-      "order-2": {
-        id: "order-2",
+      "serviceOrder-2": {
+        id: "serviceOrder-2",
         serviceItemId: "item-2",
         vendorId: "vendor-1",
         status: "ordered",
       },
     };
 
-    expect(ordersOf({ orders }, "item-1")).toEqual([orders["order-1"]]);
+    expect(serviceOrdersOf({ serviceOrders }, "item-1")).toEqual([serviceOrders["serviceOrder-1"]]);
   });
 
   it("該当する案件が無ければ空配列を返す", () => {
-    expect(ordersOf({ orders: {} }, "item-1")).toEqual([]);
+    expect(serviceOrdersOf({ serviceOrders: {} }, "item-1")).toEqual([]);
   });
 });
 
@@ -254,7 +254,7 @@ describe("serviceItemRowsOf: status 導出", () => {
   });
 });
 
-describe("serviceItemRowsOf: canCreateOrder", () => {
+describe("serviceItemRowsOf: canCreateServiceOrder", () => {
   const externalServiceItem = makeServiceItem({
     id: "ext",
     execution: EXECUTION.EXTERNAL,
@@ -265,23 +265,23 @@ describe("serviceItemRowsOf: canCreateOrder", () => {
 
   it("外部かつ有効案件なしなら true", () => {
     const [row] = serviceItemRowsOf(makeState([externalServiceItem]), TODAY);
-    expect(row.canCreateOrder).toBe(true);
+    expect(row.canCreateServiceOrder).toBe(true);
   });
 
   it("外部でも有効案件があれば false", () => {
-    const order: ServiceOrder = {
+    const serviceOrder: ServiceOrder = {
       id: "o-1",
       serviceItemId: externalServiceItem.id,
       vendorId: calibrator.id,
-      status: ORDER_STATUS.ORDERED,
+      status: SERVICE_ORDER_STATUS.ORDERED,
     };
-    const [row] = serviceItemRowsOf(makeState([externalServiceItem], [order]), TODAY);
-    expect(row.canCreateOrder).toBe(false);
+    const [row] = serviceItemRowsOf(makeState([externalServiceItem], [serviceOrder]), TODAY);
+    expect(row.canCreateServiceOrder).toBe(false);
   });
 
   it("内部項目は常に false", () => {
     const [row] = serviceItemRowsOf(makeState([makeServiceItem({ id: "int" })]), TODAY);
-    expect(row.canCreateOrder).toBe(false);
+    expect(row.canCreateServiceOrder).toBe(false);
   });
 });
 

@@ -2,7 +2,7 @@
  * 項目一覧(screen-design/05-service-item-list.md)のテーブル。
  * 行データ・並び(nextDueDate 昇順)は serviceItemRowsOf(store/selectors)/filterServiceItemRows(hooks)で確定済みのため、
  * ここは列描画と行アクション(記録/案件/編集)の起動通知だけを担う薄いビュー。
- * 「案件」は row.canCreateOrder=true(外部かつ有効案件なし)の行のみ表示する(§5)。
+ * 「案件」は row.canCreateServiceOrder=true(外部かつ有効案件なし)の行のみ表示する(§5)。
  */
 
 import { StatusBadge } from "@/components/domain";
@@ -92,7 +92,7 @@ export const ServiceItemTable = ({ rows, onRecord, onOrder, onEdit }: Props): Re
             >
               記録
             </Button>
-            {row.canCreateOrder ? (
+            {row.canCreateServiceOrder ? (
               <Button
                 variant="secondary"
                 size="sm"

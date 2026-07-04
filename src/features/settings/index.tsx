@@ -21,7 +21,7 @@ export const Settings = (): ReactElement => {
     equipment: useAppStore((store) => store.equipment),
     serviceItems: useAppStore((store) => store.serviceItems),
     records: useAppStore((store) => store.records),
-    orders: useAppStore((store) => store.orders),
+    serviceOrders: useAppStore((store) => store.serviceOrders),
     notifications: useAppStore((store) => store.notifications),
   };
 

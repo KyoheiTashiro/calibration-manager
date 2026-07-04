@@ -1,5 +1,5 @@
 /**
- * 点検校正外部案件かんばんのカード（screen-design/08-orders.md）。
+ * 点検校正外部案件かんばんのカード（screen-design/08-service-orders.md）。
  * serviceItem→equipment→managementNo/機器名、serviceItem.name、vendor→依頼先名を解決して表示する。
  * 参照先エンティティが消えている（dangling）場合は例外を投げず「(参照先なし)」表示（D-003）。
  * completed / cancelled はグレー調でアクションボタンなし（D-018）。
@@ -7,7 +7,7 @@
 
 import { Button } from "@/components/ui";
 import {
-  ORDER_STATUS,
+  SERVICE_ORDER_STATUS,
   type ServiceOrder,
   type Equipment,
   type ServiceItem,
@@ -22,19 +22,19 @@ const NO_REFERENCE_LABEL = "(参照先なし)";
 const UNSET_LABEL = "—";
 
 type Props = {
-  order: ServiceOrder;
+  serviceOrder: ServiceOrder;
   serviceItems: Record<string, ServiceItem>;
   equipment: Record<string, Equipment>;
   vendors: Record<string, Vendor>;
-  onOrder: (order: ServiceOrder) => void;
-  onAdvance: (order: ServiceOrder) => void;
-  onReturn: (order: ServiceOrder) => void;
-  onCancel: (order: ServiceOrder) => void;
-  onRecord: (order: ServiceOrder) => void;
+  onOrder: (serviceOrder: ServiceOrder) => void;
+  onAdvance: (serviceOrder: ServiceOrder) => void;
+  onReturn: (serviceOrder: ServiceOrder) => void;
+  onCancel: (serviceOrder: ServiceOrder) => void;
+  onRecord: (serviceOrder: ServiceOrder) => void;
 };
 
-export const OrderCard = ({
-  order,
+export const ServiceOrderCard = ({
+  serviceOrder,
   serviceItems,
   equipment,
   vendors,
@@ -44,11 +44,11 @@ export const OrderCard = ({
   onCancel,
   onRecord,
 }: Props): ReactElement => {
-  const serviceItem = recordValue(serviceItems, order.serviceItemId);
+  const serviceItem = recordValue(serviceItems, serviceOrder.serviceItemId);
   const equipmentEntry = serviceItem
     ? recordValue(equipment, serviceItem.equipmentId)
     : undefined;
-  const vendor = recordValue(vendors, order.vendorId);
+  const vendor = recordValue(vendors, serviceOrder.vendorId);
 
   const managementNo = equipmentEntry?.managementNo ?? NO_REFERENCE_LABEL;
   const equipmentName = equipmentEntry?.name ?? NO_REFERENCE_LABEL;
@@ -56,17 +56,17 @@ export const OrderCard = ({
   const vendorName = vendor?.name ?? NO_REFERENCE_LABEL;
 
   const isClosed =
-    order.status === ORDER_STATUS.COMPLETED || order.status === ORDER_STATUS.CANCELLED;
+    serviceOrder.status === SERVICE_ORDER_STATUS.COMPLETED || serviceOrder.status === SERVICE_ORDER_STATUS.CANCELLED;
 
   const renderActions = (): ReactNode => {
-    switch (order.status) {
-      case ORDER_STATUS.PLANNED: {
+    switch (serviceOrder.status) {
+      case SERVICE_ORDER_STATUS.PLANNED: {
         return (
           <>
             <Button
               size="sm"
               onClick={() => {
-                onOrder(order);
+                onOrder(serviceOrder);
               }}
             >
               発注する
@@ -75,7 +75,7 @@ export const OrderCard = ({
               size="sm"
               variant="danger"
               onClick={() => {
-                onCancel(order);
+                onCancel(serviceOrder);
               }}
             >
               中止
@@ -83,13 +83,13 @@ export const OrderCard = ({
           </>
         );
       }
-      case ORDER_STATUS.ORDERED: {
+      case SERVICE_ORDER_STATUS.ORDERED: {
         return (
           <>
             <Button
               size="sm"
               onClick={() => {
-                onAdvance(order);
+                onAdvance(serviceOrder);
               }}
             >
               校正中へ
@@ -98,7 +98,7 @@ export const OrderCard = ({
               size="sm"
               variant="danger"
               onClick={() => {
-                onCancel(order);
+                onCancel(serviceOrder);
               }}
             >
               中止
@@ -106,13 +106,13 @@ export const OrderCard = ({
           </>
         );
       }
-      case ORDER_STATUS.IN_CALIBRATION: {
+      case SERVICE_ORDER_STATUS.IN_CALIBRATION: {
         return (
           <>
             <Button
               size="sm"
               onClick={() => {
-                onReturn(order);
+                onReturn(serviceOrder);
               }}
             >
               返却する
@@ -121,7 +121,7 @@ export const OrderCard = ({
               size="sm"
               variant="danger"
               onClick={() => {
-                onCancel(order);
+                onCancel(serviceOrder);
               }}
             >
               中止
@@ -129,20 +129,20 @@ export const OrderCard = ({
           </>
         );
       }
-      case ORDER_STATUS.RETURNED: {
+      case SERVICE_ORDER_STATUS.RETURNED: {
         return (
           <Button
             size="sm"
             onClick={() => {
-              onRecord(order);
+              onRecord(serviceOrder);
             }}
           >
             記録登録
           </Button>
         );
       }
-      case ORDER_STATUS.COMPLETED:
-      case ORDER_STATUS.CANCELLED: {
+      case SERVICE_ORDER_STATUS.COMPLETED:
+      case SERVICE_ORDER_STATUS.CANCELLED: {
         // completed / cancelled はアクションなし（D-018）
         return null;
       }
@@ -168,15 +168,15 @@ export const OrderCard = ({
         </div>
         <div>
           <dt className="inline text-slate-500">発注日: </dt>
-          <dd className="inline">{order.orderedDate ?? UNSET_LABEL}</dd>
+          <dd className="inline">{serviceOrder.orderedDate ?? UNSET_LABEL}</dd>
         </div>
         <div>
           <dt className="inline text-slate-500">返却予定日: </dt>
-          <dd className="inline">{order.dueDate ?? UNSET_LABEL}</dd>
+          <dd className="inline">{serviceOrder.dueDate ?? UNSET_LABEL}</dd>
         </div>
         <div>
           <dt className="inline text-slate-500">費用: </dt>
-          <dd className="inline">{order.cost === undefined ? UNSET_LABEL : `${order.cost}円`}</dd>
+          <dd className="inline">{serviceOrder.cost === undefined ? UNSET_LABEL : `${serviceOrder.cost}円`}</dd>
         </div>
       </dl>
       {isClosed ? null : <div className="mt-3 flex flex-wrap gap-2">{renderActions()}</div>}

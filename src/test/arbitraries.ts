@@ -18,7 +18,7 @@ import {
   NOTIFICATION_TARGET_TYPE,
   NOTIFICATION_TYPE,
   type Notification,
-  ORDER_STATUS,
+  SERVICE_ORDER_STATUS,
   type Person,
   RECORD_RESULT,
   type Vendor,
@@ -109,7 +109,7 @@ export const serviceRecordArb: fc.Arbitrary<ServiceRecord> = fc.record({
   doneDate: isoDateArb,
   doneBy: fc.string({ minLength: 1 }),
   result: fc.constantFrom(...Object.values(RECORD_RESULT)),
-  orderId: optionalArb(fc.uuid()),
+  serviceOrderId: optionalArb(fc.uuid()),
   note: optionalArb(fc.string()),
 });
 
@@ -117,7 +117,7 @@ export const serviceOrderArb: fc.Arbitrary<ServiceOrder> = fc.record({
   id: fc.uuid(),
   serviceItemId: fc.uuid(),
   vendorId: fc.uuid(),
-  status: fc.constantFrom(...Object.values(ORDER_STATUS)),
+  status: fc.constantFrom(...Object.values(SERVICE_ORDER_STATUS)),
   orderedDate: optionalArb(isoDateArb),
   dueDate: optionalArb(isoDateArb),
   returnedDate: optionalArb(isoDateArb),

@@ -116,12 +116,12 @@ const REFERENCE_CHECKS: {
     if (recordValue(state.serviceItems, entity.serviceItemId) === undefined) {
       messages.push(`serviceItemId: 参照先が存在しません '${entity.serviceItemId}'`);
     }
-    if (entity.orderId !== undefined && recordValue(state.orders, entity.orderId) === undefined) {
-      messages.push(`orderId: 参照先が存在しません '${entity.orderId}'`);
+    if (entity.serviceOrderId !== undefined && recordValue(state.serviceOrders, entity.serviceOrderId) === undefined) {
+      messages.push(`serviceOrderId: 参照先が存在しません '${entity.serviceOrderId}'`);
     }
     return messages;
   },
-  orders: (entity, state) => {
+  serviceOrders: (entity, state) => {
     const messages: string[] = [];
     if (recordValue(state.serviceItems, entity.serviceItemId) === undefined) {
       messages.push(`serviceItemId: 参照先が存在しません '${entity.serviceItemId}'`);
@@ -138,7 +138,7 @@ const REFERENCE_CHECKS: {
     const targetExists =
       entity.targetType === NOTIFICATION_TARGET_TYPE.SERVICE_ITEM
         ? recordValue(state.serviceItems, entity.targetId) !== undefined
-        : recordValue(state.orders, entity.targetId) !== undefined;
+        : recordValue(state.serviceOrders, entity.targetId) !== undefined;
     if (!targetExists) {
       messages.push(`targetId: 参照先が存在しません '${entity.targetId}'`);
     }

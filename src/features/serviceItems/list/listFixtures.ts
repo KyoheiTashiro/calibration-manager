@@ -12,7 +12,7 @@ import {
   EQUIPMENT_STATUS,
   EXECUTION,
   SERVICE_ITEM_TYPE,
-  ORDER_STATUS,
+  SERVICE_ORDER_STATUS,
   type ServiceOrder,
   type Equipment,
   type ServiceItem,
@@ -58,7 +58,7 @@ export const personTanaka: Person = {
 export const personSato: Person = { id: "p-sato", name: "佐藤", email: "s@x.jp", isActive: true };
 export const personSuzuki: Person = { id: "p-suzuki", name: "鈴木", email: "z@x.jp", isActive: false }; // prettier-ignore
 
-/** 外部・校正・期限切れ。有効案件なし → canCreateOrder=true・overdue。lastDoneDate あり */
+/** 外部・校正・期限切れ。有効案件なし → canCreateServiceOrder=true・overdue。lastDoneDate あり */
 export const serviceItemExternalOverdue: ServiceItem = {
   id: "item-ext-overdue",
   equipmentId: eqA.id,
@@ -76,7 +76,7 @@ export const serviceItemExternalOverdue: ServiceItem = {
   isActive: true,
 };
 
-/** 外部・校正・進行中案件あり → canCreateOrder=false・inProgress。far future で overdue にしない */
+/** 外部・校正・進行中案件あり → canCreateServiceOrder=false・inProgress。far future で overdue にしない */
 export const serviceItemExternalInProgress: ServiceItem = {
   id: "item-ext-inprogress",
   equipmentId: eqA.id,
@@ -140,11 +140,11 @@ export const serviceItemOnSuspended: ServiceItem = {
 };
 
 /** serviceItemExternalInProgress を inProgress にする進行中(ordered)案件 */
-export const orderInProgress: ServiceOrder = {
-  id: "order-1",
+export const serviceOrderInProgress: ServiceOrder = {
+  id: "serviceOrder-1",
   serviceItemId: serviceItemExternalInProgress.id,
   vendorId: calibratorVendor.id,
-  status: ORDER_STATUS.ORDERED,
+  status: SERVICE_ORDER_STATUS.ORDERED,
   orderedDate: "2025-12-01",
 };
 
@@ -168,6 +168,6 @@ export const seedServiceItemList = (): void => {
       [serviceItemInactive.id]: serviceItemInactive,
       [serviceItemOnSuspended.id]: serviceItemOnSuspended,
     },
-    orders: { [orderInProgress.id]: orderInProgress },
+    serviceOrders: { [serviceOrderInProgress.id]: serviceOrderInProgress },
   });
 };

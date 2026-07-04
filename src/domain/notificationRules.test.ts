@@ -8,8 +8,8 @@ import {
   SERVICE_ITEM_TYPE,
   NOTIFICATION_TARGET_TYPE,
   NOTIFICATION_TYPE,
-  ORDER_STATUS,
-  type OrderStatus,
+  SERVICE_ORDER_STATUS,
+  type ServiceOrderStatus,
 } from "@/store/types";
 import { describe, expect, it } from "vitest";
 
@@ -44,11 +44,11 @@ const equipmentRecord: Record<string, Equipment> = {
   },
 };
 
-const buildOrder = (
-  status: OrderStatus,
+const buildServiceOrder = (
+  status: ServiceOrderStatus,
   overrides: Partial<ServiceOrder> = {},
 ): ServiceOrder => ({
-  id: "order-1",
+  id: "serviceOrder-1",
   serviceItemId: "item-1",
   vendorId: "vendor-1",
   status,
@@ -58,10 +58,10 @@ const buildOrder = (
 /** 引数省略時は案件・vendor なしで判定する */
 const compute = (
   serviceItems: ServiceItem[],
-  orders: ServiceOrder[],
+  serviceOrders: ServiceOrder[],
   today: string,
 ): NotificationSeed[] =>
-  computeExpectedNotifications(serviceItems, orders, {}, equipmentRecord, today);
+  computeExpectedNotifications(serviceItems, serviceOrders, {}, equipmentRecord, today);
 
 describe("computeExpectedNotifications: dueSoon / overdue", () => {
   it("今日 ≥ 期限 − noticeDaysBefore なら dueSoon（境界: 開始日当日）", () => {
@@ -143,18 +143,18 @@ describe("computeExpectedNotifications: orderRecommended", () => {
   it("有効な案件（planned 含む）があれば生成しない（「未発注」の解釈）", () => {
     const types = compute(
       [buildServiceItem()],
-      [buildOrder(ORDER_STATUS.PLANNED)],
+      [buildServiceOrder(SERVICE_ORDER_STATUS.PLANNED)],
       "2026-07-07",
     ).map((seed) => seed.type);
     expect(types).not.toContain(NOTIFICATION_TYPE.ORDER_RECOMMENDED);
   });
 
   it("completed / cancelled のみの案件なら生成する（有効な案件ではない）", () => {
-    const orders = [
-      buildOrder(ORDER_STATUS.COMPLETED, { id: "order-done" }),
-      buildOrder(ORDER_STATUS.CANCELLED, { id: "order-cancelled" }),
+    const serviceOrders = [
+      buildServiceOrder(SERVICE_ORDER_STATUS.COMPLETED, { id: "serviceOrder-done" }),
+      buildServiceOrder(SERVICE_ORDER_STATUS.CANCELLED, { id: "serviceOrder-cancelled" }),
     ];
-    const types = compute([buildServiceItem()], orders, "2026-07-07").map((seed) => seed.type);
+    const types = compute([buildServiceItem()], serviceOrders, "2026-07-07").map((seed) => seed.type);
     expect(types).toContain(NOTIFICATION_TYPE.ORDER_RECOMMENDED);
   });
 
@@ -202,14 +202,14 @@ describe("computeExpectedNotifications: orderRecommended", () => {
 });
 
 describe("computeExpectedNotifications: deliveryDueSoon / deliveryOverdue", () => {
-  const orderedWithDueDate = buildOrder(ORDER_STATUS.ORDERED, { dueDate: "2026-07-10" });
+  const orderedWithDueDate = buildServiceOrder(SERVICE_ORDER_STATUS.ORDERED, { dueDate: "2026-07-10" });
 
   it("今日 ≥ 返却予定日 − 7日 かつ 未返却なら deliveryDueSoon（境界: 7日前当日）", () => {
     const seeds = compute([buildServiceItem()], [orderedWithDueDate], "2026-07-03");
     expect(seeds).toContainEqual({
       type: NOTIFICATION_TYPE.DELIVERY_DUE_SOON,
-      targetType: NOTIFICATION_TARGET_TYPE.ORDER,
-      targetId: "order-1",
+      targetType: NOTIFICATION_TARGET_TYPE.SERVICE_ORDER,
+      targetId: "serviceOrder-1",
       personId: "person-1",
       message: "EQ-001 年次校正の返却予定日が近づいています",
     });
@@ -233,13 +233,13 @@ describe("computeExpectedNotifications: deliveryDueSoon / deliveryOverdue", () =
   it("今日 > 返却予定日なら deliveryOverdue を生成し、deliveryDueSoon は生成しない", () => {
     const seeds = compute([buildServiceItem()], [orderedWithDueDate], "2026-07-11");
     const deliveryTypes = seeds
-      .filter((seed) => seed.targetType === NOTIFICATION_TARGET_TYPE.ORDER)
+      .filter((seed) => seed.targetType === NOTIFICATION_TARGET_TYPE.SERVICE_ORDER)
       .map((seed) => seed.type);
     expect(deliveryTypes).toEqual([NOTIFICATION_TYPE.DELIVERY_OVERDUE]);
   });
 
   it("inCalibration の案件も対象（発注済・未返却）", () => {
-    const inCalibration = buildOrder(ORDER_STATUS.IN_CALIBRATION, { dueDate: "2026-07-10" });
+    const inCalibration = buildServiceOrder(SERVICE_ORDER_STATUS.IN_CALIBRATION, { dueDate: "2026-07-10" });
     const types = compute([buildServiceItem()], [inCalibration], "2026-07-11").map(
       (seed) => seed.type,
     );
@@ -248,47 +248,47 @@ describe("computeExpectedNotifications: deliveryDueSoon / deliveryOverdue", () =
 
   it("planned / returned / completed / cancelled の案件は対象外", () => {
     const notAwaiting = [
-      buildOrder(ORDER_STATUS.PLANNED, { id: "order-planned", dueDate: "2026-07-10" }),
-      buildOrder(ORDER_STATUS.RETURNED, { id: "order-returned", dueDate: "2026-07-10" }),
-      buildOrder(ORDER_STATUS.COMPLETED, { id: "order-completed", dueDate: "2026-07-10" }),
-      buildOrder(ORDER_STATUS.CANCELLED, { id: "order-cancelled", dueDate: "2026-07-10" }),
+      buildServiceOrder(SERVICE_ORDER_STATUS.PLANNED, { id: "serviceOrder-planned", dueDate: "2026-07-10" }),
+      buildServiceOrder(SERVICE_ORDER_STATUS.RETURNED, { id: "serviceOrder-returned", dueDate: "2026-07-10" }),
+      buildServiceOrder(SERVICE_ORDER_STATUS.COMPLETED, { id: "serviceOrder-completed", dueDate: "2026-07-10" }),
+      buildServiceOrder(SERVICE_ORDER_STATUS.CANCELLED, { id: "serviceOrder-cancelled", dueDate: "2026-07-10" }),
     ];
     const seeds = compute([buildServiceItem()], notAwaiting, "2026-07-11");
     const deliveryTypes = seeds.filter(
-      (seed) => seed.targetType === NOTIFICATION_TARGET_TYPE.ORDER,
+      (seed) => seed.targetType === NOTIFICATION_TARGET_TYPE.SERVICE_ORDER,
     );
     expect(deliveryTypes).toEqual([]);
   });
 
   it("返却予定日が未入力の案件は対象外", () => {
-    const noDueDate = buildOrder(ORDER_STATUS.ORDERED);
+    const noDueDate = buildServiceOrder(SERVICE_ORDER_STATUS.ORDERED);
     const seeds = compute([buildServiceItem()], [noDueDate], "2026-07-11");
-    expect(seeds.filter((seed) => seed.targetType === NOTIFICATION_TARGET_TYPE.ORDER)).toEqual([]);
+    expect(seeds.filter((seed) => seed.targetType === NOTIFICATION_TARGET_TYPE.SERVICE_ORDER)).toEqual([]);
   });
 
   it("serviceItems に含まれない項目の案件は対象外（宛先を解決できないため）", () => {
-    const orphanOrder = buildOrder(ORDER_STATUS.ORDERED, {
+    const orphanServiceOrder = buildServiceOrder(SERVICE_ORDER_STATUS.ORDERED, {
       serviceItemId: "item-unknown",
       dueDate: "2026-07-10",
     });
-    expect(compute([], [orphanOrder], "2026-07-11")).toEqual([]);
+    expect(compute([], [orphanServiceOrder], "2026-07-11")).toEqual([]);
   });
 
-  it("宛先は order.serviceItemId から辿った serviceItem.personId になる（Order に personId は無い）", () => {
+  it("宛先は serviceOrder.serviceItemId から辿った serviceItem.personId になる（ServiceOrder に personId は無い）", () => {
     const seeds = compute(
       [buildServiceItem({ personId: "person-42" })],
       [orderedWithDueDate],
       "2026-07-11",
     );
-    const delivery = seeds.find((seed) => seed.targetType === NOTIFICATION_TARGET_TYPE.ORDER);
+    const delivery = seeds.find((seed) => seed.targetType === NOTIFICATION_TARGET_TYPE.SERVICE_ORDER);
     expect(delivery?.personId).toBe("person-42");
   });
 });
 
 describe("computeExpectedNotifications: 複合", () => {
-  it("同一項目に serviceItem 宛と order 宛の通知が同時に発生し得る（overdue + deliveryOverdue）", () => {
-    const lateOrder = buildOrder(ORDER_STATUS.ORDERED, { dueDate: "2026-08-05" });
-    const seeds = compute([buildServiceItem()], [lateOrder], "2026-08-10");
+  it("同一項目に serviceItem 宛と serviceOrder 宛の通知が同時に発生し得る（overdue + deliveryOverdue）", () => {
+    const lateServiceOrder = buildServiceOrder(SERVICE_ORDER_STATUS.ORDERED, { dueDate: "2026-08-05" });
+    const seeds = compute([buildServiceItem()], [lateServiceOrder], "2026-08-10");
     expect(seeds.map((seed) => seed.type).toSorted()).toEqual(
       [NOTIFICATION_TYPE.OVERDUE, NOTIFICATION_TYPE.DELIVERY_OVERDUE].toSorted(),
     );

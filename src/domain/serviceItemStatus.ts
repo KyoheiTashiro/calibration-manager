@@ -4,13 +4,13 @@
  */
 
 import { recommendedOrderDate } from "@/domain/leadTime";
-import { isActiveOrderStatus } from "@/domain/orderStatus";
+import { isActiveServiceOrderStatus } from "@/domain/serviceOrderStatus";
 import {
   type ServiceOrder,
   EXECUTION,
   type ServiceItem,
   type IsoDateString,
-  ORDER_STATUS,
+  SERVICE_ORDER_STATUS,
   type Vendor,
 } from "@/store/types";
 import { addDays } from "@/utils/time";
@@ -40,37 +40,37 @@ export type ServiceItemStatus =
  * | dueSoon | 今日 ≥ nextDueDate − noticeDaysBefore |
  * | ok | 上記以外 |
  *
- * なぜ vendor を引数に取るか（docs のシグネチャ `(serviceItem, orders, today)` からの拡張）:
+ * なぜ vendor を引数に取るか（docs のシグネチャ `(serviceItem, serviceOrders, today)` からの拡張）:
  * 発注推奨日の納期解決に `serviceItem.leadTimeDays ?? vendor.standardLeadTimeDays` の
  * フォールバック（§4.2）が必要であり、vendor なしでは orderNow を判定できないため。
  *
- * @param orders 全案件でも当該項目の案件のみでもよい（内部で serviceItemId により絞り込む）
+ * @param serviceOrders 全案件でも当該項目の案件のみでもよい（内部で serviceItemId により絞り込む）
  */
 export const deriveServiceItemStatus = (
   serviceItem: ServiceItem,
-  orders: readonly ServiceOrder[],
+  serviceOrders: readonly ServiceOrder[],
   vendor: Pick<Vendor, "standardLeadTimeDays"> | null,
   today: IsoDateString,
 ): ServiceItemStatus => {
   if (today > serviceItem.nextDueDate) return SERVICE_ITEM_STATUS.OVERDUE;
 
-  const serviceItemOrders = orders.filter(
-    (order) => order.serviceItemId === serviceItem.id,
+  const itemServiceOrders = serviceOrders.filter(
+    (serviceOrder) => serviceOrder.serviceItemId === serviceItem.id,
   );
   const isExternal = serviceItem.execution === EXECUTION.EXTERNAL;
 
   if (isExternal) {
     const orderDate = recommendedOrderDate(serviceItem, vendor);
-    const hasActiveOrder = serviceItemOrders.some((order) => isActiveOrderStatus(order.status));
-    if (orderDate !== null && today >= orderDate && !hasActiveOrder) {
+    const hasActiveServiceOrder = itemServiceOrders.some((serviceOrder) => isActiveServiceOrderStatus(serviceOrder.status));
+    if (orderDate !== null && today >= orderDate && !hasActiveServiceOrder) {
       return SERVICE_ITEM_STATUS.ORDER_NOW;
     }
 
-    const hasInProgressOrder = serviceItemOrders.some(
-      (order) =>
-        order.status === ORDER_STATUS.ORDERED || order.status === ORDER_STATUS.IN_CALIBRATION,
+    const hasInProgressServiceOrder = itemServiceOrders.some(
+      (serviceOrder) =>
+        serviceOrder.status === SERVICE_ORDER_STATUS.ORDERED || serviceOrder.status === SERVICE_ORDER_STATUS.IN_CALIBRATION,
     );
-    if (hasInProgressOrder) return SERVICE_ITEM_STATUS.IN_PROGRESS;
+    if (hasInProgressServiceOrder) return SERVICE_ITEM_STATUS.IN_PROGRESS;
   }
 
   const dueSoonFrom = addDays(serviceItem.nextDueDate, -serviceItem.noticeDaysBefore);

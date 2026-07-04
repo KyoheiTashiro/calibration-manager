@@ -8,7 +8,7 @@ import {
   deriveServiceItemStatus,
   type ServiceItemStatus,
 } from "@/domain/serviceItemStatus";
-import { isActiveOrderStatus } from "@/domain/orderStatus";
+import { isActiveServiceOrderStatus } from "@/domain/serviceOrderStatus";
 import { appStateSchema } from "@/store/schema";
 import { CYCLE, EQUIPMENT_STATUS, EXECUTION, SERVICE_ITEM_TYPE } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
@@ -55,25 +55,25 @@ describe("buildSeedState", () => {
     }
   });
 
-  it("orderId指定があるrecordsのそのorderIdがordersに存在する", () => {
+  it("serviceOrderId指定があるrecordsのそのserviceOrderIdがserviceOrdersに存在する", () => {
     const state = buildSeedState(TODAY);
     for (const record of Object.values(state.records)) {
-      if (record.orderId === undefined) continue;
-      expect(state.orders[record.orderId]).toBeDefined();
+      if (record.serviceOrderId === undefined) continue;
+      expect(state.serviceOrders[record.serviceOrderId]).toBeDefined();
     }
   });
 
-  it("全ordersのserviceItemId/vendorIdがserviceItems/vendorsに存在する", () => {
+  it("全serviceOrdersのserviceItemId/vendorIdがserviceItems/vendorsに存在する", () => {
     const state = buildSeedState(TODAY);
-    for (const order of Object.values(state.orders)) {
-      expect(state.serviceItems[order.serviceItemId]).toBeDefined();
-      expect(state.vendors[order.vendorId]).toBeDefined();
+    for (const serviceOrder of Object.values(state.serviceOrders)) {
+      expect(state.serviceItems[serviceOrder.serviceItemId]).toBeDefined();
+      expect(state.vendors[serviceOrder.vendorId]).toBeDefined();
     }
   });
 
   it("有効な機器かつ有効な項目のステータスがoverdue/orderNow/inProgress/dueSoon/okの5種を全て含む", () => {
     const state = buildSeedState(TODAY);
-    const orders = Object.values(state.orders);
+    const serviceOrders = Object.values(state.serviceOrders);
     const statuses = new Set<ServiceItemStatus>();
 
     for (const serviceItem of Object.values(state.serviceItems)) {
@@ -84,7 +84,7 @@ describe("buildSeedState", () => {
         serviceItem.vendorId === undefined
           ? null
           : (state.vendors[serviceItem.vendorId] ?? null);
-      statuses.add(deriveServiceItemStatus(serviceItem, orders, vendor, TODAY));
+      statuses.add(deriveServiceItemStatus(serviceItem, serviceOrders, vendor, TODAY));
     }
 
     expect(statuses).toEqual(
@@ -112,17 +112,17 @@ describe("buildSeedState", () => {
     );
   });
 
-  it("同一serviceItemIdに有効案件(isActiveOrderStatus)が2件以上存在しない", () => {
+  it("同一serviceItemIdに有効案件(isActiveServiceOrderStatus)が2件以上存在しない", () => {
     const state = buildSeedState(TODAY);
-    const activeOrderCountByServiceItemId = new Map<string, number>();
-    for (const order of Object.values(state.orders)) {
-      if (!isActiveOrderStatus(order.status)) continue;
-      activeOrderCountByServiceItemId.set(
-        order.serviceItemId,
-        (activeOrderCountByServiceItemId.get(order.serviceItemId) ?? 0) + 1,
+    const activeServiceOrderCountByServiceItemId = new Map<string, number>();
+    for (const serviceOrder of Object.values(state.serviceOrders)) {
+      if (!isActiveServiceOrderStatus(serviceOrder.status)) continue;
+      activeServiceOrderCountByServiceItemId.set(
+        serviceOrder.serviceItemId,
+        (activeServiceOrderCountByServiceItemId.get(serviceOrder.serviceItemId) ?? 0) + 1,
       );
     }
-    for (const count of activeOrderCountByServiceItemId.values()) {
+    for (const count of activeServiceOrderCountByServiceItemId.values()) {
       expect(count).toBeLessThanOrEqual(1);
     }
   });

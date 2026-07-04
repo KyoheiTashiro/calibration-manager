@@ -1,5 +1,5 @@
 /**
- * OrderModal のフォームスキーマ（RHF + zodResolver 用、screen-design/08-orders.md「案件作成モーダル」）。
+ * ServiceOrderModal のフォームスキーマ（RHF + zodResolver 用、screen-design/08-service-orders.md「案件作成モーダル」）。
  * 入力体験向けの厳密検証（日付形式・0以上の数値等）はここで担う。
  * 永続化データの構造検証は `src/store/schema.ts` の serviceOrderSchema が別途担う
  * （coding-standards.md §3）。
@@ -30,7 +30,7 @@ const optionalNonNegativeIntegerString = (invalidMessage: string) =>
       },
     );
 
-export const orderFormSchema = z.object({
+export const serviceOrderFormSchema = z.object({
   vendorId: z.string().min(1, "校正依頼先を選択してください"),
   dueDate: z
     .string()
@@ -42,10 +42,10 @@ export const orderFormSchema = z.object({
   note: z.string().optional(),
 });
 
-export type OrderFormValues = z.infer<typeof orderFormSchema>;
+export type ServiceOrderFormValues = z.infer<typeof serviceOrderFormSchema>;
 
 /** 新規作成時の既定フォーム値。vendorId は呼び出し側で serviceItem.vendorId から解決して上書きする */
-export const defaultOrderFormValues: OrderFormValues = {
+export const defaultServiceOrderFormValues: ServiceOrderFormValues = {
   vendorId: "",
   dueDate: "",
   cost: "",

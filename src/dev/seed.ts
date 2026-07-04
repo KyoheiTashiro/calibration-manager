@@ -10,7 +10,7 @@
 import { buildSeedEquipment, buildSeedPersons, buildSeedVendors } from "@/dev/seedMasterData";
 import {
   buildSeedServiceItems,
-  buildSeedOrders,
+  buildSeedServiceOrders,
   buildSeedRecords,
 } from "@/dev/seedTransactionData";
 import type { AppState, IsoDateString } from "@/store/types";
@@ -23,7 +23,7 @@ export const buildSeedState = (today: IsoDateString): AppState => ({
   equipment: buildSeedEquipment(),
   serviceItems: buildSeedServiceItems(today),
   records: buildSeedRecords(today),
-  orders: buildSeedOrders(today),
+  serviceOrders: buildSeedServiceOrders(today),
   // なぜ空オブジェクトか: notifications は useNotificationScan（D-025）が起動時に
   // 導出データとして再生成する対象であり、シードとしては持たない（保存しない派生値）。
   notifications: {},
@@ -41,7 +41,7 @@ export const seedIfEmpty = (): boolean => {
     state.equipment,
     state.serviceItems,
     state.records,
-    state.orders,
+    state.serviceOrders,
     state.notifications,
   ].every((entities) => Object.keys(entities).length === 0);
 

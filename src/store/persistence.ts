@@ -24,7 +24,7 @@ export const emptyAppState = (): AppState => ({
   equipment: {},
   serviceItems: {},
   records: {},
-  orders: {},
+  serviceOrders: {},
   notifications: {},
 });
 
@@ -103,10 +103,37 @@ export const migrateV2ToV3: MigrationStep = (persisted) => {
 };
 
 /**
+ * v3→v4: order→serviceOrder リネーム（D-046。ルート・コードの order 系命名を
+ * ServiceOrder 系へ統一したことに伴い、永続化キーも追随）。
+ * - 状態キー orders → serviceOrders
+ * - records の orderId → serviceOrderId
+ * - notifications の targetType "order" → "serviceOrder"
+ * "order" / "orders" / "orderId" は v3 の歴史的リテラル値のため直書き。
+ */
+export const migrateV3ToV4: MigrationStep = (persisted) => {
+  if (!isRecord(persisted)) return persisted;
+  const { orders, records, notifications, ...rest } = persisted;
+  return {
+    ...rest,
+    serviceOrders: orders,
+    records: renameFieldInRecord(records, "orderId", "serviceOrderId"),
+    notifications: renameNotificationTargetType(
+      notifications,
+      "order",
+      NOTIFICATION_TARGET_TYPE.SERVICE_ORDER,
+    ),
+  };
+};
+
+/**
  * 将来のスキーマ変更時は migrateVNToVN+1 を追加してここへ登録し、
  * STORAGE_VERSION をインクリメントする（store.md「migrate」）。
  */
-export const MIGRATIONS: Record<number, MigrationStep> = { 1: migrateV1ToV2, 2: migrateV2ToV3 };
+export const MIGRATIONS: Record<number, MigrationStep> = {
+  1: migrateV1ToV2,
+  2: migrateV2ToV3,
+  3: migrateV3ToV4,
+};
 
 /**
  * fromVersion から STORAGE_VERSION までステップ変換を順に適用する。
@@ -149,7 +176,7 @@ const salvageAppStatePerRecord = (persisted: Record<string, unknown>): AppState 
   equipment: salvageRecords(persisted.equipment, equipmentSchema),
   serviceItems: salvageRecords(persisted.serviceItems, serviceItemSchema),
   records: salvageRecords(persisted.records, serviceRecordSchema),
-  orders: salvageRecords(persisted.orders, serviceOrderSchema),
+  serviceOrders: salvageRecords(persisted.serviceOrders, serviceOrderSchema),
   notifications: salvageRecords(persisted.notifications, notificationSchema),
 });
 
@@ -165,7 +192,7 @@ export const sanitizeAppState = (state: AppState): AppState => {
       if (recordValue(state.persons, notification.personId) === undefined) return false;
       return notification.targetType === NOTIFICATION_TARGET_TYPE.SERVICE_ITEM
         ? recordValue(state.serviceItems, notification.targetId) !== undefined
-        : recordValue(state.orders, notification.targetId) !== undefined;
+        : recordValue(state.serviceOrders, notification.targetId) !== undefined;
     }),
   );
   return { ...state, notifications };

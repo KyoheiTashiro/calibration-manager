@@ -1,7 +1,7 @@
 /**
  * NotificationCenter（/notifications、screen-design/10-notifications.md）の検証。
  * タブ切替・並び順（createdDate 降順/同日 id 昇順）・種別バッジ・全て既読・
- * 行クリック遷移（order/serviceItem/dangling, D-027）・空状態2種を扱う。
+ * 行クリック遷移（serviceOrder/serviceItem/dangling, D-027）・空状態2種を扱う。
  */
 
 import { ROUTES } from "@/constants/routes";
@@ -67,7 +67,7 @@ const renderCenter = (): void => {
   renderWithStore(
     <Routes>
       <Route path={ROUTES.NOTIFICATION_LIST} element={<NotificationCenter />} />
-      <Route path={ROUTES.ORDER_LIST} element={<p>案件一覧画面</p>} />
+      <Route path={ROUTES.SERVICE_ORDER_LIST} element={<p>案件一覧画面</p>} />
       <Route path={ROUTES.EQUIPMENT_DETAIL} element={<DummyEquipmentDetail />} />
     </Routes>,
     { initialEntries: [ROUTES.NOTIFICATION_LIST] },
@@ -185,15 +185,15 @@ describe("NotificationCenter: 全て既読", () => {
 });
 
 describe("NotificationCenter: 行クリック遷移（D-027）", () => {
-  it("targetType=order の行クリックで案件一覧へ遷移する", async () => {
+  it("targetType=serviceOrder の行クリックで案件一覧へ遷移する", async () => {
     const user = userEvent.setup();
     seedStore({
       notifications: {
         o1: makeNotif({
           id: "o1",
           type: NOTIFICATION_TYPE.DELIVERY_DUE_SOON,
-          targetType: NOTIFICATION_TARGET_TYPE.ORDER,
-          targetId: "order-1",
+          targetType: NOTIFICATION_TARGET_TYPE.SERVICE_ORDER,
+          targetId: "serviceOrder-1",
           message: "案件通知",
         }),
       },

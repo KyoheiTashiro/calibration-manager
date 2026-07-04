@@ -1,7 +1,7 @@
 /**
  * ServiceItemList: テーブル描画の検証(screen-design/05-service-item-list.md「表示項目」)。
  * 列内容・nextDueDate 昇順・「—」表示・対象除外(非稼働機器/無効項目)・
- * 「案件」ボタンの出し分け(canCreateOrder)・空状態を確認する。
+ * 「案件」ボタンの出し分け(canCreateServiceOrder)・空状態を確認する。
  * ステータス導出は todayIsoDate() 依存だが、フィクスチャの nextDueDate を極端値にして決定的にする。
  */
 
@@ -61,7 +61,7 @@ describe("ServiceItemList: テーブル描画", () => {
     expect(screen.queryByText("休止機器点検")).not.toBeInTheDocument();
   });
 
-  it("「案件」ボタンは canCreateOrder=true の行だけに出す", () => {
+  it("「案件」ボタンは canCreateServiceOrder=true の行だけに出す", () => {
     seedServiceItemList();
     renderList();
 

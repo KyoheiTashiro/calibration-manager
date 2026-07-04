@@ -26,7 +26,7 @@ export const CSV_ENTITY_KINDS = [
   "equipment",
   "serviceItems",
   "records",
-  "orders",
+  "serviceOrders",
   "vendors",
   "persons",
   "notifications",
@@ -106,13 +106,13 @@ export const ENTITY_CSV_SPECS: { [Kind in CsvEntityKind]: EntityCsvSpec<Kind> } 
       { key: "doneDate", kind: CSV_COLUMN_KIND.STRING },
       { key: "doneBy", kind: CSV_COLUMN_KIND.STRING },
       { key: "result", kind: CSV_COLUMN_KIND.STRING },
-      { key: "orderId", kind: CSV_COLUMN_KIND.OPTIONAL_STRING },
+      { key: "serviceOrderId", kind: CSV_COLUMN_KIND.OPTIONAL_STRING },
       { key: "note", kind: CSV_COLUMN_KIND.OPTIONAL_STRING },
     ],
     schema: serviceRecordSchema,
     uniqueKeys: [],
   },
-  orders: {
+  serviceOrders: {
     label: "点検校正外部案件",
     columns: [
       { key: "id", kind: CSV_COLUMN_KIND.STRING },

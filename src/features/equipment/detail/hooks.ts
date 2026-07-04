@@ -8,7 +8,7 @@ import {
   deriveServiceItemStatus,
   type ServiceItemStatus,
 } from "@/domain/serviceItemStatus";
-import { serviceItemsOf, ordersOf, recordsOf } from "@/store/selectors";
+import { serviceItemsOf, serviceOrdersOf, recordsOf } from "@/store/selectors";
 import {
   EQUIPMENT_STATUS,
   type ServiceOrder,
@@ -77,7 +77,7 @@ export const historyRowsOf = (
 export const displayedServiceItemStatus = (
   serviceItem: ServiceItem,
   equipmentStatus: EquipmentStatus,
-  orders: Record<string, ServiceOrder>,
+  serviceOrders: Record<string, ServiceOrder>,
   vendors: Record<string, Vendor>,
   today: IsoDateString,
 ): ServiceItemStatus | null => {
@@ -88,7 +88,7 @@ export const displayedServiceItemStatus = (
       : null;
   return deriveServiceItemStatus(
     serviceItem,
-    ordersOf({ orders }, serviceItem.id),
+    serviceOrdersOf({ serviceOrders }, serviceItem.id),
     vendor,
     today,
   );
