@@ -63,7 +63,7 @@ export const RECORD_RESULT_LABELS = {
   [RECORD_RESULT.ADJUSTED]: "調整合格",
 } as const satisfies Record<RecordResult, string>;
 
-/** 結果ラジオ(合格/不合格/調整合格)の選択肢(07-record-modal.md モック準拠の並び) */
+/** 結果ラジオ(合格/不合格/調整合格)の選択肢(07-record-modal.md 準拠の並び) */
 export const RECORD_RESULT_OPTIONS: readonly { value: RecordResult; label: string }[] =
   Object.values(RECORD_RESULT).map((result) => ({
     value: result,

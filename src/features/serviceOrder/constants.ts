@@ -16,7 +16,7 @@ export const SERVICE_ORDER_STATUS_LABELS = {
   [SERVICE_ORDER_STATUS.CANCELLED]: "中止",
 } as const satisfies Record<ServiceOrderStatus, string>;
 
-/** かんばんの進行中4列(左→右の表示順。08-service-orders.md モック準拠) */
+/** かんばんの進行中4列(左→右の表示順。08-service-orders.md 準拠) */
 export const KANBAN_ACTIVE_COLUMNS = [
   SERVICE_ORDER_STATUS.PLANNED,
   SERVICE_ORDER_STATUS.ORDERED,

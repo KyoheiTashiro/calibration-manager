@@ -12,7 +12,7 @@ import { SERVICE_ITEM_STATUS, type ServiceItemStatus } from "@/domain/serviceIte
 import type { ServiceItemRow } from "@/store/selectors";
 import type { Notification } from "@/store/types";
 
-/** サマリーカードの表示順(01-dashboard.md モック: 期限切れ→要発注→期限接近→校正中) */
+/** サマリーカードの表示順(01-dashboard.md: 期限切れ→要発注→期限接近→校正中) */
 export const SUMMARY_CARD_STATUSES: readonly ServiceItemStatus[] = [
   SERVICE_ITEM_STATUS.OVERDUE,
   SERVICE_ITEM_STATUS.ORDER_NOW,
