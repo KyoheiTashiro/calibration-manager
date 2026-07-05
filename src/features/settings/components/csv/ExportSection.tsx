@@ -40,7 +40,7 @@ export const ExportSection = ({ state }: Props): ReactElement => (
   <section className="flex flex-col gap-3 rounded border border-slate-200 p-4">
     <h2 className="border-b border-slate-200 pb-2 text-lg font-semibold">CSVエクスポート</h2>
     <p className="text-sm text-slate-700">
-      エンティティごとにCSVファイル(UTF-8 BOM付き・Excel互換)をダウンロードします。
+      データの種類ごとにCSVファイル(UTF-8 BOM付き・Excel互換)をダウンロードします。
     </p>
     <div className="flex flex-wrap gap-2">
       {CSV_ENTITY_KINDS.map((kind) => (
