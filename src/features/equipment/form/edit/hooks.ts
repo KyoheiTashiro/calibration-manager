@@ -6,7 +6,7 @@
 
 import { equipmentDetailPath } from "@/constants/routes";
 import { toEquipmentPayload, type SelectOption } from "@/features/equipment/form/shared/mapping";
-import { emptyFormValues, type EquipmentFormValues } from "@/features/equipment/form/shared/schema";
+import { defaultValues, type FormType } from "@/features/equipment/form/shared/schema";
 import { useEquipmentFormCore } from "@/features/equipment/form/shared/useFormCore";
 import { EQUIPMENT_STATUS, type Equipment } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
@@ -17,8 +17,8 @@ import { useParams } from "react-router-dom";
 
 // なぜ undefined を許容するか: Rules of Hooks により対象不在（dangling id・URL直打ち等）でも
 // フックは無条件に実行されるため、currentEquipment が undefined の場合のフォールバック
-// （新規時と同じ emptyFormValues）を用意しておく必要がある。
-const toFormValues = (equipment: Equipment | undefined): EquipmentFormValues =>
+// （新規時と同じ defaultValues）を用意しておく必要がある。
+const toFormValues = (equipment: Equipment | undefined): FormType =>
   equipment
     ? {
         managementNo: equipment.managementNo,
@@ -30,14 +30,14 @@ const toFormValues = (equipment: Equipment | undefined): EquipmentFormValues =>
         status: equipment.status,
         note: equipment.note ?? "",
       }
-    : emptyFormValues;
+    : defaultValues;
 
 type UseEditEquipmentFormResult = {
   /** 編集対象機器が存在しない（dangling id・URL直打ち等）場合 true。一覧へリダイレクトする */
   shouldRedirectToList: boolean;
-  register: UseFormRegister<EquipmentFormValues>;
-  errors: FieldErrors<EquipmentFormValues>;
-  onFormSubmit: ReturnType<UseFormHandleSubmit<EquipmentFormValues>>;
+  register: UseFormRegister<FormType>;
+  errors: FieldErrors<FormType>;
+  onFormSubmit: ReturnType<UseFormHandleSubmit<FormType>>;
   manufacturerOptions: SelectOption[];
   retireConfirmOpen: boolean;
   openRetireConfirm: () => void;
@@ -71,7 +71,7 @@ export const useEditEquipmentForm = (): UseEditEquipmentFormResult => {
     excludeEquipmentId: id,
   });
 
-  const onSubmit = (values: EquipmentFormValues): void => {
+  const onSubmit = (values: FormType): void => {
     if (currentEquipment === undefined) return;
     updateEquipment(currentEquipment.id, toEquipmentPayload(values));
     safeNavigate(equipmentDetailPath(currentEquipment.id));

@@ -12,11 +12,14 @@
 
 import { Button, DateField, Modal, TextField } from "@/components/ui";
 import {
-  serviceOrderDialogSchema,
-  returnDialogSchema,
-  type ServiceOrderDialogValues,
-  type ReturnDialogValues,
-} from "@/features/serviceOrder/schema";
+  Schema as orderDialogSchema,
+  defaultValues as orderDialogDefaultValues,
+  type FormType as OrderDialogFormType,
+} from "@/features/serviceOrder/orderDialog/schema";
+import {
+  Schema as returnDialogSchema,
+  type FormType as ReturnDialogFormType,
+} from "@/features/serviceOrder/returnDialog/schema";
 import { SERVICE_ORDER_STATUS, type ServiceOrder } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
 import { createSaveHandler } from "@/utils/form";
@@ -40,9 +43,9 @@ export const ServiceOrderDialog = ({ serviceOrder, onClose }: Props): ReactEleme
     handleSubmit,
     control,
     formState: { errors, isDirty },
-  } = useForm<ServiceOrderDialogValues>({
-    resolver: zodResolver(serviceOrderDialogSchema),
-    defaultValues: { orderedDate: todayIsoDate(), dueDate: "", cost: "" },
+  } = useForm<OrderDialogFormType>({
+    resolver: zodResolver(orderDialogSchema),
+    defaultValues: { ...orderDialogDefaultValues, orderedDate: todayIsoDate() },
   });
 
   // なぜ useWatch か: ServiceItemModal と同じ理由（react-compiler lint 対策で watch() を使わない）。
@@ -58,7 +61,7 @@ export const ServiceOrderDialog = ({ serviceOrder, onClose }: Props): ReactEleme
     isIsoDateString(dueDate) &&
     orderedDate > dueDate;
 
-  const onSubmit = (values: ServiceOrderDialogValues): void => {
+  const onSubmit = (values: OrderDialogFormType): void => {
     const transitioned = updateServiceOrderStatus(serviceOrder.id, SERVICE_ORDER_STATUS.ORDERED);
     if (transitioned) {
       updateServiceOrder(serviceOrder.id, {
@@ -110,7 +113,7 @@ export const ReturnDialog = ({ serviceOrder, onClose }: Props): ReactElement => 
     handleSubmit,
     control,
     formState: { errors, isDirty },
-  } = useForm<ReturnDialogValues>({
+  } = useForm<ReturnDialogFormType>({
     resolver: zodResolver(returnDialogSchema),
     defaultValues: { returnedDate: todayIsoDate() },
   });
@@ -124,7 +127,7 @@ export const ReturnDialog = ({ serviceOrder, onClose }: Props): ReactElement => 
     isIsoDateString(returnedDate) &&
     serviceOrder.orderedDate > returnedDate;
 
-  const onSubmit = (values: ReturnDialogValues): void => {
+  const onSubmit = (values: ReturnDialogFormType): void => {
     const transitioned = updateServiceOrderStatus(serviceOrder.id, SERVICE_ORDER_STATUS.RETURNED);
     if (transitioned) {
       updateServiceOrder(serviceOrder.id, { returnedDate: values.returnedDate });

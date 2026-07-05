@@ -6,16 +6,16 @@
 
 import { equipmentDetailPath } from "@/constants/routes";
 import { toEquipmentPayload, type SelectOption } from "@/features/equipment/form/shared/mapping";
-import { emptyFormValues, type EquipmentFormValues } from "@/features/equipment/form/shared/schema";
+import { defaultValues, type FormType } from "@/features/equipment/form/shared/schema";
 import { useEquipmentFormCore } from "@/features/equipment/form/shared/useFormCore";
 import { useAppStore } from "@/store/useAppStore";
 import { useSafeNavigate } from "@/utils/navigation";
 import type { FieldErrors, UseFormHandleSubmit, UseFormRegister } from "react-hook-form";
 
 type UseCreateEquipmentFormResult = {
-  register: UseFormRegister<EquipmentFormValues>;
-  errors: FieldErrors<EquipmentFormValues>;
-  onFormSubmit: ReturnType<UseFormHandleSubmit<EquipmentFormValues>>;
+  register: UseFormRegister<FormType>;
+  errors: FieldErrors<FormType>;
+  onFormSubmit: ReturnType<UseFormHandleSubmit<FormType>>;
   manufacturerOptions: SelectOption[];
   handleCancel: () => void;
 };
@@ -25,10 +25,10 @@ export const useCreateEquipmentForm = (): UseCreateEquipmentFormResult => {
   const addEquipment = useAppStore((state) => state.addEquipment);
 
   const { register, errors, handleSubmit, manufacturerOptions } = useEquipmentFormCore({
-    defaultValues: emptyFormValues,
+    defaultValues,
   });
 
-  const onSubmit = (values: EquipmentFormValues): void => {
+  const onSubmit = (values: FormType): void => {
     const newId = addEquipment(toEquipmentPayload(values));
     safeNavigate(equipmentDetailPath(newId));
   };

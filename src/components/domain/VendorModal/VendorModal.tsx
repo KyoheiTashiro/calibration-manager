@@ -4,7 +4,7 @@
  * （screen-design/README.md §0.5）。
  */
 
-import { vendorFormSchema, type VendorFormValues } from "@/components/domain/VendorModal/schema";
+import { Schema, defaultValues, type FormType } from "@/components/domain/VendorModal/schema";
 import { Button, Checkbox, Modal, TextField } from "@/components/ui";
 import type { Vendor } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
@@ -19,19 +19,8 @@ type Props = {
   onClose: () => void;
 };
 
-const emptyFormValues: VendorFormValues = {
-  name: "",
-  isManufacturer: false,
-  isCalibrator: false,
-  contactPerson: "",
-  email: "",
-  phone: "",
-  standardLeadTimeDays: "",
-  note: "",
-};
-
 /** 既存 Vendor をフォーム値（すべて string ベース）へ変換する。新規時は空値 */
-const toFormValues = (vendor: Vendor | undefined): VendorFormValues =>
+const toFormValues = (vendor: Vendor | undefined): FormType =>
   vendor
     ? {
         name: vendor.name,
@@ -43,7 +32,7 @@ const toFormValues = (vendor: Vendor | undefined): VendorFormValues =>
         standardLeadTimeDays: vendor.standardLeadTimeDays?.toString() ?? "",
         note: vendor.note ?? "",
       }
-    : emptyFormValues;
+    : defaultValues;
 
 export const VendorModal = ({ open, vendor, onClose }: Props): ReactElement => {
   const addVendor = useAppStore((state) => state.addVendor);
@@ -56,8 +45,8 @@ export const VendorModal = ({ open, vendor, onClose }: Props): ReactElement => {
     setValue,
     reset,
     formState: { errors, isDirty },
-  } = useForm<VendorFormValues>({
-    resolver: zodResolver(vendorFormSchema),
+  } = useForm<FormType>({
+    resolver: zodResolver(Schema),
     // なぜ values か: 編集対象（vendor）が変わるたびに既存値をプリフィルする
     // （screen-design/README.md §0.5）。RHF が深い等価比較で変化を検知し reset する。
     values: toFormValues(vendor),
@@ -77,7 +66,7 @@ export const VendorModal = ({ open, vendor, onClose }: Props): ReactElement => {
     onClose();
   };
 
-  const onSubmit = (values: VendorFormValues): void => {
+  const onSubmit = (values: FormType): void => {
     const standardLeadTimeDays = emptyToUndefined(values.standardLeadTimeDays);
     const payload = {
       name: values.name,

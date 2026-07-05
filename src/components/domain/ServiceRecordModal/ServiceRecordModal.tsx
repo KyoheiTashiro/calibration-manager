@@ -8,10 +8,7 @@
  * 常時マウントで open をトグルする使い方ではプリフィルされない。
  */
 
-import {
-  serviceRecordFormSchema,
-  type ServiceRecordFormValues,
-} from "@/components/domain/ServiceRecordModal/schema";
+import { Schema, type FormType } from "@/components/domain/ServiceRecordModal/schema";
 import { Button, DateField, Modal, RadioGroup, TextField } from "@/components/ui";
 import { SERVICE_RECORD_RESULT_OPTIONS } from "@/features/serviceItems/constants";
 import {
@@ -80,7 +77,7 @@ export const ServiceRecordModal = ({
   // なぜ defaultValues 直書きで足りるか: ServiceRecordModal は起動元で常に条件マウント（閉時アンマウント）
   // されるため、defaultValues はマウント時に1度評価されれば足り、open のたびのプリフィルは不要。
   // なぜ result を undefined か: 既定選択なし（未選択で送信すると zod エラー）とするため。
-  const defaultValues: DefaultValues<ServiceRecordFormValues> = {
+  const defaultValues: DefaultValues<FormType> = {
     doneDate: todayIsoDate(),
     doneBy: resolvePrefillDoneBy(serviceItem, serviceOrder, vendors),
     result: undefined,
@@ -92,8 +89,8 @@ export const ServiceRecordModal = ({
     handleSubmit,
     control,
     formState: { errors, isDirty },
-  } = useForm<ServiceRecordFormValues>({
-    resolver: zodResolver(serviceRecordFormSchema),
+  } = useForm<FormType>({
+    resolver: zodResolver(Schema),
     defaultValues,
   });
 
@@ -118,7 +115,7 @@ export const ServiceRecordModal = ({
     onClose();
   };
 
-  const onSubmit = (values: ServiceRecordFormValues): void => {
+  const onSubmit = (values: FormType): void => {
     const recordId = addServiceRecord({
       serviceItemId,
       doneDate: values.doneDate,

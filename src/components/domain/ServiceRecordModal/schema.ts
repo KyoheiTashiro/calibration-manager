@@ -13,7 +13,7 @@ import { SERVICE_RECORD_RESULT } from "@/store/types";
 import { isIsoDateString } from "@/utils/time";
 import { z } from "zod";
 
-export const serviceRecordFormSchema = z.object({
+export const Schema = z.object({
   doneDate: z
     .string()
     .min(1, "実施日は必須です")
@@ -25,4 +25,4 @@ export const serviceRecordFormSchema = z.object({
   note: z.string().optional(),
 });
 
-export type ServiceRecordFormValues = z.infer<typeof serviceRecordFormSchema>;
+export type FormType = z.infer<typeof Schema>;

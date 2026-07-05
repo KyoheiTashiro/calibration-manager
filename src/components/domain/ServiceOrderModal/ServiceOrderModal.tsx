@@ -7,11 +7,7 @@
  * 常時マウントで open をトグルする使い方ではプリフィルされない。
  */
 
-import {
-  defaultServiceOrderFormValues,
-  serviceOrderFormSchema,
-  type ServiceOrderFormValues,
-} from "@/components/domain/ServiceOrderModal/schema";
+import { defaultValues, Schema, type FormType } from "@/components/domain/ServiceOrderModal/schema";
 import { Button, DateField, Modal, Select, TextField } from "@/components/ui";
 import { ROUTES } from "@/constants/routes";
 import { useAppStore } from "@/store/useAppStore";
@@ -49,9 +45,9 @@ export const ServiceOrderModal = ({ open, serviceItemId, onClose }: Props): Reac
     register,
     handleSubmit,
     formState: { errors, isDirty },
-  } = useForm<ServiceOrderFormValues>({
-    resolver: zodResolver(serviceOrderFormSchema),
-    defaultValues: { ...defaultServiceOrderFormValues, vendorId: defaultVendorId },
+  } = useForm<FormType>({
+    resolver: zodResolver(Schema),
+    defaultValues: { ...defaultValues, vendorId: defaultVendorId },
   });
 
   const calibratorVendors = Object.values(vendors).filter((vendor) => vendor.isCalibrator);
@@ -72,7 +68,7 @@ export const ServiceOrderModal = ({ open, serviceItemId, onClose }: Props): Reac
     onClose();
   };
 
-  const onSubmit = (values: ServiceOrderFormValues): void => {
+  const onSubmit = (values: FormType): void => {
     const cost = emptyToUndefined(values.cost);
     const serviceOrderId = addServiceOrder({
       serviceItemId,

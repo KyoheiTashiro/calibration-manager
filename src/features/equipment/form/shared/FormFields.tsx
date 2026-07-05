@@ -7,14 +7,14 @@
 import { Select, Textarea, TextField } from "@/components/ui";
 import { ROUTES } from "@/constants/routes";
 import { statusOptions, type SelectOption } from "@/features/equipment/form/shared/mapping";
-import type { EquipmentFormValues } from "@/features/equipment/form/shared/schema";
+import type { FormType } from "@/features/equipment/form/shared/schema";
 import type { ReactElement } from "react";
 import type { FieldErrors, UseFormRegister } from "react-hook-form";
 import { Link } from "react-router-dom";
 
 type Props = {
-  register: UseFormRegister<EquipmentFormValues>;
-  errors: FieldErrors<EquipmentFormValues>;
+  register: UseFormRegister<FormType>;
+  errors: FieldErrors<FormType>;
   manufacturerOptions: SelectOption[];
 };
 

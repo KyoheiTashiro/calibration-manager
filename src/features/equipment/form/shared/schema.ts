@@ -6,11 +6,11 @@
  *
  * なぜフォーム値をすべて string ベースに保つか: HTML input/select の値は本質的に文字列であり、
  * defaultValues/reset に渡す型と register 対象の型を一致させ、preprocess/transform による
- * resolver の入出力型ズレを避ける（vendorFormSchema と同方針）。
+ * resolver の入出力型ズレを避ける（VendorModal/schema.ts と同方針）。
  *
  * なぜ managementNo のユニークチェックを呼び出し側でスキーマ生成する形にするか: 自身以外の
  * Equipment.managementNo 一覧はストアの状態（レンダー時点）に依存するため、コンポーネント側で
- * `Object.values(equipment)` から算出し `createEquipmentFormSchema(existingManagementNumbers)` に
+ * `Object.values(equipment)` から算出し `createSchema(existingManagementNumbers)` に
  * 渡す。編集モードでは自身の managementNo を除外した一覧を渡すことで自己参照時のエラーを避ける。
  * manufacturerId の存在チェック（screen-design/03-equipment-form.md）も同じ理由で呼び出し側から
  * vendors 一覧を渡す形にする: 参照可能な Vendor 一覧もストアの状態に依存するため。
@@ -19,12 +19,12 @@
 import { EQUIPMENT_STATUS, type Vendor } from "@/store/types";
 import { z } from "zod";
 
-// なぜ戻り値の型注釈を付けないか: z.infer<ReturnType<typeof createEquipmentFormSchema>> で
+// なぜ戻り値の型注釈を付けないか: z.infer<ReturnType<typeof createSchema>> で
 // フォーム値の型を導出するため、戻り値をワイドな型（ZodType等）で注釈すると refine 等による
 // 具体的なスキーマ形状が失われ z.infer が正しく推論できなくなる。そのため戻り値型は
 // TypeScript の推論に委ね、explicit-function-return-type 系ルールをこの関数に限り無効化する。
 // oxlint-disable-next-line typescript/explicit-function-return-type, typescript/explicit-module-boundary-types -- 上記理由によりzodスキーマの戻り値型は推論に委ねる必要がある
-export const createEquipmentFormSchema = (existingManagementNumbers: string[], vendors: Vendor[]) =>
+export const createSchema = (existingManagementNumbers: string[], vendors: Vendor[]) =>
   z.object({
     managementNo: z
       .string()
@@ -48,10 +48,10 @@ export const createEquipmentFormSchema = (existingManagementNumbers: string[], v
     note: z.string().optional(),
   });
 
-export type EquipmentFormValues = z.infer<ReturnType<typeof createEquipmentFormSchema>>;
+export type FormType = z.infer<ReturnType<typeof createSchema>>;
 
 /** 新規登録時の初期フォーム値（すべて string ベース、status のみ既定「稼働中」） */
-export const emptyFormValues: EquipmentFormValues = {
+export const defaultValues: FormType = {
   managementNo: "",
   name: "",
   model: "",

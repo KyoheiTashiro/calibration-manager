@@ -11,7 +11,7 @@
 
 import { z } from "zod";
 
-export const vendorFormSchema = z.object({
+export const Schema = z.object({
   name: z.string().min(1, "名称は必須です"),
   isManufacturer: z.boolean(),
   isCalibrator: z.boolean(),
@@ -36,4 +36,15 @@ export const vendorFormSchema = z.object({
   note: z.string().optional(),
 });
 
-export type VendorFormValues = z.infer<typeof vendorFormSchema>;
+export type FormType = z.infer<typeof Schema>;
+
+export const defaultValues: FormType = {
+  name: "",
+  isManufacturer: false,
+  isCalibrator: false,
+  contactPerson: "",
+  email: "",
+  phone: "",
+  standardLeadTimeDays: "",
+  note: "",
+};

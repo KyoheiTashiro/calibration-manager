@@ -12,7 +12,7 @@ import { optionalNonNegativeIntegerString } from "@/utils/form";
 import { isIsoDateString } from "@/utils/time";
 import { z } from "zod";
 
-export const serviceOrderFormSchema = z.object({
+export const Schema = z.object({
   vendorId: z.string().min(1, "校正依頼先を選択してください"),
   dueDate: z
     .string()
@@ -24,10 +24,10 @@ export const serviceOrderFormSchema = z.object({
   note: z.string().optional(),
 });
 
-export type ServiceOrderFormValues = z.infer<typeof serviceOrderFormSchema>;
+export type FormType = z.infer<typeof Schema>;
 
 /** 新規作成時の既定フォーム値。vendorId は呼び出し側で serviceItem.vendorId から解決して上書きする */
-export const defaultServiceOrderFormValues: ServiceOrderFormValues = {
+export const defaultValues: FormType = {
   vendorId: "",
   dueDate: "",
   cost: "",

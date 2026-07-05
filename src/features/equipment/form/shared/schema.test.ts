@@ -4,7 +4,7 @@
  * （vendors 参照、未指定=空文字は常に許可）をスキーマ単体で固定する。
  */
 
-import { createEquipmentFormSchema } from "@/features/equipment/form/shared/schema";
+import { createSchema } from "@/features/equipment/form/shared/schema";
 import { EQUIPMENT_STATUS, type Vendor } from "@/store/types";
 import { describe, expect, it } from "vitest";
 
@@ -25,9 +25,9 @@ const base = {
   note: "",
 };
 
-describe("createEquipmentFormSchema: manufacturerId の存在チェック", () => {
+describe("createSchema: manufacturerId の存在チェック", () => {
   it("存在しないVendor IDを指定するとエラーになる", () => {
-    const schema = createEquipmentFormSchema([], [mitutoyo]);
+    const schema = createSchema([], [mitutoyo]);
     const result = schema.safeParse({ ...base, manufacturerId: "does-not-exist" });
 
     expect(result.success).toBe(false);
@@ -37,14 +37,14 @@ describe("createEquipmentFormSchema: manufacturerId の存在チェック", () =
   });
 
   it("空文字の場合は未指定扱いでエラーにならない", () => {
-    const schema = createEquipmentFormSchema([], [mitutoyo]);
+    const schema = createSchema([], [mitutoyo]);
     const result = schema.safeParse({ ...base, manufacturerId: "" });
 
     expect(result.success).toBe(true);
   });
 
   it("実在するVendor IDを指定した場合はエラーにならない", () => {
-    const schema = createEquipmentFormSchema([], [mitutoyo]);
+    const schema = createSchema([], [mitutoyo]);
     const result = schema.safeParse({ ...base, manufacturerId: mitutoyo.id });
 
     expect(result.success).toBe(true);

@@ -4,7 +4,7 @@
  * 割り当てられている場合は確認ダイアログで警告する（README.md §0.6 の確認ダイアログポリシー）。
  */
 
-import { personFormSchema, type PersonFormValues } from "@/components/domain/PersonModal/schema";
+import { Schema, defaultValues, type FormType } from "@/components/domain/PersonModal/schema";
 import { Button, Checkbox, ConfirmModal, Modal, TextField } from "@/components/ui";
 import type { Person } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
@@ -19,21 +19,19 @@ type PersonModalProps = {
   onClose: () => void;
 };
 
-/**
- * なぜ新規追加時の isActive 既定値を true にするか: ドメイン仕様書に明記はないが、
- * 「無効な担当者を新規作成する」のは通常運用として不自然であり、既存 Person 一覧の
- * 運用（有効が既定）と整合させるための実装判断（Phase 4 実装時の判断）。
- */
-const buildDefaultValues = (person?: Person): PersonFormValues => ({
-  name: person?.name ?? "",
-  email: person?.email ?? "",
-  department: person?.department ?? "",
-  isActive: person?.isActive ?? true,
-});
+const toFormValues = (person?: Person): FormType =>
+  person
+    ? {
+        name: person.name,
+        email: person.email,
+        department: person.department ?? "",
+        isActive: person.isActive,
+      }
+    : defaultValues;
 
 /** 無効化確認待ちの状態。確定時に使う保存値と、警告文に埋め込む割り当て件数を保持する */
 type PendingDeactivation = {
-  values: PersonFormValues;
+  values: FormType;
   assignedServiceItemCount: number;
 };
 
@@ -46,9 +44,9 @@ export const PersonModal = ({ open, person, onClose }: PersonModalProps): ReactE
     handleSubmit,
     reset,
     formState: { errors, isDirty },
-  } = useForm<PersonFormValues>({
-    resolver: zodResolver(personFormSchema),
-    values: buildDefaultValues(person),
+  } = useForm<FormType>({
+    resolver: zodResolver(Schema),
+    values: toFormValues(person),
   });
 
   // なぜ close 時に reset() を呼ぶか: values オプションは内容が変わらない限り reset しないため、
@@ -61,8 +59,8 @@ export const PersonModal = ({ open, person, onClose }: PersonModalProps): ReactE
 
   const [pendingDeactivation, setPendingDeactivation] = useState<PendingDeactivation | null>(null);
 
-  const savePerson = (values: PersonFormValues): void => {
-    const normalized: PersonFormValues = {
+  const savePerson = (values: FormType): void => {
+    const normalized: FormType = {
       ...values,
       department: emptyToUndefined(values.department),
     };
@@ -76,7 +74,7 @@ export const PersonModal = ({ open, person, onClose }: PersonModalProps): ReactE
 
   // なぜ getState() で件数を都度取得するか: 送信時点でしか使わない値を毎レンダー購読するのを
   // 避けるため（coding-standards.md §5「1値1呼び出しで分割購読」の趣旨に沿ったスナップショット取得）。
-  const onSubmit = (values: PersonFormValues): void => {
+  const onSubmit = (values: FormType): void => {
     if (person?.isActive === true && !values.isActive) {
       const assignedServiceItemCount = Object.values(useAppStore.getState().serviceItems).filter(
         (serviceItem) => serviceItem.personId === person.id && serviceItem.isActive,

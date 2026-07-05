@@ -4,7 +4,7 @@
  */
 
 import { EQUIPMENT_STATUS_LABELS } from "@/features/equipment/constants";
-import type { EquipmentFormValues } from "@/features/equipment/form/shared/schema";
+import type { FormType } from "@/features/equipment/form/shared/schema";
 import type { Equipment } from "@/store/types";
 
 export type SelectOption = { value: string; label: string };
@@ -14,7 +14,7 @@ export const statusOptions: SelectOption[] = Object.entries(EQUIPMENT_STATUS_LAB
 );
 
 /** フォーム値(string ベース)をストア入力へ変換。空文字の任意項目は undefined に落とす */
-export const toEquipmentPayload = (values: EquipmentFormValues): Omit<Equipment, "id"> => ({
+export const toEquipmentPayload = (values: FormType): Omit<Equipment, "id"> => ({
   managementNo: values.managementNo,
   name: values.name,
   model: values.model === "" ? undefined : values.model,

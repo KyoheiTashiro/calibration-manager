@@ -6,7 +6,7 @@
  * なぜフォーム値をすべて string ベースに保つか: HTML input/select の値は本質的に文字列であり、
  * leadTimeDays/bufferDays/noticeDaysBefore も number へ変換するのは検証成功後（呼び出し側の
  * submit ハンドラ）に限る。defaultValues/reset に渡す型と register 対象の型を一致させ、
- * preprocess/transform による resolver の入出力型ズレを避ける（vendorFormSchema と同方針）。
+ * preprocess/transform による resolver の入出力型ズレを避ける（VendorModal/schema.ts と同方針）。
  */
 
 import { DEFAULT_BUFFER_DAYS, DEFAULT_NOTICE_DAYS_BEFORE } from "@/domain/constants";
@@ -16,7 +16,7 @@ import { isIsoDateString } from "@/utils/time";
 import { z } from "zod";
 
 /** 空欄不可・0以上の整数文字列（発注余裕日・通知開始日数向け） */
-// なぜ戻り値の型注釈を付けないか: equipment/form/shared/schema.ts の createEquipmentFormSchema と同じ理由で、
+// なぜ戻り値の型注釈を付けないか: equipment/form/shared/schema.ts の createSchema と同じ理由で、
 // refine() 済みの具体的なZodスキーマ形状をTypeScriptの推論に委ねる必要があるため。
 // oxlint-disable-next-line typescript/explicit-function-return-type, typescript/explicit-module-boundary-types -- 上記理由によりzodスキーマの戻り値型は推論に委ねる必要がある
 const requiredNonNegativeIntegerString = (requiredMessage: string, invalidMessage: string) =>
@@ -27,7 +27,7 @@ const requiredNonNegativeIntegerString = (requiredMessage: string, invalidMessag
       message: invalidMessage,
     });
 
-export const serviceItemFormSchema = z
+export const Schema = z
   .object({
     name: z.string().min(1, "項目名は必須です"),
     type: z.enum(SERVICE_ITEM_TYPE),
@@ -63,10 +63,10 @@ export const serviceItemFormSchema = z
     }
   });
 
-export type ServiceItemFormValues = z.infer<typeof serviceItemFormSchema>;
+export type FormType = z.infer<typeof Schema>;
 
 /** 新規追加時の既定フォーム値（06-service-item-modal.md「新規フォーム既定値」） */
-export const defaultServiceItemFormValues: ServiceItemFormValues = {
+export const defaultValues: FormType = {
   name: "",
   type: SERVICE_ITEM_TYPE.INSPECTION,
   cycle: CYCLE.Y1,
@@ -81,7 +81,7 @@ export const defaultServiceItemFormValues: ServiceItemFormValues = {
 };
 
 /** 既存 ServiceItem をフォーム値（すべて string ベース）へ変換する。新規時は既定値 */
-export const toFormValues = (serviceItem: ServiceItem | undefined): ServiceItemFormValues =>
+export const toFormValues = (serviceItem: ServiceItem | undefined): FormType =>
   serviceItem
     ? {
         name: serviceItem.name,
@@ -96,4 +96,4 @@ export const toFormValues = (serviceItem: ServiceItem | undefined): ServiceItemF
         nextDueDate: serviceItem.nextDueDate,
         isActive: serviceItem.isActive,
       }
-    : defaultServiceItemFormValues;
+    : defaultValues;

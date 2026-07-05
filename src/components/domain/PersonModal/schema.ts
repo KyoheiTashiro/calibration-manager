@@ -6,7 +6,7 @@
 
 import { z } from "zod";
 
-export const personFormSchema = z.object({
+export const Schema = z.object({
   name: z.string().min(1, "氏名は必須です"),
   email: z
     .string()
@@ -18,4 +18,16 @@ export const personFormSchema = z.object({
   isActive: z.boolean(),
 });
 
-export type PersonFormValues = z.infer<typeof personFormSchema>;
+export type FormType = z.infer<typeof Schema>;
+
+/**
+ * なぜ新規追加時の isActive 既定値を true にするか: ドメイン仕様書に明記はないが、
+ * 「無効な担当者を新規作成する」のは通常運用として不自然であり、既存 Person 一覧の
+ * 運用（有効が既定）と整合させるための実装判断（Phase 4 実装時の判断）。
+ */
+export const defaultValues: FormType = {
+  name: "",
+  email: "",
+  department: "",
+  isActive: true,
+};

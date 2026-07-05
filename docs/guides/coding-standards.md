@@ -42,6 +42,17 @@ Lint/Format は **oxlint + oxfmt**（ESLint/Prettier ではない）。多くは
   ```
   根拠: 値と型を 1 箇所で同期。`NOTIFICATION_TYPE`/`SERVICE_ORDER_STATUS`/`EQUIPMENT_STATUS`/`ROUTES` 等で一貫。
 - **zustand スライス**: 型 `XxxSlice` + ファクトリ `createXxxSlice`（例: `EquipmentSlice` / `createEquipmentSlice`）。初期値は独立した定数にせずファクトリ内に直接書く。
+- **RHF 用 `schema.ts` の公開名は固定**（D-051）:
+  ```ts
+  export const Schema = z.object({…});
+  export type FormType = z.infer<typeof Schema>;
+  export const defaultValues: FormType = {…};
+  ```
+  - ストア状態依存で動的生成する場合はファクトリ `createSchema` とし、`FormType` は `z.infer<ReturnType<typeof createSchema>>` で導出する（`equipment/form/shared/schema.ts`）。
+  - `defaultValues` は静的既定値を持つフォームのみ export する。今日日付・prefill 等の実行時依存値は呼び出し側で `{ ...defaultValues, orderedDate: todayIsoDate() }` のように上書きし、全フィールドが実行時依存なら export しない（`ServiceRecordModal`、`serviceOrder/returnDialog`）。
+  - 1 つの `schema.ts` には 1 スキーマのみ置く。複数フォームを持つ feature はサブディレクトリに分割する（`serviceOrder/orderDialog/schema.ts`・`serviceOrder/returnDialog/schema.ts`）。
+  - 複数の schema.ts を import する側は `import { Schema as orderDialogSchema }` のように別名を付ける。
+  - 根拠: フォーム毎に `xxxFormSchema` / `XxxFormValues` / `emptyFormValues` と命名が揺れていたため固定名に統一。schema.ts の中身が予測可能になり、defaultValues とスキーマの型整合（`defaultValues: FormType`）も colocate で保証する。
 - **selector 関数**: `xxxOf` 形（`serviceItemsOf`, `serviceOrdersOf`, `serviceRecordsOf`）。件数系は `unreadNotificationCount` のように用途を綴る。`src/store/selectors.ts`。
 - **省略形を使わない**: 識別子（変数・引数・関数・プロパティ・型）は完全な英単語で綴る。短縮形・頭文字省略・単文字いずれも不可。
   - 多文字省略形: `idx`→`index` / `eid`→`equipmentId` / `cfg`→`config` / `prev`→`previous` / `msg`→`message` / `btn`→`button` / `el`→`element` / `info`→説明的な完全名（`errorInfo` 等）。
@@ -62,7 +73,7 @@ Lint/Format は **oxlint + oxfmt**（ESLint/Prettier ではない）。多くは
 - `src/features/**/` の基本: `index.tsx`（薄いビュー本体）+ `hooks.ts`（ロジック）+ `schema.ts`（RHF 用 zod）+ `components/`。
   - feature 例: `dashboard`（ダッシュボード） / `equipment`（機器一覧・詳細） / `serviceItems`（点検校正項目一覧）/ `serviceOrder`（点検校正外部案件） / `vendors`・`persons`（メーカー/取引先・担当者マスタ） / `notifications`（通知センター） / `settings`（設定）。
 - **`index.tsx` は barrel ではなく公開コンポーネント本体**。`App.tsx` は `import { Dashboard } from "@/features/dashboard"` のように named export を直接参照。feature にバレル専用ファイルは作らない。
-- **`schema.ts`（RHF 用 zod）はフォームを持つ場所に colocate する**（D-043）。feature 内フォームは `features/**/schema.ts`（`equipment/form/shared`、`serviceOrder`）、`components/domain/` の各モーダルはモーダルディレクトリ内 `schema.ts`。必須ではない（フォームがなければ置かない）。
+- **`schema.ts`（RHF 用 zod）はフォームを持つ場所に colocate する**（D-043）。feature 内フォームは `features/**/schema.ts`（`equipment/form/shared`、`serviceOrder/orderDialog`・`serviceOrder/returnDialog`）、`components/domain/` の各モーダルはモーダルディレクトリ内 `schema.ts`。必須ではない（フォームがなければ置かない）。
 - **`hooks.ts` は全 feature に置く**（ロジックは hooks に寄せ index.tsx を薄く保つ）。
 - サブコンポーネントが 1 個だけなら feature 直下に置いてよい（複数になったら `components/` へ）。
 - **複数 feature で共有する汎用 React フックは `src/utils/` に他ユーティリティ同様サブディレクトリを切って置く**（D-044。例: `src/utils/navigation/` の `useSafeNavigate` — navigate() の戻り値を無視する共通ラッパー。画面遷移はこれを使い、`Promise.resolve(navigate(...)).catch(...)` を各所に書かない）。

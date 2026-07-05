@@ -5,10 +5,7 @@
  */
 
 import type { SelectOption } from "@/features/equipment/form/shared/mapping";
-import {
-  createEquipmentFormSchema,
-  type EquipmentFormValues,
-} from "@/features/equipment/form/shared/schema";
+import { createSchema, type FormType } from "@/features/equipment/form/shared/schema";
 import { useAppStore } from "@/store/useAppStore";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMemo } from "react";
@@ -20,21 +17,21 @@ import {
 } from "react-hook-form";
 
 type UseEquipmentFormCoreParams = {
-  defaultValues: EquipmentFormValues;
+  defaultValues: FormType;
   /**
    * 編集対象の最新値。指定時は RHF の values として渡す。深い等価比較で変化を検知した際に
    * reset + defaultValues 更新が行われるため、対象切り替え時のみプリフィルし直す用途に使う
    * （新規作成では指定しない＝undefined）。
    */
-  values?: EquipmentFormValues;
+  values?: FormType;
   /** 編集時: 管理番号ユニーク検証から自身を除外するための機器 id。新規時は undefined */
   excludeEquipmentId?: string;
 };
 
 type UseEquipmentFormCoreResult = {
-  register: UseFormRegister<EquipmentFormValues>;
-  errors: FieldErrors<EquipmentFormValues>;
-  handleSubmit: UseFormHandleSubmit<EquipmentFormValues>;
+  register: UseFormRegister<FormType>;
+  errors: FieldErrors<FormType>;
+  handleSubmit: UseFormHandleSubmit<FormType>;
   manufacturerOptions: SelectOption[];
 };
 
@@ -60,7 +57,7 @@ export const useEquipmentFormCore = ({
   // 依存配列に入れれば、ストアが実際に変わらない限り Object.values の再生成は起きず
   // resolver も不要に再生成されない。
   const resolver = useMemo(
-    () => zodResolver(createEquipmentFormSchema(existingManagementNumbers, Object.values(vendors))),
+    () => zodResolver(createSchema(existingManagementNumbers, Object.values(vendors))),
     [existingManagementNumbers, vendors],
   );
 
@@ -68,7 +65,7 @@ export const useEquipmentFormCore = ({
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<EquipmentFormValues>({
+  } = useForm<FormType>({
     resolver,
     defaultValues,
     values,

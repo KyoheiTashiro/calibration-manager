@@ -52,7 +52,7 @@ export const createFormSubmitHandler =
 /** 空欄可・0以上の整数文字列（納期(日)・費用等、フォーム入力向け zod ヘルパ） */
 // なぜ戻り値の型注釈を付けないか: refine() 済みの具体的な Zod スキーマ形状を
 // TypeScript の推論に委ねる必要があるため（equipment/form/shared/schema.ts の
-// createEquipmentFormSchema と同方針）。
+// createSchema と同方針）。
 // oxlint-disable-next-line typescript/explicit-function-return-type, typescript/explicit-module-boundary-types -- 上記理由によりzodスキーマの戻り値型は推論に委ねる必要がある
 export const optionalNonNegativeIntegerString = (invalidMessage: string) =>
   z

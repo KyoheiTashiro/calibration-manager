@@ -111,7 +111,7 @@ src/
 
 - ルーターは `main.tsx` の `HashRouter`。ルート定義は `App.tsx` に置く。12画面のルーティング対応表は screen-design/README.md §0.2 を参照し、本書では再掲しない。
 - モーダル群（ServiceItemModal/ServiceRecordModal/ServiceOrderModal/VendorModal/PersonModal）は特定の1画面に属さず複数画面から起動されるため `components/domain/` に配置している（screen-design §0.2「モーダルで行う操作」）。`components/domain/` の役割が広いのは、calibration-managerの画面設計上モーダル起動元が多い（機器詳細・点検校正項目一覧・案件一覧など）ことによる設計判断である。
-- React Hook Form + Zod用のフォームスキーマは**フォームを持つ画面/コンポーネントの直近に colocate する**（D-043）。feature 内のフォーム（機器登録編集の `equipment/form/shared/schema.ts`、かんばん遷移ダイアログの `serviceOrder/schema.ts`）は features 側、`components/domain/` のモーダル（ServiceItemModal / ServiceOrderModal / ServiceRecordModal / VendorModal / PersonModal）は各モーダルディレクトリ内の `schema.ts` に置く。永続化データの構造検証（`store/schema.ts`）とは別物。
+- React Hook Form + Zod用のフォームスキーマは**フォームを持つ画面/コンポーネントの直近に colocate する**（D-043）。feature 内のフォーム（機器登録編集の `equipment/form/shared/schema.ts`、かんばん遷移ダイアログの `serviceOrder/orderDialog/schema.ts`・`serviceOrder/returnDialog/schema.ts`）は features 側、`components/domain/` のモーダル（ServiceItemModal / ServiceOrderModal / ServiceRecordModal / VendorModal / PersonModal）は各モーダルディレクトリ内の `schema.ts` に置く。永続化データの構造検証（`store/schema.ts`）とは別物。RHF 用 `schema.ts` の公開名（`Schema`/`FormType`/`defaultValues`）は D-051 参照。
 - `store/schema.ts` はCSVインポートの行バリデーションにも再利用している（[tech-stack.md](./tech-stack.md) 参照）。
 - Storybookのstoryはコンポーネント隣に `*.stories.tsx` で配置する（colocation）。上記ツリーでは省略している。
 - `src/test/` にテスト支援ユーティリティを置く（詳細は省略）。

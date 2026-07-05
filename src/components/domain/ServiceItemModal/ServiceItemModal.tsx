@@ -4,11 +4,7 @@
  * 点検校正項目（ServiceItem）の追加・編集モーダル（screen-design/06-service-item-modal.md）。RHF + zodResolver。
  */
 
-import {
-  serviceItemFormSchema,
-  toFormValues,
-  type ServiceItemFormValues,
-} from "@/components/domain/ServiceItemModal/schema";
+import { Schema, toFormValues, type FormType } from "@/components/domain/ServiceItemModal/schema";
 import { Button, Checkbox, DateField, Modal, RadioGroup, Select, TextField } from "@/components/ui";
 import { ROUTES } from "@/constants/routes";
 import {
@@ -53,8 +49,8 @@ export const ServiceItemModal = ({
     setValue,
     reset,
     formState: { errors, isDirty },
-  } = useForm<ServiceItemFormValues>({
-    resolver: zodResolver(serviceItemFormSchema),
+  } = useForm<FormType>({
+    resolver: zodResolver(Schema),
     // なぜ values か: 編集対象（serviceItem）が変わるたびに既存値をプリフィルする
     // （screen-design/README.md §0.5）。RHF が深い等価比較で変化を検知し reset する。
     values: toFormValues(serviceItem),
@@ -93,7 +89,7 @@ export const ServiceItemModal = ({
     ? `${equipment.managementNo} ${equipment.name}`
     : "(機器情報が見つかりません)";
 
-  const onSubmit = (values: ServiceItemFormValues): void => {
+  const onSubmit = (values: FormType): void => {
     const isExternal = values.execution === EXECUTION.EXTERNAL;
     const vendorIdInput = emptyToUndefined(values.vendorId);
     const leadTimeDaysInput = emptyToUndefined(values.leadTimeDays);
