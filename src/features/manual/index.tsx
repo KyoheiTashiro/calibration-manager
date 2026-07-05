@@ -11,6 +11,8 @@ import { SERVICE_ITEM_STATUS, type ServiceItemStatus } from "@/domain/serviceIte
 import type { ReactElement } from "react";
 import { Link } from "react-router-dom";
 
+import { ManualSection } from "./components/ManualSection";
+
 /** ステータスの意味を平易な日本語で言い換えたもの(domain-model.md §4.3 の条件に対応) */
 const STATUS_DESCRIPTIONS = {
   [SERVICE_ITEM_STATUS.OVERDUE]: "次回期限を過ぎています",
@@ -21,12 +23,60 @@ const STATUS_DESCRIPTIONS = {
   [SERVICE_ITEM_STATUS.OK]: "上記のいずれにも当てはまりません",
 } as const satisfies Record<ServiceItemStatus, string>;
 
+/** 「各画面の説明」セクションのデータ駆動化(screen-design/12-manual.md §表示項目/機能) */
+const SCREEN_GUIDES = [
+  {
+    route: ROUTES.DASHBOARD,
+    title: "ダッシュボード",
+    description:
+      "対応が必要な項目の全体像をひと目で確認し、そこから各項目へすぐに移動できる画面です。",
+  },
+  {
+    route: ROUTES.EQUIPMENT_LIST,
+    title: "機器一覧・機器詳細",
+    description:
+      "登録した機器の一覧表示と検索ができます。機器詳細では、1台の機器の基本情報・点検校正項目・実施記録をまとめて確認でき、項目の管理や記録の登録もここから行います。",
+  },
+  {
+    route: ROUTES.SERVICE_ITEM_LIST,
+    title: "点検校正項目一覧",
+    description:
+      "全機器の点検校正項目を期限が近い順に確認できます。絞り込みや各行の操作で日々の点検・校正業務を進める、中心となる画面です。",
+  },
+  {
+    route: ROUTES.SERVICE_ORDER_LIST,
+    title: "点検校正外部案件",
+    description:
+      "外部点検校正の発注から返却・記録までの進み具合を、状態ごとのボード(かんばん)で管理します。",
+  },
+  {
+    route: ROUTES.VENDOR_LIST,
+    title: "メーカー/取引先",
+    description: "機器のメーカーや、校正の依頼先となる取引先を追加・編集します。",
+  },
+  {
+    route: ROUTES.PERSON_LIST,
+    title: "担当者",
+    description: "担当者を追加・編集します。使わなくなった担当者は無効化できます。",
+  },
+  {
+    route: ROUTES.NOTIFICATION_LIST,
+    title: "通知",
+    description: "アプリ内の通知を確認し、既読にできます。",
+  },
+  {
+    route: ROUTES.SETTINGS,
+    title: "設定",
+    description:
+      "アプリのインストール(PWA)、CSVでのデータのバックアップ(エクスポート)と復元(インポート)、データの全削除を行います。",
+  },
+] as const;
+
 export const Manual = (): ReactElement => (
   <div className="flex flex-col gap-4">
     <h1 className="text-xl font-bold">利用マニュアル</h1>
 
-    <section className="flex flex-col gap-3 rounded border border-slate-200 p-4">
-      <h2 className="border-b border-slate-200 pb-2 text-lg font-semibold">ご利用にあたって</h2>
+    <ManualSection title="ご利用にあたって">
       <p>このアプリは、機器の点検・校正の期限をまとめて管理するツールです。</p>
       <p>
         データはすべてお使いのブラウザー内(LocalStorage)に保存されます。外部のサーバーには
@@ -40,10 +90,9 @@ export const Manual = (): ReactElement => (
         </Link>
         から定期的にCSVエクスポートでバックアップを取ることをおすすめします。
       </p>
-    </section>
+    </ManualSection>
 
-    <section className="flex flex-col gap-3 rounded border border-slate-200 p-4">
-      <h2 className="border-b border-slate-200 pb-2 text-lg font-semibold">基本の流れ</h2>
+    <ManualSection title="基本の流れ">
       <ol className="flex list-decimal flex-col gap-2 pl-5">
         <li>
           はじめに、機器の登録で使う基本情報(
@@ -92,10 +141,9 @@ export const Manual = (): ReactElement => (
           画面のボードに表示され、発注から返却・記録の登録までの進み具合を管理できます。
         </li>
       </ol>
-    </section>
+    </ManualSection>
 
-    <section className="flex flex-col gap-3 rounded border border-slate-200 p-4">
-      <h2 className="border-b border-slate-200 pb-2 text-lg font-semibold">ステータスの見方</h2>
+    <ManualSection title="ステータスの見方">
       <ul className="flex flex-col gap-2">
         {Object.values(SERVICE_ITEM_STATUS).map((status) => (
           <li key={status} className="flex items-center gap-2">
@@ -104,12 +152,9 @@ export const Manual = (): ReactElement => (
           </li>
         ))}
       </ul>
-    </section>
+    </ManualSection>
 
-    <section className="flex flex-col gap-3 rounded border border-slate-200 p-4">
-      <h2 className="border-b border-slate-200 pb-2 text-lg font-semibold">
-        期限と発注推奨日の計算
-      </h2>
+    <ManualSection title="期限と発注推奨日の計算">
       <h3 className="border-primary border-l-4 pl-2 font-semibold">次回期限</h3>
       <p>
         次回期限は「前回実施日 + 周期」で自動計算されます。項目を登録した直後はまだ実施記録が
@@ -146,97 +191,22 @@ export const Manual = (): ReactElement => (
         から44日さかのぼった 8/17 になります。この日を過ぎても発注していない項目が「要発注」として
         表示されます。
       </p>
-    </section>
+    </ManualSection>
 
-    <section className="flex flex-col gap-3 rounded border border-slate-200 p-4">
-      <h2 className="border-b border-slate-200 pb-2 text-lg font-semibold">各画面の説明</h2>
+    <ManualSection title="各画面の説明">
+      {SCREEN_GUIDES.map((guide) => (
+        <div key={guide.route}>
+          <h3 className="font-semibold">
+            <Link to={guide.route} className="text-primary underline">
+              {guide.title}
+            </Link>
+          </h3>
+          <p>{guide.description}</p>
+        </div>
+      ))}
+    </ManualSection>
 
-      <div>
-        <h3 className="font-semibold">
-          <Link to={ROUTES.DASHBOARD} className="text-primary underline">
-            ダッシュボード
-          </Link>
-        </h3>
-        <p>対応が必要な項目の全体像をひと目で確認し、そこから各項目へすぐに移動できる画面です。</p>
-      </div>
-
-      <div>
-        <h3 className="font-semibold">
-          <Link to={ROUTES.EQUIPMENT_LIST} className="text-primary underline">
-            機器一覧・機器詳細
-          </Link>
-        </h3>
-        <p>
-          登録した機器の一覧表示と検索ができます。機器詳細では、1台の機器の基本情報・点検校正項目・
-          実施記録をまとめて確認でき、項目の管理や記録の登録もここから行います。
-        </p>
-      </div>
-
-      <div>
-        <h3 className="font-semibold">
-          <Link to={ROUTES.SERVICE_ITEM_LIST} className="text-primary underline">
-            点検校正項目一覧
-          </Link>
-        </h3>
-        <p>
-          全機器の点検校正項目を期限が近い順に確認できます。絞り込みや各行の操作で日々の点検・校正
-          業務を進める、中心となる画面です。
-        </p>
-      </div>
-
-      <div>
-        <h3 className="font-semibold">
-          <Link to={ROUTES.SERVICE_ORDER_LIST} className="text-primary underline">
-            点検校正外部案件
-          </Link>
-        </h3>
-        <p>
-          外部点検校正の発注から返却・記録までの進み具合を、状態ごとのボード(かんばん)で管理します。
-        </p>
-      </div>
-
-      <div>
-        <h3 className="font-semibold">
-          <Link to={ROUTES.VENDOR_LIST} className="text-primary underline">
-            メーカー/取引先
-          </Link>
-        </h3>
-        <p>機器のメーカーや、校正の依頼先となる取引先を追加・編集します。</p>
-      </div>
-
-      <div>
-        <h3 className="font-semibold">
-          <Link to={ROUTES.PERSON_LIST} className="text-primary underline">
-            担当者
-          </Link>
-        </h3>
-        <p>担当者を追加・編集します。使わなくなった担当者は無効化できます。</p>
-      </div>
-
-      <div>
-        <h3 className="font-semibold">
-          <Link to={ROUTES.NOTIFICATION_LIST} className="text-primary underline">
-            通知
-          </Link>
-        </h3>
-        <p>アプリ内の通知を確認し、既読にできます。</p>
-      </div>
-
-      <div>
-        <h3 className="font-semibold">
-          <Link to={ROUTES.SETTINGS} className="text-primary underline">
-            設定
-          </Link>
-        </h3>
-        <p>
-          アプリのインストール(PWA)、CSVでのデータのバックアップ(エクスポート)と復元(インポート)、
-          データの全削除を行います。
-        </p>
-      </div>
-    </section>
-
-    <section className="flex flex-col gap-3 rounded border border-slate-200 p-4">
-      <h2 className="border-b border-slate-200 pb-2 text-lg font-semibold">バックアップと復元</h2>
+    <ManualSection title="バックアップと復元">
       <p>
         <Link to={ROUTES.SETTINGS} className="text-primary underline">
           設定画面
@@ -248,12 +218,9 @@ export const Manual = (): ReactElement => (
         端末の変更やブラウザーデータの消去でデータが失われる場合に備え、定期的にエクスポートして
         おくことをおすすめします。
       </p>
-    </section>
+    </ManualSection>
 
-    <section className="flex flex-col gap-3 rounded border border-slate-200 p-4">
-      <h2 className="border-b border-slate-200 pb-2 text-lg font-semibold">
-        ライセンスとソースコード
-      </h2>
+    <ManualSection title="ライセンスとソースコード">
       <p>
         このアプリはオープンソースソフトウェアです。ソースコードは
         <a
@@ -270,6 +237,6 @@ export const Manual = (): ReactElement => (
         業務に合わせた機能追加が必要な場合は、MITライセンスの範囲でソースコードを自由に改変・
         拡張してご利用いただけます。
       </p>
-    </section>
+    </ManualSection>
   </div>
 );
