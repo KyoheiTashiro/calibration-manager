@@ -3,7 +3,7 @@
  * （全項目横断・新しい順）。0件時はEmptyStateを表示する。並び順は呼び出し側(hooks.ts)で確定済み。
  */
 
-import { EmptyState, Table, TableBody, TableHead } from "@/components/ui";
+import { EmptyState, Table, TableBody, TableHead, Td, Th } from "@/components/ui";
 import type { ServiceRecordRow } from "@/features/equipment/detail/hooks";
 import { SERVICE_RECORD_RESULT_LABELS } from "@/features/serviceItems/constants";
 import type { ReactElement } from "react";
@@ -19,31 +19,21 @@ export const ServiceRecordTable = ({ serviceRecordRows }: Props): ReactElement =
     <Table>
       <TableHead>
         <tr>
-          <th scope="col" className="px-3 py-2 text-left">
-            実施日
-          </th>
-          <th scope="col" className="px-3 py-2 text-left">
-            項目名
-          </th>
-          <th scope="col" className="px-3 py-2 text-left">
-            実施者
-          </th>
-          <th scope="col" className="px-3 py-2 text-left">
-            結果
-          </th>
-          <th scope="col" className="px-3 py-2 text-left">
-            備考
-          </th>
+          <Th>実施日</Th>
+          <Th>項目名</Th>
+          <Th>実施者</Th>
+          <Th>結果</Th>
+          <Th>備考</Th>
         </tr>
       </TableHead>
       <TableBody>
         {serviceRecordRows.map(({ serviceRecord, serviceItemName }) => (
           <tr key={serviceRecord.id}>
-            <td className="px-3 py-2">{serviceRecord.doneDate}</td>
-            <td className="px-3 py-2">{serviceItemName}</td>
-            <td className="px-3 py-2">{serviceRecord.doneBy}</td>
-            <td className="px-3 py-2">{SERVICE_RECORD_RESULT_LABELS[serviceRecord.result]}</td>
-            <td className="px-3 py-2">{serviceRecord.note ?? "—"}</td>
+            <Td>{serviceRecord.doneDate}</Td>
+            <Td>{serviceItemName}</Td>
+            <Td>{serviceRecord.doneBy}</Td>
+            <Td>{SERVICE_RECORD_RESULT_LABELS[serviceRecord.result]}</Td>
+            <Td>{serviceRecord.note ?? "—"}</Td>
           </tr>
         ))}
       </TableBody>

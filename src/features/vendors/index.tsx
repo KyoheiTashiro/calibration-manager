@@ -13,6 +13,8 @@ import {
   Table,
   TableBody,
   TableHead,
+  Td,
+  Th,
 } from "@/components/ui";
 import { useVendorDelete, useVendorList } from "@/features/vendors/hooks";
 import type { Vendor } from "@/store/types";
@@ -54,31 +56,19 @@ export const VendorList = (): ReactElement => {
         <Table>
           <TableHead>
             <tr>
-              <th scope="col" className="px-3 py-2 text-left">
-                名称
-              </th>
-              <th scope="col" className="px-3 py-2 text-left">
-                種別
-              </th>
-              <th scope="col" className="px-3 py-2 text-right">
-                標準納期
-              </th>
-              <th scope="col" className="px-3 py-2 text-left">
-                窓口
-              </th>
-              <th scope="col" className="px-3 py-2 text-left">
-                連絡先
-              </th>
-              <th scope="col" className="px-3 py-2 text-left">
-                操作
-              </th>
+              <Th>名称</Th>
+              <Th>種別</Th>
+              <Th align="right">標準納期</Th>
+              <Th>窓口</Th>
+              <Th>連絡先</Th>
+              <Th>操作</Th>
             </tr>
           </TableHead>
           <TableBody>
             {vendorList.map((vendor) => (
               <tr key={vendor.id} className="h-10 hover:bg-slate-50">
-                <td className="px-3 py-2">{vendor.name}</td>
-                <td className="px-3 py-2">
+                <Td>{vendor.name}</Td>
+                <Td>
                   {!vendor.isManufacturer && !vendor.isCalibrator ? (
                     "—"
                   ) : (
@@ -91,19 +81,19 @@ export const VendorList = (): ReactElement => {
                       )}
                     </span>
                   )}
-                </td>
-                <td className="px-3 py-2 text-right tabular-nums">
+                </Td>
+                <Td className="text-right tabular-nums">
                   {vendor.standardLeadTimeDays === undefined
                     ? "—"
                     : `${vendor.standardLeadTimeDays}日`}
-                </td>
-                <td className="px-3 py-2">{vendor.contactPerson ?? "—"}</td>
-                <td className="px-3 py-2">{vendor.phone ?? "—"}</td>
+                </Td>
+                <Td>{vendor.contactPerson ?? "—"}</Td>
+                <Td>{vendor.phone ?? "—"}</Td>
                 {/* なぜ td 直下に Button を並べるか: div でラップして1階層深くすると
                     jsx-a11y(control-has-associated-label) の既定探索深度(2)を超えて
                     ボタン内テキストを検出できず誤検知するため、td を flex コンテナ化して
                     ラッパーを1段省く。 */}
-                <td className="flex gap-2 px-3 py-2">
+                <Td className="flex gap-2">
                   <Button
                     variant="secondary"
                     size="sm"
@@ -122,7 +112,7 @@ export const VendorList = (): ReactElement => {
                   >
                     削除
                   </Button>
-                </td>
+                </Td>
               </tr>
             ))}
           </TableBody>

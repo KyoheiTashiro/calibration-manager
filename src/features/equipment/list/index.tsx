@@ -12,7 +12,10 @@ import {
   Table,
   TableBody,
   TableHead,
+  Td,
   TextField,
+  Th,
+  activatableRowProps,
 } from "@/components/ui";
 import { ROUTES, equipmentDetailPath } from "@/constants/routes";
 import {
@@ -25,7 +28,7 @@ import {
   useEquipmentList,
 } from "@/features/equipment/list/hooks";
 import { useSafeNavigate } from "@/utils/navigation";
-import type { KeyboardEvent, ReactElement } from "react";
+import type { ReactElement } from "react";
 
 export const EquipmentList = (): ReactElement => {
   const safeNavigate = useSafeNavigate();
@@ -47,15 +50,6 @@ export const EquipmentList = (): ReactElement => {
 
   const handleRowActivate = (equipmentId: string): void => {
     safeNavigate(equipmentDetailPath(equipmentId));
-  };
-
-  const handleRowKeyDown = (
-    event: KeyboardEvent<HTMLTableRowElement>,
-    equipmentId: string,
-  ): void => {
-    if (event.key !== "Enter" && event.key !== " ") return;
-    event.preventDefault();
-    handleRowActivate(equipmentId);
   };
 
   return (
@@ -103,59 +97,36 @@ export const EquipmentList = (): ReactElement => {
             <Table>
               <TableHead>
                 <tr>
-                  <th scope="col" className="px-3 py-2 text-left">
-                    管理番号
-                  </th>
-                  <th scope="col" className="px-3 py-2 text-left">
-                    機器名
-                  </th>
-                  <th scope="col" className="px-3 py-2 text-left">
-                    型式
-                  </th>
-                  <th scope="col" className="px-3 py-2 text-left">
-                    メーカー
-                  </th>
-                  <th scope="col" className="px-3 py-2 text-left">
-                    設置場所
-                  </th>
-                  <th scope="col" className="px-3 py-2 text-left">
-                    状態
-                  </th>
-                  <th scope="col" className="px-3 py-2 text-right">
-                    項目数
-                  </th>
-                  <th scope="col" className="px-3 py-2 text-left">
-                    次回期限
-                  </th>
+                  <Th>管理番号</Th>
+                  <Th>機器名</Th>
+                  <Th>型式</Th>
+                  <Th>メーカー</Th>
+                  <Th>設置場所</Th>
+                  <Th>状態</Th>
+                  <Th align="right">項目数</Th>
+                  <Th>次回期限</Th>
                 </tr>
               </TableHead>
               <TableBody>
                 {filteredEquipmentList.map((entry) => (
                   <tr
                     key={entry.id}
-                    tabIndex={0}
-                    onClick={() => {
+                    {...activatableRowProps(() => {
                       handleRowActivate(entry.id);
-                    }}
-                    onKeyDown={(event) => {
-                      handleRowKeyDown(event, entry.id);
-                    }}
-                    className="cursor-pointer hover:bg-slate-50"
+                    })}
                   >
-                    <td className="px-3 py-2">{entry.managementNo}</td>
-                    <td className="px-3 py-2">{entry.name}</td>
-                    <td className="px-3 py-2">{entry.model ?? "—"}</td>
-                    <td className="px-3 py-2">{manufacturerNameOf(entry) ?? "—"}</td>
-                    <td className="px-3 py-2">{entry.location ?? "—"}</td>
-                    <td className="px-3 py-2">
+                    <Td>{entry.managementNo}</Td>
+                    <Td>{entry.name}</Td>
+                    <Td>{entry.model ?? "—"}</Td>
+                    <Td>{manufacturerNameOf(entry) ?? "—"}</Td>
+                    <Td>{entry.location ?? "—"}</Td>
+                    <Td>
                       <Badge className={EQUIPMENT_STATUS_BADGE_CLASSES[entry.status]}>
                         {EQUIPMENT_STATUS_LABELS[entry.status]}
                       </Badge>
-                    </td>
-                    <td className="px-3 py-2 text-right tabular-nums">
-                      {serviceItemCountOf(entry)}
-                    </td>
-                    <td className="px-3 py-2">{nearestDueDateOf(entry)}</td>
+                    </Td>
+                    <Td className="text-right tabular-nums">{serviceItemCountOf(entry)}</Td>
+                    <Td>{nearestDueDateOf(entry)}</Td>
                   </tr>
                 ))}
               </TableBody>

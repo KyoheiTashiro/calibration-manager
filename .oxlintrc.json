@@ -131,6 +131,7 @@
     // なぜ: className は「受け渡しAPIとして設計されたコンポーネント」に限り許可する。
     // Badge/Link/NavLink は色・リンク色を className で渡す設計（Badge.tsx参照。NavLinkは
     // isActiveでクラス出し分けする関数classNameが公式API）、Table は table要素カスタムが仕様、
+    // Td は td要素の text-right tabular-nums 等の追加装飾を呼び出し側から渡す設計（Table.tsx参照）、
     // *Icon は呼び出し側でサイズ制御する方針（icons/base.ts）。
     // それ以外のコンポーネントへの className / style 渡しは引き続き禁止する。
     "react/forbid-component-props": [
@@ -139,7 +140,7 @@
         "forbid": [
           {
             "propName": "className",
-            "allowedFor": ["Badge", "Link", "NavLink", "Table"],
+            "allowedFor": ["Badge", "Link", "NavLink", "Table", "Td"],
             "allowedForPatterns": ["*Icon"]
           },
           "style"

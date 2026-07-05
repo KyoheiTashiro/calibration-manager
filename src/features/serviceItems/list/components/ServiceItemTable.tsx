@@ -6,7 +6,7 @@
  */
 
 import { StatusBadge } from "@/components/domain";
-import { Button, Table, TableBody, TableHead } from "@/components/ui";
+import { Button, Table, TableBody, TableHead, Td, Th } from "@/components/ui";
 import {
   CYCLE_LABELS,
   EXECUTION_LABELS,
@@ -26,63 +26,39 @@ export const ServiceItemTable = ({ rows, onRecord, onOrder, onEdit }: Props): Re
   <Table>
     <TableHead>
       <tr>
-        <th scope="col" className="px-3 py-2 text-left">
-          ステータス
-        </th>
-        <th scope="col" className="px-3 py-2 text-left">
-          管理番号
-        </th>
-        <th scope="col" className="px-3 py-2 text-left">
-          機器名
-        </th>
-        <th scope="col" className="px-3 py-2 text-left">
-          項目名
-        </th>
-        <th scope="col" className="px-3 py-2 text-left">
-          種別
-        </th>
-        <th scope="col" className="px-3 py-2 text-left">
-          内外
-        </th>
-        <th scope="col" className="px-3 py-2 text-left">
-          周期
-        </th>
-        <th scope="col" className="px-3 py-2 text-left">
-          担当
-        </th>
-        <th scope="col" className="px-3 py-2 text-left">
-          最終実施日
-        </th>
-        <th scope="col" className="px-3 py-2 text-left">
-          次回期限
-        </th>
-        <th scope="col" className="px-3 py-2 text-left">
-          発注推奨日
-        </th>
-        <th scope="col" className="px-3 py-2 text-left">
-          操作
-        </th>
+        <Th>ステータス</Th>
+        <Th>管理番号</Th>
+        <Th>機器名</Th>
+        <Th>項目名</Th>
+        <Th>種別</Th>
+        <Th>内外</Th>
+        <Th>周期</Th>
+        <Th>担当</Th>
+        <Th>最終実施日</Th>
+        <Th>次回期限</Th>
+        <Th>発注推奨日</Th>
+        <Th>操作</Th>
       </tr>
     </TableHead>
     <TableBody>
       {rows.map((row) => (
         <tr key={row.serviceItem.id}>
-          <td className="px-3 py-2">
+          <Td>
             <StatusBadge status={row.status} />
-          </td>
-          <td className="px-3 py-2">{row.equipment.managementNo}</td>
-          <td className="px-3 py-2">{row.equipment.name}</td>
-          <td className="px-3 py-2">{row.serviceItem.name}</td>
-          <td className="px-3 py-2">{SERVICE_ITEM_TYPE_LABELS[row.serviceItem.type]}</td>
-          <td className="px-3 py-2">{EXECUTION_LABELS[row.serviceItem.execution]}</td>
-          <td className="px-3 py-2">{CYCLE_LABELS[row.serviceItem.cycle]}</td>
-          <td className="px-3 py-2">{row.personLabel}</td>
-          <td className="px-3 py-2">{row.serviceItem.lastDoneDate ?? "—"}</td>
-          <td className="px-3 py-2">{row.serviceItem.nextDueDate}</td>
-          <td className="px-3 py-2">{row.recommendedOrderDate ?? "—"}</td>
+          </Td>
+          <Td>{row.equipment.managementNo}</Td>
+          <Td>{row.equipment.name}</Td>
+          <Td>{row.serviceItem.name}</Td>
+          <Td>{SERVICE_ITEM_TYPE_LABELS[row.serviceItem.type]}</Td>
+          <Td>{EXECUTION_LABELS[row.serviceItem.execution]}</Td>
+          <Td>{CYCLE_LABELS[row.serviceItem.cycle]}</Td>
+          <Td>{row.personLabel}</Td>
+          <Td>{row.serviceItem.lastDoneDate ?? "—"}</Td>
+          <Td>{row.serviceItem.nextDueDate}</Td>
+          <Td>{row.recommendedOrderDate ?? "—"}</Td>
           {/* なぜ td を flex 化して直下に Button を並べるか: equipment/detail と同様、
               div ラップだと jsx-a11y のボタンラベル探索深度を超えるため。 */}
-          <td className="flex gap-2 px-3 py-2">
+          <Td className="flex gap-2">
             <Button
               variant="secondary"
               size="sm"
@@ -112,7 +88,7 @@ export const ServiceItemTable = ({ rows, onRecord, onOrder, onEdit }: Props): Re
             >
               編集
             </Button>
-          </td>
+          </Td>
         </tr>
       ))}
     </TableBody>

@@ -1,1 +1,2 @@
-export { Table, TableHead, TableBody } from "./Table";
+export { Table, TableHead, TableBody, Th, Td } from "./Table";
+export { activatableRowProps } from "./activatableRow";

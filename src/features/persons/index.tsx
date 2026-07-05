@@ -1,5 +1,5 @@
 import { PersonModal } from "@/components/domain/PersonModal";
-import { Badge, Button, EmptyState, Table, TableBody, TableHead } from "@/components/ui";
+import { Badge, Button, EmptyState, Table, TableBody, TableHead, Td, Th } from "@/components/ui";
 import { usePersonList } from "@/features/persons/hooks";
 import type { Person } from "@/store/types";
 import { useEntityModal } from "@/utils/modal";
@@ -34,30 +34,20 @@ export const PersonList = (): ReactElement => {
         <Table>
           <TableHead>
             <tr>
-              <th scope="col" className="px-3 py-2 text-left">
-                氏名
-              </th>
-              <th scope="col" className="px-3 py-2 text-left">
-                部署
-              </th>
-              <th scope="col" className="px-3 py-2 text-left">
-                メール
-              </th>
-              <th scope="col" className="px-3 py-2 text-left">
-                状態
-              </th>
-              <th scope="col" className="px-3 py-2 text-left">
-                操作
-              </th>
+              <Th>氏名</Th>
+              <Th>部署</Th>
+              <Th>メール</Th>
+              <Th>状態</Th>
+              <Th>操作</Th>
             </tr>
           </TableHead>
           <TableBody>
             {sortedPersons.map((person) => (
               <tr key={person.id}>
-                <td className="px-3 py-2">{person.name}</td>
-                <td className="px-3 py-2">{person.department ?? "—"}</td>
-                <td className="px-3 py-2">{person.email}</td>
-                <td className="px-3 py-2">
+                <Td>{person.name}</Td>
+                <Td>{person.department ?? "—"}</Td>
+                <Td>{person.email}</Td>
+                <Td>
                   <Badge
                     className={
                       person.isActive ? ACTIVE_BADGE_CLASS_NAME : INACTIVE_BADGE_CLASS_NAME
@@ -65,8 +55,8 @@ export const PersonList = (): ReactElement => {
                   >
                     {person.isActive ? "有効" : "無効"}
                   </Badge>
-                </td>
-                <td className="px-3 py-2">
+                </Td>
+                <Td>
                   <Button
                     size="sm"
                     variant="secondary"
@@ -76,7 +66,7 @@ export const PersonList = (): ReactElement => {
                   >
                     編集
                   </Button>
-                </td>
+                </Td>
               </tr>
             ))}
           </TableBody>

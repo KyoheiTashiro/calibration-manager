@@ -1,4 +1,4 @@
-import { Table, TableBody, TableHead } from "@/components/ui/Table";
+import { Table, TableBody, TableHead, Td, Th } from "@/components/ui/Table";
 import { render, screen } from "@testing-library/react";
 // なぜ: tsc -b はプロジェクト参照ごとに独立したプログラムのため、vitest.setup.ts
 // （tsconfig.node.json側）の副作用importだけではtsconfig.app.json側の型解決に
@@ -132,5 +132,77 @@ describe("TableBody", () => {
     expect(bodyElement).not.toBeNull();
     expect(bodyElement?.className).toContain("divide-y");
     expect(bodyElement?.className).toContain("divide-slate-200");
+  });
+});
+
+describe("Th", () => {
+  it("scope=col と左寄せ用クラスが付与される（デフォルト）", () => {
+    render(
+      <table>
+        <thead>
+          <tr>
+            <Th>管理番号</Th>
+          </tr>
+        </thead>
+      </table>,
+    );
+
+    const columnHeader = screen.getByRole("columnheader", { name: "管理番号" });
+    expect(columnHeader).toHaveAttribute("scope", "col");
+    expect(columnHeader.className).toContain("px-3");
+    expect(columnHeader.className).toContain("py-2");
+    expect(columnHeader.className).toContain("text-left");
+  });
+
+  it("align='right' を渡すと text-right クラスが付与される", () => {
+    render(
+      <table>
+        <thead>
+          <tr>
+            <Th align="right">標準納期</Th>
+          </tr>
+        </thead>
+      </table>,
+    );
+
+    const columnHeader = screen.getByRole("columnheader", { name: "標準納期" });
+    expect(columnHeader.className).toContain("text-right");
+    expect(columnHeader.className).not.toContain("text-left");
+  });
+});
+
+describe("Td", () => {
+  it("px-3 py-2 クラスが付与される", () => {
+    render(
+      <table>
+        <tbody>
+          <tr>
+            <Td>EQ-001</Td>
+          </tr>
+        </tbody>
+      </table>,
+    );
+
+    const cell = screen.getByText("EQ-001");
+    expect(cell.className).toContain("px-3");
+    expect(cell.className).toContain("py-2");
+  });
+
+  it("className を渡すと px-3 py-2 に追加でマージされる", () => {
+    render(
+      <table>
+        <tbody>
+          <tr>
+            <Td className="text-right tabular-nums">123</Td>
+          </tr>
+        </tbody>
+      </table>,
+    );
+
+    const cell = screen.getByText("123");
+    expect(cell.className).toContain("px-3");
+    expect(cell.className).toContain("py-2");
+    expect(cell.className).toContain("text-right");
+    expect(cell.className).toContain("tabular-nums");
   });
 });

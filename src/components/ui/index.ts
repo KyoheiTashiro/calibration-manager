@@ -12,7 +12,7 @@ export { EmptyState } from "@/components/ui/EmptyState";
 export { Modal } from "@/components/ui/Modal";
 export { RadioGroup } from "@/components/ui/RadioGroup";
 export { Select } from "@/components/ui/Select";
-export { Table, TableBody, TableHead } from "@/components/ui/Table";
+export { Table, TableBody, TableHead, Th, Td, activatableRowProps } from "@/components/ui/Table";
 export { Tabs } from "@/components/ui/Tabs";
 export { TextField } from "@/components/ui/TextField";
 export { Textarea } from "@/components/ui/Textarea";

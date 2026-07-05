@@ -5,7 +5,7 @@
  */
 
 import { StatusBadge } from "@/components/domain";
-import { Button, EmptyState, Table, TableBody, TableHead } from "@/components/ui";
+import { Button, EmptyState, Table, TableBody, TableHead, Td, Th } from "@/components/ui";
 import { displayedServiceItemStatus, personLabelOf } from "@/features/equipment/detail/hooks";
 import {
   CYCLE_LABELS,
@@ -54,30 +54,14 @@ export const ServiceItemTable = ({
     <Table>
       <TableHead>
         <tr>
-          <th scope="col" className="px-3 py-2 text-left">
-            状態
-          </th>
-          <th scope="col" className="px-3 py-2 text-left">
-            項目名
-          </th>
-          <th scope="col" className="px-3 py-2 text-left">
-            種別
-          </th>
-          <th scope="col" className="px-3 py-2 text-left">
-            内外
-          </th>
-          <th scope="col" className="px-3 py-2 text-left">
-            周期
-          </th>
-          <th scope="col" className="px-3 py-2 text-left">
-            担当
-          </th>
-          <th scope="col" className="px-3 py-2 text-left">
-            次回期限
-          </th>
-          <th scope="col" className="px-3 py-2 text-left">
-            アクション
-          </th>
+          <Th>状態</Th>
+          <Th>項目名</Th>
+          <Th>種別</Th>
+          <Th>内外</Th>
+          <Th>周期</Th>
+          <Th>担当</Th>
+          <Th>次回期限</Th>
+          <Th>アクション</Th>
         </tr>
       </TableHead>
       <TableBody>
@@ -94,18 +78,16 @@ export const ServiceItemTable = ({
               key={serviceItem.id}
               className={serviceItem.isActive ? undefined : "text-slate-400"}
             >
-              <td className="px-3 py-2">
-                {status === null ? "—" : <StatusBadge status={status} />}
-              </td>
-              <td className="px-3 py-2">{serviceItem.name}</td>
-              <td className="px-3 py-2">{SERVICE_ITEM_TYPE_LABELS[serviceItem.type]}</td>
-              <td className="px-3 py-2">{EXECUTION_LABELS[serviceItem.execution]}</td>
-              <td className="px-3 py-2">{CYCLE_LABELS[serviceItem.cycle]}</td>
-              <td className="px-3 py-2">{personLabelOf({ persons }, serviceItem.personId)}</td>
-              <td className="px-3 py-2">{serviceItem.nextDueDate}</td>
+              <Td>{status === null ? "—" : <StatusBadge status={status} />}</Td>
+              <Td>{serviceItem.name}</Td>
+              <Td>{SERVICE_ITEM_TYPE_LABELS[serviceItem.type]}</Td>
+              <Td>{EXECUTION_LABELS[serviceItem.execution]}</Td>
+              <Td>{CYCLE_LABELS[serviceItem.cycle]}</Td>
+              <Td>{personLabelOf({ persons }, serviceItem.personId)}</Td>
+              <Td>{serviceItem.nextDueDate}</Td>
               {/* なぜ td 直下に Button を並べるか: equipment/list や VendorList と同様、
                   div でラップするとjsx-a11yのボタンラベル探索深度を超えるためtdをflex化する */}
-              <td className="flex gap-2 px-3 py-2">
+              <Td className="flex gap-2">
                 <Button
                   variant="secondary"
                   size="sm"
@@ -124,7 +106,7 @@ export const ServiceItemTable = ({
                 >
                   編集
                 </Button>
-              </td>
+              </Td>
             </tr>
           );
         })}

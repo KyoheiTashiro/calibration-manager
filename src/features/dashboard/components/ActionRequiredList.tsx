@@ -5,11 +5,19 @@
  */
 
 import { StatusBadge } from "@/components/domain";
-import { EmptyState, Table, TableBody, TableHead } from "@/components/ui";
+import {
+  EmptyState,
+  Table,
+  TableBody,
+  TableHead,
+  Td,
+  Th,
+  activatableRowProps,
+} from "@/components/ui";
 import { equipmentDetailPath } from "@/constants/routes";
 import { SERVICE_ITEM_TYPE_LABELS } from "@/features/serviceItems/constants";
 import type { ServiceItemRow } from "@/store/selectors";
-import type { KeyboardEvent, ReactElement } from "react";
+import type { ReactElement } from "react";
 
 type Props = {
   rows: readonly ServiceItemRow[];
@@ -23,61 +31,37 @@ export const ActionRequiredList = ({ rows, onNavigate }: Props): ReactElement =>
   const activate = (equipmentId: string): void => {
     onNavigate(equipmentDetailPath(equipmentId));
   };
-  const handleKeyDown = (event: KeyboardEvent<HTMLTableRowElement>, equipmentId: string): void => {
-    if (event.key !== "Enter" && event.key !== " ") return;
-    event.preventDefault();
-    activate(equipmentId);
-  };
 
   return (
     <Table>
       <TableHead>
         <tr>
-          <th scope="col" className="px-3 py-2 text-left">
-            状態
-          </th>
-          <th scope="col" className="px-3 py-2 text-left">
-            管理番号
-          </th>
-          <th scope="col" className="px-3 py-2 text-left">
-            機器名
-          </th>
-          <th scope="col" className="px-3 py-2 text-left">
-            項目名
-          </th>
-          <th scope="col" className="px-3 py-2 text-left">
-            種別
-          </th>
-          <th scope="col" className="px-3 py-2 text-left">
-            担当
-          </th>
-          <th scope="col" className="px-3 py-2 text-left">
-            次回期限
-          </th>
+          <Th>状態</Th>
+          <Th>管理番号</Th>
+          <Th>機器名</Th>
+          <Th>項目名</Th>
+          <Th>種別</Th>
+          <Th>担当</Th>
+          <Th>次回期限</Th>
         </tr>
       </TableHead>
       <TableBody>
         {rows.map((row) => (
           <tr
             key={row.serviceItem.id}
-            tabIndex={0}
-            onClick={() => {
+            {...activatableRowProps(() => {
               activate(row.equipment.id);
-            }}
-            onKeyDown={(event) => {
-              handleKeyDown(event, row.equipment.id);
-            }}
-            className="cursor-pointer hover:bg-slate-50"
+            })}
           >
-            <td className="px-3 py-2">
+            <Td>
               <StatusBadge status={row.status} />
-            </td>
-            <td className="px-3 py-2">{row.equipment.managementNo}</td>
-            <td className="px-3 py-2">{row.equipment.name}</td>
-            <td className="px-3 py-2">{row.serviceItem.name}</td>
-            <td className="px-3 py-2">{SERVICE_ITEM_TYPE_LABELS[row.serviceItem.type]}</td>
-            <td className="px-3 py-2">{row.personLabel}</td>
-            <td className="px-3 py-2">{row.serviceItem.nextDueDate}</td>
+            </Td>
+            <Td>{row.equipment.managementNo}</Td>
+            <Td>{row.equipment.name}</Td>
+            <Td>{row.serviceItem.name}</Td>
+            <Td>{SERVICE_ITEM_TYPE_LABELS[row.serviceItem.type]}</Td>
+            <Td>{row.personLabel}</Td>
+            <Td>{row.serviceItem.nextDueDate}</Td>
           </tr>
         ))}
       </TableBody>
