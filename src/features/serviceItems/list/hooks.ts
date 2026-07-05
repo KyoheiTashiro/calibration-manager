@@ -58,14 +58,6 @@ export const parseServiceItemListFilters = (
     personId: personId !== null && personId in persons ? personId : FILTER_ALL,
   };
 };
-
-/** いずれかのフィルタが適用中か(空状態の文言分岐・クリアボタン表示に使う) */
-export const hasActiveFilter = (filters: ServiceItemListFilters): boolean =>
-  filters.status !== FILTER_ALL ||
-  filters.type !== FILTER_ALL ||
-  filters.execution !== FILTER_ALL ||
-  filters.personId !== FILTER_ALL;
-
 /**
  * フィルタ適用。status フィルタは導出済み row.status に対して適用(§5 表示ルール)。
  * 行導出(serviceItemRowsOf)はダッシュボードと共有するため store/selectors.ts に置く(D-024)。

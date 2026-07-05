@@ -4,30 +4,23 @@
  * 項目追加/編集モーダルの起動起点となる。表示専用画面であり、入力検証は各モーダル側の責務。
  * 並び替え・派生ステータスの計算ロジックは hooks.ts に集約する（coding-standards.md §2）。
  * モーダル起動は単一 state で kind を持ち、1度に開くのは1つ。閉じたら state をリセットする。
+ * テーブル・カードの描画は components/ 配下へ分割し（coding-standards.md §2）、本ファイルは
+ * ページヘッダ・state・モーダル分岐・データ取得に徹する。
  */
 
-import { ServiceItemModal, RecordModal, StatusBadge } from "@/components/domain";
-import { Badge, Button, EmptyState, Table, TableBody, TableHead } from "@/components/ui";
+import { ServiceItemModal, RecordModal } from "@/components/domain";
+import { Button } from "@/components/ui";
 import { ROUTES, equipmentEditPath } from "@/constants/routes";
+import { EquipmentInfoCard } from "@/features/equipment/detail/components/EquipmentInfoCard";
+import { HistoryTable } from "@/features/equipment/detail/components/HistoryTable";
+import { ServiceItemTable } from "@/features/equipment/detail/components/ServiceItemTable";
 import {
-  EQUIPMENT_STATUS_BADGE_CLASSES,
-  EQUIPMENT_STATUS_LABELS,
-} from "@/features/equipment/constants";
-import {
-  displayedServiceItemStatus,
   historyRowsOf,
-  personLabelOf,
   sortedServiceItemsOf,
   todayIsoDate,
   useSafeNavigate,
+  type ServiceItem,
 } from "@/features/equipment/detail/hooks";
-import {
-  CYCLE_LABELS,
-  EXECUTION_LABELS,
-  SERVICE_ITEM_TYPE_LABELS,
-  RECORD_RESULT_LABELS,
-} from "@/features/serviceItems/constants";
-import type { ServiceItem } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
 import { useState, type ReactElement } from "react";
 import { Navigate, useParams } from "react-router-dom";
@@ -93,42 +86,7 @@ export const EquipmentDetail = (): ReactElement => {
         </Button>
       </div>
 
-      <div className="rounded border border-slate-200 p-4">
-        <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm sm:grid-cols-3">
-          <div>
-            <dt className="text-slate-500">型式</dt>
-            <dd>{currentEquipment.model ?? "—"}</dd>
-          </div>
-          <div>
-            <dt className="text-slate-500">S/N</dt>
-            <dd>{currentEquipment.serialNo ?? "—"}</dd>
-          </div>
-          <div>
-            <dt className="text-slate-500">メーカー</dt>
-            <dd>
-              {(currentEquipment.manufacturerId !== undefined &&
-                vendors[currentEquipment.manufacturerId]?.name) ||
-                "—"}
-            </dd>
-          </div>
-          <div>
-            <dt className="text-slate-500">設置場所</dt>
-            <dd>{currentEquipment.location ?? "—"}</dd>
-          </div>
-          <div>
-            <dt className="text-slate-500">状態</dt>
-            <dd>
-              <Badge className={EQUIPMENT_STATUS_BADGE_CLASSES[currentEquipment.status]}>
-                {EQUIPMENT_STATUS_LABELS[currentEquipment.status]}
-              </Badge>
-            </dd>
-          </div>
-          <div>
-            <dt className="text-slate-500">備考</dt>
-            <dd>{currentEquipment.note ?? "—"}</dd>
-          </div>
-        </dl>
-      </div>
+      <EquipmentInfoCard equipment={currentEquipment} vendors={vendors} />
 
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between">
@@ -136,138 +94,25 @@ export const EquipmentDetail = (): ReactElement => {
           <Button onClick={handleAddServiceItemClick}>+ 項目を追加</Button>
         </div>
 
-        {serviceItemList.length === 0 ? (
-          <EmptyState
-            message="点検校正項目が未登録です"
-            action={<Button onClick={handleAddServiceItemClick}>+ 項目を追加</Button>}
-          />
-        ) : (
-          <Table>
-            <TableHead>
-              <tr>
-                <th scope="col" className="px-3 py-2 text-left">
-                  状態
-                </th>
-                <th scope="col" className="px-3 py-2 text-left">
-                  項目名
-                </th>
-                <th scope="col" className="px-3 py-2 text-left">
-                  種別
-                </th>
-                <th scope="col" className="px-3 py-2 text-left">
-                  内外
-                </th>
-                <th scope="col" className="px-3 py-2 text-left">
-                  周期
-                </th>
-                <th scope="col" className="px-3 py-2 text-left">
-                  担当
-                </th>
-                <th scope="col" className="px-3 py-2 text-left">
-                  次回期限
-                </th>
-                <th scope="col" className="px-3 py-2 text-left">
-                  アクション
-                </th>
-              </tr>
-            </TableHead>
-            <TableBody>
-              {serviceItemList.map((serviceItem) => {
-                const status = displayedServiceItemStatus(
-                  serviceItem,
-                  currentEquipment.status,
-                  serviceOrders,
-                  vendors,
-                  today,
-                );
-                return (
-                  <tr
-                    key={serviceItem.id}
-                    className={serviceItem.isActive ? undefined : "text-slate-400"}
-                  >
-                    <td className="px-3 py-2">
-                      {status === null ? "—" : <StatusBadge status={status} />}
-                    </td>
-                    <td className="px-3 py-2">{serviceItem.name}</td>
-                    <td className="px-3 py-2">{SERVICE_ITEM_TYPE_LABELS[serviceItem.type]}</td>
-                    <td className="px-3 py-2">{EXECUTION_LABELS[serviceItem.execution]}</td>
-                    <td className="px-3 py-2">{CYCLE_LABELS[serviceItem.cycle]}</td>
-                    <td className="px-3 py-2">
-                      {personLabelOf({ persons }, serviceItem.personId)}
-                    </td>
-                    <td className="px-3 py-2">{serviceItem.nextDueDate}</td>
-                    {/* なぜ td 直下に Button を並べるか: equipment/list や VendorList と同様、
-                        div でラップするとjsx-a11yのボタンラベル探索深度を超えるためtdをflex化する */}
-                    <td className="flex gap-2 px-3 py-2">
-                      <Button
-                        variant="secondary"
-                        size="sm"
-                        onClick={() => {
-                          setModal({
-                            kind: MODAL_KIND.RECORD,
-                            serviceItemId: serviceItem.id,
-                          });
-                        }}
-                      >
-                        記録
-                      </Button>
-                      <Button
-                        variant="secondary"
-                        size="sm"
-                        onClick={() => {
-                          handleEditServiceItemClick(serviceItem);
-                        }}
-                      >
-                        編集
-                      </Button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </TableBody>
-          </Table>
-        )}
+        <ServiceItemTable
+          serviceItems={serviceItemList}
+          equipmentStatus={currentEquipment.status}
+          serviceOrders={serviceOrders}
+          vendors={vendors}
+          persons={persons}
+          today={today}
+          onAddClick={handleAddServiceItemClick}
+          onRecordClick={(serviceItemId) => {
+            setModal({ kind: MODAL_KIND.RECORD, serviceItemId });
+          }}
+          onEditClick={handleEditServiceItemClick}
+        />
       </div>
 
       <div className="flex flex-col gap-2">
         <h2 className="text-lg font-semibold">実施記録(全項目横断・新しい順)</h2>
 
-        {historyRows.length === 0 ? (
-          <EmptyState message="実施記録が未登録です" />
-        ) : (
-          <Table>
-            <TableHead>
-              <tr>
-                <th scope="col" className="px-3 py-2 text-left">
-                  実施日
-                </th>
-                <th scope="col" className="px-3 py-2 text-left">
-                  項目名
-                </th>
-                <th scope="col" className="px-3 py-2 text-left">
-                  実施者
-                </th>
-                <th scope="col" className="px-3 py-2 text-left">
-                  結果
-                </th>
-                <th scope="col" className="px-3 py-2 text-left">
-                  備考
-                </th>
-              </tr>
-            </TableHead>
-            <TableBody>
-              {historyRows.map(({ record, serviceItemName }) => (
-                <tr key={record.id}>
-                  <td className="px-3 py-2">{record.doneDate}</td>
-                  <td className="px-3 py-2">{serviceItemName}</td>
-                  <td className="px-3 py-2">{record.doneBy}</td>
-                  <td className="px-3 py-2">{RECORD_RESULT_LABELS[record.result]}</td>
-                  <td className="px-3 py-2">{record.note ?? "—"}</td>
-                </tr>
-              ))}
-            </TableBody>
-          </Table>
-        )}
+        <HistoryTable historyRows={historyRows} />
       </div>
 
       {modal?.kind === MODAL_KIND.ADD ? (

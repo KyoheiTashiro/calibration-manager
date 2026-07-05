@@ -135,7 +135,6 @@ export const ServiceOrderList = (): ReactElement => {
         title="案件を中止しますか?"
         message="この案件を中止して終了します。この操作は取り消せません。"
         confirmLabel="中止"
-        danger
         onConfirm={handleConfirmCancel}
         onCancel={closeDialog}
       />

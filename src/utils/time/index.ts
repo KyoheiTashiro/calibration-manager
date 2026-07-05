@@ -11,7 +11,7 @@ import type { IsoDateString } from "@/store/types";
 const ISO_DATE_PATTERN = /^(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})$/u;
 
 /** 年月日の内部表現。month は 1〜12（Date の 0 始まりと混同しないため 1 始まりで統一） */
-export type CalendarDate = {
+type CalendarDate = {
   year: number;
   month: number;
   day: number;

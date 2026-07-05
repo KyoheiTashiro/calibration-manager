@@ -66,6 +66,8 @@ Lint/Format は **oxlint + oxfmt**（ESLint/Prettier ではない）。多くは
 - **`hooks.ts` は全 feature に置く**（ロジックは hooks に寄せ index.tsx を薄く保つ）。
 - サブコンポーネントが 1 個だけなら feature 直下に置いてよい（複数になったら `components/` へ）。
 - **複数 feature で共有する汎用 React フックは `src/utils/` に他ユーティリティ同様サブディレクトリを切って置く**（D-044。例: `src/utils/navigation/` の `useSafeNavigate` — navigate() の戻り値を無視する共通ラッパー。画面遷移はこれを使い、`Promise.resolve(navigate(...)).catch(...)` を各所に書かない）。
+  - 追加/編集モーダルの開閉 state は `src/utils/modal` の `useEntityModal<Entity>` を共用する（D-049。persons/vendors 等で「entity 未指定 = 追加、指定 = 編集」の開閉ロジックが逐語重複していたため集約）。
+- **フォーム値の正規化・送信ハンドラ・zod 入力ヘルパは `src/utils/form` に集約する**（D-048。`emptyToUndefined`・`createSaveHandler`・`optionalNonNegativeIntegerString`・`createFormSubmitHandler` — RHF + zodResolver を使う各モーダル・フォームで逐語重複していたパターンを共通化）。
 - **共通 UI `src/components/ui/<Name>/`**: 1 コンポーネント = 1 サブディレクトリ + バレル。`Name.tsx` / `index.ts`（`export { Name } from "./Name"`）/ `Name.test.tsx` / `Name.stories.tsx` を colocate。親バレル `src/components/ui/index.ts` で一括 re-export し `@/components/ui` 経由で import。
 - アイコンは `src/components/icons/` に `XxxIcon.tsx` + 共有 `base.ts` + バレル。
 

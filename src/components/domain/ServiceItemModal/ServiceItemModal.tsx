@@ -1,3 +1,5 @@
+// oxlint-disable import/max-dependencies -- 共通ヘルパー(@/utils/form・@/utils/record)への
+// 重複排除移設(D-048)で依存数が上限をわずかに超えるが、逐語重複の解消を優先し対象外とする
 /**
  * 点検校正項目（ServiceItem）の追加・編集モーダル（screen-design/06-service-item-modal.md）。RHF + zodResolver。
  */
@@ -16,6 +18,8 @@ import {
 } from "@/features/serviceItems/constants";
 import { EXECUTION, type ServiceItem } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
+import { createSaveHandler, emptyToUndefined } from "@/utils/form";
+import { recordValue } from "@/utils/record";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { ChangeEvent, ReactElement } from "react";
 import { useForm, useWatch } from "react-hook-form";
@@ -30,17 +34,13 @@ type Props = {
   onClose: () => void;
 };
 
-// なぜ: noUncheckedIndexedAccess無効下でも実行時欠落(削除済み参照等)の可能性を型に反映するため
-const pickRecord = <Value,>(record: Record<string, Value>, key: string): Value | undefined =>
-  record[key];
-
 export const ServiceItemModal = ({
   open,
   equipmentId,
   serviceItem,
   onClose,
 }: Props): ReactElement => {
-  const equipment = useAppStore((state) => pickRecord(state.equipment, equipmentId));
+  const equipment = useAppStore((state) => recordValue(state.equipment, equipmentId));
   const vendors = useAppStore((state) => state.vendors);
   const persons = useAppStore((state) => state.persons);
   const addServiceItem = useAppStore((state) => state.addServiceItem);
@@ -95,10 +95,11 @@ export const ServiceItemModal = ({
 
   const onSubmit = (values: ServiceItemFormValues): void => {
     const isExternal = values.execution === EXECUTION.EXTERNAL;
-    const hasVendorId = values.vendorId !== undefined && values.vendorId !== "";
-    const hasLeadTimeDays = values.leadTimeDays !== undefined && values.leadTimeDays !== "";
-    const vendorId = isExternal && hasVendorId ? values.vendorId : undefined;
-    const leadTimeDays = isExternal && hasLeadTimeDays ? Number(values.leadTimeDays) : undefined;
+    const vendorIdInput = emptyToUndefined(values.vendorId);
+    const leadTimeDaysInput = emptyToUndefined(values.leadTimeDays);
+    const vendorId = isExternal ? vendorIdInput : undefined;
+    const leadTimeDays =
+      isExternal && leadTimeDaysInput !== undefined ? Number(leadTimeDaysInput) : undefined;
     const bufferDays = Number(values.bufferDays);
     const noticeDaysBefore = Number(values.noticeDaysBefore);
 
@@ -125,12 +126,7 @@ export const ServiceItemModal = ({
     handleClose();
   };
 
-  // なぜcatchで終端するか: no-void下でfloating promiseを残さないため(onSubmitは例外を投げない設計)。
-  const handleSave = (): void => {
-    handleSubmit(onSubmit)().catch(() => {
-      // onSubmitは例外を投げない設計のため到達しない想定
-    });
-  };
+  const handleSave = createSaveHandler(handleSubmit, onSubmit);
 
   return (
     <Modal
@@ -138,11 +134,7 @@ export const ServiceItemModal = ({
       title={serviceItem ? "点検校正項目を編集" : "点検校正項目を追加"}
       onClose={handleClose}
       isDirty={isDirty}
-      footer={
-        <Button type="button" onClick={handleSave}>
-          保存
-        </Button>
-      }
+      footer={<Button onClick={handleSave}>保存</Button>}
     >
       <div className="flex flex-col gap-4">
         <div>

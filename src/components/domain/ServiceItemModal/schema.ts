@@ -11,6 +11,7 @@
 
 import { DEFAULT_BUFFER_DAYS, DEFAULT_NOTICE_DAYS_BEFORE } from "@/domain/constants";
 import { CYCLE, EXECUTION, SERVICE_ITEM_TYPE, type ServiceItem } from "@/store/types";
+import { optionalNonNegativeIntegerString } from "@/utils/form";
 import { isIsoDateString } from "@/utils/time";
 import { z } from "zod";
 
@@ -25,22 +26,6 @@ const requiredNonNegativeIntegerString = (requiredMessage: string, invalidMessag
     .refine((value) => Number.isInteger(Number(value)) && Number(value) >= 0, {
       message: invalidMessage,
     });
-
-/** 空欄可・0以上の整数文字列（納期(日)向け） */
-// oxlint-disable-next-line typescript/explicit-function-return-type, typescript/explicit-module-boundary-types -- 上記理由によりzodスキーマの戻り値型は推論に委ねる必要がある
-const optionalNonNegativeIntegerString = (invalidMessage: string) =>
-  z
-    .string()
-    .optional()
-    .refine(
-      (value) =>
-        value === undefined ||
-        value === "" ||
-        (Number.isInteger(Number(value)) && Number(value) >= 0),
-      {
-        message: invalidMessage,
-      },
-    );
 
 export const serviceItemFormSchema = z
   .object({

@@ -15,14 +15,7 @@ type ModalProps = {
   isDirty?: boolean;
   children: ReactNode;
   footer?: ReactNode;
-  size?: "md" | "lg";
 };
-
-// なぜ: サイズ別の最大幅クラスをここに集約する（Button.tsxのSIZE_CLASS_NAMEイディオムに合わせる）。
-const SIZE_CLASS_NAME = {
-  md: "max-w-lg",
-  lg: "max-w-2xl",
-} as const;
 
 export const Modal = ({
   open,
@@ -31,7 +24,6 @@ export const Modal = ({
   isDirty = false,
   children,
   footer,
-  size = "md",
 }: ModalProps): ReactElement => {
   const dialogRef = useDialog(open);
   const titleId = useId();
@@ -85,7 +77,7 @@ export const Modal = ({
       onCancel={handleCancel}
       onClick={handleClick}
       onClose={handleDialogClose}
-      className={`m-auto w-full ${SIZE_CLASS_NAME[size]} border-line rounded-lg border p-0 backdrop:bg-slate-900/50`}
+      className="border-line m-auto w-full max-w-lg rounded-lg border p-0 backdrop:bg-slate-900/50"
     >
       <div className="relative flex max-h-[85vh] flex-col">
         <div className="border-line flex items-center justify-between border-b px-4 py-3">

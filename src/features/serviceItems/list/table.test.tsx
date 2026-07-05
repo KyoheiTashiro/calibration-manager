@@ -6,12 +6,8 @@
  */
 
 import { ServiceItemList } from "@/features/serviceItems/list";
-import {
-  personSato,
-  personSuzuki,
-  seedServiceItemList,
-} from "@/features/serviceItems/list/listFixtures";
 import { renderWithStore, setupStoreIsolation } from "@/test/renderWithStore";
+import { personSato, personSuzuki, seedServiceItemList } from "@/test/serviceItemListFixtures";
 import { screen, within } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
 import { beforeEach, describe, expect, it } from "vitest";

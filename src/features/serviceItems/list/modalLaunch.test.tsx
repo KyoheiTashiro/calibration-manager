@@ -5,11 +5,8 @@
  */
 
 import { ServiceItemList } from "@/features/serviceItems/list";
-import {
-  serviceItemExternalOverdue,
-  seedServiceItemList,
-} from "@/features/serviceItems/list/listFixtures";
 import { renderWithStore, setupStoreIsolation } from "@/test/renderWithStore";
+import { serviceItemExternalOverdue, seedServiceItemList } from "@/test/serviceItemListFixtures";
 import { screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom/vitest";

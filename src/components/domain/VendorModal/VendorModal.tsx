@@ -8,6 +8,7 @@ import { vendorFormSchema, type VendorFormValues } from "@/components/domain/Ven
 import { Button, Checkbox, Modal, TextField } from "@/components/ui";
 import type { Vendor } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
+import { createSaveHandler, emptyToUndefined } from "@/utils/form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { ChangeEvent, ReactElement } from "react";
 import { useForm, useWatch } from "react-hook-form";
@@ -77,24 +78,19 @@ export const VendorModal = ({ open, vendor, onClose }: Props): ReactElement => {
   };
 
   const onSubmit = (values: VendorFormValues): void => {
-    const hasContactPerson = values.contactPerson !== undefined && values.contactPerson !== "";
-    const hasEmail = values.email !== undefined && values.email !== "";
-    const hasPhone = values.phone !== undefined && values.phone !== "";
-    const hasStandardLeadTimeDays =
-      values.standardLeadTimeDays !== undefined && values.standardLeadTimeDays !== "";
-    const hasNote = values.note !== undefined && values.note !== "";
+    const standardLeadTimeDays = emptyToUndefined(values.standardLeadTimeDays);
     const payload = {
       name: values.name,
       isManufacturer: values.isManufacturer,
       isCalibrator: values.isCalibrator,
-      contactPerson: hasContactPerson ? values.contactPerson : undefined,
-      email: hasEmail ? values.email : undefined,
-      phone: hasPhone ? values.phone : undefined,
+      contactPerson: emptyToUndefined(values.contactPerson),
+      email: emptyToUndefined(values.email),
+      phone: emptyToUndefined(values.phone),
       standardLeadTimeDays:
-        values.isCalibrator && hasStandardLeadTimeDays
-          ? Number(values.standardLeadTimeDays)
+        values.isCalibrator && standardLeadTimeDays !== undefined
+          ? Number(standardLeadTimeDays)
           : undefined,
-      note: hasNote ? values.note : undefined,
+      note: emptyToUndefined(values.note),
     };
     if (vendor) {
       updateVendor(vendor.id, payload);
@@ -104,12 +100,7 @@ export const VendorModal = ({ open, vendor, onClose }: Props): ReactElement => {
     handleClose();
   };
 
-  // なぜcatchで終端するか: no-void下でfloating promiseを残さないため(onSubmitは例外を投げない設計)。
-  const handleSave = (): void => {
-    handleSubmit(onSubmit)().catch(() => {
-      // onSubmitは例外を投げない設計のため到達しない想定
-    });
-  };
+  const handleSave = createSaveHandler(handleSubmit, onSubmit);
 
   return (
     <Modal
@@ -117,11 +108,7 @@ export const VendorModal = ({ open, vendor, onClose }: Props): ReactElement => {
       title={vendor ? "取引先を編集" : "取引先を追加"}
       onClose={handleClose}
       isDirty={isDirty}
-      footer={
-        <Button type="button" onClick={handleSave}>
-          保存
-        </Button>
-      }
+      footer={<Button onClick={handleSave}>保存</Button>}
     >
       <div className="flex flex-col gap-4">
         <TextField label="名称" required error={errors.name?.message} {...register("name")} />

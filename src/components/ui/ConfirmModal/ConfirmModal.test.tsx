@@ -127,7 +127,7 @@ describe("ConfirmModal", () => {
     expect(onCancel).toHaveBeenCalledTimes(1);
   });
 
-  it("danger未指定（既定true）で実行ボタンにbg-dangerクラスが付与される", () => {
+  it("実行ボタンにbg-dangerクラスが付与される", () => {
     render(
       <ConfirmModal
         open

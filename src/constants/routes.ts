@@ -17,7 +17,6 @@ export const ROUTES = {
   SETTINGS: "/settings",
   MANUAL: "/manual",
 } as const;
-export type Route = (typeof ROUTES)[keyof typeof ROUTES];
 
 /** 機器詳細への実パス（`:id` を解決したリンク先）を組み立てる */
 export const equipmentDetailPath = (equipmentId: string): string => `/equipment/${equipmentId}`;

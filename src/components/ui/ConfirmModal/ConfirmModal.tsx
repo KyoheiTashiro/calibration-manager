@@ -13,7 +13,6 @@ type ConfirmModalProps = {
   title: string;
   message: string;
   confirmLabel: string;
-  danger?: boolean;
   onConfirm: () => void;
   onCancel: () => void;
 };
@@ -23,7 +22,6 @@ export const ConfirmModal = ({
   title,
   message,
   confirmLabel,
-  danger = true,
   onConfirm,
   onCancel,
 }: ConfirmModalProps): ReactElement => {
@@ -55,10 +53,6 @@ export const ConfirmModal = ({
     }
   };
 
-  const confirmButtonClassName = danger
-    ? "h-9 rounded bg-danger px-4 text-sm text-white"
-    : "h-9 rounded bg-primary px-4 text-sm text-white";
-
   return (
     // oxlint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions -- オーバーレイ（余白）クリックで閉じるためのonClick。キーボード経路はonCancel（Esc）が担う
     <dialog
@@ -82,7 +76,11 @@ export const ConfirmModal = ({
           >
             キャンセル
           </button>
-          <button type="button" onClick={onConfirm} className={confirmButtonClassName}>
+          <button
+            type="button"
+            onClick={onConfirm}
+            className="bg-danger h-9 rounded px-4 text-sm text-white"
+          >
             {confirmLabel}
           </button>
         </div>

@@ -9,7 +9,6 @@ import { SERVICE_ITEM_STATUS } from "@/domain/serviceItemStatus";
 import {
   FILTER_ALL,
   filterServiceItemRows,
-  hasActiveFilter,
   parseServiceItemListFilters,
   type ServiceItemListFilters,
 } from "@/features/serviceItems/list/hooks";
@@ -61,19 +60,6 @@ describe("parseServiceItemListFilters", () => {
   it("personId: persons に存在する id はその値、存在しない id は all", () => {
     expect(parse(`personId=${activePerson.id}`).personId).toBe(activePerson.id);
     expect(parse("personId=p-unknown").personId).toBe(FILTER_ALL);
-  });
-});
-
-describe("hasActiveFilter", () => {
-  it("全て all なら false", () => {
-    expect(hasActiveFilter(ALL_FILTERS)).toBe(false);
-  });
-
-  it("いずれか1つでも指定されていれば true", () => {
-    expect(hasActiveFilter({ ...ALL_FILTERS, status: SERVICE_ITEM_STATUS.OVERDUE })).toBe(true);
-    expect(hasActiveFilter({ ...ALL_FILTERS, type: SERVICE_ITEM_TYPE.INSPECTION })).toBe(true);
-    expect(hasActiveFilter({ ...ALL_FILTERS, execution: EXECUTION.INTERNAL })).toBe(true);
-    expect(hasActiveFilter({ ...ALL_FILTERS, personId: activePerson.id })).toBe(true);
   });
 });
 

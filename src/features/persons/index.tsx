@@ -1,6 +1,8 @@
 import { PersonModal } from "@/components/domain/PersonModal";
 import { Badge, Button, EmptyState, Table, TableBody, TableHead } from "@/components/ui";
-import { usePersonList, usePersonModal } from "@/features/persons/hooks";
+import { usePersonList } from "@/features/persons/hooks";
+import type { Person } from "@/store/types";
+import { useEntityModal } from "@/utils/modal";
 import type { ReactElement } from "react";
 
 /** 状態バッジの色classNameマッピング（screen-design/09-masters.md §9-B、StatusBadgeと同じ配色パターン） */
@@ -13,7 +15,8 @@ const INACTIVE_BADGE_CLASS_NAME = "bg-slate-100 text-slate-600";
  */
 export const PersonList = (): ReactElement => {
   const sortedPersons = usePersonList();
-  const { modalState, handleAddClick, handleEditClick, handleModalClose } = usePersonModal();
+  const { modalState, handleAddClick, handleEditClick, handleModalClose } =
+    useEntityModal<Person>();
 
   return (
     <div className="flex flex-col gap-4">
@@ -80,7 +83,7 @@ export const PersonList = (): ReactElement => {
         </Table>
       )}
 
-      <PersonModal open={modalState.open} person={modalState.person} onClose={handleModalClose} />
+      <PersonModal open={modalState.open} person={modalState.entity} onClose={handleModalClose} />
     </div>
   );
 };

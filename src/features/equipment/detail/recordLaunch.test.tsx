@@ -7,13 +7,13 @@
 
 import { ROUTES, equipmentDetailPath } from "@/constants/routes";
 import { EquipmentDetail } from "@/features/equipment/detail";
+import { useAppStore } from "@/store/useAppStore";
 import {
   equipmentFull,
   serviceItemExternal,
   seedEquipmentFullServiceItemsAndRecords,
   seedEquipmentFullMasters,
-} from "@/features/equipment/detail/detailFixtures";
-import { useAppStore } from "@/store/useAppStore";
+} from "@/test/equipmentDetailFixtures";
 import { renderWithStore, setupStoreIsolation } from "@/test/renderWithStore";
 import { screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";

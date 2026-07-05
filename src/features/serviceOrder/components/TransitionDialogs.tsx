@@ -19,6 +19,7 @@ import {
 } from "@/features/serviceOrder/schema";
 import { SERVICE_ORDER_STATUS, type ServiceOrder } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
+import { createSaveHandler } from "@/utils/form";
 import { isIsoDateString, todayIsoDate } from "@/utils/time";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { ReactElement } from "react";
@@ -69,12 +70,7 @@ export const ServiceOrderDialog = ({ serviceOrder, onClose }: Props): ReactEleme
     onClose();
   };
 
-  // なぜcatchで終端するか: no-void下でfloating promiseを残さないため(onSubmitは例外を投げない設計)。
-  const handleSave = (): void => {
-    handleSubmit(onSubmit)().catch(() => {
-      // onSubmitは例外を投げない設計のため何もしない
-    });
-  };
+  const handleSave = createSaveHandler(handleSubmit, onSubmit);
 
   return (
     <Modal
@@ -136,12 +132,7 @@ export const ReturnDialog = ({ serviceOrder, onClose }: Props): ReactElement => 
     onClose();
   };
 
-  // なぜcatchで終端するか: no-void下でfloating promiseを残さないため(onSubmitは例外を投げない設計)。
-  const handleSave = (): void => {
-    handleSubmit(onSubmit)().catch(() => {
-      // onSubmitは例外を投げない設計のため何もしない
-    });
-  };
+  const handleSave = createSaveHandler(handleSubmit, onSubmit);
 
   return (
     <Modal

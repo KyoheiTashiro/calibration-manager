@@ -15,7 +15,7 @@ import {
   serviceItemOfSuspendedEquipment,
   seedEquipmentFullServiceItemsAndRecords,
   seedEquipmentFullMasters,
-} from "@/features/equipment/detail/detailFixtures";
+} from "@/test/equipmentDetailFixtures";
 import { renderWithStore, seedStore, setupStoreIsolation } from "@/test/renderWithStore";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";

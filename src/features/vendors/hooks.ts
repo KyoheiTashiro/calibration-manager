@@ -19,36 +19,6 @@ export const useVendorList = (): Vendor[] => {
   );
 };
 
-type ModalState = {
-  open: boolean;
-  vendor?: Vendor;
-};
-
-type UseVendorModalResult = {
-  modalState: ModalState;
-  handleAddClick: () => void;
-  handleEditClick: (vendor: Vendor) => void;
-  handleModalClose: () => void;
-};
-
-/** 追加/編集モーダルの開閉状態（vendor 未指定 = 追加、指定 = 編集） */
-export const useVendorModal = (): UseVendorModalResult => {
-  const [modalState, setModalState] = useState<ModalState>({ open: false });
-
-  return {
-    modalState,
-    handleAddClick: (): void => {
-      setModalState({ open: true, vendor: undefined });
-    },
-    handleEditClick: (vendor: Vendor): void => {
-      setModalState({ open: true, vendor });
-    },
-    handleModalClose: (): void => {
-      setModalState({ open: false, vendor: undefined });
-    },
-  };
-};
-
 type UseVendorDeleteResult = {
   /** 削除確認ダイアログの対象 Vendor id（undefined = 非表示） */
   deleteTargetId: string | undefined;

@@ -103,14 +103,4 @@ describe("Modal", () => {
 
     expect(onClose).toHaveBeenCalledTimes(1);
   });
-
-  it("size=lgでmax-w-2xlクラスが付与される", () => {
-    const { container } = render(
-      <Modal open title="点検項目の編集" onClose={vi.fn<() => void>()} size="lg">
-        <p>本文</p>
-      </Modal>,
-    );
-
-    expect(container.querySelector("dialog")).toHaveClass("max-w-2xl");
-  });
 });

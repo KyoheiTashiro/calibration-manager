@@ -4,8 +4,8 @@
  */
 
 import { ServiceItemList } from "@/features/serviceItems/list";
-import { personSuzuki, seedServiceItemList } from "@/features/serviceItems/list/listFixtures";
 import { renderWithStore, setupStoreIsolation } from "@/test/renderWithStore";
+import { personSuzuki, seedServiceItemList } from "@/test/serviceItemListFixtures";
 import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom/vitest";

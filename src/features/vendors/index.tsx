@@ -14,7 +14,9 @@ import {
   TableBody,
   TableHead,
 } from "@/components/ui";
-import { useVendorDelete, useVendorList, useVendorModal } from "@/features/vendors/hooks";
+import { useVendorDelete, useVendorList } from "@/features/vendors/hooks";
+import type { Vendor } from "@/store/types";
+import { useEntityModal } from "@/utils/modal";
 import type { ReactElement } from "react";
 
 // 種別バッジ: -100 背景 × -800 文字 × -300 枠線の組は statusBadge.ts と同じ WCAG AA 設計値
@@ -24,7 +26,8 @@ const CALIBRATOR_BADGE_CLASS_NAME = "bg-emerald-100 text-emerald-800 border bord
 export const VendorList = (): ReactElement => {
   const vendorList = useVendorList();
 
-  const { modalState, handleAddClick, handleEditClick, handleModalClose } = useVendorModal();
+  const { modalState, handleAddClick, handleEditClick, handleModalClose } =
+    useEntityModal<Vendor>();
 
   const {
     deleteTargetId,
@@ -126,14 +129,13 @@ export const VendorList = (): ReactElement => {
         </Table>
       )}
 
-      <VendorModal open={modalState.open} vendor={modalState.vendor} onClose={handleModalClose} />
+      <VendorModal open={modalState.open} vendor={modalState.entity} onClose={handleModalClose} />
 
       <ConfirmModal
         open={deleteTargetId !== undefined}
         title="取引先の削除"
         message="この取引先を削除しますか?"
         confirmLabel="削除"
-        danger
         onConfirm={handleConfirmDelete}
         onCancel={handleCancelDelete}
       />

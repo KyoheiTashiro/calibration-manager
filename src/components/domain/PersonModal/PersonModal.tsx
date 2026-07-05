@@ -8,6 +8,7 @@ import { personFormSchema, type PersonFormValues } from "@/components/domain/Per
 import { Button, Checkbox, ConfirmModal, Modal, TextField } from "@/components/ui";
 import type { Person } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
+import { createSaveHandler, emptyToUndefined } from "@/utils/form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState, type ReactElement } from "react";
 import { useForm } from "react-hook-form";
@@ -63,7 +64,7 @@ export const PersonModal = ({ open, person, onClose }: PersonModalProps): ReactE
   const savePerson = (values: PersonFormValues): void => {
     const normalized: PersonFormValues = {
       ...values,
-      department: values.department === "" ? undefined : values.department,
+      department: emptyToUndefined(values.department),
     };
     if (person) {
       updatePerson(person.id, normalized);
@@ -96,12 +97,7 @@ export const PersonModal = ({ open, person, onClose }: PersonModalProps): ReactE
     setPendingDeactivation(null);
   };
 
-  // なぜcatchで終端するか: no-void下でfloating promiseを残さないため(onSubmitは例外を投げない設計)。
-  const handleSave = (): void => {
-    handleSubmit(onSubmit)().catch(() => {
-      // onSubmitは例外を投げない設計のため到達しない想定
-    });
-  };
+  const handleSave = createSaveHandler(handleSubmit, onSubmit);
 
   const confirmMessage =
     pendingDeactivation && pendingDeactivation.assignedServiceItemCount > 0
@@ -115,11 +111,7 @@ export const PersonModal = ({ open, person, onClose }: PersonModalProps): ReactE
         title={person ? "担当者を編集" : "担当者を追加"}
         onClose={handleClose}
         isDirty={isDirty}
-        footer={
-          <Button type="button" onClick={handleSave}>
-            保存
-          </Button>
-        }
+        footer={<Button onClick={handleSave}>保存</Button>}
       >
         <div className="flex flex-col gap-4">
           <TextField label="氏名" required error={errors.name?.message} {...register("name")} />
@@ -134,7 +126,6 @@ export const PersonModal = ({ open, person, onClose }: PersonModalProps): ReactE
           title="担当者の無効化"
           message={confirmMessage}
           confirmLabel="無効化"
-          danger
           onConfirm={handleConfirmDeactivation}
           onCancel={handleCancelDeactivation}
         />

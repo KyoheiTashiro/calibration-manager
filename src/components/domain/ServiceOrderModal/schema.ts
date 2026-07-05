@@ -5,30 +5,12 @@
  * （coding-standards.md §3）。
  *
  * なぜフォーム値をすべて string ベースに保つか: ServiceItemModal/schema.ts と同方針。cost を number へ
- * 変換するのは検証成功後（呼び出し側の submit ハンドラ）に限る。共有ヘルパー抽出は今回のタスク
- * 範囲外のため、optionalNonNegativeIntegerString は独立して再実装する。
+ * 変換するのは検証成功後（呼び出し側の submit ハンドラ）に限る。
  */
 
+import { optionalNonNegativeIntegerString } from "@/utils/form";
 import { isIsoDateString } from "@/utils/time";
 import { z } from "zod";
-
-/** 空欄可・0以上の整数文字列（費用向け） */
-// なぜ戻り値の型注釈を付けないか: ServiceItemModal/schema.ts の同名ヘルパーと同じ理由で、
-// refine() 済みの具体的なZodスキーマ形状をTypeScriptの推論に委ねる必要があるため。
-// oxlint-disable-next-line typescript/explicit-function-return-type, typescript/explicit-module-boundary-types -- 上記理由によりzodスキーマの戻り値型は推論に委ねる必要がある
-const optionalNonNegativeIntegerString = (invalidMessage: string) =>
-  z
-    .string()
-    .optional()
-    .refine(
-      (value) =>
-        value === undefined ||
-        value === "" ||
-        (Number.isInteger(Number(value)) && Number(value) >= 0),
-      {
-        message: invalidMessage,
-      },
-    );
 
 export const serviceOrderFormSchema = z.object({
   vendorId: z.string().min(1, "校正依頼先を選択してください"),

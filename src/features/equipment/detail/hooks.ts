@@ -16,6 +16,10 @@ import {
   type Vendor,
 } from "@/store/types";
 
+// ServiceItem 型も同様の理由で再 export する(index.tsx の @/store/types への
+// 直接依存を減らし import/max-dependencies 対策とする)
+export type { ServiceItem } from "@/store/types";
+
 // 担当者表示名は selectors へ昇格済み(D-024)。この画面の表示ロジック一式を
 // hooks 経由で供給するため再 export する(index.tsx の依存数も抑える)
 export { personLabelOf } from "@/store/selectors";

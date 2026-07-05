@@ -15,6 +15,8 @@ import {
 import { Button, DateField, Modal, Select, TextField } from "@/components/ui";
 import { ROUTES } from "@/constants/routes";
 import { useAppStore } from "@/store/useAppStore";
+import { createSaveHandler, emptyToUndefined } from "@/utils/form";
+import { recordValue } from "@/utils/record";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState, type ReactElement } from "react";
 import { useForm } from "react-hook-form";
@@ -27,14 +29,10 @@ type Props = {
   onClose: () => void;
 };
 
-// なぜ: noUncheckedIndexedAccess無効下でも実行時欠落(削除済み参照等)の可能性を型に反映するため
-const pickRecord = <Value,>(record: Record<string, Value>, key: string): Value | undefined =>
-  record[key];
-
 export const ServiceOrderModal = ({ open, serviceItemId, onClose }: Props): ReactElement => {
-  const serviceItem = useAppStore((state) => pickRecord(state.serviceItems, serviceItemId));
+  const serviceItem = useAppStore((state) => recordValue(state.serviceItems, serviceItemId));
   const equipment = useAppStore((state) =>
-    serviceItem ? pickRecord(state.equipment, serviceItem.equipmentId) : undefined,
+    serviceItem ? recordValue(state.equipment, serviceItem.equipmentId) : undefined,
   );
   const vendors = useAppStore((state) => state.vendors);
   const addServiceOrder = useAppStore((state) => state.addServiceOrder);
@@ -75,15 +73,13 @@ export const ServiceOrderModal = ({ open, serviceItemId, onClose }: Props): Reac
   };
 
   const onSubmit = (values: ServiceOrderFormValues): void => {
-    const hasDueDate = values.dueDate !== undefined && values.dueDate !== "";
-    const hasCost = values.cost !== undefined && values.cost !== "";
-    const hasNote = values.note !== undefined && values.note !== "";
+    const cost = emptyToUndefined(values.cost);
     const serviceOrderId = addServiceOrder({
       serviceItemId,
       vendorId: values.vendorId,
-      dueDate: hasDueDate ? values.dueDate : undefined,
-      cost: hasCost ? Number(values.cost) : undefined,
-      note: hasNote ? values.note : undefined,
+      dueDate: emptyToUndefined(values.dueDate),
+      cost: cost === undefined ? undefined : Number(cost),
+      note: emptyToUndefined(values.note),
     });
     // なぜここで setState か: react-compiler(EffectSetState) が effect 内での同期 setState を
     // 禁則とするため、submitFailed はイベントハンドラ側（onSubmit）に一本化し（RecordModal.tsx
@@ -93,12 +89,7 @@ export const ServiceOrderModal = ({ open, serviceItemId, onClose }: Props): Reac
     handleClose();
   };
 
-  // なぜcatchで終端するか: no-void下でfloating promiseを残さないため(onSubmitは例外を投げない設計)。
-  const handleSave = (): void => {
-    handleSubmit(onSubmit)().catch(() => {
-      // onSubmitは例外を投げない設計のため到達しない想定
-    });
-  };
+  const handleSave = createSaveHandler(handleSubmit, onSubmit);
 
   return (
     <Modal
@@ -106,11 +97,7 @@ export const ServiceOrderModal = ({ open, serviceItemId, onClose }: Props): Reac
       title="点検校正外部案件を追加"
       onClose={handleClose}
       isDirty={isDirty}
-      footer={
-        <Button type="button" onClick={handleSave}>
-          保存
-        </Button>
-      }
+      footer={<Button onClick={handleSave}>保存</Button>}
     >
       <div className="flex flex-col gap-4">
         <div>

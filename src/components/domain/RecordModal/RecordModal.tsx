@@ -1,3 +1,5 @@
+// oxlint-disable import/max-dependencies -- 共通ヘルパー(@/utils/form・@/utils/record)への
+// 重複排除移設(D-048)で依存数が上限をわずかに超えるが、逐語重複の解消を優先し対象外とする
 /**
  * 実施記録（ServiceRecord）の登録モーダル（screen-design/07-record-modal.md）。RHF + zodResolver。
  * 対象項目は常に確定した状態で起動元から渡される。登録時の期限更新・案件完了カスケードは
@@ -17,6 +19,8 @@ import {
   type Vendor,
 } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
+import { createSaveHandler } from "@/utils/form";
+import { recordValue } from "@/utils/record";
 import { todayIsoDate } from "@/utils/time";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState, type ReactElement } from "react";
@@ -31,10 +35,6 @@ type Props = {
   onClose: () => void;
 };
 
-// なぜ: noUncheckedIndexedAccess無効下でも実行時欠落(削除済み参照等)の可能性を型に反映するため
-const pickRecord = <Value,>(record: Record<string, Value>, key: string): Value | undefined =>
-  record[key];
-
 /**
  * doneBy プリフィル値を解決する（D-017 の解決順）:
  * ①案件経由 → 当該案件の業者名、②項目が external → 項目の業者名、
@@ -45,11 +45,11 @@ const resolvePrefillDoneBy = (
   serviceOrder: ServiceOrder | undefined,
   vendors: Record<string, Vendor>,
 ): string => {
-  if (serviceOrder) return pickRecord(vendors, serviceOrder.vendorId)?.name ?? "";
+  if (serviceOrder) return recordValue(vendors, serviceOrder.vendorId)?.name ?? "";
   if (serviceItem !== undefined && serviceItem.execution === EXECUTION.EXTERNAL) {
     const { vendorId } = serviceItem;
     if (vendorId !== undefined && vendorId !== "") {
-      return pickRecord(vendors, vendorId)?.name ?? "";
+      return recordValue(vendors, vendorId)?.name ?? "";
     }
   }
   return "";
@@ -61,14 +61,14 @@ export const RecordModal = ({
   serviceOrderId,
   onClose,
 }: Props): ReactElement => {
-  const serviceItem = useAppStore((state) => pickRecord(state.serviceItems, serviceItemId));
+  const serviceItem = useAppStore((state) => recordValue(state.serviceItems, serviceItemId));
   const equipment = useAppStore((state) =>
-    serviceItem ? pickRecord(state.equipment, serviceItem.equipmentId) : undefined,
+    serviceItem ? recordValue(state.equipment, serviceItem.equipmentId) : undefined,
   );
   const vendors = useAppStore((state) => state.vendors);
   const hasServiceOrderId = serviceOrderId !== undefined && serviceOrderId !== "";
   const serviceOrder = useAppStore((state) =>
-    hasServiceOrderId ? pickRecord(state.serviceOrders, serviceOrderId) : undefined,
+    hasServiceOrderId ? recordValue(state.serviceOrders, serviceOrderId) : undefined,
   );
   const addRecord = useAppStore((state) => state.addRecord);
 
@@ -100,7 +100,7 @@ export const RecordModal = ({
 
   const isFutureDoneDate = typeof doneDate === "string" && doneDate > todayIsoDate();
   const serviceOrderVendorName = serviceOrder
-    ? (pickRecord(vendors, serviceOrder.vendorId)?.name ?? "")
+    ? (recordValue(vendors, serviceOrder.vendorId)?.name ?? "")
     : "";
 
   const targetLabel =
@@ -131,12 +131,7 @@ export const RecordModal = ({
     handleClose();
   };
 
-  // なぜcatchで終端するか: no-void下でfloating promiseを残さないため(onSubmitは例外を投げない設計)。
-  const handleSave = (): void => {
-    handleSubmit(onSubmit)().catch(() => {
-      // onSubmitは例外を投げない設計のため到達しない想定
-    });
-  };
+  const handleSave = createSaveHandler(handleSubmit, onSubmit);
 
   return (
     <Modal
@@ -144,11 +139,7 @@ export const RecordModal = ({
       title="実施記録を登録"
       onClose={handleClose}
       isDirty={isDirty}
-      footer={
-        <Button type="button" onClick={handleSave}>
-          保存
-        </Button>
-      }
+      footer={<Button onClick={handleSave}>保存</Button>}
     >
       <div className="flex flex-col gap-4">
         <div>
