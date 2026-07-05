@@ -3,7 +3,13 @@
  * UI（index.tsx）を薄いビューに保つため切り出す（coding-standards.md §2）。
  */
 
-import { KANBAN_ACTIVE_COLUMNS, KANBAN_CLOSED_COLUMNS } from "@/features/serviceOrder/constants";
+import {
+  CARD_ACTION,
+  KANBAN_ACTIVE_COLUMNS,
+  KANBAN_CLOSED_COLUMNS,
+  type CardAction,
+  type DialogState,
+} from "@/features/serviceOrder/constants";
 import {
   SERVICE_ORDER_STATUS,
   type ServiceOrder,
@@ -14,16 +20,6 @@ import {
 } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
 import { useMemo, useState } from "react";
-
-/** カード操作で開くダイアログ種別（画面ローカルの UI 状態。ドメイン列挙とは別軸） */
-export const DIALOG_TYPE = {
-  ORDER: "order",
-  RETURN: "return",
-  CANCEL: "cancel",
-  SERVICE_RECORD: "serviceRecord",
-} as const;
-export type DialogType = (typeof DIALOG_TYPE)[keyof typeof DIALOG_TYPE];
-export type DialogState = { type: DialogType; serviceOrder: ServiceOrder };
 
 /**
  * 列内カードの決定的な並び: dueDate 昇順（未設定は末尾）→ id 昇順。
@@ -49,11 +45,7 @@ type UseServiceOrderKanbanResult = {
   totalServiceOrderCount: number;
   dialog: DialogState | null;
   closeDialog: () => void;
-  handleOrder: (serviceOrder: ServiceOrder) => void;
-  handleReturn: (serviceOrder: ServiceOrder) => void;
-  handleCancelRequest: (serviceOrder: ServiceOrder) => void;
-  handleRecord: (serviceOrder: ServiceOrder) => void;
-  handleAdvance: (serviceOrder: ServiceOrder) => void;
+  handleCardAction: (action: CardAction, serviceOrder: ServiceOrder) => void;
   handleConfirmCancel: () => void;
 };
 
@@ -102,21 +94,13 @@ export const useServiceOrderKanban = (): UseServiceOrderKanbanResult => {
     setDialog(null);
   };
 
-  const handleOrder = (serviceOrder: ServiceOrder): void => {
-    setDialog({ type: DIALOG_TYPE.ORDER, serviceOrder });
-  };
-  const handleReturn = (serviceOrder: ServiceOrder): void => {
-    setDialog({ type: DIALOG_TYPE.RETURN, serviceOrder });
-  };
-  const handleCancelRequest = (serviceOrder: ServiceOrder): void => {
-    setDialog({ type: DIALOG_TYPE.CANCEL, serviceOrder });
-  };
-  const handleRecord = (serviceOrder: ServiceOrder): void => {
-    setDialog({ type: DIALOG_TYPE.SERVICE_RECORD, serviceOrder });
-  };
-  const handleAdvance = (serviceOrder: ServiceOrder): void => {
-    // ordered → inCalibration は入力なしで即時遷移
-    updateServiceOrderStatus(serviceOrder.id, SERVICE_ORDER_STATUS.IN_CALIBRATION);
+  const handleCardAction = (action: CardAction, serviceOrder: ServiceOrder): void => {
+    if (action === CARD_ACTION.ADVANCE) {
+      // ordered → inCalibration は入力なしで即時遷移
+      updateServiceOrderStatus(serviceOrder.id, SERVICE_ORDER_STATUS.IN_CALIBRATION);
+      return;
+    }
+    setDialog({ type: action, serviceOrder });
   };
   const handleConfirmCancel = (): void => {
     if (dialog) {
@@ -136,11 +120,7 @@ export const useServiceOrderKanban = (): UseServiceOrderKanbanResult => {
     totalServiceOrderCount,
     dialog,
     closeDialog,
-    handleOrder,
-    handleReturn,
-    handleCancelRequest,
-    handleRecord,
-    handleAdvance,
+    handleCardAction,
     handleConfirmCancel,
   };
 };

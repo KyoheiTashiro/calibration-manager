@@ -4,7 +4,24 @@
  * (features/equipment/constants.ts / features/serviceItems/constants.ts と同じ運用)。
  */
 
-import { SERVICE_ORDER_STATUS, type ServiceOrderStatus } from "@/store/types";
+import { SERVICE_ORDER_STATUS, type ServiceOrder, type ServiceOrderStatus } from "@/store/types";
+
+/** カード操作で開くダイアログ種別（画面ローカルの UI 状態。ドメイン列挙とは別軸） */
+export const DIALOG_TYPE = {
+  ORDER: "order",
+  RETURN: "return",
+  CANCEL: "cancel",
+  SERVICE_RECORD: "serviceRecord",
+} as const;
+export type DialogType = (typeof DIALOG_TYPE)[keyof typeof DIALOG_TYPE];
+export type DialogState = { type: DialogType; serviceOrder: ServiceOrder };
+
+/** カードのアクション種別 = ダイアログ起動4種 + 即時遷移 advance(画面ローカルUI状態) */
+export const CARD_ACTION = {
+  ...DIALOG_TYPE,
+  ADVANCE: "advance",
+} as const;
+export type CardAction = (typeof CARD_ACTION)[keyof typeof CARD_ACTION];
 
 /** 案件状態 → 日本語ラベル(domain-model.md §3.6 の状態遷移図表記) */
 export const SERVICE_ORDER_STATUS_LABELS = {

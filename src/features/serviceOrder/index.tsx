@@ -13,8 +13,8 @@ import {
   ServiceOrderDialog,
   ReturnDialog,
 } from "@/features/serviceOrder/components/TransitionDialogs";
-import { SERVICE_ORDER_STATUS_LABELS } from "@/features/serviceOrder/constants";
-import { DIALOG_TYPE, useServiceOrderKanban } from "@/features/serviceOrder/hooks";
+import { DIALOG_TYPE, SERVICE_ORDER_STATUS_LABELS } from "@/features/serviceOrder/constants";
+import { useServiceOrderKanban } from "@/features/serviceOrder/hooks";
 import { SERVICE_ORDER_STATUS, type ServiceOrderStatus } from "@/store/types";
 import { useSafeNavigate } from "@/utils/navigation";
 import type { ReactElement } from "react";
@@ -42,11 +42,7 @@ export const ServiceOrderList = (): ReactElement => {
     totalServiceOrderCount,
     dialog,
     closeDialog,
-    handleOrder,
-    handleReturn,
-    handleCancelRequest,
-    handleRecord,
-    handleAdvance,
+    handleCardAction,
     handleConfirmCancel,
   } = useServiceOrderKanban();
 
@@ -101,11 +97,7 @@ export const ServiceOrderList = (): ReactElement => {
                         serviceItems={serviceItems}
                         equipment={equipment}
                         vendors={vendors}
-                        onOrder={handleOrder}
-                        onAdvance={handleAdvance}
-                        onReturn={handleReturn}
-                        onCancel={handleCancelRequest}
-                        onRecord={handleRecord}
+                        onAction={handleCardAction}
                       />
                     ))
                   )}

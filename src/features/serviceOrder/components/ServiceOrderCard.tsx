@@ -6,9 +6,11 @@
  */
 
 import { Button } from "@/components/ui";
+import { CARD_ACTION, type CardAction } from "@/features/serviceOrder/constants";
 import {
   SERVICE_ORDER_STATUS,
   type ServiceOrder,
+  type ServiceOrderStatus,
   type Equipment,
   type ServiceItem,
   type Vendor,
@@ -21,16 +23,33 @@ const NO_REFERENCE_LABEL = "(参照先なし)";
 /** 属性が未設定のときの表示 */
 const UNSET_LABEL = "—";
 
+type CardActionSpec = { label: string; action: CardAction; variant?: "danger" };
+
+/** 状態別のカードアクション定義(表示順・ラベル・variant を一元化) */
+const STATUS_ACTIONS: Record<ServiceOrderStatus, readonly CardActionSpec[]> = {
+  [SERVICE_ORDER_STATUS.PLANNED]: [
+    { label: "発注する", action: CARD_ACTION.ORDER },
+    { label: "中止", action: CARD_ACTION.CANCEL, variant: "danger" },
+  ],
+  [SERVICE_ORDER_STATUS.ORDERED]: [
+    { label: "校正中へ", action: CARD_ACTION.ADVANCE },
+    { label: "中止", action: CARD_ACTION.CANCEL, variant: "danger" },
+  ],
+  [SERVICE_ORDER_STATUS.IN_CALIBRATION]: [
+    { label: "返却する", action: CARD_ACTION.RETURN },
+    { label: "中止", action: CARD_ACTION.CANCEL, variant: "danger" },
+  ],
+  [SERVICE_ORDER_STATUS.RETURNED]: [{ label: "記録登録", action: CARD_ACTION.SERVICE_RECORD }],
+  [SERVICE_ORDER_STATUS.COMPLETED]: [], // completed/cancelled はアクションなし(D-018)
+  [SERVICE_ORDER_STATUS.CANCELLED]: [],
+};
+
 type Props = {
   serviceOrder: ServiceOrder;
   serviceItems: Record<string, ServiceItem>;
   equipment: Record<string, Equipment>;
   vendors: Record<string, Vendor>;
-  onOrder: (serviceOrder: ServiceOrder) => void;
-  onAdvance: (serviceOrder: ServiceOrder) => void;
-  onReturn: (serviceOrder: ServiceOrder) => void;
-  onCancel: (serviceOrder: ServiceOrder) => void;
-  onRecord: (serviceOrder: ServiceOrder) => void;
+  onAction: (action: CardAction, serviceOrder: ServiceOrder) => void;
 };
 
 export const ServiceOrderCard = ({
@@ -38,11 +57,7 @@ export const ServiceOrderCard = ({
   serviceItems,
   equipment,
   vendors,
-  onOrder,
-  onAdvance,
-  onReturn,
-  onCancel,
-  onRecord,
+  onAction,
 }: Props): ReactElement => {
   const serviceItem = recordValue(serviceItems, serviceOrder.serviceItemId);
   const equipmentEntry = serviceItem ? recordValue(equipment, serviceItem.equipmentId) : undefined;
@@ -57,99 +72,19 @@ export const ServiceOrderCard = ({
     serviceOrder.status === SERVICE_ORDER_STATUS.COMPLETED ||
     serviceOrder.status === SERVICE_ORDER_STATUS.CANCELLED;
 
-  const renderActions = (): ReactNode => {
-    switch (serviceOrder.status) {
-      case SERVICE_ORDER_STATUS.PLANNED: {
-        return (
-          <>
-            <Button
-              size="sm"
-              onClick={() => {
-                onOrder(serviceOrder);
-              }}
-            >
-              発注する
-            </Button>
-            <Button
-              size="sm"
-              variant="danger"
-              onClick={() => {
-                onCancel(serviceOrder);
-              }}
-            >
-              中止
-            </Button>
-          </>
-        );
-      }
-      case SERVICE_ORDER_STATUS.ORDERED: {
-        return (
-          <>
-            <Button
-              size="sm"
-              onClick={() => {
-                onAdvance(serviceOrder);
-              }}
-            >
-              校正中へ
-            </Button>
-            <Button
-              size="sm"
-              variant="danger"
-              onClick={() => {
-                onCancel(serviceOrder);
-              }}
-            >
-              中止
-            </Button>
-          </>
-        );
-      }
-      case SERVICE_ORDER_STATUS.IN_CALIBRATION: {
-        return (
-          <>
-            <Button
-              size="sm"
-              onClick={() => {
-                onReturn(serviceOrder);
-              }}
-            >
-              返却する
-            </Button>
-            <Button
-              size="sm"
-              variant="danger"
-              onClick={() => {
-                onCancel(serviceOrder);
-              }}
-            >
-              中止
-            </Button>
-          </>
-        );
-      }
-      case SERVICE_ORDER_STATUS.RETURNED: {
-        return (
-          <Button
-            size="sm"
-            onClick={() => {
-              onRecord(serviceOrder);
-            }}
-          >
-            記録登録
-          </Button>
-        );
-      }
-      case SERVICE_ORDER_STATUS.COMPLETED:
-      case SERVICE_ORDER_STATUS.CANCELLED: {
-        // completed / cancelled はアクションなし（D-018）
-        return null;
-      }
-      default: {
-        return null;
-      }
-    }
-  };
+  const renderActions = (): ReactNode =>
+    STATUS_ACTIONS[serviceOrder.status].map(({ label, action, variant }) => (
+      <Button
+        key={action}
+        size="sm"
+        variant={variant}
+        onClick={() => {
+          onAction(action, serviceOrder);
+        }}
+      >
+        {label}
+      </Button>
+    ));
 
   return (
     <div
