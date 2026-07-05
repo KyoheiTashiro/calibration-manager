@@ -222,7 +222,7 @@ export const Manual = (): ReactElement => (
 
     <ManualSection title="ライセンスとソースコード">
       <p>
-        このアプリはオープンソースソフトウェアです。ソースコードは
+        このアプリはオープンソースソフトウェアです。ソースコードはMITライセンスのもと、
         <a
           href="https://github.com/KyoheiTashiro/calibration-manager"
           target="_blank"
@@ -231,11 +231,19 @@ export const Manual = (): ReactElement => (
         >
           GitHubリポジトリ
         </a>
-        でMITライセンスのもと公開されています。
+        で公開されています。
       </p>
       <p>
-        業務に合わせた機能追加が必要な場合は、MITライセンスの範囲でソースコードを自由に改変・
-        拡張してご利用いただけます。
+        業務に合わせて機能を追加したい場合は、
+        <a
+          href="https://github.com/KyoheiTashiro/calibration-manager/blob/main/LICENSE"
+          target="_blank"
+          rel="noreferrer"
+          className="text-primary mx-1 underline"
+        >
+          ライセンスの条件
+        </a>
+        に従い、ソースコードを自由に改変・拡張してご利用いただけます。
       </p>
     </ManualSection>
   </div>
