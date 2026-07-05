@@ -33,7 +33,7 @@ export const Header = ({ onMenuClick }: Props): ReactElement => {
         >
           <MenuIcon className="h-6 w-6" />
         </button>
-        <span className="text-base font-semibold">機器点検・校正管理</span>
+        <span className="text-base font-semibold">機器点検校正管理</span>
       </div>
 
       <div className="flex items-center">

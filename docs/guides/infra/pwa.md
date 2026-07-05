@@ -13,8 +13,8 @@
 
 ```json
 {
-  "name": "機器点検・校正管理",
-  "short_name": "機器点検・校正管理",
+  "name": "機器点検校正管理",
+  "short_name": "機器点検校正管理",
   "description": "機器の点検・校正の期限を管理し、担当者へ通知する",
   "start_url": "/calibration-manager/",
   "scope": "/calibration-manager/",

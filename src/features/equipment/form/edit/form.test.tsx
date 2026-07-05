@@ -89,8 +89,9 @@ describe("EquipmentEditForm: 編集プリフィル・更新", () => {
     await user.type(locationInput, "校正室");
     await user.click(screen.getByRole("button", { name: "保存" }));
 
+    // 保存(react-hook-formのasync submit)後の遷移は非同期のためfindByTextで待機する
+    expect(await screen.findByText(`機器詳細:${existingEquipment.id}`)).toBeInTheDocument();
     expect(useAppStore.getState().equipment[existingEquipment.id]?.location).toBe("校正室");
-    expect(screen.getByText(`機器詳細:${existingEquipment.id}`)).toBeInTheDocument();
   });
 });
 
@@ -109,11 +110,12 @@ describe("EquipmentEditForm: 管理番号ユニーク検証", () => {
 
     await user.click(screen.getByRole("button", { name: "保存" }));
 
+    // 保存(react-hook-formのasync submit)後の遷移は非同期のためfindByTextで待機する
+    expect(await screen.findByText(`機器詳細:${existingEquipment.id}`)).toBeInTheDocument();
     expect(screen.queryByText("この管理番号は既に使用されています")).not.toBeInTheDocument();
     expect(useAppStore.getState().equipment[existingEquipment.id]?.managementNo).toBe(
       existingEquipment.managementNo,
     );
-    expect(screen.getByText(`機器詳細:${existingEquipment.id}`)).toBeInTheDocument();
   });
 });
 
@@ -137,10 +139,11 @@ describe("EquipmentEditForm: 廃棄ボタン", () => {
 
     await user.click(within(dialog).getByRole("button", { name: "廃棄" }));
 
+    // 確定後の遷移は非同期になり得るためfindByTextで待機する
+    expect(await screen.findByText(`機器詳細:${existingEquipment.id}`)).toBeInTheDocument();
     expect(useAppStore.getState().equipment[existingEquipment.id]?.status).toBe(
       EQUIPMENT_STATUS.RETIRED,
     );
-    expect(screen.getByText(`機器詳細:${existingEquipment.id}`)).toBeInTheDocument();
   });
 });
 
