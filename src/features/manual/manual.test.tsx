@@ -69,13 +69,13 @@ describe("Manual", () => {
     expect(link).toHaveAttribute("rel", "noreferrer");
   });
 
-  it("ライセンス条件へのリンクがLICENSEファイルを新規タブで開く形で存在する", () => {
+  it("ライセンス条件へのリンクがLICENSE.ja.mdファイルを新規タブで開く形で存在する", () => {
     renderWithStore(<Manual />);
 
     const link = screen.getByRole("link", { name: "ライセンスの条件" });
     expect(link).toHaveAttribute(
       "href",
-      "https://github.com/KyoheiTashiro/calibration-manager/blob/main/LICENSE",
+      "https://github.com/KyoheiTashiro/calibration-manager/blob/main/LICENSE.ja.md",
     );
     expect(link).toHaveAttribute("target", "_blank");
     expect(link).toHaveAttribute("rel", "noreferrer");

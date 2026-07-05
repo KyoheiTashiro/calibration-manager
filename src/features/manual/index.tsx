@@ -236,7 +236,7 @@ export const Manual = (): ReactElement => (
       <p>
         業務に合わせて機能を追加したい場合は、
         <a
-          href="https://github.com/KyoheiTashiro/calibration-manager/blob/main/LICENSE"
+          href="https://github.com/KyoheiTashiro/calibration-manager/blob/main/LICENSE.ja.md"
           target="_blank"
           rel="noreferrer"
           className="text-primary mx-1 underline"

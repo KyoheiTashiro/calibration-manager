@@ -55,7 +55,7 @@
 - **期限と発注推奨日の計算**: ドメインモデル §4.1/§4.2 の計算式をそのまま記載する(次回期限 = 前回実施日 + 周期、月単位の加算は暦月ベース。発注推奨日(外部のみ) = 次回期限 − 納期 − 発注余裕日数、納期は項目個別設定がなければ依頼先の標準納期を使用)。
 - **各画面の説明**: ダッシュボード([§1](./01-dashboard.md))・機器一覧/機器詳細([§2](./02-equipment-list.md)/[§4](./04-equipment-detail.md))・点検校正項目一覧([§5](./05-service-item-list.md))・点検校正外部案件([§8](./08-service-orders.md))・メーカー/取引先・担当者([§9](./09-masters.md))・通知([§10](./10-notifications.md))・設定([§11](./11-settings.md)、PWAとしてのインストール、CSVによるデータのエクスポート/インポート、データ全削除)の各画面へのリンクと、各画面の目的を2〜3文で要約する。
 - **バックアップと復元**: 設定画面([§11](./11-settings.md))からのCSVエクスポート(UTF-8 BOM付き)/インポートの案内と、端末変更・ブラウザデータ消去に備えた定期エクスポートの推奨。
-- **ライセンスとソースコード**: 本アプリがMITライセンスのオープンソースソフトウェアであることと、ソースコードのGitHubリポジトリ(<https://github.com/KyoheiTashiro/calibration-manager>)への外部リンク(`target="_blank"` + `rel="noreferrer"`)を記載する。あわせて、ログイン機能・アカウントごとの権限管理・DBサーバーによる複数人でのデータ共有などは本アプリのスコープ外であり、ライセンスの条件(GitHubリポジトリの LICENSE ファイル <https://github.com/KyoheiTashiro/calibration-manager/blob/main/LICENSE> への外部リンク、同じく `target="_blank"` + `rel="noreferrer"`)に従い利用者が自由に改変・拡張できることを案内する。
+- **ライセンスとソースコード**: 本アプリがMITライセンスのオープンソースソフトウェアであることと、ソースコードのGitHubリポジトリ(<https://github.com/KyoheiTashiro/calibration-manager>)への外部リンク(`target="_blank"` + `rel="noreferrer"`)を記載する。あわせて、ログイン機能・アカウントごとの権限管理・DBサーバーによる複数人でのデータ共有などは本アプリのスコープ外であり、ライセンスの条件(GitHubリポジトリの LICENSE.ja.md ファイル(日本語参考訳) <https://github.com/KyoheiTashiro/calibration-manager/blob/main/LICENSE.ja.md> への外部リンク、同じく `target="_blank"` + `rel="noreferrer"`)に従い利用者が自由に改変・拡張できることを案内する。
 
 ## 表示ルール・バリデーション(zod)
 
