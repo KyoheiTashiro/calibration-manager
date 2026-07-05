@@ -1,8 +1,8 @@
 /**
- * EquipmentDetail: 実施記録登録モーダル(RecordModal)の起動結節点の検証
- * (screen-design/04-equipment-detail.md「操作・アクション」/ 07-record-modal.md)。
+ * EquipmentDetail: 実施記録登録モーダル(ServiceRecordModal)の起動結節点の検証
+ * (screen-design/04-equipment-detail.md「操作・アクション」/ 07-service-record-modal.md)。
  * 行「記録」ボタンで対象項目がプリセットされたモーダルが開き、登録で実施記録が増えることを扱う。
- * モーダル自体の入力・検証は RecordModal.test.tsx の責務。
+ * モーダル自体の入力・検証は ServiceRecordModal.test.tsx の責務。
  */
 
 import { ROUTES, equipmentDetailPath } from "@/constants/routes";
@@ -55,7 +55,7 @@ beforeEach(() => {
   seedEquipmentFullServiceItemsAndRecords();
 });
 
-describe("EquipmentDetail: RecordModal起動", () => {
+describe("EquipmentDetail: ServiceRecordModal起動", () => {
   it("行の「記録」で対象項目がプリセットされたモーダルが開く", async () => {
     const user = userEvent.setup();
     renderDetail();
@@ -72,7 +72,7 @@ describe("EquipmentDetail: RecordModal起動", () => {
     const user = userEvent.setup();
     renderDetail();
 
-    const recordsBefore = Object.keys(useAppStore.getState().records).length;
+    const recordsBefore = Object.keys(useAppStore.getState().serviceRecords).length;
     const historyRowsBefore = getHistoryRows().length;
 
     await user.click(within(getServiceItemRow(/年次校正/u)).getByRole("button", { name: "記録" }));
@@ -81,6 +81,6 @@ describe("EquipmentDetail: RecordModal起動", () => {
     await user.click(within(dialogElement).getByRole("button", { name: "保存" }));
 
     expect(getHistoryRows()).toHaveLength(historyRowsBefore + 1);
-    expect(Object.keys(useAppStore.getState().records)).toHaveLength(recordsBefore + 1);
+    expect(Object.keys(useAppStore.getState().serviceRecords)).toHaveLength(recordsBefore + 1);
   });
 });

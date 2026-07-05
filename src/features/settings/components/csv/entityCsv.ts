@@ -25,7 +25,7 @@ export type CsvEntityKind = keyof AppState;
 export const CSV_ENTITY_KINDS = [
   "equipment",
   "serviceItems",
-  "records",
+  "serviceRecords",
   "serviceOrders",
   "vendors",
   "persons",
@@ -98,7 +98,7 @@ export const ENTITY_CSV_SPECS: { [Kind in CsvEntityKind]: EntityCsvSpec<Kind> } 
     schema: serviceItemSchema,
     uniqueKeys: [],
   },
-  records: {
+  serviceRecords: {
     label: "実施記録",
     columns: [
       { key: "id", kind: CSV_COLUMN_KIND.STRING },

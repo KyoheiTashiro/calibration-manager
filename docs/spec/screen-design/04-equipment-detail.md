@@ -42,7 +42,7 @@
 
 - 「編集」→ `/equipment/:id/edit`。
 - 「+ 項目を追加」→ **[点検校正項目モーダル](./06-service-item-modal.md)** を新規モードで起動(equipmentId をプリセット)。
-- 各項目行「記録」→ **[実施記録登録モーダル](./07-record-modal.md)** を起動(serviceItemId プリセット)。
+- 各項目行「記録」→ **[実施記録登録モーダル](./07-service-record-modal.md)** を起動(serviceItemId プリセット)。
 - 各項目行「編集」→ **[点検校正項目モーダル](./06-service-item-modal.md)** を編集モードで起動。
 
 ## 表示ルール・バリデーション

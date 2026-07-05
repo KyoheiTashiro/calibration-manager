@@ -20,7 +20,7 @@ export const DIALOG_TYPE = {
   ORDER: "order",
   RETURN: "return",
   CANCEL: "cancel",
-  RECORD: "record",
+  SERVICE_RECORD: "serviceRecord",
 } as const;
 export type DialogType = (typeof DIALOG_TYPE)[keyof typeof DIALOG_TYPE];
 export type DialogState = { type: DialogType; serviceOrder: ServiceOrder };
@@ -112,7 +112,7 @@ export const useServiceOrderKanban = (): UseServiceOrderKanbanResult => {
     setDialog({ type: DIALOG_TYPE.CANCEL, serviceOrder });
   };
   const handleRecord = (serviceOrder: ServiceOrder): void => {
-    setDialog({ type: DIALOG_TYPE.RECORD, serviceOrder });
+    setDialog({ type: DIALOG_TYPE.SERVICE_RECORD, serviceOrder });
   };
   const handleAdvance = (serviceOrder: ServiceOrder): void => {
     // ordered → inCalibration は入力なしで即時遷移

@@ -179,7 +179,7 @@ describe("EquipmentDetail: 実施記録", () => {
  * EquipmentDetail: 点検校正項目テーブルの検証(screen-design/04-equipment-detail.md)。
  * 列内容・並び順(isActive優先→nextDueDate昇順)・淡色表示・ステータスバッジの
  * D-014両分岐(稼働=導出表示 / 休止=「—」)・担当者の「(無効)」注記(D-001)・
- * 記録ボタンの活性(Phase 7でRecordModalへ接続)を扱う。
+ * 記録ボタンの活性(Phase 7でServiceRecordModalへ接続)を扱う。
  */
 describe("EquipmentDetail: 項目テーブルの列内容", () => {
   it("種別・内外・周期・担当者名・次回期限が表示される", () => {
@@ -256,9 +256,9 @@ describe("EquipmentDetail: 項目ステータス(D-014)", () => {
 });
 
 describe("EquipmentDetail: 記録ボタン", () => {
-  // なぜ変更したか: Phase 7 で実施記録登録モーダル(RecordModal)を接続し、記録ボタンを活性化した。
-  // 旧テストは接続前の先行設置(常時disabled)を検証していたが、活性化が仕様(07-record-modal.md)の
-  // ため期待値を活性へ是正する(テストを弱める改変ではない)。起動結節点の検証は recordLaunch.test.tsx。
+  // なぜ変更したか: Phase 7 で実施記録登録モーダル(ServiceRecordModal)を接続し、記録ボタンを活性化した。
+  // 旧テストは接続前の先行設置(常時disabled)を検証していたが、活性化が仕様(07-service-record-modal.md)の
+  // ため期待値を活性へ是正する(テストを弱める改変ではない)。起動結節点の検証は serviceRecordLaunch.test.tsx。
   it("各項目行の記録ボタンが活性で表示される", () => {
     seedEquipmentFullMasters();
     seedEquipmentFullServiceItemsAndRecords();

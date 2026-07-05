@@ -5,6 +5,6 @@
 export { ServiceItemModal } from "@/components/domain/ServiceItemModal";
 export { ServiceOrderModal } from "@/components/domain/ServiceOrderModal";
 export { PersonModal } from "@/components/domain/PersonModal";
-export { RecordModal } from "@/components/domain/RecordModal";
+export { ServiceRecordModal } from "@/components/domain/ServiceRecordModal";
 export { StatusBadge } from "@/components/domain/StatusBadge";
 export { VendorModal } from "@/components/domain/VendorModal";

@@ -1,5 +1,5 @@
 /**
- * detail.test.tsx / recordLaunch.test.tsx の2テストファイルで共有するテスト用フィクスチャ。
+ * detail.test.tsx / serviceRecordLaunch.test.tsx の2テストファイルで共有するテスト用フィクスチャ。
  * どちらか一方へ取り込むと他方がテストファイルをimportする形になるため、独立ファイルとして維持する。
  */
 
@@ -8,7 +8,7 @@ import {
   EQUIPMENT_STATUS,
   EXECUTION,
   SERVICE_ITEM_TYPE,
-  RECORD_RESULT,
+  SERVICE_RECORD_RESULT,
   type Equipment,
   type ServiceItem,
   type ServiceRecord,
@@ -158,7 +158,7 @@ export const recordOverdueServiceItem: ServiceRecord = {
   serviceItemId: serviceItemOverdue.id,
   doneDate: "2026-06-25",
   doneBy: "鈴木",
-  result: RECORD_RESULT.PASS,
+  result: SERVICE_RECORD_RESULT.PASS,
 };
 
 export const recordExternalServiceItemSameDay: ServiceRecord = {
@@ -166,7 +166,7 @@ export const recordExternalServiceItemSameDay: ServiceRecord = {
   serviceItemId: serviceItemExternal.id,
   doneDate: "2026-06-25",
   doneBy: "田中",
-  result: RECORD_RESULT.FAIL,
+  result: SERVICE_RECORD_RESULT.FAIL,
 };
 
 export const recordExternalServiceItemOlder: ServiceRecord = {
@@ -174,7 +174,7 @@ export const recordExternalServiceItemOlder: ServiceRecord = {
   serviceItemId: serviceItemExternal.id,
   doneDate: "2025-06-18",
   doneBy: "ミツトヨ校正センター",
-  result: RECORD_RESULT.ADJUSTED,
+  result: SERVICE_RECORD_RESULT.ADJUSTED,
   note: "証明書#A-102",
 };
 
@@ -202,7 +202,7 @@ export const seedEquipmentFullServiceItemsAndRecords = (): void => {
       [serviceItemDeactivated.id]: serviceItemDeactivated,
       [serviceItemExternal.id]: serviceItemExternal,
     },
-    records: {
+    serviceRecords: {
       [recordOverdueServiceItem.id]: recordOverdueServiceItem,
       [recordExternalServiceItemSameDay.id]: recordExternalServiceItemSameDay,
       [recordExternalServiceItemOlder.id]: recordExternalServiceItemOlder,

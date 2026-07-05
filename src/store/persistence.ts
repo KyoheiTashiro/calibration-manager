@@ -23,7 +23,7 @@ export const emptyAppState = (): AppState => ({
   persons: {},
   equipment: {},
   serviceItems: {},
-  records: {},
+  serviceRecords: {},
   serviceOrders: {},
   notifications: {},
 });
@@ -126,6 +126,21 @@ export const migrateV3ToV4: MigrationStep = (persisted) => {
 };
 
 /**
+ * v4→v5: record→serviceRecord リネーム（D-050。コードの Record 系命名を
+ * ServiceRecord 系へ統一したことに伴い、永続化キーも追随）。
+ * - 状態キー records → serviceRecords
+ * "records" は v4 の歴史的リテラル値のため直書き。
+ */
+export const migrateV4ToV5: MigrationStep = (persisted) => {
+  if (!isRecord(persisted)) return persisted;
+  const { records, ...rest } = persisted;
+  return {
+    ...rest,
+    serviceRecords: records,
+  };
+};
+
+/**
  * 将来のスキーマ変更時は migrateVNToVN+1 を追加してここへ登録し、
  * STORAGE_VERSION をインクリメントする（store.md「migrate」）。
  */
@@ -133,6 +148,7 @@ export const MIGRATIONS: Record<number, MigrationStep> = {
   1: migrateV1ToV2,
   2: migrateV2ToV3,
   3: migrateV3ToV4,
+  4: migrateV4ToV5,
 };
 
 /**
@@ -175,7 +191,7 @@ const salvageAppStatePerRecord = (persisted: Record<string, unknown>): AppState 
   persons: salvageRecords(persisted.persons, personSchema),
   equipment: salvageRecords(persisted.equipment, equipmentSchema),
   serviceItems: salvageRecords(persisted.serviceItems, serviceItemSchema),
-  records: salvageRecords(persisted.records, serviceRecordSchema),
+  serviceRecords: salvageRecords(persisted.serviceRecords, serviceRecordSchema),
   serviceOrders: salvageRecords(persisted.serviceOrders, serviceOrderSchema),
   notifications: salvageRecords(persisted.notifications, notificationSchema),
 });

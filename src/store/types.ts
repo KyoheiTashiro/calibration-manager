@@ -43,12 +43,13 @@ export const EXECUTION = {
 export type Execution = (typeof EXECUTION)[keyof typeof EXECUTION];
 
 /** 実施記録の結果（domain-model.md §3.5）。fail は次回期限を更新しない */
-export const RECORD_RESULT = {
+export const SERVICE_RECORD_RESULT = {
   PASS: "pass",
   FAIL: "fail",
   ADJUSTED: "adjusted",
 } as const;
-export type RecordResult = (typeof RECORD_RESULT)[keyof typeof RECORD_RESULT];
+export type ServiceRecordResult =
+  (typeof SERVICE_RECORD_RESULT)[keyof typeof SERVICE_RECORD_RESULT];
 
 /**
  * 点検校正外部案件の状態（domain-model.md §3.6）。
@@ -159,7 +160,7 @@ export type ServiceRecord = {
   doneDate: IsoDateString;
   /** 実施者名（外部の場合は業者名） */
   doneBy: string;
-  result: RecordResult;
+  result: ServiceRecordResult;
   /** 外部点検校正の場合、元になった ServiceOrder 参照 */
   serviceOrderId?: string;
   note?: string;
@@ -204,7 +205,7 @@ export type AppState = {
   persons: Record<string, Person>;
   equipment: Record<string, Equipment>;
   serviceItems: Record<string, ServiceItem>;
-  records: Record<string, ServiceRecord>;
+  serviceRecords: Record<string, ServiceRecord>;
   serviceOrders: Record<string, ServiceOrder>;
   notifications: Record<string, Notification>;
 };

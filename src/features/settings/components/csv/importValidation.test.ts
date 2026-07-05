@@ -274,13 +274,13 @@ describe("validateEntityCsv: 参照整合(D-029: 現在ストアと突合)", () 
     expect(result.validCount).toBe(1);
   });
 
-  it("records の serviceOrderId は指定時のみ突合する", () => {
+  it("serviceRecords の serviceOrderId は指定時のみ突合する", () => {
     const csv = joinCsv(
       "id,serviceItemId,doneDate,doneBy,result,serviceOrderId,note",
       "rc-1,item-1,2026-07-01,田中,pass,,",
       "rc-2,item-1,2026-07-01,校正社,pass,serviceOrder-9,",
     );
-    const result = validateEntityCsv("records", csv, stateWithReferences());
+    const result = validateEntityCsv("serviceRecords", csv, stateWithReferences());
     expect(result.errors).toEqual([
       { line: 3, message: "serviceOrderId: 参照先が存在しません 'serviceOrder-9'" },
     ]);

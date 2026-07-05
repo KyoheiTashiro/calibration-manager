@@ -8,7 +8,7 @@
  * - モーダル起動は単一 state で kind を持ち、1度に開くのは1つ。閉じたら state をリセットする。
  */
 
-import { ServiceItemModal, ServiceOrderModal, RecordModal } from "@/components/domain";
+import { ServiceItemModal, ServiceOrderModal, ServiceRecordModal } from "@/components/domain";
 import { Button, EmptyState } from "@/components/ui";
 import { FilterBar } from "@/features/serviceItems/list/components/FilterBar";
 import { ServiceItemTable } from "@/features/serviceItems/list/components/ServiceItemTable";
@@ -26,7 +26,7 @@ import { useSearchParams } from "react-router-dom";
 
 /** 起動中モーダルの種別(画面ローカルUI状態)。1度に1つのみ開く */
 const MODAL_KIND = {
-  RECORD: "record",
+  SERVICE_RECORD: "serviceRecord",
   ORDER: "order",
   EDIT: "edit",
 } as const;
@@ -99,7 +99,7 @@ export const ServiceItemList = (): ReactElement => {
             <ServiceItemTable
               rows={filteredRows}
               onRecord={(row) => {
-                setModal({ kind: MODAL_KIND.RECORD, row });
+                setModal({ kind: MODAL_KIND.SERVICE_RECORD, row });
               }}
               onOrder={(row) => {
                 setModal({ kind: MODAL_KIND.ORDER, row });
@@ -112,8 +112,8 @@ export const ServiceItemList = (): ReactElement => {
         </>
       )}
 
-      {modal?.kind === MODAL_KIND.RECORD ? (
-        <RecordModal open serviceItemId={modal.row.serviceItem.id} onClose={closeModal} />
+      {modal?.kind === MODAL_KIND.SERVICE_RECORD ? (
+        <ServiceRecordModal open serviceItemId={modal.row.serviceItem.id} onClose={closeModal} />
       ) : null}
       {modal?.kind === MODAL_KIND.ORDER ? (
         <ServiceOrderModal open serviceItemId={modal.row.serviceItem.id} onClose={closeModal} />

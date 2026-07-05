@@ -39,7 +39,7 @@ planned → ordered → inCalibration → returned → completed
 - **planned → ordered**: 「発注する」→ 小ダイアログで `orderedDate` 入力(既定=今日)。任意で dueDate・cost。
 - **ordered → inCalibration**: 「校正中へ」→ 即時遷移(入力なし)。
 - **inCalibration → returned**: 「返却する」→ ダイアログで `returnedDate`(実返却日、既定=今日)入力。
-- **returned → completed**: 「記録登録」→ **[実施記録登録モーダル](./07-record-modal.md)** を起動。記録確定で当該案件が `completed`、項目の nextDueDate 更新([§7 副作用5](./07-record-modal.md#操作アクション副作用重要))。
+- **returned → completed**: 「記録登録」→ **[実施記録登録モーダル](./07-service-record-modal.md)** を起動。記録確定で当該案件が `completed`、項目の nextDueDate 更新([§7 副作用5](./07-service-record-modal.md#操作アクション副作用重要))。
 - **各段階 → cancelled**: 「中止」→ 確認ダイアログ後に `cancelled`。
 - 遷移は上記の隣接遷移のみ許可(飛び越し不可)。`completed`/`cancelled` からの再遷移不可。
 

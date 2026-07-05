@@ -1,8 +1,8 @@
 /**
  * かんばん×記録モーダルの結合シナリオ。
- * かんばん(screen-design/08-service-orders.md)→ 実施記録登録モーダル(07-record-modal.md)→
+ * かんばん(screen-design/08-service-orders.md)→ 実施記録登録モーダル(07-service-record-modal.md)→
  * ストアカスケード(record 追加 → 期限再計算 → ServiceOrder completed 連鎖)を画面操作で貫通検証する。
- * 各モーダル・ダイアログ単体の入力検証は RecordModal.test.tsx / serviceOrders の各テストの責務。
+ * 各モーダル・ダイアログ単体の入力検証は ServiceRecordModal.test.tsx / serviceOrders の各テストの責務。
  */
 
 import { ServiceOrderList } from "@/features/serviceOrder";
@@ -12,7 +12,7 @@ import {
   EXECUTION,
   SERVICE_ITEM_TYPE,
   SERVICE_ORDER_STATUS,
-  RECORD_RESULT,
+  SERVICE_RECORD_RESULT,
   type ServiceOrder,
   type Equipment,
   type ServiceItem,
@@ -112,15 +112,15 @@ describe("結合: returned 案件 → 記録登録 → カスケード", () => {
     await registerRecordFromReturnedCard(user, "合格");
 
     const state = useAppStore.getState();
-    const records = Object.values(state.records);
-    expect(records).toHaveLength(1);
+    const serviceRecords = Object.values(state.serviceRecords);
+    expect(serviceRecords).toHaveLength(1);
     // doneBy は案件の依頼先 Vendor.name がプリフィルされ、そのまま登録される(D-017)
-    expect(records[0]).toMatchObject({
+    expect(serviceRecords[0]).toMatchObject({
       serviceItemId: serviceItem.id,
       serviceOrderId: returnedServiceOrder.id,
       doneDate: "2026-06-20",
       doneBy: vendor.name,
-      result: RECORD_RESULT.PASS,
+      result: SERVICE_RECORD_RESULT.PASS,
     } satisfies Partial<ServiceRecord>);
     const updatedServiceItem = state.serviceItems[serviceItem.id];
     expect(updatedServiceItem.lastDoneDate).toBe("2026-06-20");
@@ -147,7 +147,7 @@ describe("結合: returned 案件 → 記録登録 → カスケード", () => {
     expect(state.serviceOrders[returnedServiceOrder.id].status).toBe(
       SERVICE_ORDER_STATUS.COMPLETED,
     );
-    expect(Object.values(state.records)[0]?.result).toBe(RECORD_RESULT.FAIL);
+    expect(Object.values(state.serviceRecords)[0]?.result).toBe(SERVICE_RECORD_RESULT.FAIL);
   });
 
   it("fail 選択時はモーダル内に「次回期限は更新されません」の注意書きが出る", async () => {

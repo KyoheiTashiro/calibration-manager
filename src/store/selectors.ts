@@ -38,12 +38,12 @@ export const serviceOrdersOf = (
   );
 
 /** 項目に紐づく実施記録の一覧（実施日の新しい順。同日はid辞書順で決定的に） */
-export const recordsOf = (
-  state: Pick<AppState, "records">,
+export const serviceRecordsOf = (
+  state: Pick<AppState, "serviceRecords">,
   serviceItemId: string,
 ): ServiceRecord[] =>
-  Object.values(state.records)
-    .filter((record) => record.serviceItemId === serviceItemId)
+  Object.values(state.serviceRecords)
+    .filter((serviceRecord) => serviceRecord.serviceItemId === serviceItemId)
     .toSorted(
       (left, right) =>
         right.doneDate.localeCompare(left.doneDate) || left.id.localeCompare(right.id),

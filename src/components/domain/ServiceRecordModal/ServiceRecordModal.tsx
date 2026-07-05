@@ -1,19 +1,22 @@
 // oxlint-disable import/max-dependencies -- 共通ヘルパー(@/utils/form・@/utils/record)への
 // 重複排除移設(D-048)で依存数が上限をわずかに超えるが、逐語重複の解消を優先し対象外とする
 /**
- * 実施記録（ServiceRecord）の登録モーダル（screen-design/07-record-modal.md）。RHF + zodResolver。
+ * 実施記録（ServiceRecord）の登録モーダル（screen-design/07-service-record-modal.md）。RHF + zodResolver。
  * 対象項目は常に確定した状態で起動元から渡される。登録時の期限更新・案件完了カスケードは
- * ストア層 addRecord が担う（serviceRecordSlice.ts）。
+ * ストア層 addServiceRecord が担う（serviceRecordSlice.ts）。
  * 呼び出し元は閉時アンマウント（条件マウント）必須。defaultValues はマウント時にのみ評価されるため、
  * 常時マウントで open をトグルする使い方ではプリフィルされない。
  */
 
-import { recordFormSchema, type RecordFormValues } from "@/components/domain/RecordModal/schema";
+import {
+  serviceRecordFormSchema,
+  type ServiceRecordFormValues,
+} from "@/components/domain/ServiceRecordModal/schema";
 import { Button, DateField, Modal, RadioGroup, TextField } from "@/components/ui";
-import { RECORD_RESULT_OPTIONS } from "@/features/serviceItems/constants";
+import { SERVICE_RECORD_RESULT_OPTIONS } from "@/features/serviceItems/constants";
 import {
   EXECUTION,
-  RECORD_RESULT,
+  SERVICE_RECORD_RESULT,
   type ServiceOrder,
   type ServiceItem,
   type Vendor,
@@ -55,7 +58,7 @@ const resolvePrefillDoneBy = (
   return "";
 };
 
-export const RecordModal = ({
+export const ServiceRecordModal = ({
   open,
   serviceItemId,
   serviceOrderId,
@@ -70,14 +73,14 @@ export const RecordModal = ({
   const serviceOrder = useAppStore((state) =>
     hasServiceOrderId ? recordValue(state.serviceOrders, serviceOrderId) : undefined,
   );
-  const addRecord = useAppStore((state) => state.addRecord);
+  const addServiceRecord = useAppStore((state) => state.addServiceRecord);
 
   const [submitFailed, setSubmitFailed] = useState(false);
 
-  // なぜ defaultValues 直書きで足りるか: RecordModal は起動元で常に条件マウント（閉時アンマウント）
+  // なぜ defaultValues 直書きで足りるか: ServiceRecordModal は起動元で常に条件マウント（閉時アンマウント）
   // されるため、defaultValues はマウント時に1度評価されれば足り、open のたびのプリフィルは不要。
   // なぜ result を undefined か: 既定選択なし（未選択で送信すると zod エラー）とするため。
-  const defaultValues: DefaultValues<RecordFormValues> = {
+  const defaultValues: DefaultValues<ServiceRecordFormValues> = {
     doneDate: todayIsoDate(),
     doneBy: resolvePrefillDoneBy(serviceItem, serviceOrder, vendors),
     result: undefined,
@@ -89,8 +92,8 @@ export const RecordModal = ({
     handleSubmit,
     control,
     formState: { errors, isDirty },
-  } = useForm<RecordFormValues>({
-    resolver: zodResolver(recordFormSchema),
+  } = useForm<ServiceRecordFormValues>({
+    resolver: zodResolver(serviceRecordFormSchema),
     defaultValues,
   });
 
@@ -115,8 +118,8 @@ export const RecordModal = ({
     onClose();
   };
 
-  const onSubmit = (values: RecordFormValues): void => {
-    const recordId = addRecord({
+  const onSubmit = (values: ServiceRecordFormValues): void => {
+    const recordId = addServiceRecord({
       serviceItemId,
       doneDate: values.doneDate,
       doneBy: values.doneBy,
@@ -164,11 +167,11 @@ export const RecordModal = ({
         <RadioGroup
           label="結果"
           required
-          options={RECORD_RESULT_OPTIONS}
+          options={SERVICE_RECORD_RESULT_OPTIONS}
           error={errors.result?.message}
           {...register("result")}
         />
-        {result === RECORD_RESULT.FAIL ? (
+        {result === SERVICE_RECORD_RESULT.FAIL ? (
           <p className="text-xs text-slate-600">次回期限は更新されません</p>
         ) : null}
         <TextField label="備考" error={errors.note?.message} {...register("note")} />

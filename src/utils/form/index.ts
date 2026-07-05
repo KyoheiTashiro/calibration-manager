@@ -1,6 +1,6 @@
 /**
  * RHF（react-hook-form）+ zodResolver を使うフォームで共通に必要になる処理のユーティリティ。
- * なぜ必要か: 各モーダル・ダイアログ（PersonModal/VendorModal/RecordModal/ServiceOrderModal/
+ * なぜ必要か: 各モーダル・ダイアログ（PersonModal/VendorModal/ServiceRecordModal/ServiceOrderModal/
  * ServiceItemModal/TransitionDialogs）で同じ送信ハンドラ・空文字正規化・zod 入力ヘルパが
  * 逐語重複していたため、ここに集約する（D-048）。
  */

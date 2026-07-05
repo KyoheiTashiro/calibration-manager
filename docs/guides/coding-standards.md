@@ -42,7 +42,7 @@ Lint/Format は **oxlint + oxfmt**（ESLint/Prettier ではない）。多くは
   ```
   根拠: 値と型を 1 箇所で同期。`NOTIFICATION_TYPE`/`SERVICE_ORDER_STATUS`/`EQUIPMENT_STATUS`/`ROUTES` 等で一貫。
 - **zustand スライス**: 型 `XxxSlice` + ファクトリ `createXxxSlice`（例: `EquipmentSlice` / `createEquipmentSlice`）。初期値は独立した定数にせずファクトリ内に直接書く。
-- **selector 関数**: `xxxOf` 形（`serviceItemsOf`, `serviceOrdersOf`, `recordsOf`）。件数系は `unreadNotificationCount` のように用途を綴る。`src/store/selectors.ts`。
+- **selector 関数**: `xxxOf` 形（`serviceItemsOf`, `serviceOrdersOf`, `serviceRecordsOf`）。件数系は `unreadNotificationCount` のように用途を綴る。`src/store/selectors.ts`。
 - **省略形を使わない**: 識別子（変数・引数・関数・プロパティ・型）は完全な英単語で綴る。短縮形・頭文字省略・単文字いずれも不可。
   - 多文字省略形: `idx`→`index` / `eid`→`equipmentId` / `cfg`→`config` / `prev`→`previous` / `msg`→`message` / `btn`→`button` / `el`→`element` / `info`→説明的な完全名（`errorInfo` 等）。
   - **単文字のコールバック/selector 引数も不可**。`.map((i) => ...)` ではなく `.map((serviceItem) => ...)`、zustand は `(s) => s.serviceItems` ではなく `(state) => state.serviceItems`、イベントは `(e) => ...` ではなく `(event) => ...`、ループ index は `i` ではなく `index`。
@@ -109,7 +109,7 @@ Lint/Format は **oxlint + oxfmt**（ESLint/Prettier ではない）。多くは
   ```
 - **action 内ガードは early-return**（`const serviceItem = state.serviceItems[id]; if (!serviceItem) return;`）。
 - **横断 selector（複数エンティティ導出）は `src/store/selectors.ts` に純関数で**（store を引数に取りテスト可能に）。
-- **ローカル state vs store**: 永続化対象（equipment/service-items/records/service-orders/vendors/persons/notifications 等、`partialize` で限定）は store。UI 一時状態（編集中 id・モーダル開閉・選択 Set）は `useState`。項目ステータス（`deriveServiceItemStatus`）・発注推奨日は**永続化せず純関数で派生**（ドメインモデル §4）。
+- **ローカル state vs store**: 永続化対象（equipment/service-items/service-records/service-orders/vendors/persons/notifications 等、`partialize` で限定）は store。UI 一時状態（編集中 id・モーダル開閉・選択 Set）は `useState`。項目ステータス（`deriveServiceItemStatus`）・発注推奨日は**永続化せず純関数で派生**（ドメインモデル §4）。
 
 ## 6. import
 

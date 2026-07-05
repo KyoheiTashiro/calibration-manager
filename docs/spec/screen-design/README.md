@@ -61,14 +61,14 @@
 - [4. 機器詳細](./04-equipment-detail.md)
 - [5. 点検校正項目一覧(中核画面)](./05-service-item-list.md)
 - [6. 点検校正項目モーダル](./06-service-item-modal.md)
-- [7. 実施記録登録モーダル](./07-record-modal.md)
+- [7. 実施記録登録モーダル](./07-service-record-modal.md)
 - [8. 点検校正外部案件](./08-service-orders.md)
 - [9. マスタ管理(メーカー/取引先・担当者)](./09-masters.md)
 - [10. 通知センター](./10-notifications.md)
 - [11. 設定](./11-settings.md)
 - [12. 利用マニュアル](./12-manual.md)
 
-**モーダルで行う操作(ページ遷移しない)**: 点検校正項目の登録・編集([§6](./06-service-item-modal.md))、実施記録登録([§7](./07-record-modal.md))、点検校正外部案件の作成・状態更新([§8](./08-service-orders.md))、Vendor/Person の追加・編集([§9](./09-masters.md))。これらは機器詳細・点検校正項目一覧・案件一覧などから起動する。
+**モーダルで行う操作(ページ遷移しない)**: 点検校正項目の登録・編集([§6](./06-service-item-modal.md))、実施記録登録([§7](./07-service-record-modal.md))、点検校正外部案件の作成・状態更新([§8](./08-service-orders.md))、Vendor/Person の追加・編集([§9](./09-masters.md))。これらは機器詳細・点検校正項目一覧・案件一覧などから起動する。
 
 ### 0.3 ステータスバッジ色(共通定義)
 

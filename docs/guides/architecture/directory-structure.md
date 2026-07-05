@@ -19,7 +19,7 @@ src/
 │   ├── domain/                     // ドメイン固有の複合UIコンポーネント（各コンポーネントはサブディレクトリ + barrel）
 │   │   ├── StatusBadge/            // deriveServiceItemStatus + statusBadgeClass によるステータスバッジ（screen-design §0.3）
 │   │   ├── ServiceItemModal/              // 点検校正項目 登録・編集モーダル（screen-design §6）。equipment/detail と serviceItems 双方から起動するため共通配置
-│   │   ├── RecordModal/            // 実施記録登録モーダル（screen-design §7）。equipment/detail・serviceItems・serviceOrder から起動
+│   │   ├── ServiceRecordModal/     // 実施記録登録モーダル（screen-design §7）。equipment/detail・serviceItems・serviceOrder から起動
 │   │   ├── ServiceOrderModal/             // 点検校正外部案件 作成・状態更新モーダル（screen-design §8）
 │   │   ├── VendorModal/            // メーカー/取引先 追加・編集モーダル（screen-design §9）
 │   │   ├── PersonModal/            // 担当者 追加・編集モーダル（screen-design §9）
@@ -84,7 +84,7 @@ src/
 │   ├── persistence.ts              // migrate（migrateV1ToV2等をMIGRATIONSへ登録）/ merge（3段サルベージ）/ sanitizeAppState
 │   ├── storeState.ts               // StoreState型（7スライス + resetAll / replaceEntities の合成型）
 │   ├── schema.ts                   // zodスキーマ（7エンティティ）。CSVインポート検証にも再利用
-│   ├── selectors.ts                // 導出セレクタ（serviceItemsOf / serviceOrdersOf / recordsOf / personLabelOf（D-024）/ serviceItemRowsOf / unreadNotificationCount）
+│   ├── selectors.ts                // 導出セレクタ（serviceItemsOf / serviceOrdersOf / serviceRecordsOf / personLabelOf（D-024）/ serviceItemRowsOf / unreadNotificationCount）
 │   ├── types.ts
 │   └── slices/                     // Zustandスライス（7エンティティに1:1対応）
 │       ├── vendorSlice.ts
@@ -110,8 +110,8 @@ src/
 ## 補足
 
 - ルーターは `main.tsx` の `HashRouter`。ルート定義は `App.tsx` に置く。12画面のルーティング対応表は screen-design/README.md §0.2 を参照し、本書では再掲しない。
-- モーダル群（ServiceItemModal/RecordModal/ServiceOrderModal/VendorModal/PersonModal）は特定の1画面に属さず複数画面から起動されるため `components/domain/` に配置している（screen-design §0.2「モーダルで行う操作」）。`components/domain/` の役割が広いのは、calibration-managerの画面設計上モーダル起動元が多い（機器詳細・点検校正項目一覧・案件一覧など）ことによる設計判断である。
-- React Hook Form + Zod用のフォームスキーマは**フォームを持つ画面/コンポーネントの直近に colocate する**（D-043）。feature 内のフォーム（機器登録編集の `equipment/form/shared/schema.ts`、かんばん遷移ダイアログの `serviceOrder/schema.ts`）は features 側、`components/domain/` のモーダル（ServiceItemModal / ServiceOrderModal / RecordModal / VendorModal / PersonModal）は各モーダルディレクトリ内の `schema.ts` に置く。永続化データの構造検証（`store/schema.ts`）とは別物。
+- モーダル群（ServiceItemModal/ServiceRecordModal/ServiceOrderModal/VendorModal/PersonModal）は特定の1画面に属さず複数画面から起動されるため `components/domain/` に配置している（screen-design §0.2「モーダルで行う操作」）。`components/domain/` の役割が広いのは、calibration-managerの画面設計上モーダル起動元が多い（機器詳細・点検校正項目一覧・案件一覧など）ことによる設計判断である。
+- React Hook Form + Zod用のフォームスキーマは**フォームを持つ画面/コンポーネントの直近に colocate する**（D-043）。feature 内のフォーム（機器登録編集の `equipment/form/shared/schema.ts`、かんばん遷移ダイアログの `serviceOrder/schema.ts`）は features 側、`components/domain/` のモーダル（ServiceItemModal / ServiceOrderModal / ServiceRecordModal / VendorModal / PersonModal）は各モーダルディレクトリ内の `schema.ts` に置く。永続化データの構造検証（`store/schema.ts`）とは別物。
 - `store/schema.ts` はCSVインポートの行バリデーションにも再利用している（[tech-stack.md](./tech-stack.md) 参照）。
 - Storybookのstoryはコンポーネント隣に `*.stories.tsx` で配置する（colocation）。上記ツリーでは省略している。
 - `src/test/` にテスト支援ユーティリティを置く（詳細は省略）。

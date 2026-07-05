@@ -5,7 +5,7 @@
  * 起動元は項目一覧（Phase 8）。状態遷移・属性更新はストア（updateServiceOrderStatus / updateServiceOrder）が最終検証する。
  */
 
-import { RecordModal } from "@/components/domain";
+import { ServiceRecordModal } from "@/components/domain";
 import { Button, Checkbox, ConfirmModal, EmptyState } from "@/components/ui";
 import { ROUTES } from "@/constants/routes";
 import { ServiceOrderCard } from "@/features/serviceOrder/components/ServiceOrderCard";
@@ -122,8 +122,8 @@ export const ServiceOrderList = (): ReactElement => {
       {dialog?.type === DIALOG_TYPE.RETURN ? (
         <ReturnDialog serviceOrder={dialog.serviceOrder} onClose={closeDialog} />
       ) : null}
-      {dialog?.type === DIALOG_TYPE.RECORD ? (
-        <RecordModal
+      {dialog?.type === DIALOG_TYPE.SERVICE_RECORD ? (
+        <ServiceRecordModal
           open
           serviceItemId={dialog.serviceOrder.serviceItemId}
           serviceOrderId={dialog.serviceOrder.id}

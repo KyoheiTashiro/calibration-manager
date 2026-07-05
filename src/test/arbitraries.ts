@@ -20,7 +20,7 @@ import {
   type Notification,
   SERVICE_ORDER_STATUS,
   type Person,
-  RECORD_RESULT,
+  SERVICE_RECORD_RESULT,
   type Vendor,
 } from "@/store/types";
 import { daysInMonth, formatIsoDate } from "@/utils/time";
@@ -108,7 +108,7 @@ export const serviceRecordArb: fc.Arbitrary<ServiceRecord> = fc.record({
   serviceItemId: fc.uuid(),
   doneDate: isoDateArb,
   doneBy: fc.string({ minLength: 1 }),
-  result: fc.constantFrom(...Object.values(RECORD_RESULT)),
+  result: fc.constantFrom(...Object.values(SERVICE_RECORD_RESULT)),
   serviceOrderId: optionalArb(fc.uuid()),
   note: optionalArb(fc.string()),
 });

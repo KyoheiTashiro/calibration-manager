@@ -8,12 +8,12 @@
  * ページヘッダ・state・モーダル分岐・データ取得に徹する。
  */
 
-import { ServiceItemModal, RecordModal } from "@/components/domain";
+import { ServiceItemModal, ServiceRecordModal } from "@/components/domain";
 import { Button } from "@/components/ui";
 import { ROUTES, equipmentEditPath } from "@/constants/routes";
 import { EquipmentInfoCard } from "@/features/equipment/detail/components/EquipmentInfoCard";
-import { HistoryTable } from "@/features/equipment/detail/components/HistoryTable";
 import { ServiceItemTable } from "@/features/equipment/detail/components/ServiceItemTable";
+import { ServiceRecordTable } from "@/features/equipment/detail/components/ServiceRecordTable";
 import {
   historyRowsOf,
   sortedServiceItemsOf,
@@ -29,12 +29,12 @@ import { Navigate, useParams } from "react-router-dom";
 const MODAL_KIND = {
   ADD: "add",
   EDIT: "edit",
-  RECORD: "record",
+  SERVICE_RECORD: "serviceRecord",
 } as const;
 type ModalState =
   | { kind: typeof MODAL_KIND.ADD }
   | { kind: typeof MODAL_KIND.EDIT; serviceItem: ServiceItem }
-  | { kind: typeof MODAL_KIND.RECORD; serviceItemId: string };
+  | { kind: typeof MODAL_KIND.SERVICE_RECORD; serviceItemId: string };
 
 export const EquipmentDetail = (): ReactElement => {
   const { id } = useParams<{ id: string }>();
@@ -45,7 +45,7 @@ export const EquipmentDetail = (): ReactElement => {
   const persons = useAppStore((state) => state.persons);
   const serviceItems = useAppStore((state) => state.serviceItems);
   const serviceOrders = useAppStore((state) => state.serviceOrders);
-  const records = useAppStore((state) => state.records);
+  const serviceRecords = useAppStore((state) => state.serviceRecords);
 
   const [modal, setModal] = useState<ModalState | null>(null);
 
@@ -66,7 +66,7 @@ export const EquipmentDetail = (): ReactElement => {
   };
 
   const serviceItemList = sortedServiceItemsOf(serviceItems, currentEquipment.id);
-  const historyRows = historyRowsOf(serviceItems, records, currentEquipment.id);
+  const serviceRecordRows = historyRowsOf(serviceItems, serviceRecords, currentEquipment.id);
   // today は行ごとに再取得せず1度だけ計算し、displayedServiceItemStatus へ注入する
   // (serviceItemRowsOf と同方針、テスト容易性のため)
   const today = todayIsoDate();
@@ -103,7 +103,7 @@ export const EquipmentDetail = (): ReactElement => {
           today={today}
           onAddClick={handleAddServiceItemClick}
           onRecordClick={(serviceItemId) => {
-            setModal({ kind: MODAL_KIND.RECORD, serviceItemId });
+            setModal({ kind: MODAL_KIND.SERVICE_RECORD, serviceItemId });
           }}
           onEditClick={handleEditServiceItemClick}
         />
@@ -112,7 +112,7 @@ export const EquipmentDetail = (): ReactElement => {
       <div className="flex flex-col gap-2">
         <h2 className="text-lg font-semibold">実施記録(全項目横断・新しい順)</h2>
 
-        <HistoryTable historyRows={historyRows} />
+        <ServiceRecordTable serviceRecordRows={serviceRecordRows} />
       </div>
 
       {modal?.kind === MODAL_KIND.ADD ? (
@@ -126,8 +126,8 @@ export const EquipmentDetail = (): ReactElement => {
           onClose={handleModalClose}
         />
       ) : null}
-      {modal?.kind === MODAL_KIND.RECORD ? (
-        <RecordModal
+      {modal?.kind === MODAL_KIND.SERVICE_RECORD ? (
+        <ServiceRecordModal
           key={modal.serviceItemId}
           open
           serviceItemId={modal.serviceItemId}

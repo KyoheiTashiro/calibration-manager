@@ -8,7 +8,7 @@
  *
  * - 遷移は隣接遷移のみ許可（飛び越し不可。screen-design/08-service-orders.md）
  * - completed / cancelled は終端（再遷移不可）
- * - `returned → completed` は実施記録登録（addRecord）のカスケード経由でのみ発生させ、
+ * - `returned → completed` は実施記録登録（addServiceRecord）のカスケード経由でのみ発生させ、
  *   ストアの updateServiceOrderStatus からは直接指定しない（store.md「アクション仕様」）。
  *   テーブル自体には遷移として存在する（かんばんの「記録登録」ボタン表示判定にも使う）。
  */

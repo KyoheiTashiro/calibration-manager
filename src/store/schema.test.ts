@@ -96,7 +96,7 @@ describe("appStateSchema", () => {
     persons: {},
     equipment: {},
     serviceItems: {},
-    records: {},
+    serviceRecords: {},
     serviceOrders: {},
     notifications: {},
   };

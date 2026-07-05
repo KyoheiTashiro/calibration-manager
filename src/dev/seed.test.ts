@@ -45,16 +45,16 @@ describe("buildSeedState", () => {
     }
   });
 
-  it("全recordsのserviceItemIdがserviceItemsに存在する", () => {
+  it("全serviceRecordsのserviceItemIdがserviceItemsに存在する", () => {
     const state = buildSeedState(TODAY);
-    for (const record of Object.values(state.records)) {
+    for (const record of Object.values(state.serviceRecords)) {
       expect(state.serviceItems[record.serviceItemId]).toBeDefined();
     }
   });
 
-  it("serviceOrderId指定があるrecordsのそのserviceOrderIdがserviceOrdersに存在する", () => {
+  it("serviceOrderId指定があるserviceRecordsのそのserviceOrderIdがserviceOrdersに存在する", () => {
     const state = buildSeedState(TODAY);
-    for (const record of Object.values(state.records)) {
+    for (const record of Object.values(state.serviceRecords)) {
       if (record.serviceOrderId === undefined) continue;
       expect(state.serviceOrders[record.serviceOrderId]).toBeDefined();
     }

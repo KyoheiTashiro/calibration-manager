@@ -4,16 +4,16 @@
  */
 
 import { EmptyState, Table, TableBody, TableHead } from "@/components/ui";
-import type { HistoryRow } from "@/features/equipment/detail/hooks";
-import { RECORD_RESULT_LABELS } from "@/features/serviceItems/constants";
+import type { ServiceRecordRow } from "@/features/equipment/detail/hooks";
+import { SERVICE_RECORD_RESULT_LABELS } from "@/features/serviceItems/constants";
 import type { ReactElement } from "react";
 
 type Props = {
-  historyRows: readonly HistoryRow[];
+  serviceRecordRows: readonly ServiceRecordRow[];
 };
 
-export const HistoryTable = ({ historyRows }: Props): ReactElement =>
-  historyRows.length === 0 ? (
+export const ServiceRecordTable = ({ serviceRecordRows }: Props): ReactElement =>
+  serviceRecordRows.length === 0 ? (
     <EmptyState message="実施記録が未登録です" />
   ) : (
     <Table>
@@ -37,13 +37,13 @@ export const HistoryTable = ({ historyRows }: Props): ReactElement =>
         </tr>
       </TableHead>
       <TableBody>
-        {historyRows.map(({ record, serviceItemName }) => (
-          <tr key={record.id}>
-            <td className="px-3 py-2">{record.doneDate}</td>
+        {serviceRecordRows.map(({ serviceRecord, serviceItemName }) => (
+          <tr key={serviceRecord.id}>
+            <td className="px-3 py-2">{serviceRecord.doneDate}</td>
             <td className="px-3 py-2">{serviceItemName}</td>
-            <td className="px-3 py-2">{record.doneBy}</td>
-            <td className="px-3 py-2">{RECORD_RESULT_LABELS[record.result]}</td>
-            <td className="px-3 py-2">{record.note ?? "—"}</td>
+            <td className="px-3 py-2">{serviceRecord.doneBy}</td>
+            <td className="px-3 py-2">{SERVICE_RECORD_RESULT_LABELS[serviceRecord.result]}</td>
+            <td className="px-3 py-2">{serviceRecord.note ?? "—"}</td>
           </tr>
         ))}
       </TableBody>

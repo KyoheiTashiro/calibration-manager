@@ -3,7 +3,7 @@ import {
   serviceItemRowsOf,
   serviceItemsOf,
   serviceOrdersOf,
-  recordsOf,
+  serviceRecordsOf,
   unreadNotificationCount,
 } from "@/store/selectors";
 import {
@@ -90,9 +90,9 @@ describe("serviceOrdersOf", () => {
   });
 });
 
-describe("recordsOf", () => {
+describe("serviceRecordsOf", () => {
   it("doneDateの降順で並び、同日はidの昇順で決定的に並ぶ", () => {
-    const records: Record<string, ServiceRecord> = {
+    const serviceRecords: Record<string, ServiceRecord> = {
       "record-b": {
         id: "record-b",
         serviceItemId: "item-1",
@@ -123,15 +123,15 @@ describe("recordsOf", () => {
       },
     };
 
-    expect(recordsOf({ records }, "item-1")).toEqual([
-      records["record-newest"],
-      records["record-a"],
-      records["record-b"],
+    expect(serviceRecordsOf({ serviceRecords }, "item-1")).toEqual([
+      serviceRecords["record-newest"],
+      serviceRecords["record-a"],
+      serviceRecords["record-b"],
     ]);
   });
 
   it("該当する実施記録が無ければ空配列を返す", () => {
-    expect(recordsOf({ records: {} }, "item-1")).toEqual([]);
+    expect(serviceRecordsOf({ serviceRecords: {} }, "item-1")).toEqual([]);
   });
 });
 

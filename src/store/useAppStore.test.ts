@@ -88,12 +88,12 @@ describe("replaceEntities: CSVインポートの全置換(D-029)", () => {
   });
 });
 
-describe("addRecord: 期限更新カスケード", () => {
+describe("addServiceRecord: 期限更新カスケード", () => {
   it.each(["pass", "adjusted"] as const)(
     "result=%s で記録を追加し lastDoneDate / nextDueDate を更新する",
     (result) => {
       seedBase();
-      const id = useAppStore.getState().addRecord({
+      const id = useAppStore.getState().addServiceRecord({
         serviceItemId: serviceItem.id,
         doneDate: "2026-07-10",
         doneBy: "田中",
@@ -103,7 +103,7 @@ describe("addRecord: 期限更新カスケード", () => {
       expect(id).not.toBeNull();
       if (id === null) throw new Error("id should not be null");
       const state = useAppStore.getState();
-      expect(state.records[id]).toMatchObject({
+      expect(state.serviceRecords[id]).toMatchObject({
         serviceItemId: serviceItem.id,
         doneDate: "2026-07-10",
         result,
@@ -114,9 +114,9 @@ describe("addRecord: 期限更新カスケード", () => {
     },
   );
 
-  it("result=fail は lastDoneDate を更新し期限のみ据え置く（07-record-modal.md 副作用2・4、D-015）", () => {
+  it("result=fail は lastDoneDate を更新し期限のみ据え置く（07-service-record-modal.md 副作用2・4、D-015）", () => {
     seedBase();
-    const id = useAppStore.getState().addRecord({
+    const id = useAppStore.getState().addServiceRecord({
       serviceItemId: serviceItem.id,
       doneDate: "2026-07-10",
       doneBy: "田中",
@@ -131,36 +131,36 @@ describe("addRecord: 期限更新カスケード", () => {
 
   it("存在しない項目には no-op（null）", () => {
     seedBase();
-    const id = useAppStore.getState().addRecord({
+    const id = useAppStore.getState().addServiceRecord({
       serviceItemId: "item-gone",
       doneDate: "2026-07-10",
       doneBy: "田中",
       result: "pass",
     });
     expect(id).toBeNull();
-    expect(useAppStore.getState().records).toEqual({});
+    expect(useAppStore.getState().serviceRecords).toEqual({});
   });
 
   it("不正な doneDate は全体 no-op（D-005: 記録だけ追加されない）", () => {
     seedBase();
-    const id = useAppStore.getState().addRecord({
+    const id = useAppStore.getState().addServiceRecord({
       serviceItemId: serviceItem.id,
       doneDate: "2026-02-30",
       doneBy: "田中",
       result: "pass",
     });
     expect(id).toBeNull();
-    expect(useAppStore.getState().records).toEqual({});
+    expect(useAppStore.getState().serviceRecords).toEqual({});
     expect(useAppStore.getState().serviceItems[serviceItem.id].nextDueDate).toBe("2026-07-15");
   });
 });
 
-describe("addRecord: 案件完了カスケード", () => {
+describe("addServiceRecord: 案件完了カスケード", () => {
   it("returned の案件を serviceOrderId 指定で completed に遷移させる", () => {
     seedBase();
     seedStore({ serviceOrders: { [returnedServiceOrder.id]: returnedServiceOrder } });
 
-    const id = useAppStore.getState().addRecord({
+    const id = useAppStore.getState().addServiceRecord({
       serviceItemId: serviceItem.id,
       doneDate: "2026-07-10",
       doneBy: "校正社",
@@ -172,7 +172,7 @@ describe("addRecord: 案件完了カスケード", () => {
     if (id === null) throw new Error("id should not be null");
     const state = useAppStore.getState();
     expect(state.serviceOrders[returnedServiceOrder.id].status).toBe("completed");
-    expect(state.records[id].serviceOrderId).toBe(returnedServiceOrder.id);
+    expect(state.serviceRecords[id].serviceOrderId).toBe(returnedServiceOrder.id);
   });
 
   it.each(["planned", "ordered", "inCalibration", "completed", "cancelled"] as const)(
@@ -183,7 +183,7 @@ describe("addRecord: 案件完了カスケード", () => {
         serviceOrders: { [returnedServiceOrder.id]: { ...returnedServiceOrder, status } },
       });
 
-      const id = useAppStore.getState().addRecord({
+      const id = useAppStore.getState().addServiceRecord({
         serviceItemId: serviceItem.id,
         doneDate: "2026-07-10",
         doneBy: "校正社",
@@ -193,7 +193,7 @@ describe("addRecord: 案件完了カスケード", () => {
 
       expect(id).toBeNull();
       const state = useAppStore.getState();
-      expect(state.records).toEqual({});
+      expect(state.serviceRecords).toEqual({});
       expect(state.serviceOrders[returnedServiceOrder.id].status).toBe(status);
       expect(state.serviceItems[serviceItem.id].nextDueDate).toBe("2026-07-15");
     },
@@ -201,7 +201,7 @@ describe("addRecord: 案件完了カスケード", () => {
 
   it("存在しない案件を serviceOrderId 指定すると全体 no-op", () => {
     seedBase();
-    const id = useAppStore.getState().addRecord({
+    const id = useAppStore.getState().addServiceRecord({
       serviceItemId: serviceItem.id,
       doneDate: "2026-07-10",
       doneBy: "校正社",
@@ -209,7 +209,7 @@ describe("addRecord: 案件完了カスケード", () => {
       serviceOrderId: "serviceOrder-gone",
     });
     expect(id).toBeNull();
-    expect(useAppStore.getState().records).toEqual({});
+    expect(useAppStore.getState().serviceRecords).toEqual({});
   });
 });
 
@@ -294,7 +294,7 @@ describe("updateServiceOrderStatus: 遷移テーブル検証", () => {
     expect(useAppStore.getState().serviceOrders[returnedServiceOrder.id].status).toBe(from);
   });
 
-  it("completed への直接遷移は returned からでも拒否する（addRecord 経由のみ）", () => {
+  it("completed への直接遷移は returned からでも拒否する（addServiceRecord 経由のみ）", () => {
     seedServiceOrderWith("returned");
     expect(
       useAppStore.getState().updateServiceOrderStatus(returnedServiceOrder.id, "completed"),
@@ -321,7 +321,7 @@ describe("resetAll", () => {
     expect(state.persons).toEqual({});
     expect(state.equipment).toEqual({});
     expect(state.serviceItems).toEqual({});
-    expect(state.records).toEqual({});
+    expect(state.serviceRecords).toEqual({});
     expect(state.serviceOrders).toEqual({});
     expect(state.notifications).toEqual({});
   });

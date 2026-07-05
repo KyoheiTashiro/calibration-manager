@@ -66,7 +66,7 @@ export const ServiceOrderModal = ({ open, serviceItemId, onClose }: Props): Reac
       : "対象:(項目情報が見つかりません)";
 
   // なぜ: submitFailed を閉時にリセットし、同一対象で開き直した際の残留エラー表示を防ぐ
-  // （RecordModal.tsx と同パターン。起動元のマウント方法に依存させない）。
+  // （ServiceRecordModal.tsx と同パターン。起動元のマウント方法に依存させない）。
   const handleClose = (): void => {
     setSubmitFailed(false);
     onClose();
@@ -82,7 +82,7 @@ export const ServiceOrderModal = ({ open, serviceItemId, onClose }: Props): Reac
       note: emptyToUndefined(values.note),
     });
     // なぜここで setState か: react-compiler(EffectSetState) が effect 内での同期 setState を
-    // 禁則とするため、submitFailed はイベントハンドラ側（onSubmit）に一本化し（RecordModal.tsx
+    // 禁則とするため、submitFailed はイベントハンドラ側（onSubmit）に一本化し（ServiceRecordModal.tsx
     // と同方針）、再送信のたびに最新の結果へ更新する。
     setSubmitFailed(serviceOrderId === null);
     if (serviceOrderId === null) return;

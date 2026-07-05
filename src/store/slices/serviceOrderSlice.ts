@@ -23,11 +23,11 @@ export type ServiceOrderSlice = {
    * @returns 生成した案件のid。no-op 時は null
    */
   addServiceOrder: (input: AddServiceOrderInput) => string | null;
-  /** status 以外の属性更新。status は updateServiceOrderStatus / addRecord 経由のみ */
+  /** status 以外の属性更新。status は updateServiceOrderStatus / addServiceRecord 経由のみ */
   updateServiceOrder: (id: string, patch: Partial<Omit<ServiceOrder, "id" | "status">>) => void;
   /**
    * 遷移許可テーブルで検証し、許可されない遷移は no-op（store.md「アクション仕様」）。
-   * completed への遷移は addRecord のカスケード専用のため本アクションでは常に拒否する。
+   * completed への遷移は addServiceRecord のカスケード専用のため本アクションでは常に拒否する。
    * @returns 遷移できたら true
    */
   updateServiceOrderStatus: (id: string, nextStatus: ServiceOrderStatus) => boolean;

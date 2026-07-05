@@ -1,17 +1,17 @@
 /**
- * RecordModal: 実施記録登録モーダルの検証（screen-design/07-record-modal.md）。
+ * ServiceRecordModal: 実施記録登録モーダルの検証（screen-design/07-service-record-modal.md）。
  * 対象固定表示・doneBy プリフィル3分岐(D-017)・既定実施日・fail 注意書き・未来日警告(D-016)・
- * 登録カスケード・addRecord no-op 時のエラー維持・バリデーションを扱う。
+ * 登録カスケード・addServiceRecord no-op 時のエラー維持・バリデーションを扱う。
  */
 
-import { RecordModal } from "@/components/domain/RecordModal";
+import { ServiceRecordModal } from "@/components/domain/ServiceRecordModal";
 import {
   CYCLE,
   EQUIPMENT_STATUS,
   EXECUTION,
   SERVICE_ITEM_TYPE,
   SERVICE_ORDER_STATUS,
-  RECORD_RESULT,
+  SERVICE_RECORD_RESULT,
   type ServiceOrder,
   type Equipment,
   type ServiceItem,
@@ -98,7 +98,7 @@ const serviceOrderReturned: ServiceOrder = {
   status: SERVICE_ORDER_STATUS.RETURNED,
 };
 
-/** planned 案件（completed へ遷移不可）。addRecord が null を返す異常系の検証用 */
+/** planned 案件（completed へ遷移不可）。addServiceRecord が null を返す異常系の検証用 */
 const serviceOrderPlanned: ServiceOrder = {
   id: "serviceOrder-planned",
   serviceItemId: serviceItemExternal.id,
@@ -131,32 +131,42 @@ beforeEach(() => {
   seedRecordModalStore();
 });
 
-const recordsOf = (): ReturnType<typeof useAppStore.getState>["records"] =>
-  useAppStore.getState().records;
+const serviceRecordsOf = (): ReturnType<typeof useAppStore.getState>["serviceRecords"] =>
+  useAppStore.getState().serviceRecords;
 
-describe("RecordModal", () => {
+describe("ServiceRecordModal", () => {
   it("対象が「対象:管理番号 機器名 / 項目名」で固定表示される", () => {
     renderWithStore(
-      <RecordModal open serviceItemId={serviceItemExternal.id} onClose={vi.fn<() => void>()} />,
+      <ServiceRecordModal
+        open
+        serviceItemId={serviceItemExternal.id}
+        onClose={vi.fn<() => void>()}
+      />,
     );
     expect(screen.getByText("対象:EQ-001 ノギス / 年次校正")).toBeInTheDocument();
   });
 
   it("項目が解決できない場合でも例外を投げず defensive 表示になる", () => {
-    renderWithStore(<RecordModal open serviceItemId="missing" onClose={vi.fn<() => void>()} />);
+    renderWithStore(
+      <ServiceRecordModal open serviceItemId="missing" onClose={vi.fn<() => void>()} />,
+    );
     expect(screen.getByText("対象:(項目情報が見つかりません)")).toBeInTheDocument();
   });
 
   it("実施日の既定値は今日", () => {
     renderWithStore(
-      <RecordModal open serviceItemId={serviceItemExternal.id} onClose={vi.fn<() => void>()} />,
+      <ServiceRecordModal
+        open
+        serviceItemId={serviceItemExternal.id}
+        onClose={vi.fn<() => void>()}
+      />,
     );
     expect(screen.getByLabelText("実施日", { exact: false })).toHaveValue(todayIsoDate());
   });
 
   it("doneBy プリフィル: serviceOrder 経由起動は案件の業者名", () => {
     renderWithStore(
-      <RecordModal
+      <ServiceRecordModal
         open
         serviceItemId={serviceItemExternal.id}
         serviceOrderId={serviceOrderReturned.id}
@@ -168,21 +178,29 @@ describe("RecordModal", () => {
 
   it("doneBy プリフィル: external 項目(serviceOrder なし)は項目の業者名", () => {
     renderWithStore(
-      <RecordModal open serviceItemId={serviceItemExternal.id} onClose={vi.fn<() => void>()} />,
+      <ServiceRecordModal
+        open
+        serviceItemId={serviceItemExternal.id}
+        onClose={vi.fn<() => void>()}
+      />,
     );
     expect(screen.getByLabelText("実施者", { exact: false })).toHaveValue(serviceItemVendor.name);
   });
 
   it("doneBy プリフィル: internal 項目は空欄", () => {
     renderWithStore(
-      <RecordModal open serviceItemId={serviceItemInternal.id} onClose={vi.fn<() => void>()} />,
+      <ServiceRecordModal
+        open
+        serviceItemId={serviceItemInternal.id}
+        onClose={vi.fn<() => void>()}
+      />,
     );
     expect(screen.getByLabelText("実施者", { exact: false })).toHaveValue("");
   });
 
   it("serviceOrder 経由起動時は案件連携の説明が表示される", () => {
     renderWithStore(
-      <RecordModal
+      <ServiceRecordModal
         open
         serviceItemId={serviceItemExternal.id}
         serviceOrderId={serviceOrderReturned.id}
@@ -196,7 +214,11 @@ describe("RecordModal", () => {
   it("fail 選択時に「次回期限は更新されません」の注意書きが表示される", async () => {
     const user = userEvent.setup();
     renderWithStore(
-      <RecordModal open serviceItemId={serviceItemExternal.id} onClose={vi.fn<() => void>()} />,
+      <ServiceRecordModal
+        open
+        serviceItemId={serviceItemExternal.id}
+        onClose={vi.fn<() => void>()}
+      />,
     );
 
     expect(screen.queryByText("次回期限は更新されません")).not.toBeInTheDocument();
@@ -207,7 +229,9 @@ describe("RecordModal", () => {
   it("未来日を入力すると警告を表示するが登録はブロックしない", async () => {
     const user = userEvent.setup();
     const onClose = vi.fn<() => void>();
-    renderWithStore(<RecordModal open serviceItemId={serviceItemExternal.id} onClose={onClose} />);
+    renderWithStore(
+      <ServiceRecordModal open serviceItemId={serviceItemExternal.id} onClose={onClose} />,
+    );
 
     const doneDateField = screen.getByLabelText("実施日", { exact: false });
     await user.clear(doneDateField);
@@ -217,37 +241,39 @@ describe("RecordModal", () => {
     await user.click(screen.getByLabelText("合格"));
     await user.click(screen.getByRole("button", { name: "保存" }));
 
-    expect(Object.values(recordsOf())).toHaveLength(1);
+    expect(Object.values(serviceRecordsOf())).toHaveLength(1);
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
   it("pass 登録でストアに記録が追加され onClose される", async () => {
     const user = userEvent.setup();
     const onClose = vi.fn<() => void>();
-    renderWithStore(<RecordModal open serviceItemId={serviceItemExternal.id} onClose={onClose} />);
+    renderWithStore(
+      <ServiceRecordModal open serviceItemId={serviceItemExternal.id} onClose={onClose} />,
+    );
 
     await user.click(screen.getByLabelText("合格"));
     await user.type(screen.getByLabelText("備考", { exact: false }), "証明書#A-102");
     await user.click(screen.getByRole("button", { name: "保存" }));
 
-    const records = Object.values(recordsOf());
-    expect(records).toHaveLength(1);
-    expect(records[0]).toMatchObject({
+    const serviceRecords = Object.values(serviceRecordsOf());
+    expect(serviceRecords).toHaveLength(1);
+    expect(serviceRecords[0]).toMatchObject({
       serviceItemId: serviceItemExternal.id,
       doneDate: todayIsoDate(),
       doneBy: serviceItemVendor.name,
-      result: RECORD_RESULT.PASS,
+      result: SERVICE_RECORD_RESULT.PASS,
       note: "証明書#A-102",
     });
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
-  it("addRecord が no-op(null)の場合はエラーを表示しモーダルを閉じない", async () => {
+  it("addServiceRecord が no-op(null)の場合はエラーを表示しモーダルを閉じない", async () => {
     const user = userEvent.setup();
     const onClose = vi.fn<() => void>();
-    // planned 案件は completed へ遷移不可のため addRecord は null を返す（D-005）
+    // planned 案件は completed へ遷移不可のため addServiceRecord は null を返す（D-005）
     renderWithStore(
-      <RecordModal
+      <ServiceRecordModal
         open
         serviceItemId={serviceItemExternal.id}
         serviceOrderId={serviceOrderPlanned.id}
@@ -261,32 +287,40 @@ describe("RecordModal", () => {
     expect(
       screen.getByText("登録できませんでした。データの状態を確認してください"),
     ).toBeInTheDocument();
-    expect(Object.values(recordsOf())).toHaveLength(0);
+    expect(Object.values(serviceRecordsOf())).toHaveLength(0);
     expect(onClose).not.toHaveBeenCalled();
   });
 
   it("実施者が空のまま登録するとエラーが表示されストアが変化しない", async () => {
     const user = userEvent.setup();
     renderWithStore(
-      <RecordModal open serviceItemId={serviceItemInternal.id} onClose={vi.fn<() => void>()} />,
+      <ServiceRecordModal
+        open
+        serviceItemId={serviceItemInternal.id}
+        onClose={vi.fn<() => void>()}
+      />,
     );
 
     await user.click(screen.getByLabelText("合格"));
     await user.click(screen.getByRole("button", { name: "保存" }));
 
     expect(await screen.findByText("実施者は必須です")).toBeInTheDocument();
-    expect(Object.values(recordsOf())).toHaveLength(0);
+    expect(Object.values(serviceRecordsOf())).toHaveLength(0);
   });
 
   it("結果未選択で登録するとエラーが表示されストアが変化しない", async () => {
     const user = userEvent.setup();
     renderWithStore(
-      <RecordModal open serviceItemId={serviceItemExternal.id} onClose={vi.fn<() => void>()} />,
+      <ServiceRecordModal
+        open
+        serviceItemId={serviceItemExternal.id}
+        onClose={vi.fn<() => void>()}
+      />,
     );
 
     await user.click(screen.getByRole("button", { name: "保存" }));
 
     expect(await screen.findByText("結果を選択してください")).toBeInTheDocument();
-    expect(Object.values(recordsOf())).toHaveLength(0);
+    expect(Object.values(serviceRecordsOf())).toHaveLength(0);
   });
 });

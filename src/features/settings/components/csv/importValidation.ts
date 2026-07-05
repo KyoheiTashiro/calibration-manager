@@ -111,7 +111,7 @@ const REFERENCE_CHECKS: {
     }
     return messages;
   },
-  records: (entity, state) => {
+  serviceRecords: (entity, state) => {
     const messages: string[] = [];
     if (recordValue(state.serviceItems, entity.serviceItemId) === undefined) {
       messages.push(`serviceItemId: 参照先が存在しません '${entity.serviceItemId}'`);

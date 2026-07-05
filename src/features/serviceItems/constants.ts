@@ -8,11 +8,11 @@ import {
   CYCLE,
   EXECUTION,
   SERVICE_ITEM_TYPE,
-  RECORD_RESULT,
+  SERVICE_RECORD_RESULT,
   type Cycle,
   type Execution,
   type ServiceItemType,
-  type RecordResult,
+  type ServiceRecordResult,
 } from "@/store/types";
 
 /** 項目種別 → 日本語ラベル(domain-model.md §3.4) */
@@ -57,15 +57,17 @@ export const EXECUTION_OPTIONS: readonly { value: Execution; label: string }[] =
 ).map((execution) => ({ value: execution, label: EXECUTION_LABELS[execution] }));
 
 /** 実施記録の結果 → 日本語ラベル(domain-model.md §3.5、04-equipment-detail.md 実施記録) */
-export const RECORD_RESULT_LABELS = {
-  [RECORD_RESULT.PASS]: "合格",
-  [RECORD_RESULT.FAIL]: "不合格",
-  [RECORD_RESULT.ADJUSTED]: "調整合格",
-} as const satisfies Record<RecordResult, string>;
+export const SERVICE_RECORD_RESULT_LABELS = {
+  [SERVICE_RECORD_RESULT.PASS]: "合格",
+  [SERVICE_RECORD_RESULT.FAIL]: "不合格",
+  [SERVICE_RECORD_RESULT.ADJUSTED]: "調整合格",
+} as const satisfies Record<ServiceRecordResult, string>;
 
-/** 結果ラジオ(合格/不合格/調整合格)の選択肢(07-record-modal.md 準拠の並び) */
-export const RECORD_RESULT_OPTIONS: readonly { value: RecordResult; label: string }[] =
-  Object.values(RECORD_RESULT).map((result) => ({
-    value: result,
-    label: RECORD_RESULT_LABELS[result],
-  }));
+/** 結果ラジオ(合格/不合格/調整合格)の選択肢(07-service-record-modal.md 準拠の並び) */
+export const SERVICE_RECORD_RESULT_OPTIONS: readonly {
+  value: ServiceRecordResult;
+  label: string;
+}[] = Object.values(SERVICE_RECORD_RESULT).map((result) => ({
+  value: result,
+  label: SERVICE_RECORD_RESULT_LABELS[result],
+}));

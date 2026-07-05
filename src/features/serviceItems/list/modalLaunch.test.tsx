@@ -1,6 +1,6 @@
 /**
  * ServiceItemList: 行アクションからのモーダル起動結節点の検証(screen-design/05-service-item-list.md「操作」)。
- * [記録]→RecordModal / [案件]→ServiceOrderModal / [編集]→ServiceItemModal が正しい対象で開くことを確認する。
+ * [記録]→ServiceRecordModal / [案件]→ServiceOrderModal / [編集]→ServiceItemModal が正しい対象で開くことを確認する。
  * モーダル内部の入力・検証は各モーダルの単体テストの責務。
  */
 
@@ -36,7 +36,7 @@ beforeEach(() => {
 });
 
 describe("ServiceItemList: モーダル起動", () => {
-  it("[記録]で対象項目の RecordModal が開く", async () => {
+  it("[記録]で対象項目の ServiceRecordModal が開く", async () => {
     renderList();
     await clickRowAction("記録");
 

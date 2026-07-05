@@ -24,6 +24,8 @@
 
 ServiceOrder を指す略記の order 系命名も serviceOrder 系へ統一する: ルート `/orders` → `/service-orders`、永続化状態キー `orders` → `serviceOrders`、`ServiceRecord.orderId` → `serviceOrderId`、Notification の `targetType` 値 `order` → `serviceOrder`、コードの Order* 識別子 → ServiceOrder*。発注という行為を指す語(`orderedDate`、項目ステータス `orderNow`、通知種別 `orderRecommended`、発注推奨日)は ServiceOrder の略記ではないため対象外。旧永続化データはスキーマ v4 マイグレーションで無損失変換。旧ヘッダ `orderId` を含む records の既エクスポートCSVはインポート互換なし、要再エクスポート(D-046)。
 
+ServiceRecord を指す略記の record 系命名も serviceRecord 系へ統一する: 永続化状態キー `records` → `serviceRecords`、コードの Record\*/record\* 識別子(`RecordModal` → `ServiceRecordModal`、`RECORD_RESULT` → `SERVICE_RECORD_RESULT`、`addRecord` → `addServiceRecord`、`recordsOf` → `serviceRecordsOf` 等)。TypeScript 組込みの `Record<K, V>` 型と汎用ヘルパ `utils/record`(`recordValue` / `isRecord`)はエンティティの略記ではないため対象外。旧永続化データはスキーマ v5 マイグレーションで無損失変換。CSV は列ヘッダ(フィールド名)不変のため既エクスポートCSVのインポート互換は維持(エクスポートのファイル名接頭辞のみ `records_` → `serviceRecords_`)(D-050)。
+
 ## 2. エンティティ関連図
 
 ```mermaid

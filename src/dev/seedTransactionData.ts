@@ -1,5 +1,5 @@
 /**
- * 開発用シードデータ（トランザクション系: serviceItems/records/serviceOrders）。
+ * 開発用シードデータ（トランザクション系: serviceItems/serviceRecords/serviceOrders）。
  * today からの相対日付で構成するため、today を引数に取る関数として提供する
  * （src/dev/seed.ts から呼び出される）。
  */
@@ -14,7 +14,7 @@ import {
   type IsoDateString,
   SERVICE_ITEM_TYPE,
   SERVICE_ORDER_STATUS,
-  RECORD_RESULT,
+  SERVICE_RECORD_RESULT,
 } from "@/store/types";
 import { addDays } from "@/utils/time";
 
@@ -173,7 +173,7 @@ export const buildSeedRecords = (today: IsoDateString): Record<string, ServiceRe
     serviceItemId: "seed-item-overdue",
     doneDate: addDays(today, -375) ?? today,
     doneBy: "佐藤 由紀子",
-    result: RECORD_RESULT.PASS,
+    result: SERVICE_RECORD_RESULT.PASS,
     note: "定期点検実施",
   },
   "seed-record-overdue-fail": {
@@ -181,7 +181,7 @@ export const buildSeedRecords = (today: IsoDateString): Record<string, ServiceRe
     serviceItemId: "seed-item-overdue",
     doneDate: addDays(today, -740) ?? today,
     doneBy: "佐藤 由紀子",
-    result: RECORD_RESULT.FAIL,
+    result: SERVICE_RECORD_RESULT.FAIL,
     note: "基準値超過のため再点検",
   },
   "seed-record-due-soon": {
@@ -189,14 +189,14 @@ export const buildSeedRecords = (today: IsoDateString): Record<string, ServiceRe
     serviceItemId: "seed-item-due-soon",
     doneDate: addDays(today, -173) ?? today,
     doneBy: "佐藤 由紀子",
-    result: RECORD_RESULT.PASS,
+    result: SERVICE_RECORD_RESULT.PASS,
   },
   "seed-record-ok": {
     id: "seed-record-ok",
     serviceItemId: "seed-item-ok",
     doneDate: addDays(today, -185) ?? today,
     doneBy: "鈴木 健太",
-    result: RECORD_RESULT.ADJUSTED,
+    result: SERVICE_RECORD_RESULT.ADJUSTED,
     note: "経年劣化により調整",
   },
   "seed-record-external-inspection": {
@@ -204,21 +204,21 @@ export const buildSeedRecords = (today: IsoDateString): Record<string, ServiceRe
     serviceItemId: "seed-item-external-inspection",
     doneDate: addDays(today, -215) ?? today,
     doneBy: "東京計測サービス",
-    result: RECORD_RESULT.PASS,
+    result: SERVICE_RECORD_RESULT.PASS,
   },
   "seed-record-internal-calibration": {
     id: "seed-record-internal-calibration",
     serviceItemId: "seed-item-internal-calibration",
     doneDate: addDays(today, -168) ?? today,
     doneBy: "佐藤 由紀子",
-    result: RECORD_RESULT.PASS,
+    result: SERVICE_RECORD_RESULT.PASS,
   },
   "seed-record-order-now-completed": {
     id: "seed-record-order-now-completed",
     serviceItemId: "seed-item-order-now",
     doneDate: addDays(today, -345) ?? today,
     doneBy: "東京計測サービス",
-    result: RECORD_RESULT.PASS,
+    result: SERVICE_RECORD_RESULT.PASS,
     serviceOrderId: "seed-order-completed",
   },
 });

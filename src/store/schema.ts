@@ -24,7 +24,7 @@ import {
   type Notification,
   SERVICE_ORDER_STATUS,
   type Person,
-  RECORD_RESULT,
+  SERVICE_RECORD_RESULT,
   type Vendor,
 } from "@/store/types";
 import { isIsoDateString } from "@/utils/time";
@@ -107,7 +107,7 @@ export const serviceRecordSchema = z.object({
   serviceItemId: requiredStringSchema,
   doneDate: isoDateStringSchema,
   doneBy: requiredStringSchema,
-  result: z.enum(RECORD_RESULT),
+  result: z.enum(SERVICE_RECORD_RESULT),
   serviceOrderId: z.string().optional(),
   note: z.string().optional(),
 });
@@ -141,7 +141,7 @@ export const appStateSchema = z.object({
   persons: z.record(z.string(), personSchema),
   equipment: z.record(z.string(), equipmentSchema),
   serviceItems: z.record(z.string(), serviceItemSchema),
-  records: z.record(z.string(), serviceRecordSchema),
+  serviceRecords: z.record(z.string(), serviceRecordSchema),
   serviceOrders: z.record(z.string(), serviceOrderSchema),
   notifications: z.record(z.string(), notificationSchema),
 });

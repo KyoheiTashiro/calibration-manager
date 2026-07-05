@@ -5,7 +5,7 @@
  */
 
 import { deriveServiceItemStatus, type ServiceItemStatus } from "@/domain/serviceItemStatus";
-import { serviceItemsOf, serviceOrdersOf, recordsOf } from "@/store/selectors";
+import { serviceItemsOf, serviceOrdersOf, serviceRecordsOf } from "@/store/selectors";
 import {
   EQUIPMENT_STATUS,
   type ServiceOrder,
@@ -32,7 +32,7 @@ export { useSafeNavigate } from "@/utils/navigation";
 export { todayIsoDate } from "@/utils/time";
 
 /** 実施記録の1行(項目横断マージ用に項目名を同梱) */
-export type HistoryRow = { record: ServiceRecord; serviceItemName: string };
+export type ServiceRecordRow = { serviceRecord: ServiceRecord; serviceItemName: string };
 
 /** 項目一覧の並び順: isActive=true を先頭に、両グループ内は nextDueDate 昇順(同値は id 昇順) */
 const compareServiceItemRows = (left: ServiceItem, right: ServiceItem): number => {
@@ -41,12 +41,12 @@ const compareServiceItemRows = (left: ServiceItem, right: ServiceItem): number =
 };
 
 /**
- * 実施記録の並び順。recordsOf は項目単位で既にソート済みだが、複数項目を
+ * 実施記録の並び順。serviceRecordsOf は項目単位で既にソート済みだが、複数項目を
  * flatMap でマージした配列は全体としてソート済みでなくなるため、同一比較関数で再ソートする。
  */
-const compareHistoryRows = (left: HistoryRow, right: HistoryRow): number =>
-  right.record.doneDate.localeCompare(left.record.doneDate) ||
-  left.record.id.localeCompare(right.record.id);
+const compareHistoryRows = (left: ServiceRecordRow, right: ServiceRecordRow): number =>
+  right.serviceRecord.doneDate.localeCompare(left.serviceRecord.doneDate) ||
+  left.serviceRecord.id.localeCompare(right.serviceRecord.id);
 
 /** この機器に属する項目一覧を表示順(isActive優先→nextDueDate昇順→id昇順)へ並べ替える */
 export const sortedServiceItemsOf = (
@@ -57,13 +57,13 @@ export const sortedServiceItemsOf = (
 /** この機器の全項目の実施記録を項目横断でマージし、doneDate降順(同日はid昇順)に並べる */
 export const historyRowsOf = (
   serviceItems: Record<string, ServiceItem>,
-  records: Record<string, ServiceRecord>,
+  serviceRecords: Record<string, ServiceRecord>,
   equipmentId: string,
-): HistoryRow[] =>
+): ServiceRecordRow[] =>
   serviceItemsOf({ serviceItems }, equipmentId)
     .flatMap((serviceItem) =>
-      recordsOf({ records }, serviceItem.id).map((record) => ({
-        record,
+      serviceRecordsOf({ serviceRecords }, serviceItem.id).map((serviceRecord) => ({
+        serviceRecord,
         serviceItemName: serviceItem.name,
       })),
     )
