@@ -57,7 +57,7 @@ const SCREEN_GUIDES = [
   {
     route: ROUTES.PERSON_LIST,
     title: "担当者",
-    description: "担当者を追加・編集します。使わなくなった担当者は無効化できます。",
+    description: "担当者を追加・編集します。",
   },
   {
     route: ROUTES.NOTIFICATION_LIST,
