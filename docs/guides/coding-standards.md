@@ -60,7 +60,7 @@ Lint/Format は **oxlint + oxfmt**（ESLint/Prettier ではない）。多くは
 ## 2. ディレクトリ/ファイル構成
 
 - `src/features/**/` の基本: `index.tsx`（薄いビュー本体）+ `hooks.ts`（ロジック）+ `schema.ts`（RHF 用 zod）+ `components/`。
-  - feature 例: `dashboard`（ダッシュボード） / `equipment`（機器一覧・詳細） / `serviceItems`（点検校正項目一覧）/ `serviceOrder`（点検校正外部案件） / `vendors`・`persons`（メーカー/取引先・担当者マスタ） / `notifications`（通知センター） / `settings`（設定・バックアップ）。
+  - feature 例: `dashboard`（ダッシュボード） / `equipment`（機器一覧・詳細） / `serviceItems`（点検校正項目一覧）/ `serviceOrder`（点検校正外部案件） / `vendors`・`persons`（メーカー/取引先・担当者マスタ） / `notifications`（通知センター） / `settings`（設定）。
 - **`index.tsx` は barrel ではなく公開コンポーネント本体**。`App.tsx` は `import { Dashboard } from "@/features/dashboard"` のように named export を直接参照。feature にバレル専用ファイルは作らない。
 - **`schema.ts`（RHF 用 zod）はフォームを持つ場所に colocate する**（D-043）。feature 内フォームは `features/**/schema.ts`（`equipment/form/shared`、`serviceOrder`）、`components/domain/` の各モーダルはモーダルディレクトリ内 `schema.ts`。必須ではない（フォームがなければ置かない）。
 - **`hooks.ts` は全 feature に置く**（ロジックは hooks に寄せ index.tsx を薄く保つ）。

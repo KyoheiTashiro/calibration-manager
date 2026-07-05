@@ -1,5 +1,5 @@
 /**
- * 設定・バックアップ画面(screen-design/11-settings.md §11、D-028〜D-031)の結線検証。
+ * 設定画面(screen-design/11-settings.md §11、D-028〜D-031)の結線検証。
  * エクスポート(BOM付きCSV生成・ファイル名)、インポート(検証プレビュー・全置換・クリア)、
  * データ全削除(2段階確認)を実ストア → 描画 → 操作の順で確認する。
  * ロジック層(entityCsv / importValidation)の網羅はそれぞれの *.test.ts が担う。

@@ -50,7 +50,7 @@
 | `/vendors`            | メーカー/取引先マスタ      | [§9](./09-masters.md)          |                                    |
 | `/persons`            | 担当者マスタ               | [§9](./09-masters.md)          |                                    |
 | `/notifications`      | 通知センター               | [§10](./10-notifications.md)   |                                    |
-| `/settings`           | 設定・バックアップ         | [§11](./11-settings.md)        |                                    |
+| `/settings`           | 設定                       | [§11](./11-settings.md)        |                                    |
 | `/manual`             | 利用マニュアル             | [§12](./12-manual.md)          |                                    |
 
 **画面ファイル一覧(目次)**:
@@ -65,7 +65,7 @@
 - [8. 点検校正外部案件](./08-service-orders.md)
 - [9. マスタ管理(メーカー/取引先・担当者)](./09-masters.md)
 - [10. 通知センター](./10-notifications.md)
-- [11. 設定・バックアップ](./11-settings.md)
+- [11. 設定](./11-settings.md)
 - [12. 利用マニュアル](./12-manual.md)
 
 **モーダルで行う操作(ページ遷移しない)**: 点検校正項目の登録・編集([§6](./06-service-item-modal.md))、実施記録登録([§7](./07-record-modal.md))、点検校正外部案件の作成・状態更新([§8](./08-service-orders.md))、Vendor/Person の追加・編集([§9](./09-masters.md))。これらは機器詳細・点検校正項目一覧・案件一覧などから起動する。

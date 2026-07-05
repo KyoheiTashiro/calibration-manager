@@ -28,7 +28,7 @@ describe("主要ルートのプレースホルダ表示", () => {
     ["/equipment", "機器一覧"],
     ["/service-items", "点検校正項目一覧"],
     ["/notifications", "通知センター"],
-    ["/settings", "設定・バックアップ"],
+    ["/settings", "設定"],
   ])("%s は見出し「%s」を表示する", (path, heading) => {
     renderWithStore(<App />, { initialEntries: [path] });
 
