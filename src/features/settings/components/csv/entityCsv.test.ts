@@ -52,12 +52,12 @@ describe("buildEntityCsv", () => {
 
   it("全種別の列定義が id 列で始まる(ユニーク検証の前提)", () => {
     for (const kind of CSV_ENTITY_KINDS) {
-      expect(ENTITY_CSV_SPECS[kind].columns[0].key).toBe("id");
+      expect(Object.keys(ENTITY_CSV_SPECS[kind].shape)[0]).toBe("id");
     }
   });
 
   it("エクスポート列に型上の全フィールドを含む(equipment)", () => {
-    const keys = ENTITY_CSV_SPECS.equipment.columns.map((column) => column.key);
+    const keys = Object.keys(ENTITY_CSV_SPECS.equipment.shape);
     const equipment: Equipment = {
       id: "e",
       managementNo: "m",

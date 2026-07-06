@@ -81,7 +81,6 @@ describe("validateEntityCsv: 取り込み成功", () => {
     const result = validateEntityCsv("equipment", csv, stateWithReferences());
     expect(result.errors).toEqual([]);
     expect(result.validCount).toBe(2);
-    expect(result.errorRowCount).toBe(0);
     expect(result.entities).toEqual({
       "eq-1": {
         id: "eq-1",
@@ -105,14 +104,7 @@ describe("validateEntityCsv: 取り込み成功", () => {
 
   it("ヘッダのみ(データ0行)は取り込み可の空 Record を返す", () => {
     const result = validateEntityCsv("equipment", joinCsv(EQUIPMENT_HEADER), emptyAppState());
-    expect(result).toEqual({
-      validCount: 0,
-      errorRowCount: 0,
-      errors: [],
-      entities: {},
-      warnings: [],
-      warningRowCount: 0,
-    });
+    expect(result).toEqual({ validCount: 0, errors: [], entities: {}, warnings: [] });
   });
 
   it("数値・boolean のセルをフィールド値へ変換する(serviceItems)", () => {
@@ -155,7 +147,6 @@ describe("validateEntityCsv: ファイル全体エラー(行1)", () => {
     expect(result.errors).toEqual([
       { line: 1, message: "ヘッダが不正です(機器のCSVではありません)" },
     ]);
-    expect(result.errorRowCount).toBe(1);
   });
 });
 
@@ -264,7 +255,6 @@ describe("validateEntityCsv: 参照整合(D-029: 現在ストアと突合)", () 
       { line: 2, message: "equipmentId: 参照先が存在しません 'equipment-9'" },
       { line: 2, message: "personId: 参照先が存在しません 'person-9'" },
     ]);
-    expect(result.errorRowCount).toBe(1);
   });
 
   it("notifications は targetType に応じて serviceItems / serviceOrders と突合する", () => {
@@ -304,7 +294,7 @@ describe("validateEntityCsv: 件数集計と取り込み可否(D-030)", () => {
     );
     const result = validateEntityCsv("equipment", csv, emptyAppState());
     expect(result.validCount).toBe(2);
-    expect(result.errorRowCount).toBe(1);
+    expect(result.errors).toHaveLength(1);
     expect(result.entities).toBeNull();
   });
 });
@@ -349,7 +339,6 @@ describe("validateEntityCsv: 数式インジェクション警告(D-053)", () =>
     expect(result.errors).toEqual([]);
     expect(result.validCount).toBe(1);
     expect(result.entities).not.toBeNull();
-    expect(result.warningRowCount).toBe(1);
   });
 
   it("エラー行と警告行が混在しても両方を報告し、entities は null のまま", () => {
@@ -369,13 +358,12 @@ describe("validateEntityCsv: 数式インジェクション警告(D-053)", () =>
     expect(result.warnings).toEqual([]);
   });
 
-  it("warningRowCount は行単位で重複排除する(同一行の複数セルが対象でも1)", () => {
+  it("同一行の複数セルが対象なら列ごとに警告する", () => {
     const csv = joinCsv(EQUIPMENT_HEADER, "eq-1,EQ-101,ノギスA,,,,=A1,active,=B1");
     const result = validateEntityCsv("equipment", csv, emptyAppState());
     expect(result.warnings).toEqual([
       { line: 2, message: "location: 数式として解釈され得る値です(Excel等で開く際は注意)" },
       { line: 2, message: "note: 数式として解釈され得る値です(Excel等で開く際は注意)" },
     ]);
-    expect(result.warningRowCount).toBe(1);
   });
 });

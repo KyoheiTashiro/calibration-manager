@@ -11,10 +11,10 @@ import {
   ENTITY_CSV_SPECS,
 } from "@/features/settings/components/csv/entityCsv";
 import {
+  type ImportRowError,
   type ImportValidationResult,
   validateEntityCsv,
 } from "@/features/settings/components/csv/importValidation";
-import { IssueList, type IssueTone } from "@/features/settings/components/csv/IssueList";
 import type { AppState } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
 import { type ChangeEvent, type ReactElement, type ReactNode, useRef, useState } from "react";
@@ -30,14 +30,6 @@ const isCsvEntityKind = (value: string): value is CsvEntityKind =>
 
 const IMPORT_STEP = { IDLE: "idle", PREVIEW: "preview", DONE: "done" } as const;
 
-// なぜ IssueList.tsx で export しないか: 同ファイルに tone 用の as-const オブジェクトを
-// export すると oxlint の react/only-export-components(Fast Refresh 対応)に抵触するため、
-// 値は呼び出し側であるここで持つ(型 IssueTone のみ IssueList.tsx から import する)。
-const ISSUE_TONE = { ERROR: "error", WARNING: "warning" } as const satisfies Record<
-  string,
-  IssueTone
->;
-
 /** 未選択・プレビュー・完了の3状態を1つの判別可能 union で管理する(組合せ不整合を排除) */
 type ViewState =
   | { step: typeof IMPORT_STEP.IDLE }
@@ -47,6 +39,28 @@ type ViewState =
       result: ImportValidationResult<CsvEntityKind>;
     }
   | { step: typeof IMPORT_STEP.DONE; message: string };
+
+/**
+ * エラー・警告一覧(見出し + 行番号付きリスト、§11)。両者の差は色調のみ。
+ * 見出しの行数は行番号の重複を除いて数える(同一行の複数指摘は1行と数える)。
+ */
+const issueBlock = (
+  mark: string,
+  label: string,
+  items: ImportRowError[],
+  colorClassName: string,
+): ReactElement => (
+  <div className={`flex flex-col gap-1 ${colorClassName}`}>
+    <p>{`${mark} ${new Set(items.map((item) => item.line)).size}行 ${label}`}</p>
+    <ul className="flex flex-col gap-0.5">
+      {items.map((item) => (
+        <li key={`${item.line}-${item.message}`}>
+          行{item.line}: {item.message}
+        </li>
+      ))}
+    </ul>
+  </div>
+);
 
 type Props = {
   /** 参照整合の突合先となる現在のストア全状態(D-029) */
@@ -131,20 +145,8 @@ export const ImportSection = ({ state }: Props): ReactElement => {
     return (
       <div className="flex flex-col gap-1">
         <p className="text-green-700">✓ {result.validCount}行 取り込み可</p>
-        {result.errorRowCount > 0 && (
-          <IssueList
-            heading={`✗ ${result.errorRowCount}行 エラー`}
-            tone={ISSUE_TONE.ERROR}
-            items={result.errors}
-          />
-        )}
-        {result.warningRowCount > 0 && (
-          <IssueList
-            heading={`⚠ ${result.warningRowCount}行 警告`}
-            tone={ISSUE_TONE.WARNING}
-            items={result.warnings}
-          />
-        )}
+        {result.errors.length > 0 && issueBlock("✗", "エラー", result.errors, "text-danger")}
+        {result.warnings.length > 0 && issueBlock("⚠", "警告", result.warnings, "text-amber-600")}
       </div>
     );
   };

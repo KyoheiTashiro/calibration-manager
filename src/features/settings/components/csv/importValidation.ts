@@ -10,8 +10,6 @@
  */
 
 import {
-  CSV_COLUMN_TYPE,
-  type CsvColumn,
   type CsvEntityKind,
   ENTITY_CSV_SPECS,
   type EntityCsvSpec,
@@ -21,7 +19,7 @@ import {
 import type { AppState } from "@/store/types";
 import { parseCsv } from "@/utils/csv";
 import { recordValue } from "@/utils/record";
-import type { z } from "zod";
+import { z } from "zod";
 
 export type ImportRowError = {
   /** ファイル上の行番号(ヘッダ=1)。ファイル全体のエラーは 1 */
@@ -32,29 +30,25 @@ export type ImportRowError = {
 export type ImportValidationResult<Kind extends CsvEntityKind> = {
   /** 取り込み可能な行数(プレビューの「✓ N行 取り込み可」用) */
   validCount: number;
-  /** エラーを含む行数(プレビューの「✗ N行 エラー」用) */
-  errorRowCount: number;
-  /** エラー一覧(行番号順)。空ならインポート確定可能 */
+  /** エラー一覧(行番号順)。空ならインポート確定可能。エラー行数は行番号の重複排除で導出する */
   errors: ImportRowError[];
   /** エラー0件のときのみ非 null。replaceEntities へそのまま渡せる Record(D-029) */
   entities: AppState[Kind] | null;
-  /** 数式インジェクション警告(D-053)。取り込みは妨げない */
+  /** 数式インジェクション警告(D-053)。取り込みは妨げない。警告行数は errors 同様に導出する */
   warnings: ImportRowError[];
-  /** 警告を含む行数(プレビューの「⚠ N行 警告」用) */
-  warningRowCount: number;
 };
 
 /**
- * セル文字列を列種別に従いフィールド値へ変換する(D-028 の逆変換)。
+ * セル文字列を zod フィールドの型に従いフィールド値へ変換する(D-028 の逆変換)。
  * 数値・boolean として解釈できないセルは生文字列のまま返し、
  * エラー検出・報告は後段の zod(invalid_type)に委ねる。
  */
-const cellToValue = <Entity>(cell: string, column: CsvColumn<Entity>): unknown => {
-  if (cell === "" && column.optional) return undefined;
-  if (column.type === CSV_COLUMN_TYPE.NUMBER && NUMBER_CELL_PATTERN.test(cell)) {
-    return Number(cell);
-  }
-  if (column.type === CSV_COLUMN_TYPE.BOOLEAN && (cell === "true" || cell === "false")) {
+const cellToValue = (cell: string, field: z.ZodType): unknown => {
+  const optional = field instanceof z.ZodOptional;
+  if (cell === "" && optional) return undefined;
+  const inner = optional ? field.unwrap() : field;
+  if (inner instanceof z.ZodNumber && NUMBER_CELL_PATTERN.test(cell)) return Number(cell);
+  if (inner instanceof z.ZodBoolean && (cell === "true" || cell === "false")) {
     return cell === "true";
   }
   return cell;
@@ -67,10 +61,9 @@ const INVALID_TYPE_MESSAGES: Record<string, string> = {
   boolean: "true/false のいずれかを指定してください",
 };
 
-const zodIssueDetail = (issue: z.core.$ZodIssue, raw: Record<string, unknown>): string => {
-  // 列挙の不正値(例: status が 'broken')。入力値を提示して修正しやすくする
-  // (zod の issue は入力値を保持しないため、変換済みの行データから引く)
-  if (issue.code === "invalid_value") return `不正値 '${String(raw[String(issue.path[0])])}'`;
+const zodIssueDetail = (issue: z.core.$ZodIssue): string => {
+  // 列挙の不正値(例: status が 'broken')。safeParse の reportInput で issue が入力値を保持する
+  if (issue.code === "invalid_value") return `不正値 '${String(issue.input)}'`;
   if (issue.code === "invalid_type") {
     return recordValue(INVALID_TYPE_MESSAGES, issue.expected) ?? "値の型が不正です";
   }
@@ -82,77 +75,38 @@ const zodIssueDetail = (issue: z.core.$ZodIssue, raw: Record<string, unknown>): 
 };
 
 /** zod の issue を「列名: 内容」の日本語1行メッセージへ整形する(§11「エラー内容」) */
-const formatZodIssue = (issue: z.core.$ZodIssue, raw: Record<string, unknown>): string => {
+const formatZodIssue = (issue: z.core.$ZodIssue): string => {
   const path = issue.path.join(".");
-  const detail = zodIssueDetail(issue, raw);
+  const detail = zodIssueDetail(issue);
   return path === "" ? detail : `${path}: ${detail}`;
-};
-
-/** パースとヘッダ検証。データ行に進めない場合はファイル全体エラー(行1)を返す */
-const preflightCsv = <Entity>(
-  spec: EntityCsvSpec<Entity>,
-  csvText: string,
-): { dataRows: string[][] } | { errors: ImportRowError[] } => {
-  const parsed = parseCsv(csvText);
-  if (parsed === null) {
-    return {
-      errors: [{ line: 1, message: "CSVとして解釈できません(引用符の対応を確認してください)" }],
-    };
-  }
-  const [header, ...dataRows] = parsed;
-  const expectedHeader = spec.columns.map((column) => column.key).join(",");
-  // なぜ parsed.length === 0 を先にみるか: 空文字列は parseCsv が [] を返すため、
-  // 分割代入の header は実行時に undefined になり得る。noUncheckedIndexedAccess を
-  // 無効化しているため型上は string[] だが、header.join を呼ぶ前にこの分岐で弾く。
-  if (parsed.length === 0 || header.join(",") !== expectedHeader) {
-    return { errors: [{ line: 1, message: `ヘッダが不正です(${spec.label}のCSVではありません)` }] };
-  }
-  return { dataRows };
 };
 
 /** Excel等が数式として解釈し得るセル先頭文字(CSVインジェクション、D-053) */
 const FORMULA_LIKE_PATTERN = /^[=+\-@\t\r]/u;
 
-/** 数式として解釈され得るセルの警告(D-053)。正当な負数(`-20`等)と列数不正行(呼び出し側で除外)は対象外 */
-const collectFormulaWarnings = <Entity>(
+/** 文字列列(= 数値・boolean 以外)かどうか。数式警告(D-053)の対象列判定 */
+const isStringField = (field: z.ZodType): boolean => {
+  const inner = field instanceof z.ZodOptional ? field.unwrap() : field;
+  return !(inner instanceof z.ZodNumber || inner instanceof z.ZodBoolean);
+};
+
+/** 数式として解釈され得るセルの警告(D-053)。正当な負数(`-20`等)は対象外 */
+const formulaWarnings = <Entity>(
   spec: EntityCsvSpec<Entity>,
   cells: string[],
   line: number,
-): ImportRowError[] => {
-  const warnings: ImportRowError[] = [];
-  for (const [columnIndex, column] of spec.columns.entries()) {
-    if (column.type !== CSV_COLUMN_TYPE.STRING) continue;
+): ImportRowError[] =>
+  Object.entries(spec.shape).flatMap(([key, field], columnIndex) => {
     const cell = cells[columnIndex];
-    if (FORMULA_LIKE_PATTERN.test(cell) && !NUMBER_CELL_PATTERN.test(cell)) {
-      warnings.push({
-        line,
-        message: `${column.key}: 数式として解釈され得る値です(Excel等で開く際は注意)`,
-      });
+    if (
+      !isStringField(field) ||
+      !FORMULA_LIKE_PATTERN.test(cell) ||
+      NUMBER_CELL_PATTERN.test(cell)
+    ) {
+      return [];
     }
-  }
-  return warnings;
-};
-
-/** 1データ行をエンティティへ変換する(列数 → セル変換 + zod)。失敗時はメッセージ一覧 */
-const rowToEntity = <Entity>(
-  spec: EntityCsvSpec<Entity>,
-  cells: string[],
-): { entity: Entity } | { messages: string[] } => {
-  if (cells.length !== spec.columns.length) {
-    return { messages: [`列数が不正です(期待${spec.columns.length}・実際${cells.length})`] };
-  }
-  const raw: Record<string, unknown> = Object.fromEntries(
-    spec.columns.map((column, columnIndex) => [
-      column.key,
-      cellToValue(cells[columnIndex], column),
-    ]),
-  );
-  const result = spec.schema.safeParse(raw);
-  if (!result.success) {
-    return { messages: result.error.issues.map((issue) => formatZodIssue(issue, raw)) };
-  }
-  return { entity: result.data };
-};
+    return [{ line, message: `${key}: 数式として解釈され得る値です(Excel等で開く際は注意)` }];
+  });
 
 /**
  * ファイル内ユニーク制約(id + uniqueKeys)の検証。`seen` のキーは「列名 + NUL + 値」で、
@@ -191,6 +145,35 @@ const referenceErrors = <Entity>(
     return exists ? [] : [`${ref.key}: 参照先が存在しません '${value}'`];
   });
 
+/**
+ * 1データ行(列数検証済み)を検証する: セル変換 + zod → ファイル内ユニーク → 参照整合。
+ * 失敗時は日本語メッセージ一覧。zod を通過した行は参照エラーがあっても `seen` へ登録する
+ * (同じ id 重複は後続行で必ず報告するため)。
+ */
+const validateRow = <Kind extends CsvEntityKind>(
+  spec: EntityCsvSpec<EntityOf<Kind>>,
+  cells: string[],
+  seen: Map<string, number>,
+  state: AppState,
+  line: number,
+): { entity: EntityOf<Kind> } | { messages: string[] } => {
+  const raw: Record<string, unknown> = Object.fromEntries(
+    Object.entries(spec.shape).map(([key, field], columnIndex) => [
+      key,
+      cellToValue(cells[columnIndex], field),
+    ]),
+  );
+  const result = spec.schema.safeParse(raw, { reportInput: true });
+  if (!result.success) {
+    return { messages: result.error.issues.map((issue) => formatZodIssue(issue)) };
+  }
+  const messages = [
+    ...checkUniqueness(result.data, ["id", ...spec.uniqueKeys], seen, line),
+    ...referenceErrors(spec, result.data, state),
+  ];
+  return messages.length > 0 ? { messages } : { entity: result.data };
+};
+
 /** 全データ行を検証し、取り込み可能行の Record とエラー・警告を収集する */
 const collectRows = <Kind extends CsvEntityKind>(
   kind: Kind,
@@ -203,34 +186,37 @@ const collectRows = <Kind extends CsvEntityKind>(
   entities: Record<string, EntityOf<Kind>>;
 } => {
   const spec = ENTITY_CSV_SPECS[kind];
+  const columnCount = Object.keys(spec.shape).length;
   const errors: ImportRowError[] = [];
+  const warnings: ImportRowError[] = [];
   const entities: Record<string, EntityOf<Kind>> = {};
-  const uniqueKeys = ["id", ...spec.uniqueKeys];
   const seen = new Map<string, number>();
-  // 警告は列数の正しい行のみ対象(列数不正はエラー側で報告済みのため、D-053)
-  const warnings = dataRows.flatMap((cells, dataIndex) =>
-    cells.length === spec.columns.length ? collectFormulaWarnings(spec, cells, dataIndex + 2) : [],
-  );
   for (const [dataIndex, cells] of dataRows.entries()) {
     const line = dataIndex + 2;
-    const outcome = rowToEntity(spec, cells);
+    if (cells.length !== columnCount) {
+      errors.push({ line, message: `列数が不正です(期待${columnCount}・実際${cells.length})` });
+      continue;
+    }
+    // 警告は列数の正しい行のみ対象(列数不正はエラー側で報告済み、D-053)。zod の成否とは独立に収集する
+    warnings.push(...formulaWarnings(spec, cells, line));
+    const outcome = validateRow(spec, cells, seen, state, line);
     if ("messages" in outcome) {
       errors.push(...outcome.messages.map((message) => ({ line, message })));
-      continue;
+    } else {
+      entities[outcome.entity.id] = outcome.entity;
     }
-    const rowMessages = [
-      ...checkUniqueness(outcome.entity, uniqueKeys, seen, line),
-      ...referenceErrors(spec, outcome.entity, state),
-    ];
-    if (rowMessages.length > 0) {
-      errors.push(...rowMessages.map((message) => ({ line, message })));
-      continue;
-    }
-    entities[outcome.entity.id] = outcome.entity;
   }
   // 有効行は必ず一意な id を1つ登録する(id 重複はエラー)ため、件数は entities のキー数と一致
   return { validCount: Object.keys(entities).length, errors, warnings, entities };
 };
+
+/** ファイル全体エラー(行1)1件のみの検証結果(パース不能・ヘッダ不一致) */
+const fileError = <Kind extends CsvEntityKind>(message: string): ImportValidationResult<Kind> => ({
+  validCount: 0,
+  errors: [{ line: 1, message }],
+  entities: null,
+  warnings: [],
+});
 
 /**
  * CSV テキストを検証し、取り込み可能なら置換用の Record を返す(§11、D-029 / D-030)。
@@ -241,20 +227,26 @@ export const validateEntityCsv = <Kind extends CsvEntityKind>(
   csvText: string,
   state: AppState,
 ): ImportValidationResult<Kind> => {
-  const preflighted = preflightCsv(ENTITY_CSV_SPECS[kind], csvText);
-  const { validCount, errors, warnings, entities } =
-    "errors" in preflighted
-      ? { validCount: 0, errors: preflighted.errors, warnings: [], entities: {} }
-      : collectRows(kind, preflighted.dataRows, state);
+  const spec = ENTITY_CSV_SPECS[kind];
+  const parsed = parseCsv(csvText);
+  if (parsed === null) {
+    return fileError("CSVとして解釈できません(引用符の対応を確認してください)");
+  }
+  const [header, ...dataRows] = parsed;
+  // なぜ parsed.length === 0 を先にみるか: 空文字列は parseCsv が [] を返すため、
+  // 分割代入の header は実行時に undefined になり得る。noUncheckedIndexedAccess を
+  // 無効化しているため型上は string[] だが、header.join を呼ぶ前にこの分岐で弾く。
+  if (parsed.length === 0 || header.join(",") !== Object.keys(spec.shape).join(",")) {
+    return fileError(`ヘッダが不正です(${spec.label}のCSVではありません)`);
+  }
+  const { validCount, errors, warnings, entities } = collectRows(kind, dataRows, state);
   return {
     validCount,
-    errorRowCount: new Set(errors.map((error) => error.line)).size,
     errors,
     // Kind が未解決ジェネリックのため Record<string, EntityOf<Kind>> と AppState[Kind] の
     // 同値性を TS は証明できない(correlated union 制限)。具体化された各 Kind では構造的に一致する。
     // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- 上記 correlated union 制限のため
     entities: errors.length === 0 ? (entities as AppState[Kind]) : null,
     warnings,
-    warningRowCount: new Set(warnings.map((warning) => warning.line)).size,
   };
 };
