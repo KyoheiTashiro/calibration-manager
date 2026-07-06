@@ -31,18 +31,13 @@ const listeners = new Set<() => void>();
 let isSetup = false;
 
 const setState = (next: PwaInstallState): void => {
-  // なぜ新しいオブジェクトで置換するか: useSyncExternalStore はスナップショットの参照比較で
-  // 再レンダー要否を判定するため、参照を変えないと更新が伝わらない。
   state = next;
   for (const listener of listeners) {
     listener();
   }
 };
 
-/**
- * `beforeinstallprompt` / `appinstalled` の捕捉を開始する。アプリ起動時（main.tsx）に一度だけ呼ぶ。
- * `isSetup` フラグにより複数回呼ばれても登録が重複しない（冪等）。
- */
+/** アプリ起動時（main.tsx）に一度だけ呼ぶ */
 export const setupPwaInstallCapture = (): void => {
   if (isSetup) {
     return;
@@ -77,12 +72,8 @@ const subscribe = (listener: () => void): (() => void) => {
 
 const getSnapshot = (): PwaInstallState => state;
 
-/**
- * PWA インストール状態を購読するフック。捕捉自体は行わず、モジュールストアの現在値を返すだけ。
- */
 export const usePwaInstall = (): PwaInstallState => useSyncExternalStore(subscribe, getSnapshot);
 
-/** テスト用: ストアを初期状態に戻し全リスナーへ通知する。 */
 export const resetPwaInstallStateForTest = (): void => {
   setState(createInitialState());
 };

@@ -5,7 +5,7 @@ import { Outlet } from "react-router-dom";
 
 export const AppLayout = (): ReactElement => {
   // なぜローカルuseStateか: サイドバーオーバーレイの開閉はUI一時状態であり、
-  // 永続化対象ではないためstoreに置かない(coding-standards.md §5)。
+  // 永続化対象ではないためstoreに置かない。
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
 
   const handleMenuClick = (): void => {
@@ -17,8 +17,6 @@ export const AppLayout = (): ReactElement => {
   };
 
   useEffect(() => {
-    // なぜオーバーレイが開いているときだけ購読するか: 不要なイベントリスナーを
-    // 常時貼り続けないため(閉じている間はEscを監視する意味がない)。
     if (!isOverlayOpen) {
       return (): void => {
         // オーバーレイ非表示時はイベント購読自体していないため、後始末は不要

@@ -1,7 +1,5 @@
 /**
- * 実施記録スライス（store.md「スライス構成」）。
- * addServiceRecord は期限更新・案件完了のカスケードを持つドメインの心臓部
- * （store.md「アクション仕様」、domain-model.md §3.5・§3.6）。
+ * addServiceRecord は期限更新・案件完了のカスケードを持つドメインの心臓部。
  */
 
 import { addCycle } from "@/domain/dateCycle";
@@ -16,13 +14,13 @@ export type AddServiceRecordInput = Omit<ServiceRecord, "id">;
 export type ServiceRecordSlice = {
   serviceRecords: Record<string, ServiceRecord>;
   /**
-   * 実施記録を追加し、以下をカスケードする（store.md「アクション仕様」）:
-   * - 常に serviceItem.lastDoneDate = doneDate（screen-design/07-service-record-modal.md 副作用2。D-015）
+   * 実施記録を追加し、以下をカスケードする:
+   * - 常に serviceItem.lastDoneDate = doneDate
    * - result !== 'fail': nextDueDate = addCycle(doneDate, cycle)
-   * - result === 'fail': 次回期限のみ据え置き（domain-model.md §3.5）
-   * - serviceOrderId 指定時: 対象 ServiceOrder を completed に遷移（domain-model.md §3.6）
+   * - result === 'fail': 次回期限のみ据え置き
+   * - serviceOrderId 指定時: 対象 ServiceOrder を completed に遷移
    *
-   * 原子性優先で、以下は記録追加ごと no-op（D-005）:
+   * 原子性優先で、以下は記録追加ごと no-op:
    * - serviceItemId が存在しない / doneDate から次回期限を計算できない
    * - serviceOrderId の案件が存在しない、または completed へ遷移不可（returned 以外）
    *

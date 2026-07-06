@@ -11,8 +11,6 @@ type Props = {
 
 export const Header = ({ onMenuClick }: Props): ReactElement => {
   const navigate = useNavigate();
-  // なぜ selectors.ts 経由か: 横断selectorはコンポーネントごとに再定義せず
-  // store/selectors.ts の純関数へ集約する(coding-standards.md §5)。
   const unreadCount = useAppStore((state) => unreadNotificationCount(state));
 
   // なぜcatchで終端するか: no-void下でfloating promiseを残さないため(navigateは基本的に例外を投げない設計)。
@@ -44,8 +42,7 @@ export const Header = ({ onMenuClick }: Props): ReactElement => {
           className="relative text-slate-600"
         >
           <BellIcon className="h-6 w-6" />
-          {/* なぜ 0件で非表示か: ui-guidelines.md §5「未読0でバッジ非表示」に従う。
-              バッジ自体は装飾表現のためaria-hiddenにし、件数の告知は下のaria-live領域に任せる。 */}
+          {/* バッジ自体は装飾表現のためaria-hiddenにし、件数の告知は下のaria-live領域に任せる。 */}
           {unreadCount > 0 ? (
             <span
               aria-hidden="true"
@@ -55,8 +52,6 @@ export const Header = ({ onMenuClick }: Props): ReactElement => {
             </span>
           ) : null}
         </button>
-        {/* なぜ aria-live か: ui-guidelines.md §11「通知ベルの未読件数変化はaria-live="polite"の
-            領域で告知する」に対応するため、視覚バッジとは別にスクリーンリーダー専用の文言を持つ。 */}
         <span className="sr-only" aria-live="polite">
           {unreadCount > 0 ? `未読通知${unreadCount}件` : "未読通知なし"}
         </span>

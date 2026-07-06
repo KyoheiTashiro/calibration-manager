@@ -1,5 +1,5 @@
 /**
- * ドメイン固有複合UIコンポーネントの集約barrel（directory-structure.md）。
+ * ドメイン固有複合UIコンポーネントの集約barrel。
  */
 
 export { ServiceItemModal } from "@/components/domain/ServiceItemModal";

@@ -1,8 +1,3 @@
-/**
- * CSV 直列化/パースのラウンドトリップ性質(D-028)。
- * どんなセル値(カンマ・引用符・空文字を含む)でも parse(serialize(rows)) === rows。
- */
-
 import { parseCsv, serializeCsv } from "@/utils/csv";
 import * as fc from "fast-check";
 import { describe, expect, it } from "vitest";

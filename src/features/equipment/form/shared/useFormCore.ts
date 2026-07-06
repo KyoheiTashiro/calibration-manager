@@ -1,9 +1,3 @@
-/**
- * 機器登録・編集フォーム（create/edit 共通）の RHF+zodResolver 状態管理フック
- * （screen-design/03-equipment-form.md）。UI（create/edit の index.tsx）を薄いビューに保つため
- * 切り出す（coding-standards.md §2）。
- */
-
 import type { SelectOption } from "@/features/equipment/form/shared/mapping";
 import { createSchema, type FormType } from "@/features/equipment/form/shared/schema";
 import { useAppStore } from "@/store/useAppStore";
@@ -19,9 +13,8 @@ import {
 type UseEquipmentFormCoreParams = {
   defaultValues: FormType;
   /**
-   * 編集対象の最新値。指定時は RHF の values として渡す。深い等価比較で変化を検知した際に
-   * reset + defaultValues 更新が行われるため、対象切り替え時のみプリフィルし直す用途に使う
-   * （新規作成では指定しない＝undefined）。
+   * 編集対象の最新値。指定時は RHF の values として渡す。対象切り替え時のみプリフィルし
+   * 直す用途に使う（新規作成では指定しない＝undefined）。
    */
   values?: FormType;
   /** 編集時: 管理番号ユニーク検証から自身を除外するための機器 id。新規時は undefined */

@@ -1,5 +1,5 @@
 /**
- * VendorModal の検証（screen-design/09-masters.md §9-A）。
+ * VendorModal の検証。
  * addVendor/updateVendor 呼び出し・バリデーション・standardLeadTimeDaysの条件表示/クリアを扱う。
  */
 

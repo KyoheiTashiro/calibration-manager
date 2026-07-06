@@ -4,9 +4,6 @@
  * 属性定義は docs/domain-model.md §3 と一言一句矛盾させないこと。
  */
 
-// なぜ「as const オブジェクト + 派生 union 型」か: 値と型を1箇所で同期させる
-// プロジェクト共通イディオム（coding-standards.md §1）。
-
 /** 点検・校正の周期（domain-model.md §1・§3.4） */
 export const CYCLE = {
   M1: "1M",
@@ -120,7 +117,6 @@ export type Equipment = {
   name: string;
   model?: string;
   serialNo?: string;
-  /** Vendor参照（メーカー） */
   manufacturerId?: string;
   location?: string;
   status: EquipmentStatus;
@@ -130,7 +126,6 @@ export type Equipment = {
 /** 点検校正項目（domain-model.md §3.4）— 中核エンティティ。1機器に複数登録可能 */
 export type ServiceItem = {
   id: string;
-  /** Equipment参照 */
   equipmentId: string;
   type: ServiceItemType;
   name: string;
@@ -142,7 +137,6 @@ export type ServiceItem = {
   leadTimeDays?: number;
   /** 発注余裕日数（デフォルト14 = domain/constants.ts の DEFAULT_BUFFER_DAYS） */
   bufferDays: number;
-  /** Person参照 */
   personId: string;
   /** 通知開始日数（デフォルト30 = domain/constants.ts の DEFAULT_NOTICE_DAYS_BEFORE） */
   noticeDaysBefore: number;
@@ -155,7 +149,6 @@ export type ServiceItem = {
 /** 実施記録（domain-model.md §3.5） */
 export type ServiceRecord = {
   id: string;
-  /** ServiceItem参照 */
   serviceItemId: string;
   doneDate: IsoDateString;
   /** 実施者名（外部の場合は業者名） */
@@ -169,9 +162,7 @@ export type ServiceRecord = {
 /** 点検校正外部案件（domain-model.md §3.6）。発注1回分の進捗と納期を追跡する */
 export type ServiceOrder = {
   id: string;
-  /** ServiceItem参照 */
   serviceItemId: string;
-  /** 依頼先（Vendor参照） */
   vendorId: string;
   status: ServiceOrderStatus;
   orderedDate?: IsoDateString;
@@ -189,7 +180,6 @@ export type Notification = {
   targetType: NotificationTargetType;
   /** 対象のID（targetType=serviceItem なら ServiceItem、serviceOrder なら ServiceOrder） */
   targetId: string;
-  /** 宛先担当者（Person参照） */
   personId: string;
   message: string;
   createdDate: IsoDateString;

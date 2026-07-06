@@ -6,8 +6,6 @@ import userEvent from "@testing-library/user-event";
 import { Route, Routes } from "react-router-dom";
 import { beforeEach, describe, expect, it } from "vitest";
 
-// なぜ毎回この形で描画するか: AppLayoutをレイアウトルートとして使い、
-// <Outlet />経由の子ルート表示を実際のルーティングに近い形で検証するため。
 const renderAppLayout = (): ReturnType<typeof renderWithStore> =>
   renderWithStore(
     <Routes>

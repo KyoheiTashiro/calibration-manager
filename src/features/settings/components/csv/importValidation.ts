@@ -1,14 +1,3 @@
-/**
- * CSV インポートの行単位検証(§11、D-029 / D-030 / D-053)。
- * 検証順: ヘッダ一致 → 行ごとに [列数 → セル変換 + zod(store/schema.ts)] →
- * ファイル内ユニーク(id + uniqueKeys) → 外向き参照の存在チェック(現在ストアと突合)。
- * セル変換はベストエフォート(変換できないセルは生文字列のまま)で、型不一致の検出と
- * 報告は zod の invalid_type に一本化し、日本語メッセージへ整形する。
- * 数式インジェクション様セル(D-053)は警告のみで取り込みを妨げない。
- * エラーが1件でもあれば取り込み不可(entities = null、D-030)。
- * 行番号はファイル上の行番号(ヘッダ = 1行目、データ先頭 = 行2)。
- */
-
 import {
   type CsvEntityKind,
   ENTITY_CSV_SPECS,
@@ -38,11 +27,7 @@ export type ImportValidationResult<Kind extends CsvEntityKind> = {
   warnings: ImportRowError[];
 };
 
-/**
- * セル文字列を zod フィールドの型に従いフィールド値へ変換する(D-028 の逆変換)。
- * 数値・boolean として解釈できないセルは生文字列のまま返し、
- * エラー検出・報告は後段の zod(invalid_type)に委ねる。
- */
+/** 数値・boolean として解釈できないセルは生文字列のまま返し、エラー検出・報告は後段の zod(invalid_type)に委ねる */
 const cellToValue = (cell: string, field: z.ZodType): unknown => {
   const optional = field instanceof z.ZodOptional;
   if (cell === "" && optional) return undefined;
@@ -62,7 +47,6 @@ const INVALID_TYPE_MESSAGES: Record<string, string> = {
 };
 
 const zodIssueDetail = (issue: z.core.$ZodIssue): string => {
-  // 列挙の不正値(例: status が 'broken')。safeParse の reportInput で issue が入力値を保持する
   if (issue.code === "invalid_value") return `不正値 '${String(issue.input)}'`;
   if (issue.code === "invalid_type") {
     return recordValue(INVALID_TYPE_MESSAGES, issue.expected) ?? "値の型が不正です";
@@ -74,7 +58,6 @@ const zodIssueDetail = (issue: z.core.$ZodIssue): string => {
   return issue.message;
 };
 
-/** zod の issue を「列名: 内容」の日本語1行メッセージへ整形する(§11「エラー内容」) */
 const formatZodIssue = (issue: z.core.$ZodIssue): string => {
   const path = issue.path.join(".");
   const detail = zodIssueDetail(issue);
@@ -84,7 +67,6 @@ const formatZodIssue = (issue: z.core.$ZodIssue): string => {
 /** Excel等が数式として解釈し得るセル先頭文字(CSVインジェクション、D-053) */
 const FORMULA_LIKE_PATTERN = /^[=+\-@\t\r]/u;
 
-/** 文字列列(= 数値・boolean 以外)かどうか。数式警告(D-053)の対象列判定 */
 const isStringField = (field: z.ZodType): boolean => {
   const inner = field instanceof z.ZodOptional ? field.unwrap() : field;
   return !(inner instanceof z.ZodNumber || inner instanceof z.ZodBoolean);
@@ -108,10 +90,6 @@ const formulaWarnings = <Entity>(
     return [{ line, message: `${key}: 数式として解釈され得る値です(Excel等で開く際は注意)` }];
   });
 
-/**
- * ファイル内ユニーク制約(id + uniqueKeys)の検証。`seen` のキーは「列名 + NUL + 値」で、
- * 初出の行番号を記録し、重複時は初出行番号付きのメッセージを返す。
- */
 const checkUniqueness = (
   entity: Record<string, unknown>,
   keys: readonly string[],
@@ -128,7 +106,6 @@ const checkUniqueness = (
     return [`${key}: 重複しています(行${firstLine}と同じ値)`];
   });
 
-/** spec.references に基づき外向き参照(FK)の存在を現在のストアと突合する(D-029)。値が未設定(optional FK)の行は対象外 */
 const referenceErrors = <Entity>(
   spec: EntityCsvSpec<Entity>,
   entity: Entity,
@@ -145,11 +122,7 @@ const referenceErrors = <Entity>(
     return exists ? [] : [`${ref.key}: 参照先が存在しません '${value}'`];
   });
 
-/**
- * 1データ行(列数検証済み)を検証する: セル変換 + zod → ファイル内ユニーク → 参照整合。
- * 失敗時は日本語メッセージ一覧。zod を通過した行は参照エラーがあっても `seen` へ登録する
- * (同じ id 重複は後続行で必ず報告するため)。
- */
+/** zod を通過した行は参照エラーがあっても `seen` へ登録する(同じ id 重複は後続行で必ず報告するため) */
 const validateRow = <Kind extends CsvEntityKind>(
   spec: EntityCsvSpec<EntityOf<Kind>>,
   cells: string[],
@@ -174,7 +147,6 @@ const validateRow = <Kind extends CsvEntityKind>(
   return messages.length > 0 ? { messages } : { entity: result.data };
 };
 
-/** 全データ行を検証し、取り込み可能行の Record とエラー・警告を収集する */
 const collectRows = <Kind extends CsvEntityKind>(
   kind: Kind,
   dataRows: string[][],
@@ -210,7 +182,6 @@ const collectRows = <Kind extends CsvEntityKind>(
   return { validCount: Object.keys(entities).length, errors, warnings, entities };
 };
 
-/** ファイル全体エラー(行1)1件のみの検証結果(パース不能・ヘッダ不一致) */
 const fileError = <Kind extends CsvEntityKind>(message: string): ImportValidationResult<Kind> => ({
   validCount: 0,
   errors: [{ line: 1, message }],
@@ -218,10 +189,6 @@ const fileError = <Kind extends CsvEntityKind>(message: string): ImportValidatio
   warnings: [],
 });
 
-/**
- * CSV テキストを検証し、取り込み可能なら置換用の Record を返す(§11、D-029 / D-030)。
- * `state` は参照整合の突合先(現在のストアのスナップショット)。
- */
 export const validateEntityCsv = <Kind extends CsvEntityKind>(
   kind: Kind,
   csvText: string,

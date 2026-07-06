@@ -1,7 +1,4 @@
-// oxlint-disable import/max-dependencies -- 7スライス+永続化を合成するルートのため依存数上限の対象外とする
 /**
- * アプリ全状態を保持する単一 zustand ストア（store.md）。
- * ミドルウェア順は persist(immer(...))（coding-standards.md §5）。
  * 読込パイプライン: LocalStorage → migrate → merge（3段サルベージ）→ ストア。
  */
 
@@ -20,7 +17,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
 
-/** 永続化対象は7エンティティの Record のみ（store.md「partialize」） */
+/** 永続化対象は7エンティティの Record のみ */
 const partializeAppState = (state: StoreState): AppState => ({
   vendors: state.vendors,
   persons: state.persons,

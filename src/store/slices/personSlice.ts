@@ -1,6 +1,5 @@
 /**
- * 担当者スライス（store.md「スライス構成」）。
- * Personは物理削除せず isActive=false で無効化する（domain-model.md §3.2）。
+ * Personは物理削除せず isActive=false で無効化する。
  */
 
 import type { AppSliceCreator } from "@/store/storeState";

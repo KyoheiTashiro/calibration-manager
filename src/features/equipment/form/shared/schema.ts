@@ -1,8 +1,6 @@
 /**
- * 機器登録・編集フォーム（create/edit 共通、form/shared/schema.ts）のスキーマ（RHF + zodResolver 用、
- * screen-design/03-equipment-form.md）。
  * 入力体験向けの厳密検証（管理番号のユニークチェック等）はここで担う。
- * 永続化データの構造検証は `src/store/schema.ts` の equipmentSchema が別途担う（coding-standards.md §3）。
+ * 永続化データの構造検証は `src/store/schema.ts` の equipmentSchema が別途担う。
  *
  * なぜフォーム値をすべて string ベースに保つか: HTML input/select の値は本質的に文字列であり、
  * defaultValues/reset に渡す型と register 対象の型を一致させ、preprocess/transform による
@@ -12,8 +10,8 @@
  * Equipment.managementNo 一覧はストアの状態（レンダー時点）に依存するため、コンポーネント側で
  * `Object.values(equipment)` から算出し `createSchema(existingManagementNumbers)` に
  * 渡す。編集モードでは自身の managementNo を除外した一覧を渡すことで自己参照時のエラーを避ける。
- * manufacturerId の存在チェック（screen-design/03-equipment-form.md）も同じ理由で呼び出し側から
- * vendors 一覧を渡す形にする: 参照可能な Vendor 一覧もストアの状態に依存するため。
+ * manufacturerId の存在チェックも同じ理由で呼び出し側から vendors 一覧を渡す形にする:
+ * 参照可能な Vendor 一覧もストアの状態に依存するため。
  */
 
 import { EQUIPMENT_STATUS, type Vendor } from "@/store/types";
@@ -50,7 +48,6 @@ export const createSchema = (existingManagementNumbers: string[], vendors: Vendo
 
 export type FormType = z.infer<ReturnType<typeof createSchema>>;
 
-/** 新規登録時の初期フォーム値（すべて string ベース、status のみ既定「稼働中」） */
 export const defaultValues: FormType = {
   managementNo: "",
   name: "",

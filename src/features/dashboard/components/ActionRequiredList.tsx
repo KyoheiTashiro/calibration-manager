@@ -1,9 +1,3 @@
-/**
- * ダッシュボードの要対応項目リスト(01-dashboard.md)。
- * 行データ・並び(優先度順)は hooks.ts の actionRequiredRows で確定済みのため、
- * ここは列描画と行アクティベート(クリック/Enter/Space で機器詳細へ遷移。D-026)のみを担う薄いビュー。
- */
-
 import { StatusBadge } from "@/components/domain";
 import {
   EmptyState,

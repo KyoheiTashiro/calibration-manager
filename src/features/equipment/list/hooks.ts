@@ -1,15 +1,9 @@
-/**
- * 機器一覧画面（screen-design/02-equipment-list.md）のフィルタ・導出ロジックと状態管理フック。
- * UI（index.tsx）を薄いビューに保つため切り出す（coding-standards.md §2）。
- */
-
 import { serviceItemsOf } from "@/store/selectors";
 import { EQUIPMENT_STATUS, type Equipment, type EquipmentStatus } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
 import { useMemo, useState } from "react";
 
 /**
- * 状態フィルタの選択肢（as const + 派生union、coding-standards.md §1）。
  * ドメインの EquipmentStatus とは別軸（「稼働+休止」「全て」という複合値を持つ）のため
  * features/equipment/constants.ts には追加せずこのファイルに閉じたモジュールレベル定数とする。
  */
@@ -51,11 +45,9 @@ const MATCHES_STATUS_FILTER_RULES: Record<StatusFilter, (status: EquipmentStatus
   [STATUS_FILTER.ACTIVE_AND_SUSPENDED]: (status) => status !== EQUIPMENT_STATUS.RETIRED,
 };
 
-/** 状態フィルタの選択値が機器の状態に一致するか（screen-design/02-equipment-list.md「操作・アクション」） */
 const matchesStatusFilter = (status: EquipmentStatus, filter: StatusFilter): boolean =>
   MATCHES_STATUS_FILTER_RULES[filter](status);
 
-/** 検索語がmanagementNo/name/modelのいずれかに部分一致するか(大文字小文字無視) */
 const matchesSearch = (equipment: Equipment, normalizedSearch: string): boolean => {
   if (normalizedSearch === "") return true;
   const haystack = [equipment.managementNo, equipment.name, equipment.model ?? ""]
@@ -65,23 +57,17 @@ const matchesSearch = (equipment: Equipment, normalizedSearch: string): boolean 
 };
 
 type UseEquipmentListResult = {
-  /** フィルタ適用前の登録機器総数（未登録の空状態判定に使う） */
   totalCount: number;
-  /** 検索・状態フィルタ適用後、管理番号昇順の機器リスト */
   filteredEquipmentList: Equipment[];
   searchText: string;
   setSearchText: (value: string) => void;
   statusFilter: StatusFilter;
   setStatusFilter: (value: StatusFilter) => void;
-  /** メーカー名（未設定・不明は undefined） */
   manufacturerNameOf: (target: Equipment) => string | undefined;
-  /** 機器に紐づく点検項目数 */
   serviceItemCountOf: (target: Equipment) => number;
-  /** 機器の最も近い次回期限（非稼働は無条件で— / 有効項目なしも—。screen-design §2「最も近い次回期限」） */
   nearestDueDateOf: (target: Equipment) => string;
 };
 
-/** 機器一覧の store 購読・検索/状態フィルタ・行表示用の導出値一式 */
 export const useEquipmentList = (): UseEquipmentListResult => {
   const equipment = useAppStore((state) => state.equipment);
   const vendors = useAppStore((state) => state.vendors);

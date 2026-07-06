@@ -12,7 +12,6 @@ describe("emptyToUndefined", () => {
   });
 
   it("undefined は undefined を返す", () => {
-    // oxlint-disable-next-line unicorn/no-useless-undefined -- undefined入力時の挙動確認のため明示的に渡す必要がある
     expect(emptyToUndefined(undefined)).toBeUndefined();
   });
 
@@ -23,7 +22,6 @@ describe("emptyToUndefined", () => {
 
 describe("createSaveHandler", () => {
   it("handleSubmit(onSubmit)()を呼び出す関数を返す", async () => {
-    // oxlint-disable-next-line unicorn/no-useless-undefined -- mockResolvedValue は Promise<void> の解決値として引数必須
     const submitFn = vi.fn().mockResolvedValue(undefined);
     const handleSubmit = vi.fn().mockReturnValue(submitFn);
     const onSubmit = vi.fn();
@@ -52,7 +50,6 @@ describe("createSaveHandler", () => {
 describe("createFormSubmitHandler", () => {
   // イベント型はジェネリックに素通しされるため、React イベントを偽装せず文字列で代用する
   it("onFormSubmit(event)を呼び出す", async () => {
-    // oxlint-disable-next-line unicorn/no-useless-undefined -- mockResolvedValue は Promise<void> の解決値として引数必須
     const onFormSubmit = vi.fn<(event: string) => Promise<void>>().mockResolvedValue(undefined);
 
     const handleSubmit = createFormSubmitHandler(onFormSubmit);
@@ -79,7 +76,6 @@ describe("optionalNonNegativeIntegerString", () => {
   const schema = optionalNonNegativeIntegerString("0以上の整数で入力してください");
 
   it("undefinedは許容する", () => {
-    // oxlint-disable-next-line unicorn/no-useless-undefined -- undefined入力時の挙動確認のため明示的に渡す必要がある
     expect(schema.safeParse(undefined).success).toBe(true);
   });
 

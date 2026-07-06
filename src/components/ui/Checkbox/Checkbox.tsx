@@ -7,7 +7,7 @@ type Props = {
 } & InputHTMLAttributes<HTMLInputElement>;
 
 // なぜ: チェックボックスはラベルを右横に置くレイアウトが必要で、TextField の
-// 上ラベル構造と異なるため別コンポーネントにする。register()素通しは他と同じ。
+// 上ラベル構造と異なるため別コンポーネントにする。
 export const Checkbox = ({ label, error, ref, ...rest }: Props): ReactElement => {
   const generatedId = useId();
   const inputId = rest.id ?? generatedId;

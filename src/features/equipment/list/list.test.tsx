@@ -1,9 +1,3 @@
-/**
- * EquipmentList（/equipment）の検証（screen-design/02-equipment-list.md）。
- * 一覧表示・メーカー名解決・項目数・最寄り期限算出・状態フィルタ・検索・行クリック遷移・
- * 追加ボタン遷移・空状態2種を扱う。
- */
-
 import { ROUTES } from "@/constants/routes";
 import { EquipmentList } from "@/features/equipment/list";
 import {
@@ -23,7 +17,6 @@ import type { ReactElement } from "react";
 import { Route, Routes, useParams } from "react-router-dom";
 import { beforeEach, describe, expect, it } from "vitest";
 
-/** 遷移先確認用のダミー機器詳細画面(useParamsで:idを表示するだけ) */
 const DummyEquipmentDetail = (): ReactElement => {
   const { id } = useParams();
   return <p>機器詳細:{id}</p>;
@@ -130,10 +123,8 @@ describe("EquipmentList: 一覧表示", () => {
     expect(within(noginsuRow).getByText("検査室")).toBeInTheDocument();
     expect(within(noginsuRow).getByText("稼働")).toBeInTheDocument();
     expect(within(noginsuRow).getByText("2")).toBeInTheDocument();
-    // なぜ 08-15 か: item-1(09-01)とitem-2(08-15)の最小値
     expect(within(noginsuRow).getByText("2026-08-15")).toBeInTheDocument();
 
-    // メーカー未設定機器は型式・メーカー・設置場所・期限が「—」(項目0件のため項目数は"0")
     const microRow = screen.getByRole("row", { name: /EQ-002/u });
     expect(within(microRow).getByText("0")).toBeInTheDocument();
     expect(within(microRow).getAllByText("—")).toHaveLength(4);

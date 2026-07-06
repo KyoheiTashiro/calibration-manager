@@ -1,8 +1,3 @@
-/**
- * ServiceItemList: フィルタ(screen-design/05-service-item-list.md「操作」、D-022)の検証。
- * URLクエリが唯一の真実源: 初期化(?status=)・Select 操作による絞り込みと URL 反映・クリアを確認する。
- */
-
 import { ServiceItemList } from "@/features/serviceItems/list";
 import { renderWithStore, setupStoreIsolation } from "@/test/renderWithStore";
 import { personSuzuki, seedServiceItemList } from "@/test/serviceItemListFixtures";
@@ -13,7 +8,6 @@ import type { ReactElement } from "react";
 import { useLocation } from "react-router-dom";
 import { beforeEach, describe, expect, it } from "vitest";
 
-/** 現在の location.search をテストから読めるように testid で露出する */
 const LocationProbe = (): ReactElement => {
   const location = useLocation();
   return <span data-testid="search">{location.search}</span>;

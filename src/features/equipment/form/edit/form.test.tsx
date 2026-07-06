@@ -1,9 +1,3 @@
-/**
- * EquipmentEditForm（/equipment/:id/edit）の検証（screen-design/03-equipment-form.md）。
- * 編集プリフィル/更新・管理番号ユニーク検証（自己除外含む）・廃棄確認フロー・
- * 編集モードの存在しないid（リダイレクト）を扱う。
- */
-
 import { ROUTES, equipmentEditPath } from "@/constants/routes";
 import { EquipmentEditForm } from "@/features/equipment/form/edit";
 import { EQUIPMENT_STATUS, type Equipment, type Vendor } from "@/store/types";
@@ -13,8 +7,7 @@ import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 // なぜ: tsc -b はプロジェクト参照ごとに独立したプログラムのため、vitest.setup.ts
 // （tsconfig.node.json側）の副作用importだけではtsconfig.app.json側の型解決に
-// jest-domのmatcher拡張が伝播しない。テストファイル側でも明示的にimportし型を解決する
-// （coding-standards.md §6・.oxlintrc.jsonのallowリストで明示的に許容されているパターン）。
+// jest-domのmatcher拡張が伝播しない。テストファイル側でも明示的にimportし型を解決する。
 import "@testing-library/jest-dom/vitest";
 import type { ReactElement } from "react";
 import { MemoryRouter, Route, Routes, useParams } from "react-router-dom";
@@ -44,7 +37,6 @@ const otherEquipment: Equipment = {
   status: EQUIPMENT_STATUS.ACTIVE,
 };
 
-/** 遷移先確認用ダミー: 機器詳細(:id を表示) */
 const DummyEquipmentDetail = (): ReactElement => {
   const { id } = useParams();
   return <p>機器詳細:{id}</p>;
@@ -77,7 +69,7 @@ describe("EquipmentEditForm: 編集プリフィル・更新", () => {
 
   it("値を変更して保存するとストアが更新される", async () => {
     const user = userEvent.setup();
-    // manufacturerId の存在検証(03-equipment-form.md)が保存時に走るため、参照先 Vendor も seed する
+    // manufacturerId の存在検証が保存時に走るため、参照先 Vendor も seed する
     seedStore({
       equipment: { [existingEquipment.id]: existingEquipment },
       vendors: { [mitutoyo.id]: mitutoyo },
@@ -98,7 +90,7 @@ describe("EquipmentEditForm: 編集プリフィル・更新", () => {
 describe("EquipmentEditForm: 管理番号ユニーク検証", () => {
   it("編集時に自身の管理番号を変更せず再送信してもエラーにならない", async () => {
     const user = userEvent.setup();
-    // manufacturerId の存在検証(03-equipment-form.md)が保存時に走るため、参照先 Vendor も seed する
+    // manufacturerId の存在検証が保存時に走るため、参照先 Vendor も seed する
     seedStore({
       equipment: {
         [existingEquipment.id]: existingEquipment,

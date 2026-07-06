@@ -1,8 +1,3 @@
-/**
- * 汎用UIコンポーネントの集約barrel（directory-structure.md）。
- * 利用側は `@/components/ui` からimportし、個別サブディレクトリへ直接依存しない。
- */
-
 export { Badge } from "@/components/ui/Badge";
 export { Button } from "@/components/ui/Button";
 export { Checkbox } from "@/components/ui/Checkbox";

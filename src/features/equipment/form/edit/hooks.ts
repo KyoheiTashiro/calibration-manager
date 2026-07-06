@@ -1,9 +1,3 @@
-/**
- * 機器編集画面（screen-design/03-equipment-form.md、URL `/equipment/:id/edit`）の状態管理フック。
- * フォーム状態そのものは shared/useFormCore.ts の useEquipmentFormCore に委譲し、
- * プリフィル・保存後の遷移・廃棄確認フローのみここで扱う。
- */
-
 import { equipmentDetailPath } from "@/constants/routes";
 import { toEquipmentPayload, type SelectOption } from "@/features/equipment/form/shared/mapping";
 import { defaultValues, type FormType } from "@/features/equipment/form/shared/schema";
@@ -33,7 +27,6 @@ const toFormValues = (equipment: Equipment | undefined): FormType =>
     : defaultValues;
 
 type UseEditEquipmentFormResult = {
-  /** 編集対象機器が存在しない（dangling id・URL直打ち等）場合 true。一覧へリダイレクトする */
   shouldRedirectToList: boolean;
   register: UseFormRegister<FormType>;
   errors: FieldErrors<FormType>;
@@ -60,11 +53,8 @@ export const useEditEquipmentForm = (): UseEditEquipmentFormResult => {
 
   const currentFormValues = toFormValues(currentEquipment);
 
-  // なぜ values を渡すか: 編集画面はルートページで対象（currentEquipment）が変わる場合のみ
-  // 内容を更新すればよい。RHF の values は深い等価比較で変化を検知した際に reset +
-  // defaultValues 更新を行うため、対象切り替え時のみプリフィルし直す従来の挙動を維持できる
-  // （screen-design/README.md §0.5「対象を編集する場合は既存値をプリフィルする」と同方針）。
-  // defaultValues は初回マウント時（currentEquipment 未確定タイミング含む）用に残す。
+  // 編集画面はルートページで対象（currentEquipment）が変わる場合のみ内容を更新すればよいため
+  // values を渡す。defaultValues は初回マウント時（currentEquipment 未確定タイミング含む）用に残す。
   const { register, errors, handleSubmit, manufacturerOptions } = useEquipmentFormCore({
     defaultValues: currentFormValues,
     values: currentFormValues,
@@ -85,9 +75,8 @@ export const useEditEquipmentForm = (): UseEditEquipmentFormResult => {
   };
 
   return {
-    // なぜ: 編集対象が存在しない（dangling id・URL直打ち等）場合は一覧へリダイレクトする
-    // （タスク仕様。domain-model.md の「dangling FKでもユーザーデータは保持」とは別軸の、
-    // 画面パラメータ不正時のガード）。
+    // 編集対象が存在しない（dangling id・URL直打ち等）場合は一覧へリダイレクトする
+    // （domain-model.md の「dangling FKでもユーザーデータは保持」とは別軸の、画面パラメータ不正時のガード）。
     shouldRedirectToList: currentEquipment === undefined,
     register,
     errors,

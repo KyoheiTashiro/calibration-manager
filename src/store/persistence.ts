@@ -1,6 +1,6 @@
 /**
- * LocalStorage 読込パイプライン: migrate（バージョン変換）→ merge（検証・サルベージ・結合）
- * （store.md「永続化」）。zustand persist の設定から呼ばれる純関数群で、ストアに依存しない。
+ * LocalStorage 読込パイプライン: migrate（バージョン変換）→ merge（検証・サルベージ・結合）。
+ * zustand persist の設定から呼ばれる純関数群で、ストアに依存しない。
  */
 
 import { STORAGE_VERSION } from "@/constants/storage";
@@ -43,7 +43,6 @@ const renameFieldInRecord = (value: unknown, from: string, to: string): unknown 
   );
 };
 
-/** notifications の targetType を from → to へ変更する。非オブジェクトはそのまま残す */
 const renameNotificationTargetType = (
   notifications: unknown,
   from: string,
@@ -59,10 +58,7 @@ const renameNotificationTargetType = (
 };
 
 /**
- * v1→v2: item→inspectionItem リネーム（D-036）。
- * - 状態キー items → inspectionItems
- * - records / orders の itemId → inspectionItemId
- * - notifications の targetType "item" → "inspectionItem"
+ * v1→v2: item→inspectionItem リネーム。
  * ステップ変換は「v2 当時の形式」を出力する（最終形式は後続ステップが作る）ため、
  * "item" / "inspectionItem" 等はいずれも歴史的リテラル値（現行列挙に存在しない）で直書き。
  */
@@ -81,9 +77,6 @@ export const migrateV1ToV2: MigrationStep = (persisted) => {
 /**
  * v2→v3: inspectionItem→serviceItem リネーム（D-045。Inspection 系と Calibration 系が
  * 混在していたエンティティ英語名を Service 系へ統一）。
- * - 状態キー inspectionItems → serviceItems
- * - records / orders の inspectionItemId → serviceItemId
- * - notifications の targetType "inspectionItem" → "serviceItem"
  * "inspectionItem" は v2 の歴史的リテラル値のため直書き。
  */
 export const migrateV2ToV3: MigrationStep = (persisted) => {
@@ -105,9 +98,6 @@ export const migrateV2ToV3: MigrationStep = (persisted) => {
 /**
  * v3→v4: order→serviceOrder リネーム（D-046。ルート・コードの order 系命名を
  * ServiceOrder 系へ統一したことに伴い、永続化キーも追随）。
- * - 状態キー orders → serviceOrders
- * - records の orderId → serviceOrderId
- * - notifications の targetType "order" → "serviceOrder"
  * "order" / "orders" / "orderId" は v3 の歴史的リテラル値のため直書き。
  */
 export const migrateV3ToV4: MigrationStep = (persisted) => {
@@ -128,7 +118,6 @@ export const migrateV3ToV4: MigrationStep = (persisted) => {
 /**
  * v4→v5: record→serviceRecord リネーム（D-050。コードの Record 系命名を
  * ServiceRecord 系へ統一したことに伴い、永続化キーも追随）。
- * - 状態キー records → serviceRecords
  * "records" は v4 の歴史的リテラル値のため直書き。
  */
 export const migrateV4ToV5: MigrationStep = (persisted) => {
@@ -142,7 +131,7 @@ export const migrateV4ToV5: MigrationStep = (persisted) => {
 
 /**
  * 将来のスキーマ変更時は migrateVNToVN+1 を追加してここへ登録し、
- * STORAGE_VERSION をインクリメントする（store.md「migrate」）。
+ * STORAGE_VERSION をインクリメントする。
  */
 export const MIGRATIONS: Record<number, MigrationStep> = {
   1: migrateV1ToV2,
@@ -152,7 +141,6 @@ export const MIGRATIONS: Record<number, MigrationStep> = {
 };
 
 /**
- * fromVersion から STORAGE_VERSION までステップ変換を順に適用する。
  * @param migrations 通常は MIGRATIONS。テストでステップ適用の機構を検証するために注入可能にしている
  */
 export const migratePersistedState = (
@@ -172,7 +160,6 @@ export const migratePersistedState = (
   return state;
 };
 
-/** レコード単位サルベージ: パースに成功したエントリのみ残す（store.md「merge」段階2） */
 const salvageRecords = <Entity>(
   value: unknown,
   schema: z.ZodType<Entity>,
@@ -215,7 +202,7 @@ export const sanitizeAppState = (state: AppState): AppState => {
 };
 
 /**
- * merge の3段サルベージ（store.md「merge」）:
+ * merge の3段サルベージ:
  * 1. ハッピーパス: 全体 safeParse 成功ならそのまま採用
  * 2. 部分破損: オブジェクトではあるが全体パース失敗 → レコード単位で成功分のみ救済
  * 3. 最終手段: オブジェクトですらない → 初期状態

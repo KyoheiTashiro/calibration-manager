@@ -10,12 +10,10 @@ type Props = {
 type NavItem = {
   path: string;
   label: string;
-  /** ダッシュボード("/")のみ true。他ルートとの前方一致誤爆を防ぐ(NavLinkのendプロパティ) */
+  /** ダッシュボード("/")のみ true。 */
   end?: boolean;
 };
 
-// なぜここに集約するか: screen-design/README.md §0.1 のワイヤーフレーム通りの9項目・順序を
-// 1箇所で管理し、パス文字列は ROUTES 定数参照に限定してハードコードを避けるため。
 const NAV_ITEMS: NavItem[] = [
   { path: ROUTES.DASHBOARD, label: "ダッシュボード", end: true },
   { path: ROUTES.EQUIPMENT_LIST, label: "機器一覧" },
@@ -29,7 +27,6 @@ const NAV_ITEMS: NavItem[] = [
 ];
 
 export const Sidebar = ({ onNavigate }: Props): ReactElement => {
-  // なぜ: propsで渡されない場合(PC固定表示)は何もしない安全側の既定動作にする。
   const handleNavigate = (): void => {
     onNavigate?.();
   };

@@ -1,10 +1,9 @@
 /**
- * 点検校正外部案件（ServiceOrder）の新規作成モーダル（screen-design/08-service-orders.md「案件作成モーダル」）。
- * RHF + zodResolver。起動元は項目一覧の「案件」アクション（外部・有効案件なしの項目）。
- * 新規作成専用（status は常に addServiceOrder が
- * planned 固定で付与するため渡さない)。1項目1有効案件制約（D-006）はストア層 addServiceOrder が最終防衛線。
- * 呼び出し元は閉時アンマウント（条件マウント）必須。defaultValues はマウント時にのみ評価されるため、
- * 常時マウントで open をトグルする使い方ではプリフィルされない。
+ * 点検校正外部案件（ServiceOrder）の新規作成モーダル。RHF + zodResolver。
+ * 起動元は項目一覧の「案件」アクション（外部・有効案件なしの項目）。新規作成専用
+ * （status は常に addServiceOrder が planned 固定で付与するため渡さない）。
+ * 1項目1有効案件制約はストア層 addServiceOrder が最終防衛線。
+ * 呼び出し元は閉時アンマウント（条件マウント）必須。
  */
 
 import { defaultValues, Schema, type FormType } from "@/components/domain/ServiceOrderModal/schema";
@@ -39,8 +38,6 @@ export const ServiceOrderModal = ({ open, serviceItemId, onClose }: Props): Reac
   const defaultVendorId =
     presetVendorId !== undefined && vendors[presetVendorId]?.isCalibrator ? presetVendorId : "";
 
-  // なぜ defaultValues 直書きで足りるか: ServiceOrderModal は起動元で常に条件マウント（閉時アンマウント）
-  // されるため、defaultValues はマウント時に1度評価されれば足り、open のたびのプリフィルは不要。
   const {
     register,
     handleSubmit,

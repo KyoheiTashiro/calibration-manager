@@ -1,9 +1,3 @@
-/**
- * 設定画面のインポートセクション(screen-design/11-settings.md §11、D-029 / D-030)。
- * 対象種別を選び CSV を検証 → プレビュー → 確認ダイアログ後に対象 Record を全置換する。
- * エラーが1件でもあれば取り込み不可([確定]非活性、D-030)。
- */
-
 import { Button, ConfirmModal, Select } from "@/components/ui";
 import {
   CSV_ENTITY_KINDS,
@@ -24,13 +18,11 @@ const ENTITY_OPTIONS = CSV_ENTITY_KINDS.map((kind) => ({
   label: ENTITY_CSV_SPECS[kind].label,
 }));
 
-/** Select の onChange が渡す string を CsvEntityKind へ型ガードする */
 const isCsvEntityKind = (value: string): value is CsvEntityKind =>
   CSV_ENTITY_KINDS.some((kind) => kind === value);
 
 const IMPORT_STEP = { IDLE: "idle", PREVIEW: "preview", DONE: "done" } as const;
 
-/** 未選択・プレビュー・完了の3状態を1つの判別可能 union で管理する(組合せ不整合を排除) */
 type ViewState =
   | { step: typeof IMPORT_STEP.IDLE }
   | {
@@ -40,10 +32,7 @@ type ViewState =
     }
   | { step: typeof IMPORT_STEP.DONE; message: string };
 
-/**
- * エラー・警告一覧(見出し + 行番号付きリスト、§11)。両者の差は色調のみ。
- * 見出しの行数は行番号の重複を除いて数える(同一行の複数指摘は1行と数える)。
- */
+/** 見出しの行数は行番号の重複を除いて数える(同一行の複数指摘は1行と数える) */
 const issueBlock = (
   mark: string,
   label: string,
@@ -63,7 +52,6 @@ const issueBlock = (
 );
 
 type Props = {
-  /** 参照整合の突合先となる現在のストア全状態(D-029) */
   state: AppState;
 };
 
@@ -109,7 +97,7 @@ export const ImportSection = ({ state }: Props): ReactElement => {
         result: validateEntityCsv(kind, text, state),
       });
     } catch {
-      // 読み取り失敗は例外を投げず無視する(coding-standards §8)
+      // 読み取り失敗は無視する
     }
   };
 
@@ -163,7 +151,9 @@ export const ImportSection = ({ state }: Props): ReactElement => {
             type="file"
             accept=".csv"
             aria-label="ファイル"
-            onChange={handleFileChange}
+            onChange={(event) => {
+              void handleFileChange(event);
+            }}
             className="sr-only"
           />
           <Button variant="secondary" onClick={() => fileInputRef.current?.click()}>

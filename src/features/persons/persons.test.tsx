@@ -66,7 +66,7 @@ describe("PersonList", () => {
     renderWithStore(<PersonList />);
 
     // なぜ getAllByRole の先頭要素か: 0件時はヘッダーの「+ 追加」とEmptyStateのCTAが
-    // 同名で2つ描画されるため（screen-design README.md §0.7）、先頭（ヘッダー側）を使う。
+    // 同名で2つ描画されるため、先頭（ヘッダー側）を使う。
     await user.click(screen.getAllByRole("button", { name: "+ 追加" })[0]);
 
     await user.type(screen.getByLabelText("氏名", { exact: false }), "鈴木一郎");

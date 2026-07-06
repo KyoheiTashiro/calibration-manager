@@ -10,8 +10,6 @@ type Props = {
 
 // なぜ: ラジオ群は fieldset/legend でグループ名を与える構造が必要で、単一 input の
 // TextField / Select と DOM 構造が異なるため別コンポーネントにする。
-// register() の戻り値を全ラジオへ素通しし、value だけ選択肢ごとに固定する
-// (react-hook-form は同名 radio 群の複数 ref を束ねて扱える)。
 export const RadioGroup = ({
   label,
   options,

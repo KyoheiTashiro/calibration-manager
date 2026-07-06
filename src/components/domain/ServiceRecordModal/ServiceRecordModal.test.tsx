@@ -1,9 +1,3 @@
-/**
- * ServiceRecordModal: 実施記録登録モーダルの検証（screen-design/07-service-record-modal.md）。
- * 対象固定表示・doneBy プリフィル3分岐(D-017)・既定実施日・fail 注意書き・未来日警告(D-016)・
- * 登録カスケード・addServiceRecord no-op 時のエラー維持・バリデーションを扱う。
- */
-
 import { ServiceRecordModal } from "@/components/domain/ServiceRecordModal";
 import {
   CYCLE,
@@ -106,7 +100,6 @@ const serviceOrderPlanned: ServiceOrder = {
   status: SERVICE_ORDER_STATUS.PLANNED,
 };
 
-/** 機器・業者・担当者・両項目・両案件をストアへ投入する共通シード */
 const seedRecordModalStore = (): void => {
   seedStore({
     equipment: { [equipment.id]: equipment },
@@ -271,7 +264,7 @@ describe("ServiceRecordModal", () => {
   it("addServiceRecord が no-op(null)の場合はエラーを表示しモーダルを閉じない", async () => {
     const user = userEvent.setup();
     const onClose = vi.fn<() => void>();
-    // planned 案件は completed へ遷移不可のため addServiceRecord は null を返す（D-005）
+    // planned 案件は completed へ遷移不可のため addServiceRecord は null を返す
     renderWithStore(
       <ServiceRecordModal
         open

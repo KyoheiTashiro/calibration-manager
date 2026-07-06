@@ -1,7 +1,6 @@
 /**
  * 横断 selector（複数エンティティ導出）。store を引数に取る純関数として定義し、
- * コンポーネントは `useAppStore((state) => serviceItemsOf(state, id))` の形で購読する
- * （coding-standards.md §5、store.md「派生」）。
+ * コンポーネントは `useAppStore((state) => serviceItemsOf(state, id))` の形で購読する。
  */
 
 import { recommendedOrderDate } from "@/domain/leadTime";
@@ -19,7 +18,6 @@ import {
 } from "@/store/types";
 import { recordValue } from "@/utils/record";
 
-/** 機器に属する項目の一覧 */
 export const serviceItemsOf = (
   state: Pick<AppState, "serviceItems">,
   equipmentId: string,
@@ -28,7 +26,6 @@ export const serviceItemsOf = (
     (serviceItem) => serviceItem.equipmentId === equipmentId,
   );
 
-/** 項目に紐づく案件の一覧 */
 export const serviceOrdersOf = (
   state: Pick<AppState, "serviceOrders">,
   serviceItemId: string,
@@ -49,10 +46,7 @@ export const serviceRecordsOf = (
         right.doneDate.localeCompare(left.doneDate) || left.id.localeCompare(right.id),
     );
 
-/**
- * 担当者名の解決。参照先なし(dangling)は「—」、無効化済みは「(無効)」を注記(D-001)。
- * 機器詳細・項目一覧など担当者名を表示する全画面がこれを使う。
- */
+/** 機器詳細・項目一覧など担当者名を表示する全画面がこれを使う。 */
 export const personLabelOf = (state: Pick<AppState, "persons">, personId: string): string => {
   const person = recordValue(state.persons, personId);
   if (person === undefined) return "—";
@@ -60,8 +54,7 @@ export const personLabelOf = (state: Pick<AppState, "persons">, personId: string
 };
 
 /**
- * Vendor が Equipment.manufacturerId / ServiceItem.vendorId / ServiceOrder.vendorId の
- * いずれかから参照されているかを判定する。store の removeVendor の参照ガードと、
+ * store の removeVendor の参照ガードと、
  * features/vendors 側の削除クリック時の事前チェックが同一判定を共用するための横断 selector。
  */
 export const isVendorReferenced = (
@@ -78,7 +71,7 @@ export const isVendorReferenced = (
     (serviceOrderEntry) => serviceOrderEntry.vendorId === vendorId,
   );
 
-/** ヘッダーの通知ベルに出す未読件数（screen-design/README.md） */
+/** ヘッダーの通知ベルに出す未読件数 */
 export const unreadNotificationCount = (state: Pick<AppState, "notifications">): number =>
   Object.values(state.notifications).filter((notification) => !notification.isRead).length;
 
@@ -86,23 +79,22 @@ export const unreadNotificationCount = (state: Pick<AppState, "notifications">):
 export type ServiceItemRow = {
   serviceItem: ServiceItem;
   equipment: Equipment;
-  status: ServiceItemStatus; // deriveServiceItemStatus による導出値
-  personLabel: string; // personLabelOf(D-001: dangling「—」、無効「(無効)」注記)
-  recommendedOrderDate: IsoDateString | null; // recommendedOrderDate(§4.2)。内部・算出不能は null
+  status: ServiceItemStatus;
+  personLabel: string;
+  recommendedOrderDate: IsoDateString | null; // 内部・算出不能は null
   canCreateServiceOrder: boolean; // external かつ 有効な案件(isActiveServiceOrderStatus)なし
 };
 
-/** 表示順: nextDueDate 昇順、同値は serviceItem.id 昇順（§5 既定並び） */
+/** 表示順: nextDueDate 昇順、同値は serviceItem.id 昇順 */
 const compareServiceItemRows = (left: ServiceItemRow, right: ServiceItemRow): number =>
   left.serviceItem.nextDueDate.localeCompare(right.serviceItem.nextDueDate) ||
   left.serviceItem.id.localeCompare(right.serviceItem.id);
 
 /**
- * 表示対象の項目行を構築する横断 selector。対象は status=active 機器の isActive=true 項目のみ(D-023)。
- * 参照先機器のない項目(dangling)は行にしない。並びは nextDueDate 昇順、同値は serviceItem.id 昇順。
+ * 表示対象の項目行を構築する横断 selector。
  *
- * 項目一覧(§5)とダッシュボード(§1)が同一規則で行を導出するため、feature 間 import を避けて
- * 横断導出を selectors.ts に純関数で置く規約(coding-standards.md §5、D-024)に従いここへ集約する。
+ * 項目一覧とダッシュボードが同一規則で行を導出するため、feature 間 import を避けて
+ * 横断導出を selectors.ts に純関数で置く規約に従いここへ集約する。
  */
 export const serviceItemRowsOf = (
   state: Pick<AppState, "serviceItems" | "equipment" | "serviceOrders" | "vendors" | "persons">,

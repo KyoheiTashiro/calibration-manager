@@ -1,8 +1,3 @@
-/**
- * CSV インポート検証(§11、D-029 / D-030)。
- * ヘッダ一致・行単位 zod・ファイル内ユニーク・参照整合・件数集計を検証する。
- */
-
 import { validateEntityCsv } from "@/features/settings/components/csv/importValidation";
 import { emptyAppState } from "@/store/persistence";
 import {
@@ -54,7 +49,6 @@ const serviceOrder: ServiceOrder = {
   status: SERVICE_ORDER_STATUS.ORDERED,
 };
 
-/** 参照整合の突合先(D-029: 現在ストアのスナップショット相当) */
 const stateWithReferences = (): AppState => ({
   ...emptyAppState(),
   vendors: { [vendor.id]: vendor },

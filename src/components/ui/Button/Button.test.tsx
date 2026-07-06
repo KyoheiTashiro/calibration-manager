@@ -2,8 +2,7 @@ import { Button } from "@/components/ui/Button";
 import { fireEvent, render, screen } from "@testing-library/react";
 // なぜ: tsc -b はプロジェクト参照ごとに独立したプログラムのため、vitest.setup.ts
 // （tsconfig.node.json側）の副作用importだけではtsconfig.app.json側の型解決に
-// jest-domのmatcher拡張が伝播しない。テストファイル側でも明示的にimportし型を解決する
-// （coding-standards.md §6・.oxlintrc.jsonのallowリストで明示的に許容されているパターン）。
+// jest-domのmatcher拡張が伝播しない。テストファイル側でも明示的にimportし型を解決する。
 import "@testing-library/jest-dom/vitest";
 import { describe, expect, it, vi } from "vitest";
 

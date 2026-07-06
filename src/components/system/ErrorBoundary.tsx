@@ -8,11 +8,6 @@ type State = {
   error: Error | null;
 };
 
-// なぜclassコンポーネントで書くか（coding-standards.md §4の例外）:
-// このコードベースはアロー関数コンポーネントを原則とするが、
-// Reactのエラー境界（Error Boundary）は `componentDidCatch` / `getDerivedStateFromError` という
-// クラスコンポーネントのライフサイクルAPIでしか実装できない仕様上の制約があるため、
-// このコンポーネントに限り class component を用いる。
 export class ErrorBoundary extends Component<Props, State> {
   public constructor(props: Props) {
     super(props);
@@ -24,8 +19,7 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
-    // なぜ: 例外を握りつぶさず、原因調査ができるようコンソールに残す
-    // （coding-standards.md §8「例外を投げない」方針の裏側でも、捕捉した例外自体は可視化する）。
+    // なぜ: 例外を握りつぶさず、原因調査ができるようコンソールに残す。
     console.error("予期しないエラーが発生しました", error, errorInfo);
   }
 

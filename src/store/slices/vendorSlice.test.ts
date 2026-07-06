@@ -1,7 +1,3 @@
-/**
- * vendorSlice の検証。removeVendor の参照ガードは store.md「アクション仕様」準拠。
- */
-
 import type { ServiceOrder, Equipment, ServiceItem, Vendor } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
 import { seedStore, setupStoreIsolation } from "@/test/renderWithStore";

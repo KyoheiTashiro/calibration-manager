@@ -12,7 +12,7 @@ const meta = {
 export default meta;
 
 // なぜ: 5種類のステータスを1画面で見比べられるよう、
-// SERVICE_ITEM_STATUSの全値を並べて表示する単一ストーリーにする（文字列リテラルは直書きしない）。
+// SERVICE_ITEM_STATUSの全値を並べて表示する単一ストーリーにする。
 export const AllStatuses: StoryObj<typeof meta> = {
   // なぜargsが必要か: renderで独自にステータス一覧を描画するため個々のargsは使わないが、
   // StoryObjの型上componentが要求するargsを満たす必要があるため代表値を渡す。

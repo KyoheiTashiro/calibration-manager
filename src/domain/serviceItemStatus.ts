@@ -1,6 +1,6 @@
 /**
  * 点検校正項目のステータス導出（domain-model.md §4.3）。
- * 保存しない派生値であり、表示のたびにこの関数で導出する（coding-standards.md §5）。
+ * 保存しない派生値であり、表示のたびにこの関数で導出する。
  */
 
 import { recommendedOrderDate } from "@/domain/leadTime";

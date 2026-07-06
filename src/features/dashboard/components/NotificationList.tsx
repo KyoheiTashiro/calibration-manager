@@ -1,9 +1,3 @@
-/**
- * ダッシュボードの「最新の通知」パネル(01-dashboard.md)。
- * 選定順(未読優先→新しい順→id昇順)・件数は hooks.ts の latestNotifications で確定済みのため、
- * ここは種別バッジ・message・createdDate の描画と「通知センターへ」リンクのみを担う薄いビュー。
- */
-
 import { Badge, EmptyState } from "@/components/ui";
 import { ROUTES } from "@/constants/routes";
 import {

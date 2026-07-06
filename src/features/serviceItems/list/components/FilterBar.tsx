@@ -1,8 +1,5 @@
 /**
- * 項目一覧(screen-design/05-service-item-list.md)のフィルタ行。
- * 4つのSelect(状態/種別/内外/担当)と「クリア」ボタンからなる薄いビュー。
  * フィルタの真実源はURLクエリ(D-022)であり、値の保持・更新は親(index.tsx)の責務。
- * ここでは選択肢の組み立てと変更イベントの通知のみを行う。
  */
 
 import { Button, Select } from "@/components/ui";
@@ -16,13 +13,11 @@ import type { ReactElement } from "react";
 
 type SelectOption = { value: string; label: string };
 
-/** 「全て」を先頭に付けた選択肢を作る(全Selectの共通形) */
 const withAllOption = (options: readonly SelectOption[]): SelectOption[] => [
   { value: FILTER_ALL, label: "全て" },
   ...options,
 ];
 
-/** 状態フィルタ: §0.3の5値を statusBadgeLabel の日本語で(導出結果に適用、§5) */
 const STATUS_OPTIONS: SelectOption[] = withAllOption(
   Object.values(SERVICE_ITEM_STATUS).map((status) => ({
     value: status,
@@ -41,7 +36,7 @@ type Props = {
 };
 
 export const FilterBar = ({ filters, persons, onFilterChange, onClear }: Props): ReactElement => {
-  // 担当: name 昇順、無効者は personLabelOf で「(無効)」注記(D-001)
+  // 無効者は personLabelOf で「(無効)」注記(D-001)
   const personOptions: SelectOption[] = withAllOption(
     Object.values(persons)
       .toSorted((left, right) => left.name.localeCompare(right.name))

@@ -1,9 +1,3 @@
-/**
- * ダッシュボードのサマリーカード4枚(01-dashboard.md)。
- * 件数集計は hooks.ts、色・ラベルは domain/statusBadge.ts の単一マッピングに委譲する薄いビュー。
- * クリックで /service-items?status=<値> へ遷移する(status 値は SERVICE_ITEM_STATUS 列挙から。リテラル直書き禁止)。
- */
-
 import { ROUTES } from "@/constants/routes";
 import type { ServiceItemStatus } from "@/domain/serviceItemStatus";
 import { statusBadgeClass, statusBadgeLabel } from "@/domain/statusBadge";
@@ -19,7 +13,6 @@ type Props = {
   onNavigate: (path: string) => void;
 };
 
-/** status に対応する項目一覧(プリフィルタ)への遷移先URLを組み立てる */
 const serviceItemListPathForStatus = (status: ServiceItemStatus): string =>
   `${ROUTES.SERVICE_ITEM_LIST}?${new URLSearchParams({ [SERVICE_ITEM_LIST_STATUS_PARAM]: status }).toString()}`;
 

@@ -1,11 +1,7 @@
-// oxlint-disable import/max-dependencies -- 共通ヘルパー(@/utils/form・@/utils/record)への
-// 重複排除移設(D-048)で依存数が上限をわずかに超えるが、逐語重複の解消を優先し対象外とする
 /**
- * 実施記録（ServiceRecord）の登録モーダル（screen-design/07-service-record-modal.md）。RHF + zodResolver。
- * 対象項目は常に確定した状態で起動元から渡される。登録時の期限更新・案件完了カスケードは
- * ストア層 addServiceRecord が担う（serviceRecordSlice.ts）。
- * 呼び出し元は閉時アンマウント（条件マウント）必須。defaultValues はマウント時にのみ評価されるため、
- * 常時マウントで open をトグルする使い方ではプリフィルされない。
+ * 実施記録（ServiceRecord）の登録モーダル。RHF + zodResolver。
+ * 登録時の期限更新・案件完了カスケードはストア層 addServiceRecord が担う（serviceRecordSlice.ts）。
+ * 呼び出し元は閉時アンマウント（条件マウント）必須。
  */
 
 import { Schema, type FormType } from "@/components/domain/ServiceRecordModal/schema";
@@ -35,11 +31,6 @@ type Props = {
   onClose: () => void;
 };
 
-/**
- * doneBy プリフィル値を解決する（D-017 の解決順）:
- * ①案件経由 → 当該案件の業者名、②項目が external → 項目の業者名、
- * ③internal または Vendor 解決不能 → 空欄。
- */
 const resolvePrefillDoneBy = (
   serviceItem: ServiceItem | undefined,
   serviceOrder: ServiceOrder | undefined,
@@ -74,8 +65,6 @@ export const ServiceRecordModal = ({
 
   const [submitFailed, setSubmitFailed] = useState(false);
 
-  // なぜ defaultValues 直書きで足りるか: ServiceRecordModal は起動元で常に条件マウント（閉時アンマウント）
-  // されるため、defaultValues はマウント時に1度評価されれば足り、open のたびのプリフィルは不要。
   // なぜ result を undefined か: 既定選択なし（未選択で送信すると zod エラー）とするため。
   const defaultValues: DefaultValues<FormType> = {
     doneDate: todayIsoDate(),

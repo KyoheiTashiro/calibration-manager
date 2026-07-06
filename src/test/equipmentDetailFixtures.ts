@@ -178,7 +178,6 @@ export const recordExternalServiceItemOlder: ServiceRecord = {
   note: "証明書#A-102",
 };
 
-/** equipmentFull + 関連マスタ(メーカー/校正業者/担当者)をストアへ投入する共通シード */
 export const seedEquipmentFullMasters = (): void => {
   seedStore({
     equipment: { [equipmentFull.id]: equipmentFull },
@@ -193,7 +192,6 @@ export const seedEquipmentFullMasters = (): void => {
   });
 };
 
-/** equipmentFull配下の全項目・全実施記録をストアへ投入する */
 export const seedEquipmentFullServiceItemsAndRecords = (): void => {
   seedStore({
     serviceItems: {

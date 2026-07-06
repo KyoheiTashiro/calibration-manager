@@ -149,7 +149,7 @@ export const serviceOrderInProgress: ServiceOrder = {
 };
 
 /**
- * 全フィクスチャをストアへ投入する。表示対象は3行:
+ * 表示対象は3行:
  * serviceItemExternalOverdue(2000) < serviceItemExternalInProgress(2098) < serviceItemInternalOk(2099) の nextDueDate 昇順。
  */
 export const seedServiceItemList = (): void => {

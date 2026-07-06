@@ -1,8 +1,8 @@
 /**
  * 点検校正外部案件（かんばん、screen-design/08-service-orders.md）。
  * 状態別の4列（発注準備/発注済/校正中/返却済）でカードを表示し、隣接遷移のみをアクションで提供する。
- * トグル「完了/中止も表示」ON で記録登録済/中止の2列を右側に追加（D-018）。案件作成の導線は本画面には持たず、
- * 起動元は項目一覧（Phase 8）。状態遷移・属性更新はストア（updateServiceOrderStatus / updateServiceOrder）が最終検証する。
+ * 案件作成の導線は本画面には持たず、起動元は項目一覧（Phase 8）。状態遷移・属性更新はストア
+ * （updateServiceOrderStatus / updateServiceOrder）が最終検証する。
  */
 
 import { ServiceRecordModal } from "@/components/domain";
@@ -19,7 +19,7 @@ import { SERVICE_ORDER_STATUS, type ServiceOrderStatus } from "@/store/types";
 import { useSafeNavigate } from "@/utils/navigation";
 import type { ReactElement } from "react";
 
-/** 列ヘッダの状態別アクセント色（色 + 日本語ラベル併記の規約に沿う視覚区別） */
+/** 列ヘッダの状態別アクセント色 */
 const COLUMN_ACCENT_CLASS = {
   [SERVICE_ORDER_STATUS.PLANNED]: "border-t-slate-400",
   [SERVICE_ORDER_STATUS.ORDERED]: "border-t-blue-400",

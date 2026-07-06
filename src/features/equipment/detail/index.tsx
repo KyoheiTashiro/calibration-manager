@@ -1,13 +1,3 @@
-/**
- * 機器詳細画面（screen-design/04-equipment-detail.md）。
- * 1機器の基本情報・点検校正項目一覧・実施記録(項目横断)を集約表示し、
- * 項目追加/編集モーダルの起動起点となる。表示専用画面であり、入力検証は各モーダル側の責務。
- * 並び替え・派生ステータスの計算ロジックは hooks.ts に集約する（coding-standards.md §2）。
- * モーダル起動は単一 state で kind を持ち、1度に開くのは1つ。閉じたら state をリセットする。
- * テーブル・カードの描画は components/ 配下へ分割し（coding-standards.md §2）、本ファイルは
- * ページヘッダ・state・モーダル分岐・データ取得に徹する。
- */
-
 import { ServiceItemModal, ServiceRecordModal } from "@/components/domain";
 import { Button } from "@/components/ui";
 import { ROUTES, equipmentEditPath } from "@/constants/routes";
@@ -25,7 +15,6 @@ import { useAppStore } from "@/store/useAppStore";
 import { useState, type ReactElement } from "react";
 import { Navigate, useParams } from "react-router-dom";
 
-/** 起動中モーダルの種別(画面ローカルUI状態)。1度に1つのみ開く */
 const MODAL_KIND = {
   ADD: "add",
   EDIT: "edit",
@@ -67,8 +56,6 @@ export const EquipmentDetail = (): ReactElement => {
 
   const serviceItemList = sortedServiceItemsOf(serviceItems, currentEquipment.id);
   const serviceRecordRows = historyRowsOf(serviceItems, serviceRecords, currentEquipment.id);
-  // today は行ごとに再取得せず1度だけ計算し、displayedServiceItemStatus へ注入する
-  // (serviceItemRowsOf と同方針、テスト容易性のため)
   const today = todayIsoDate();
 
   return (

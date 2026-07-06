@@ -1,8 +1,3 @@
-/**
- * 開発用シードデータの検証（seed.ts）。
- * スキーマ整合・参照整合・全ステータス網羅・D-006（1項目1有効案件）を確認する。
- */
-
 import { buildSeedState, seedIfEmpty } from "@/dev/seed";
 import { deriveServiceItemStatus, type ServiceItemStatus } from "@/domain/serviceItemStatus";
 import { isActiveServiceOrderStatus } from "@/domain/serviceOrderStatus";

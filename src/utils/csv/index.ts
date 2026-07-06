@@ -5,7 +5,7 @@
  * ここは文字列 ⇔ セル二次元配列の変換のみを扱う。
  */
 
-/** UTF-8 BOM。エクスポート時にファイル先頭へ付与する(Excel 互換、domain-model.md §5) */
+/** UTF-8 BOM。エクスポート時にファイル先頭へ付与する(Excel 互換) */
 export const CSV_BOM = "\u{FEFF}";
 
 /** 引用が必要な文字(カンマ・引用符・改行)を含むかの判定用 */
@@ -34,8 +34,7 @@ const FIELD_PATTERN = /(?<raw>"(?:[^"]|"")*"|[^",\r\n][^,\r\n]*|)(?<delimiter>,|
 /**
  * CSV 文字列をセル二次元配列へパースする。先頭 BOM は除去し、行末は CRLF / LF / 単独 CR の
  * いずれも受理、末尾の改行は無視する。引用フィールド内のカンマ・改行・`""` を扱う。
- * 不正な引用(閉じ引用の欠落、閉じ引用直後の余分な文字)は例外を投げず null を返す
- * (coding-standards.md §8「例外を投げない」)。
+ * 不正な引用(閉じ引用の欠落、閉じ引用直後の余分な文字)は例外を投げず null を返す。
  */
 export const parseCsv = (text: string): string[][] | null => {
   const content = text.startsWith(CSV_BOM) ? text.slice(CSV_BOM.length) : text;

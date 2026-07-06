@@ -1,10 +1,3 @@
-/**
- * 追加/編集モーダルの開閉状態管理フック。
- * なぜ必要か: persons/vendors 等の各マスタ画面で「追加は entity 未指定、編集は entity 指定で
- * モーダルを開く」という同一パターンが逐語重複していたため、エンティティ型をジェネリックにして
- * 集約する（D-049）。
- */
-
 import { useState } from "react";
 
 export type EntityModalState<Entity> = {
@@ -19,7 +12,6 @@ export type UseEntityModalResult<Entity> = {
   handleModalClose: () => void;
 };
 
-/** 追加/編集モーダルの開閉状態（entity 未指定 = 追加、指定 = 編集） */
 export const useEntityModal = <Entity>(): UseEntityModalResult<Entity> => {
   const [modalState, setModalState] = useState<EntityModalState<Entity>>({ open: false });
 

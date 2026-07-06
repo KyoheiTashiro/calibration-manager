@@ -1,8 +1,3 @@
-/**
- * メーカー/取引先マスタ画面（screen-design/09-masters.md §9-A）。
- * 状態管理・削除参照ガードは hooks.ts に切り出し、本ファイルはビューに徹する。
- */
-
 import { VendorModal } from "@/components/domain/VendorModal";
 import {
   Badge,

@@ -1,9 +1,3 @@
-/**
- * 開発用シードデータ（トランザクション系: serviceItems/serviceRecords/serviceOrders）。
- * today からの相対日付で構成するため、today を引数に取る関数として提供する
- * （src/dev/seed.ts から呼び出される）。
- */
-
 import { DEFAULT_BUFFER_DAYS, DEFAULT_NOTICE_DAYS_BEFORE } from "@/domain/constants";
 import {
   type ServiceOrder,

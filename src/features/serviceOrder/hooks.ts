@@ -1,6 +1,5 @@
 /**
  * 点検校正外部案件（かんばん、screen-design/08-service-orders.md）の状態管理フック。
- * UI（index.tsx）を薄いビューに保つため切り出す（coding-standards.md §2）。
  */
 
 import {
@@ -22,7 +21,6 @@ import { useAppStore } from "@/store/useAppStore";
 import { useMemo, useState } from "react";
 
 /**
- * 列内カードの決定的な並び: dueDate 昇順（未設定は末尾）→ id 昇順。
  * ISO日付文字列は辞書順比較がそのまま日付順（utils/time.ts）。
  */
 const compareServiceOrdersForColumn = (left: ServiceOrder, right: ServiceOrder): number => {
@@ -49,7 +47,6 @@ type UseServiceOrderKanbanResult = {
   handleConfirmCancel: () => void;
 };
 
-/** かんばん画面のロジック一式: store 購読・表示列導出・ダイアログ状態・状態遷移アクション */
 export const useServiceOrderKanban = (): UseServiceOrderKanbanResult => {
   const serviceOrders = useAppStore((state) => state.serviceOrders);
   const serviceItems = useAppStore((state) => state.serviceItems);
@@ -96,7 +93,6 @@ export const useServiceOrderKanban = (): UseServiceOrderKanbanResult => {
 
   const handleCardAction = (action: CardAction, serviceOrder: ServiceOrder): void => {
     if (action === CARD_ACTION.ADVANCE) {
-      // ordered → inCalibration は入力なしで即時遷移
       updateServiceOrderStatus(serviceOrder.id, SERVICE_ORDER_STATUS.IN_CALIBRATION);
       return;
     }

@@ -56,8 +56,7 @@ const WIDE_COLUMN_LABELS = [
   "ステータス",
 ] as const;
 
-// なぜ: ui-guidelines.md §6の横スクロール仕様を確認するため、
-// 意図的に8列超の広いテーブルを用意する。
+// なぜ: 横スクロール仕様を確認するため、意図的に8列超の広いテーブルを用意する。
 export const WideScrollable: StoryObj<typeof meta> = {
   // なぜargsが必要か: renderで独自のテーブル構造を描画するため個々のargsは使わないが、
   // StoryObjの型上componentが要求するargsを満たす必要があるため代表値を渡す。

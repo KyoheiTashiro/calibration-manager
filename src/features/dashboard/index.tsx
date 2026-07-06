@@ -1,12 +1,3 @@
-/**
- * ダッシュボード画面(screen-design/01-dashboard.md)。表示専用画面。
- * 要対応の全体像(サマリーカード4枚)・要対応項目リスト・最新の通知5件を一望させる。
- *
- * - 集計は serviceItemRowsOf(@/store/selectors。稼働機器×有効項目×導出ステータスを一元化)の
- *   結果に対し、hooks.ts の純関数(countByStatus / actionRequiredRows / latestNotifications)を適用する。
- * - 遷移(カード→項目一覧プリフィルタ / 行→機器詳細)は useSafeNavigate を子へ渡し、本体は薄いビューに保つ。
- */
-
 import { ActionRequiredList } from "@/features/dashboard/components/ActionRequiredList";
 import { NotificationList } from "@/features/dashboard/components/NotificationList";
 import { SummaryCards } from "@/features/dashboard/components/SummaryCards";

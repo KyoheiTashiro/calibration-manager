@@ -1,7 +1,7 @@
 /**
- * VendorModal のフォームスキーマ（RHF + zodResolver 用、screen-design/09-masters.md §9-A）。
+ * VendorModal のフォームスキーマ（RHF + zodResolver 用）。
  * 入力体験向けの厳密検証（email形式・0以上の数値等）はここで担う。
- * 永続化データの構造検証は `src/store/schema.ts` の vendorSchema が別途担う（coding-standards.md §3）。
+ * 永続化データの構造検証は `src/store/schema.ts` の vendorSchema が別途担う。
  *
  * なぜフォーム値をすべて string ベースに保つか: HTML input の値は本質的に文字列であり、
  * `standardLeadTimeDays` も number へ変換するのは検証成功後（呼び出し側の submit ハンドラ）に限る。

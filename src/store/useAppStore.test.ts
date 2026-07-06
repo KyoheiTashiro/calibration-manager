@@ -1,5 +1,4 @@
 /**
- * カスケードアクションの検証（store.md「アクション仕様」、D-005 / D-006）。
  * 単純CRUDのスライス単体検証は slices/*.test.ts、読込パイプラインは merge.test.ts が担う。
  */
 
@@ -52,7 +51,6 @@ const returnedServiceOrder: ServiceOrder = {
   status: "returned",
 };
 
-/** 上記フィクスチャ一式を store へ投入する（serviceItems のみ差し替え可） */
 const seedBase = (overrides?: { serviceItems?: Record<string, ServiceItem> }): void => {
   seedStore({
     vendors: { [vendor.id]: vendor },
@@ -62,7 +60,6 @@ const seedBase = (overrides?: { serviceItems?: Record<string, ServiceItem> }): v
   });
 };
 
-/** 遷移テーブル検証用: 任意ステータスの案件を1件投入する */
 const seedServiceOrderWith = (status: ServiceOrder["status"]): void => {
   seedBase();
   seedStore({ serviceOrders: { [returnedServiceOrder.id]: { ...returnedServiceOrder, status } } });

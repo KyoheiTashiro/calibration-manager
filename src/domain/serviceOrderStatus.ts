@@ -15,10 +15,6 @@
 
 import { SERVICE_ORDER_STATUS, type ServiceOrderStatus } from "@/store/types";
 
-/**
- * 各状態から遷移可能な状態の一覧（許可テーブル）。
- * なぜ satisfies か: SERVICE_ORDER_STATUS に状態が追加された際、この表の定義漏れをビルドエラーで検出するため。
- */
 export const SERVICE_ORDER_STATUS_TRANSITIONS = {
   [SERVICE_ORDER_STATUS.PLANNED]: [SERVICE_ORDER_STATUS.ORDERED, SERVICE_ORDER_STATUS.CANCELLED],
   [SERVICE_ORDER_STATUS.ORDERED]: [

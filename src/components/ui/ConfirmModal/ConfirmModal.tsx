@@ -31,8 +31,7 @@ export const ConfirmModal = ({
 
   // なぜ: 破壊的操作の確認ダイアログは既定フォーカスを安全側（キャンセル）に置く。
   // showModal()の既定フォーカスも実ブラウザでは最初のフォーカス可能要素（＝キャンセル）に
-  // 当たるが、DOM順への暗黙依存になるため明示的にフォーカスする（フォーカス管理は
-  // effectの正当用途）。
+  // 当たるが、DOM順への暗黙依存になるため明示的にフォーカスする。
   useEffect(() => {
     if (open) {
       cancelButtonRef.current?.focus();

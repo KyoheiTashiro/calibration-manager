@@ -1,7 +1,4 @@
 /**
- * ServiceItemList: テーブル描画の検証(screen-design/05-service-item-list.md「表示項目」)。
- * 列内容・nextDueDate 昇順・「—」表示・対象除外(非稼働機器/無効項目)・
- * 「案件」ボタンの出し分け(canCreateServiceOrder)・空状態を確認する。
  * ステータス導出は todayIsoDate() 依存だが、フィクスチャの nextDueDate を極端値にして決定的にする。
  */
 
@@ -15,7 +12,6 @@ import { beforeEach, describe, expect, it } from "vitest";
 const renderList = (search = ""): ReturnType<typeof renderWithStore> =>
   renderWithStore(<ServiceItemList />, { initialEntries: [`/service-items${search}`] });
 
-/** ヘッダ行を除いたデータ行(tbody)を返す */
 const getBodyRows = (): HTMLElement[] => screen.getAllByRole("row").slice(1);
 
 beforeEach(() => {
@@ -34,7 +30,6 @@ describe("ServiceItemList: テーブル描画", () => {
     expect(rows[1]).toHaveTextContent("半期校正");
     expect(rows[2]).toHaveTextContent("月次点検");
 
-    // 1行目: 管理番号・機器名・担当
     expect(rows[0]).toHaveTextContent("EQ-001");
     expect(rows[0]).toHaveTextContent("ノギス");
     expect(rows[0]).toHaveTextContent("田中");

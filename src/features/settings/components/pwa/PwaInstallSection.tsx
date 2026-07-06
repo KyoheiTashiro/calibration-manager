@@ -1,7 +1,5 @@
 /**
- * 設定画面のPWAインストール案内セクション。
- * usePwaInstall の状態を表示に反映するだけの薄いビュー。イベント捕捉は main.tsx の
- * setupPwaInstallCapture が起動時に行う(コンポーネントマウント前の発火を取り逃さないため)。
+ * イベント捕捉は main.tsx の setupPwaInstallCapture が起動時に行う(コンポーネントマウント前の発火を取り逃さないため)。
  */
 
 import { Button } from "@/components/ui";
@@ -22,7 +20,7 @@ export const PwaInstallSection = (): ReactElement => {
       await deferredPrompt.prompt();
       await deferredPrompt.userChoice;
     } catch {
-      // インストール操作の失敗は例外を投げず無視する(coding-standards §8)
+      // インストール操作の失敗は無視する
     } finally {
       // なぜ: Chrome は同一イベントの再 prompt() を許さないため、結果に関わらず deferred を破棄する。
       clearDeferredPrompt();
@@ -40,7 +38,12 @@ export const PwaInstallSection = (): ReactElement => {
     if (deferredPrompt !== null) {
       return (
         <div>
-          <Button variant="primary" onClick={handleInstallClick}>
+          <Button
+            variant="primary"
+            onClick={() => {
+              void handleInstallClick();
+            }}
+          >
             アプリとしてインストール
           </Button>
         </div>

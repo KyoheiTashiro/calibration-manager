@@ -1,8 +1,3 @@
-/**
- * 機器詳細画面（screen-design/04-equipment-detail.md）の基本情報カード。
- * 型式・S/N・メーカー名解決・設置場所・状態バッジ・備考を表示専用で描画する。
- */
-
 import { Badge } from "@/components/ui";
 import {
   EQUIPMENT_STATUS_BADGE_CLASSES,

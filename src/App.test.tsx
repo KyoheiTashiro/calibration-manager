@@ -6,7 +6,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 
 // なぜ beforeEach(setupStoreIsolation) が必須か: HeaderがunreadNotificationCountを
 // 購読しており、テスト間でストア・LocalStorageの状態が持ち越されると
-// 未読バッジの表示が前のテストの影響を受けてしまうため（coding-standards.md §7）。
+// 未読バッジの表示が前のテストの影響を受けてしまうため。
 
 const buildNotification = (overrides: Partial<Notification> = {}): Notification => ({
   id: "notification-1",

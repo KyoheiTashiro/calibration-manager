@@ -1,6 +1,5 @@
 /**
- * ストア全体の型（store.md「スライス構成」）。
- * 7スライスの合成 + resetAll。値の実体は useAppStore.ts が合成する。
+ * ストア全体の型。値の実体は useAppStore.ts が合成する。
  * スライス実装とは型のみの相互参照であり、実行時の循環importは発生しない。
  */
 
@@ -21,7 +20,7 @@ export type StoreState = VendorSlice &
   ServiceRecordSlice &
   ServiceOrderSlice &
   NotificationSlice & {
-    /** 全エンティティを初期状態に戻す（設定画面の全削除・テスト分離用） */
+    /** 設定画面の全削除・テスト分離用 */
     resetAll: () => void;
     /** CSVインポート確定: 対象エンティティの Record を検証済みデータで全置換する（D-029） */
     replaceEntities: <Key extends keyof AppState>(key: Key, entities: AppState[Key]) => void;
@@ -29,7 +28,7 @@ export type StoreState = VendorSlice &
 
 /**
  * スライス定義用の StateCreator 別名。ミドルウェア合成 persist(immer(...))
- * （coding-standards.md §5）の内側で動くため、set はImmerドラフトを受け取る。
+ * の内側で動くため、set はImmerドラフトを受け取る。
  */
 export type AppSliceCreator<Slice> = StateCreator<
   StoreState,

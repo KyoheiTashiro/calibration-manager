@@ -1,10 +1,3 @@
-/**
- * 設定画面(screen-design/11-settings.md §11、D-028〜D-031)の結線検証。
- * エクスポート(BOM付きCSV生成・ファイル名)、インポート(検証プレビュー・全置換・クリア)、
- * データ全削除(2段階確認)を実ストア → 描画 → 操作の順で確認する。
- * ロジック層(entityCsv / importValidation)の網羅はそれぞれの *.test.ts が担う。
- */
-
 import { Settings } from "@/features/settings";
 import {
   buildEntityCsv,
@@ -113,7 +106,6 @@ describe("エクスポート(§11)", () => {
   });
 });
 
-/** 検証済み(ラウンドトリップ保証)の機器CSVを File 化する(D-028) */
 const equipmentCsvFile = (equipment: Equipment): File =>
   new File([buildEntityCsv("equipment", { [equipment.id]: equipment })], "equipment.csv", {
     type: "text/csv",

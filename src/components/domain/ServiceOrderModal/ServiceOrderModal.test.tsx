@@ -1,8 +1,4 @@
-/**
- * ServiceOrderModal: 案件作成モーダルの検証（screen-design/08-service-orders.md「案件作成モーダル」）。
- * 対象表示・依頼先既定値/選択肢絞り込み・addServiceOrder連携・D-006 no-op時のエラー表示・
- * 校正業者0件の空状態・バリデーションを扱う。起動元(項目一覧)との結線は modalLaunch.test.tsx 側の責務。
- */
+/** 起動元（項目一覧）との結線は modalLaunch.test.tsx 側の責務 */
 
 import { ServiceOrderModal } from "@/components/domain/ServiceOrderModal";
 import {
@@ -60,7 +56,6 @@ const externalServiceItem: ServiceItem = {
   isActive: true,
 };
 
-/** 機器・校正業者/非校正業者Vendor・対象項目(外部・vendorIdプリセット済)をストアへ投入する共通シード */
 const seedBaseMasters = (): void => {
   seedStore({
     equipment: { [equipment.id]: equipment },

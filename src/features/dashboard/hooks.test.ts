@@ -1,11 +1,3 @@
-/**
- * ダッシュボードの集計・選定純関数(hooks.ts)の検証(screen-design/01-dashboard.md)。
- * - countByStatus: 全ステータスの件数集計(該当0のステータスも0で埋める)
- * - actionRequiredRows: overdue/orderNow/dueSoon のみを優先度順に、同グループ内は元順(nextDueDate昇順)維持
- * - latestNotifications: 未読優先 → createdDate 降順 → id 昇順で5件
- * 導出ロジックは serviceItemRowsOf 側で検証済みのため、ここは合成した ServiceItemRow / Notification で純粋に検証する。
- */
-
 import { SERVICE_ITEM_STATUS, type ServiceItemStatus } from "@/domain/serviceItemStatus";
 import { actionRequiredRows, countByStatus, latestNotifications } from "@/features/dashboard/hooks";
 import type { ServiceItemRow } from "@/store/selectors";

@@ -5,14 +5,11 @@ import type { Person } from "@/store/types";
 import { useEntityModal } from "@/utils/modal";
 import type { ReactElement } from "react";
 
-/** 状態バッジの色classNameマッピング（screen-design/09-masters.md §9-B、StatusBadgeと同じ配色パターン） */
+/** 状態バッジの色classNameマッピング（StatusBadgeと同じ配色パターン） */
 const ACTIVE_BADGE_CLASS_NAME = "bg-green-100 text-green-800";
 const INACTIVE_BADGE_CLASS_NAME = "bg-slate-100 text-slate-600";
 
-/**
- * 担当者マスタ画面（screen-design/09-masters.md §9-B）。
- * 物理削除は行わず、モーダル内の「有効」チェックボックストグルで無効化する。
- */
+/** 物理削除は行わず、モーダル内の「有効」チェックボックストグルで無効化する。 */
 export const PersonList = (): ReactElement => {
   const sortedPersons = usePersonList();
   const { modalState, handleAddClick, handleEditClick, handleModalClose } =

@@ -1,11 +1,5 @@
-/**
- * 各画面に `Promise.resolve(navigate(...)).catch(() => {})` というボイラープレートが
- * コピペされていたため、遷移処理を一元化するフック。戻り値を無視して遷移するだけの薄いラッパー(D-044)。
- */
-
 import { useNavigate, type To } from "react-router-dom";
 
-/** 戻り値を無視して遷移する関数。To(パス)または number(履歴デルタ)を受ける */
 export const useSafeNavigate = (): ((to: To | number) => void) => {
   const navigate = useNavigate();
   return (to: To | number): void => {

@@ -1,5 +1,4 @@
 /**
- * notificationSlice の検証（store.md「アクション仕様」generateNotifications）。
  * 発生条件そのものの網羅は domain/notificationRules.test.ts が担い、ここでは
  * ストア側の責務（対象絞り込み・重複抑止・id/日付付与・既読操作）を検証する。
  */

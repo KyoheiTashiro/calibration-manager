@@ -1,7 +1,7 @@
 /**
- * 担当者の追加/編集モーダル（screen-design/09-masters.md §9-B）。
+ * 担当者の追加/編集モーダル。
  * 削除の代わりに isActive=false への無効化を行い、有効な ServiceItem に
- * 割り当てられている場合は確認ダイアログで警告する（README.md §0.6 の確認ダイアログポリシー）。
+ * 割り当てられている場合は確認ダイアログで警告する。
  */
 
 import { Schema, defaultValues, type FormType } from "@/components/domain/PersonModal/schema";
@@ -72,8 +72,7 @@ export const PersonModal = ({ open, person, onClose }: PersonModalProps): ReactE
     handleClose();
   };
 
-  // なぜ getState() で件数を都度取得するか: 送信時点でしか使わない値を毎レンダー購読するのを
-  // 避けるため（coding-standards.md §5「1値1呼び出しで分割購読」の趣旨に沿ったスナップショット取得）。
+  // なぜ getState() で件数を都度取得するか: 送信時点でしか使わない値を毎レンダー購読するのを避けるため。
   const onSubmit = (values: FormType): void => {
     if (person?.isActive === true && !values.isActive) {
       const assignedServiceItemCount = Object.values(useAppStore.getState().serviceItems).filter(

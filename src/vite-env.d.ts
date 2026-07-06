@@ -3,7 +3,7 @@
 
 /**
  * 非標準 API `beforeinstallprompt`(Chromium系のみ)の型宣言。
- * lib.dom.d.ts に収録されていないため自前で宣言する(docs/infra/pwa.md 参照)。
+ * lib.dom.d.ts に収録されていないため自前で宣言する。
  */
 type BeforeInstallPromptEvent = Event & {
   readonly platforms: readonly string[];

@@ -1,10 +1,3 @@
-/**
- * Dashboard(/)の検証(screen-design/01-dashboard.md)。
- * サマリーカード件数・カードクリック遷移(プリフィルタURL)・要対応リストの絞り込みと行クリック遷移・
- * 最新の通知の描画と「通知センターへ」遷移・空状態2種を扱う。
- * 集計/選定の網羅は hooks.test.ts が担うため、ここは実ストア→描画→遷移の結線を確認する。
- */
-
 import { ROUTES } from "@/constants/routes";
 import { Dashboard } from "@/features/dashboard";
 import {
@@ -27,13 +20,11 @@ import type { ReactElement } from "react";
 import { Route, Routes, useParams, useSearchParams } from "react-router-dom";
 import { beforeEach, describe, expect, it } from "vitest";
 
-/** 遷移先確認用ダミー: 項目一覧(status クエリを表示) */
 const DummyServiceItemList = (): ReactElement => {
   const [params] = useSearchParams();
   return <p>項目一覧:{params.get("status")}</p>;
 };
 
-/** 遷移先確認用ダミー: 機器詳細(:id を表示) */
 const DummyEquipmentDetail = (): ReactElement => {
   const { id } = useParams();
   return <p>機器詳細:{id}</p>;
@@ -120,7 +111,6 @@ describe("Dashboard: サマリーカード", () => {
     const overdueCard = screen.getByRole("button", { name: /期限切れ/u });
     expect(within(overdueCard).getByText("2")).toBeInTheDocument();
 
-    // 要発注・期限接近・校正中は0件
     expect(
       within(screen.getByRole("button", { name: /要発注/u })).getByText("0"),
     ).toBeInTheDocument();
@@ -157,10 +147,8 @@ describe("Dashboard: 要対応項目リスト", () => {
     seedActionScenario();
     renderDashboardWithRoutes();
 
-    const rows = screen.getAllByRole("row").slice(1); // 先頭はヘッダ行
-    // 列: 状態/管理番号/機器名/項目名/種別/担当/次回期限 → 項目名は index 3
+    const rows = screen.getAllByRole("row").slice(1);
     const names = rows.map((row) => within(row).getAllByRole("cell")[3]?.textContent);
-    // item-a(2000-01-01) が item-b(2000-06-01) より先
     expect(names).toEqual(["A校正", "B点検"]);
   });
 
@@ -215,16 +203,14 @@ describe("Dashboard: 最新の通知", () => {
 
     expect(screen.getByText("EQ-001 年次校正が期限超過")).toBeInTheDocument();
     expect(screen.getByText("2026-07-01")).toBeInTheDocument();
-    expect(screen.getByText("期限超過")).toBeInTheDocument(); // NOTIFICATION_TYPE_LABELS[overdue]
+    expect(screen.getByText("期限超過")).toBeInTheDocument();
   });
 
   it("アイコングリフを aria-hidden 付きで描画し、ラベルはスクリーンリーダーから読める", () => {
     seedStore({ notifications: { [overdueNotification.id]: overdueNotification } });
     renderDashboardWithRoutes();
 
-    // アイコングリフ自体は装飾のためスクリーンリーダーから隠す(overdue = 🔴)
     expect(screen.getByText("🔴")).toHaveAttribute("aria-hidden", "true");
-    // ラベルは別要素(別テキストノード)であり aria-hidden を持たない
     expect(screen.getByText("期限超過")).not.toHaveAttribute("aria-hidden");
   });
 

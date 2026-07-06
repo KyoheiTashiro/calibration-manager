@@ -1,13 +1,7 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
-  // なぜ: coding-standards.md §10 の通り plugins = typescript/unicorn/oxc/react/jsx-a11y/import を有効化する。
-  // "eslint" は oxlint の基礎ルール群のため常に含める必要がある（省くとcorrectness系の基本チェックが抜ける）。
   "plugins": ["eslint", "typescript", "unicorn", "oxc", "react", "jsx-a11y", "import"],
-  // なぜ: dev-dist は vite-plugin-pwa の devOptions が生成する開発用 Service Worker 生成物であり、
-  // lint 対象にすると workbox 由来の大量エラーが出るため除外する（.gitignore にも追加済み）。
   "ignorePatterns": ["dev-dist"],
-  // なぜ: coding-standards.md §10「categories 全 error」。
-  // 個別ルールのoffは override + 理由コメントで行う方針のため、ここでは全カテゴリを一律 error にする。
   "categories": {
     "correctness": "error",
     "suspicious": "error",
@@ -23,21 +17,12 @@
     "browser": true
   },
   "rules": {
-    // なぜ: React 19 は自動JSXランタイムのため `import React` は不要（react/react-in-jsx-scope は
-    // 旧クラシックランタイム前提のルールでありこのプロジェクトの実態と矛盾する）。
+    // React 19 の自動JSXランタイムでは `import React` 不要のため、クラシックランタイム前提のこのルールは誤検知になる
     "react/react-in-jsx-scope": "off",
-    // なぜ: coding-standards.md §3 で type を使い interface を禁止する方針のため、
-    // interface宣言を禁止するルールを明示的に有効化する。
     "typescript/consistent-type-definitions": ["error", "type"],
-    // なぜ: coding-standards.md §9「no-inline-comments は意図的に off」
-    // （「なぜ」を日本語コメントで残す文化のため、インラインコメント自体を禁止しない）。
     "eslint/no-inline-comments": "off",
-    // なぜ: import順序はoxfmtの sortImports（.oxfmtrc.json）が担う方針のため
-    // （coding-standards.md §6）、lintルール側の並び順チェックは二重管理を避けるためoffにする。
     "eslint/sort-imports": "off",
-    // なぜ: coding-standards.md §8でストア/CSVインポート等が `console.warn` によるサルベージ通知を
-    // 行う方針のため、また ErrorBoundary が `console.error` で例外を可視化する方針のため
-    // （coding-standards.md §9「例外を投げない」の裏側で捕捉した例外自体は可視化する）。
+    // ErrorBoundary が `console.error` で例外を可視化する方針のため
     "eslint/no-console": "off",
     // なぜ: Reactのクラスコンポーネントのライフサイクルメソッド（componentDidCatch等）は
     // 実装上 this を参照しないことが正当にあり得るため（ErrorBoundary参照）。
@@ -118,10 +103,17 @@
     // なぜ: 逐次の非同期処理は async/await の方が Promise チェーンより読みやすく、
     // テスト(user-event 等で await 必須)と本体で書き方が割れるのも避けたいため全面的に許可する。
     "oxc/no-async-await": "off",
+    // なぜ: イベントハンドラ等の void 文脈へ async 関数を渡す際、`void fn()` 文で
+    // 「結果を意図的に破棄する fire-and-forget」を明示する(no-misused-promises 対応の定石)。
+    // 式としての void(値の undefined 化)は引き続き禁止する。
+    "eslint/no-void": ["error", { "allowAsStatement": true }],
     // なぜ: ドメイン上意味を持つ既定値は domain/constants.ts へのJSDoc付き集約（coding-standards.md §8）
     // で担保する。一方で暦計算の「1年=12ヶ月」「月は1始まり」やゼロ埋め桁数のような文脈自明の数まで
     // 定数化を強制すると、かえって可読性を損なうため機械的な全数検出は行わない。
     "eslint/no-magic-numbers": "off",
+    // なぜ: 違反は全てルート定義・ストア合成・大型モーダルなど役割上依存が集まるファイルで、
+    // 個別disableが増えるだけだった。肥大化は max-lines / max-statements が別途担保する。
+    "import/max-dependencies": "off",
     // なぜ: fast-check は `fc.integer()` のように名前空間プレフィックス付きで使うのが公式慣習であり、
     // named import に展開すると `string` / `record` / `boolean` 等の汎用名がスコープを汚染して
     // かえって可読性を損なうため、ワイルドカード import を許可する。
@@ -232,6 +224,9 @@
         // なぜ: テストはケース網羅で行数が自然に嵩み、行数上限で機械分割すると同一対象のテストが
         // 複数ファイルに散って見通しが悪化するため、テストファイルに限り行数上限を適用しない。
         "eslint/max-lines": "off",
+        // なぜ: mockResolvedValue(undefined) や undefined 入力の挙動確認など、テストでは
+        // undefined の明示渡しが定型であり、同一文言の個別disableが増殖していた(5箇所)。
+        "unicorn/no-useless-undefined": "off",
         // なぜ: 遷移先ダミー画面など、テスト内で複数の小さなコンポーネントを同一ファイルに
         // 並べるのはルーティングテストの標準パターンのため、テストに限り複数コンポーネントを許容する。
         "react/no-multi-comp": "off"

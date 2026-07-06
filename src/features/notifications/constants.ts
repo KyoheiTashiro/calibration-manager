@@ -1,12 +1,5 @@
-/**
- * 通知種別の表示定義（screen-design/10-notifications.md「通知種別のアイコン/色」）。
- * 通知センター・ダッシュボード「最新の通知」が共用する単一マッピング。
- * バッジは常に「色 + 日本語ラベル」をセットで表示する（README §0.3。色のみ禁止）。
- */
-
 import { NOTIFICATION_TYPE, type NotificationType } from "@/store/types";
 
-/** 通知種別→日本語ラベル（screen-design/10-notifications.md の表と一言一句一致させる） */
 export const NOTIFICATION_TYPE_LABELS = {
   [NOTIFICATION_TYPE.DUE_SOON]: "期限接近",
   [NOTIFICATION_TYPE.OVERDUE]: "期限超過",

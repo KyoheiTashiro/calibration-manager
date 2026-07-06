@@ -1,8 +1,7 @@
 /**
  * 発注ダイアログ（planned → ordered、screen-design/08-service-orders.md）のフォームスキーマ
- * （RHF + zodResolver）。形式検証（必須・YYYY-MM-DD・0以上数値）はここで担いブロックする。
- * 日付整合（orderedDate ≤ dueDate）は警告表示のみでブロックしない（D-019）ため zod では扱わず
- * コンポーネント側で判定する。
+ * （RHF + zodResolver）。日付整合（orderedDate ≤ dueDate）は警告表示のみでブロックしない（D-019）ため
+ * zod では扱わずコンポーネント側で判定する。
  *
  * なぜフォーム値を string ベースに保つか: HTML input の値は本質的に文字列であり、number への変換は
  * 検証成功後（submit ハンドラ）に限る。ServiceItemModal / schema.ts と同方針。
@@ -11,7 +10,6 @@
 import { isIsoDateString } from "@/utils/time";
 import { z } from "zod";
 
-/** orderedDate 必須、dueDate・cost 任意 */
 export const Schema = z.object({
   orderedDate: z
     .string()

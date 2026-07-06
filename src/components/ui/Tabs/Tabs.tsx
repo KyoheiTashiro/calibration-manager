@@ -1,8 +1,5 @@
 import type { ReactElement } from "react";
 
-// なぜ: 制御コンポーネントとしてタブ一覧・選択中key・変更通知を親から受け取る形にし、
-// タブの状態を持たせない（coding-standards.md §5「ローカル state vs store」の方針に倣い、
-// 選択状態は呼び出し側が管理する）。
 type Props = {
   tabs: readonly { key: string; label: string }[];
   activeKey: string;

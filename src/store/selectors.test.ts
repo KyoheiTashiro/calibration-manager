@@ -179,9 +179,7 @@ describe("unreadNotificationCount", () => {
 });
 
 /**
- * serviceItemRowsOf(横断 selector。features/serviceItems/list/hooks.ts から昇格、D-024/coding-standards §5)の検証。
  * 固定データは @/test/serviceItemRowFixtures に集約(項目一覧フィルタのテストと共有)。
- * 無効非稼働除外(D-023)・personLabelOf(D-001)・発注推奨日(§4.2)の導出を扱う。
  */
 describe("serviceItemRowsOf: 対象の絞り込み・並び順", () => {
   it("非稼働機器(休止/廃棄)の項目・isActive=false 項目・dangling機器の項目を除外する", () => {

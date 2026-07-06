@@ -1,8 +1,3 @@
-/**
- * 開発用シードデータ（マスタ系: vendors/persons/equipment）。
- * 日付を持たないため today に依存しない（src/dev/seed.ts から呼び出される）。
- */
-
 import { EQUIPMENT_STATUS, type Equipment, type Person, type Vendor } from "@/store/types";
 
 export const buildSeedVendors = (): Record<string, Vendor> => ({

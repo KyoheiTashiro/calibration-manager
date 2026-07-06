@@ -95,7 +95,6 @@ describe("カード表示", () => {
     expect(screen.getByText("年次校正")).toBeInTheDocument();
     expect(screen.getByText("ミツトヨ校正センター")).toBeInTheDocument();
     expect(screen.getByText("12000円")).toBeInTheDocument();
-    // 返却予定日は未設定 → 「—」
     expect(screen.getByText("—")).toBeInTheDocument();
   });
 
@@ -112,7 +111,6 @@ describe("カード表示", () => {
     });
     renderWithStore(<ServiceOrderList />);
 
-    // 管理番号・機器名・項目名・依頼先すべてが解決不能 → 複数の「(参照先なし)」
     expect(screen.getAllByText("(参照先なし)").length).toBeGreaterThanOrEqual(3);
   });
 });
@@ -149,7 +147,6 @@ describe("完了/中止も表示 トグル", () => {
 
     expect(screen.getByText("記録登録済")).toBeInTheDocument();
     expect(screen.getByText("中止", { selector: "header" })).toBeInTheDocument();
-    // 完了カードにアクションボタンは付かない（D-018）
     expect(screen.queryByRole("button", { name: "記録登録" })).not.toBeInTheDocument();
   });
 });
@@ -168,14 +165,12 @@ describe("中止フロー", () => {
     renderWithStore(<ServiceOrderList />);
 
     await user.click(screen.getByRole("button", { name: "中止" }));
-    // 確認ダイアログ
     const dialog = screen.getByRole("dialog");
     await user.click(within(dialog).getByRole("button", { name: "中止" }));
 
     expect(useAppStore.getState().serviceOrders["serviceOrder-1"].status).toBe(
       SERVICE_ORDER_STATUS.CANCELLED,
     );
-    // cancelled はトグルOFFで非表示
     expect(screen.queryByText("EQ-001")).not.toBeInTheDocument();
   });
 });
@@ -217,11 +212,9 @@ describe("空状態", () => {
     });
     renderWithStore(<ServiceOrderList />);
 
-    // 案件は存在する（completed 1件）ため、全列0件の空状態メッセージは出ない
     expect(
       screen.queryByText("点検校正外部案件はありません。点検校正項目一覧から案件を追加できます"),
     ).not.toBeInTheDocument();
-    // 進行中4列（発注準備/発注済/校正中/返却済）のヘッダーは表示される
     for (const status of KANBAN_ACTIVE_COLUMNS) {
       expect(screen.getByText(SERVICE_ORDER_STATUS_LABELS[status])).toBeInTheDocument();
     }
@@ -250,7 +243,6 @@ describe("発注ダイアログの整合警告（D-019）", () => {
 
     expect(screen.getByText("発注日が返却予定日より後になっています")).toBeInTheDocument();
 
-    // 警告があっても確定できる（ブロックしない）
     await user.click(screen.getByRole("button", { name: "確定" }));
     expect(useAppStore.getState().serviceOrders["serviceOrder-1"].status).toBe(
       SERVICE_ORDER_STATUS.ORDERED,

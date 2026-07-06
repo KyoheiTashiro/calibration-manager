@@ -1,8 +1,7 @@
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { fireEvent, render, screen } from "@testing-library/react";
 // なぜ: vitest.setup.ts（tsconfig.node.json側）の副作用importだけではtsconfig.app.json側の
-// 型解決にjest-domのmatcher拡張が伝播しないため、テストファイル側でも明示的にimportする
-// （coding-standards.md §6・.oxlintrc.jsonのallowリストで明示的に許容されているパターン）。
+// 型解決にjest-domのmatcher拡張が伝播しないため、テストファイル側でも明示的にimportする。
 import "@testing-library/jest-dom/vitest";
 import { describe, expect, it, vi } from "vitest";
 

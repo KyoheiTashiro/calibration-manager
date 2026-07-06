@@ -1,10 +1,3 @@
-/**
- * useNotificationScan（D-025）の検証。
- * (a) マウント時1回スキャン (b) 同日はインターバル発火してもスキャンしない
- * (c) 日付変更でインターバルスキャン (d) visibilitychange 可視復帰+日付変更でスキャン
- * (e) アンマウント後は発火しない、を fake timers + setSystemTime で確認する。
- */
-
 import { useNotificationScan } from "@/features/notifications/scan/useNotificationScan";
 import type { IsoDateString } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";

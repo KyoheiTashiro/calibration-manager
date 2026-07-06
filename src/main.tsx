@@ -7,16 +7,14 @@ import { HashRouter } from "react-router-dom";
 import { registerSW } from "virtual:pwa-register";
 
 // なぜ副作用importとして許可するか: Tailwindのグローバルスタイル・トークン定義（@theme）を
-// アプリ全体に適用するためエントリポイントで一度だけ読み込む必要がある
-// （.oxlintrc.json の overrides で本ファイルを許可リスト化済み）。
+// アプリ全体に適用するためエントリポイントで一度だけ読み込む必要がある。
 import "@/styles/index.css";
 
 // なぜ: GitHub Pagesは任意パスへのフォールバックができず、`BrowserRouter` では
-// 深いパスへの直接アクセス・リロードが404になるため `HashRouter` を採用する
-// （docs/architecture/tech-stack.md「HashRouter採用理由」）。
+// 深いパスへの直接アクセス・リロードが404になるため `HashRouter` を採用する。
 // なぜmain.tsxで直接登録するか: Reactの再レンダーに左右されず、
 // アプリ起動時に一度だけService Workerを登録すればよいため、
-// フック化はせずエントリポイントで直接 `registerSW` を呼ぶ（docs/infra/pwa.md §1・§4 autoUpdate）。
+// フック化はせずエントリポイントで直接 `registerSW` を呼ぶ。
 registerSW({ immediate: true });
 
 // なぜ main.tsx で登録するか: `beforeinstallprompt` はページロード直後に一度だけ発火する非標準イベントのため、

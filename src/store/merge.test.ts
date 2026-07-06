@@ -1,6 +1,5 @@
 /**
  * 読込パイプライン（migrate → merge 3段サルベージ → sanitize）の検証
- * （store.md「永続化」、D-003）。
  */
 
 import { STORAGE_KEY, STORAGE_VERSION } from "@/constants/storage";
@@ -111,7 +110,6 @@ describe("migratePersistedState", () => {
   });
 });
 
-/** v1 形式の永続化データ（items キー / itemId / targetType "item"） */
 const v1State = (): Record<string, unknown> => ({
   vendors: { [vendor.id]: vendor },
   persons: { [person.id]: person },
@@ -137,7 +135,6 @@ const v1State = (): Record<string, unknown> => ({
   },
 });
 
-/** v2 形式の永続化データ（inspectionItems キー / inspectionItemId / targetType "inspectionItem"） */
 const v2State = (): Record<string, unknown> => ({
   vendors: { [vendor.id]: vendor },
   persons: { [person.id]: person },
@@ -204,7 +201,6 @@ describe("migrateV1ToV2: item→inspectionItem リネーム（D-036）", () => {
   });
 });
 
-/** v3 形式の永続化データ（orders キー / orderId / targetType "order"） */
 const v3State = (): Record<string, unknown> => ({
   vendors: { [vendor.id]: vendor },
   persons: { [person.id]: person },
@@ -424,7 +420,7 @@ describe("sanitizeAppState: 参照整合（D-003）", () => {
   it("ユーザー入力データは dangling FK があっても保持する", () => {
     const state = { ...validState(), equipment: {}, vendors: {} };
     const sanitized = sanitizeAppState(state);
-    expect(sanitized.serviceItems).toEqual(validState().serviceItems); // equipmentId/vendorId が dangling でも残す
+    expect(sanitized.serviceItems).toEqual(validState().serviceItems);
     expect(sanitized.serviceOrders).toEqual(validState().serviceOrders);
   });
 });

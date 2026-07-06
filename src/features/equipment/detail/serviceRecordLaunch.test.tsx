@@ -1,10 +1,3 @@
-/**
- * EquipmentDetail: 実施記録登録モーダル(ServiceRecordModal)の起動結節点の検証
- * (screen-design/04-equipment-detail.md「操作・アクション」/ 07-service-record-modal.md)。
- * 行「記録」ボタンで対象項目がプリセットされたモーダルが開き、登録で実施記録が増えることを扱う。
- * モーダル自体の入力・検証は ServiceRecordModal.test.tsx の責務。
- */
-
 import { ROUTES, equipmentDetailPath } from "@/constants/routes";
 import { EquipmentDetail } from "@/features/equipment/detail";
 import { useAppStore } from "@/store/useAppStore";
@@ -26,7 +19,6 @@ const renderDetail = (): ReturnType<typeof renderWithStore> =>
     routePath: ROUTES.EQUIPMENT_DETAIL,
   });
 
-/** モーダルタイトルからdialog要素を特定し、開いていることを検証して返す */
 const getOpenDialog = (title: string): HTMLElement => {
   const dialogElement = screen.getByText(title).closest("dialog");
   if (!dialogElement) throw new Error("dialog要素が見つかりません");
@@ -41,7 +33,6 @@ const getServiceItemRow = (name: RegExp): HTMLElement => {
   return within(serviceItemTable).getByRole("row", { name });
 };
 
-/** 実施記録テーブル(2つ目のtable)のデータ行を返す */
 const getHistoryRows = (): HTMLElement[] => {
   const historyTable = screen.getAllByRole("table").at(1);
   if (!historyTable) throw new Error("実施記録テーブルが見つかりません");

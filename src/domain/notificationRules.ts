@@ -31,8 +31,7 @@ export type NotificationSeed = Omit<Notification, "id" | "createdDate" | "isRead
 
 /**
  * 通知文の先頭に付ける機器の管理番号プレフィックス（screen-design/10-notifications.md の文例準拠）。
- * 参照先の機器が見つからない場合（dangling FK）は項目名のみの通知文になる
- * （例外を投げない。coding-standards.md §8）。
+ * 参照先の機器が見つからない場合（dangling FK）は項目名のみの通知文になる。
  */
 const messagePrefix = (serviceItem: ServiceItem, equipment: Record<string, Equipment>): string => {
   const managementNo = recordValue(equipment, serviceItem.equipmentId)?.managementNo;

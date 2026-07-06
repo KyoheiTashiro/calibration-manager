@@ -1,9 +1,4 @@
 /**
- * ドメインロジックのマジックナンバー集約（coding-standards.md §8）。
- * 期限計算・通知判定で使う既定値はすべてここに JSDoc 付きで定義する。
- */
-
-/**
  * 発注余裕日数のデフォルト（domain-model.md §3.4 ServiceItem.bufferDays）。
  * 発注推奨日 = nextDueDate − leadTime − bufferDays の余裕分。
  */

@@ -7,8 +7,6 @@ type Props = {
   ref?: Ref<HTMLInputElement>;
 } & InputHTMLAttributes<HTMLInputElement>;
 
-// なぜ: ui-guidelines.md §7 のラベル・必須マーク・エラー表示パターンを Select / DateField と
-// 統一した汎用テキスト入力。type はrest素通しなので "number" 等にも使える。
 export const TextField = ({ label, error, required, ref, ...rest }: Props): ReactElement => {
   const generatedId = useId();
   const inputId = rest.id ?? generatedId;

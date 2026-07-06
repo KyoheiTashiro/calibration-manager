@@ -1,6 +1,5 @@
 /**
- * ServiceItemModal: 新規追加モード・編集モード・D-012（無効担当者の扱い）・空状態の検証
- * （screen-design/06-service-item-modal.md）。
+ * ServiceItemModal: 新規追加モード・編集モード・D-012（無効担当者の扱い）・空状態の検証。
  * 新規追加は既定値・対象機器固定表示・外部ブロックの条件表示/クリア・バリデーション・addServiceItem反映を、
  * 編集は既存値プリフィル・updateServiceItem反映・D-012を、空状態はVendor/Person0件時の導線表示を扱う。
  */
@@ -293,7 +292,7 @@ describe("ServiceItemModal: 新規追加", () => {
   });
 });
 
-// 編集モード・D-012(無効担当者の扱い)の検証(screen-design/06-service-item-modal.md)。
+// 編集モード・D-012(無効担当者の扱い)の検証。
 describe("ServiceItemModal: 編集", () => {
   it("既存値がプリフィルされる", () => {
     seedBaseMasters();
@@ -406,7 +405,7 @@ describe("ServiceItemModal: 編集", () => {
   });
 });
 
-// 空状態の検証(screen-design/06-service-item-modal.md)。
+// 空状態の検証。
 describe("ServiceItemModal: 空状態", () => {
   it("外部選択時にisCalibrator=trueのVendorが0件だと文言とVendorList導線が表示される", async () => {
     seedStore({

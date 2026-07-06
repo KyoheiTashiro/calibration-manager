@@ -1,9 +1,3 @@
-/**
- * 機器登録・編集フォーム（create/edit 共通）のフィールド群（screen-design/03-equipment-form.md）。
- * 管理番号〜備考の8項目を純粋ビューとして提供する。`<form>` タグ・ボタン群は含めない
- * （ページ側の責務）。
- */
-
 import { Select, Textarea, TextField } from "@/components/ui";
 import { ROUTES } from "@/constants/routes";
 import { statusOptions, type SelectOption } from "@/features/equipment/form/shared/mapping";

@@ -1,7 +1,6 @@
 /**
- * Vendor（メーカー/取引先）の追加・編集モーダル（screen-design/09-masters.md §9-A）。
- * RHF + zodResolver。送信ボタンはエラー時も無効化せず、送信試行でエラー表示する
- * （screen-design/README.md §0.5）。
+ * Vendor（メーカー/取引先）の追加・編集モーダル。
+ * RHF + zodResolver。送信ボタンはエラー時も無効化せず、送信試行でエラー表示する。
  */
 
 import { Schema, defaultValues, type FormType } from "@/components/domain/VendorModal/schema";
@@ -47,14 +46,13 @@ export const VendorModal = ({ open, vendor, onClose }: Props): ReactElement => {
     formState: { errors, isDirty },
   } = useForm<FormType>({
     resolver: zodResolver(Schema),
-    // なぜ values か: 編集対象（vendor）が変わるたびに既存値をプリフィルする
-    // （screen-design/README.md §0.5）。RHF が深い等価比較で変化を検知し reset する。
+    // なぜ values か: 編集対象（vendor）が変わるたびに既存値をプリフィルする。
     values: toFormValues(vendor),
   });
 
   // なぜ watch() ではなく useWatch か: watch() が返す購読値は React Compiler が
   // 安全にメモ化できず lint(react-compiler)がエラーになるため、フックとして使える
-  // useWatch を用いる（PersonModal.tsx と異なりVendorModalは条件表示のため購読が必要）。
+  // useWatch を用いる。
   const isManufacturer = useWatch({ control, name: "isManufacturer" });
   const isCalibrator = useWatch({ control, name: "isCalibrator" });
 
@@ -105,7 +103,7 @@ export const VendorModal = ({ open, vendor, onClose }: Props): ReactElement => {
         <Checkbox
           label="校正業者"
           // なぜ onChange でクリアするか: isCalibrator オフ時は「標準納期(日)」を非表示にするだけでなく
-          // 入力値もクリアし、再度オンにしても古い値が復活しないようにする（タスク仕様）。
+          // 入力値もクリアし、再度オンにしても古い値が復活しないようにする。
           // state 変化に反応する effect ではなくユーザー操作イベントで直接処理する。
           {...register("isCalibrator", {
             onChange: (event: ChangeEvent<HTMLInputElement>) => {

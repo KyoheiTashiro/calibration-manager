@@ -1,5 +1,4 @@
 /**
- * ルートパス定数（screen-design/README.md §0.2 のルーティング一覧に対応）。
  * ルート定義（App.tsx）とサイドバー・画面間リンクはすべてこの定数を参照し、
  * パス文字列のハードコードを禁止する。
  */
@@ -18,8 +17,6 @@ export const ROUTES = {
   MANUAL: "/manual",
 } as const;
 
-/** 機器詳細への実パス（`:id` を解決したリンク先）を組み立てる */
 export const equipmentDetailPath = (equipmentId: string): string => `/equipment/${equipmentId}`;
 
-/** 機器編集への実パス（`:id` を解決したリンク先）を組み立てる */
 export const equipmentEditPath = (equipmentId: string): string => `/equipment/${equipmentId}/edit`;

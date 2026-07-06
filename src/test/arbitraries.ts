@@ -1,5 +1,5 @@
 /**
- * fast-check の Arbitrary 定義集約（docs/testing.md「テストヘルパー」）。
+ * fast-check の Arbitrary 定義集約。
  * property test（*.proptest.test.ts）はここから生成器を import し、
  * 各テストファイルで生成器を重複定義しない。
  */
@@ -25,8 +25,7 @@ import {
 } from "@/store/types";
 import { daysInMonth, formatIsoDate } from "@/utils/time";
 // なぜワイルドカード import か: fast-check は `fc.integer()` のようにプレフィックス付きで使うのが
-// 公式慣習であり、named import では `string` / `record` 等の汎用名がスコープを汚染するため
-// （.oxlintrc.json で import/no-namespace を理由付きで無効化済み）。
+// 公式慣習であり、named import では `string` / `record` 等の汎用名がスコープを汚染するため。
 import * as fc from "fast-check";
 
 // なぜこの範囲か: 機器台帳で現実に扱う年代をカバーしつつ、閏年（2000年・2024年等）と

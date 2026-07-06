@@ -1,9 +1,4 @@
-/**
- * エクスポート → インポートのラウンドトリップ性質(D-028 / D-029)。
- * 参照を持たない vendors / persons で、任意のエンティティ集合が
- * buildEntityCsv → validateEntityCsv を経て元の Record に戻ることを検証する。
- * optional 文字列の空文字は CSV 上で「未設定」と区別できないため undefined へ正規化して比較する。
- */
+/** optional 文字列の空文字は CSV 上で「未設定」と区別できないため undefined へ正規化して比較する */
 
 import { buildEntityCsv } from "@/features/settings/components/csv/entityCsv";
 import { validateEntityCsv } from "@/features/settings/components/csv/importValidation";

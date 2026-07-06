@@ -10,14 +10,11 @@ type Props = {
   children: ReactNode;
 };
 
-// なぜ: ui-guidelines.md §10「主要ボタンh-9・二次/行内ボタンh-8」に対応するサイズ別クラス。
 const SIZE_CLASS_NAME = {
   md: "h-9 px-4 text-sm",
   sm: "h-8 px-3 text-sm",
 } as const;
 
-// なぜ: ui-guidelines.md §3の色トークン（primary/primaryHover/danger）を使い、
-// variantごとの配色をここに集約する。
 const VARIANT_CLASS_NAME = {
   primary: "bg-primary text-white hover:bg-primaryHover",
   secondary: "border border-slate-300 text-slate-700 hover:bg-slate-50",

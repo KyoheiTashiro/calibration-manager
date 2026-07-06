@@ -1,8 +1,4 @@
-/**
- * VendorList（/vendors）の検証（screen-design/09-masters.md §9-A）。
- * 一覧表示・空状態・追加・編集・削除ガード（参照あり/なし）を扱う
- * （バリデーション詳細はVendorModal.test.tsxで担保）。
- */
+/** バリデーション詳細はVendorModal.test.tsxで担保 */
 
 import { VendorList } from "@/features/vendors";
 import { EQUIPMENT_STATUS, type Equipment, type Vendor } from "@/store/types";
@@ -57,7 +53,6 @@ describe("VendorList: 一覧表示", () => {
     expect(within(mitutoyoRow).getByText("山田")).toBeInTheDocument();
     expect(within(mitutoyoRow).getByText("03-1111-2222")).toBeInTheDocument();
 
-    // なぜ3件か: 標準納期(未設定)・窓口(未設定)・連絡先(未設定)の3列が「—」になる
     const nihonSokkiRow = screen.getByRole("row", { name: /日本測器/u });
     expect(within(nihonSokkiRow).getByText("校正業者")).toBeInTheDocument();
     expect(within(nihonSokkiRow).queryByText("メーカー")).not.toBeInTheDocument();
@@ -70,7 +65,6 @@ describe("VendorList: 空状態", () => {
     renderWithStore(<VendorList />);
 
     expect(screen.getByText("取引先が未登録です")).toBeInTheDocument();
-    // なぜ2件か: ヘッダ右上の「+ 追加」と EmptyState 内の CTA の両方が表示される
     expect(screen.getAllByRole("button", { name: "+ 追加" })).toHaveLength(2);
   });
 });

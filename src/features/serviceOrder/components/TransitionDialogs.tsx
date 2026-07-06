@@ -1,7 +1,5 @@
 /**
  * かんばんの入力付き遷移ダイアログ（screen-design/08-service-orders.md、README §0.5）。RHF + zodResolver。
- * - ServiceOrderDialog: planned → ordered（発注日・返却予定日・費用）
- * - ReturnDialog: inCalibration → returned（実返却日）
  * updateServiceOrderStatus が true のときのみ属性を updateServiceOrder で patch する。false（遷移不可・競合）なら
  * patch せず閉じる（silent no-op）。日付整合の不一致は警告表示のみでブロックしない（D-019）。
  */
@@ -52,7 +50,6 @@ export const ServiceOrderDialog = ({ serviceOrder, onClose }: Props): ReactEleme
   const orderedDate = useWatch({ control, name: "orderedDate" });
   const dueDate = useWatch({ control, name: "dueDate" });
 
-  // D-019: 発注日 > 返却予定日 は警告のみ。両方が妥当な日付のときだけ比較する。
   const showDueDateWarning =
     typeof orderedDate === "string" &&
     isIsoDateString(orderedDate) &&
@@ -120,7 +117,6 @@ export const ReturnDialog = ({ serviceOrder, onClose }: Props): ReactElement => 
 
   const returnedDate = useWatch({ control, name: "returnedDate" });
 
-  // D-019: 発注日 > 実返却日 は警告のみ。発注日は案件の保存値を使う。
   const showReturnWarning =
     serviceOrder.orderedDate !== undefined &&
     typeof returnedDate === "string" &&

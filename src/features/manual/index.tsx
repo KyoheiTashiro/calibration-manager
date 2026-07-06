@@ -1,10 +1,3 @@
-/**
- * 利用マニュアル画面(screen-design/12-manual.md)。
- * store を一切参照しない静的コンテンツページ。アプリの目的・基本操作の流れ・
- * ステータスの見方・期限計算式・各画面の説明・バックアップ方法・ライセンスを1画面にまとめ、
- * 他画面への導線は react-router-dom の `Link` + `ROUTES` 定数経由で提供する。
- */
-
 import { StatusBadge } from "@/components/domain";
 import { ROUTES } from "@/constants/routes";
 import { SERVICE_ITEM_STATUS, type ServiceItemStatus } from "@/domain/serviceItemStatus";
@@ -13,7 +6,6 @@ import { Link } from "react-router-dom";
 
 import { ManualSection } from "./components/ManualSection";
 
-/** ステータスの意味を平易な日本語で言い換えたもの(domain-model.md §4.3 の条件に対応) */
 const STATUS_DESCRIPTIONS = {
   [SERVICE_ITEM_STATUS.OVERDUE]: "次回期限を過ぎています",
   [SERVICE_ITEM_STATUS.ORDER_NOW]:
@@ -23,7 +15,6 @@ const STATUS_DESCRIPTIONS = {
   [SERVICE_ITEM_STATUS.OK]: "上記のいずれにも当てはまりません",
 } as const satisfies Record<ServiceItemStatus, string>;
 
-/** 「各画面の説明」セクションのデータ駆動化(screen-design/12-manual.md §表示項目/機能) */
 const SCREEN_GUIDES = [
   {
     route: ROUTES.DASHBOARD,

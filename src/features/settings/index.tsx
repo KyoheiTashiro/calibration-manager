@@ -1,10 +1,3 @@
-/**
- * 設定画面(screen-design/11-settings.md §11)。
- * アプリのインストール(PWA) / CSV エクスポート / インポート / データ全削除の4セクションを束ねる薄いビュー。
- * 各セクションの手続きは ResetSection / ExportSection / ImportSection / PwaInstallSection に分割する
- * (oxlint の依存数上限・max-statements 対策、dashboard と同じ分割イディオム)。
- */
-
 import { ExportSection } from "@/features/settings/components/csv/ExportSection";
 import { ImportSection } from "@/features/settings/components/csv/ImportSection";
 import { PwaInstallSection } from "@/features/settings/components/pwa/PwaInstallSection";

@@ -1,8 +1,3 @@
-/**
- * 機器詳細画面（screen-design/04-equipment-detail.md）の実施記録テーブル
- * （全項目横断・新しい順）。0件時はEmptyStateを表示する。並び順は呼び出し側(hooks.ts)で確定済み。
- */
-
 import { EmptyState, Table, TableBody, TableHead, Td, Th } from "@/components/ui";
 import type { ServiceRecordRow } from "@/features/equipment/detail/hooks";
 import { SERVICE_RECORD_RESULT_LABELS } from "@/features/serviceItems/constants";

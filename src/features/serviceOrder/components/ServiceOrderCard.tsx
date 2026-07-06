@@ -1,8 +1,5 @@
 /**
  * 点検校正外部案件かんばんのカード（screen-design/08-service-orders.md）。
- * serviceItem→equipment→managementNo/機器名、serviceItem.name、vendor→依頼先名を解決して表示する。
- * 参照先エンティティが消えている（dangling）場合は例外を投げず「(参照先なし)」表示（D-003）。
- * completed / cancelled はグレー調でアクションボタンなし（D-018）。
  */
 
 import { Button } from "@/components/ui";
@@ -18,7 +15,7 @@ import {
 import { recordValue } from "@/utils/record";
 import type { ReactElement, ReactNode } from "react";
 
-/** 参照先が消えている（dangling FK）ときの表示。D-003 の寛容方針で例外を投げず表示に留める */
+/** 参照先が消えている場合の表示 */
 const NO_REFERENCE_LABEL = "(参照先なし)";
 /** 属性が未設定のときの表示 */
 const UNSET_LABEL = "—";
@@ -40,7 +37,7 @@ const STATUS_ACTIONS: Record<ServiceOrderStatus, readonly CardActionSpec[]> = {
     { label: "中止", action: CARD_ACTION.CANCEL, variant: "danger" },
   ],
   [SERVICE_ORDER_STATUS.RETURNED]: [{ label: "記録登録", action: CARD_ACTION.SERVICE_RECORD }],
-  [SERVICE_ORDER_STATUS.COMPLETED]: [], // completed/cancelled はアクションなし(D-018)
+  [SERVICE_ORDER_STATUS.COMPLETED]: [],
   [SERVICE_ORDER_STATUS.CANCELLED]: [],
 };
 

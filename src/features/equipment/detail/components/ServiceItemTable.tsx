@@ -1,9 +1,3 @@
-/**
- * 機器詳細画面（screen-design/04-equipment-detail.md）の点検校正項目テーブル。
- * 0件時はEmptyStateを表示する。並び順・派生ステータスは呼び出し側(hooks.ts)で確定済みのため、
- * ここは列描画と行アクション(記録/編集)の起動通知だけを担う薄いビュー。
- */
-
 import { StatusBadge } from "@/components/domain";
 import { Button, EmptyState, Table, TableBody, TableHead, Td, Th } from "@/components/ui";
 import { displayedServiceItemStatus, personLabelOf } from "@/features/equipment/detail/hooks";

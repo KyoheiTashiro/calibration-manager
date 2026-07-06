@@ -1,7 +1,5 @@
-// oxlint-disable import/max-dependencies -- 共通ヘルパー(@/utils/form・@/utils/record)への
-// 重複排除移設(D-048)で依存数が上限をわずかに超えるが、逐語重複の解消を優先し対象外とする
 /**
- * 点検校正項目（ServiceItem）の追加・編集モーダル（screen-design/06-service-item-modal.md）。RHF + zodResolver。
+ * 点検校正項目（ServiceItem）の追加・編集モーダル。RHF + zodResolver。
  */
 
 import { Schema, toFormValues, type FormType } from "@/components/domain/ServiceItemModal/schema";
@@ -51,8 +49,7 @@ export const ServiceItemModal = ({
     formState: { errors, isDirty },
   } = useForm<FormType>({
     resolver: zodResolver(Schema),
-    // なぜ values か: 編集対象（serviceItem）が変わるたびに既存値をプリフィルする
-    // （screen-design/README.md §0.5）。RHF が深い等価比較で変化を検知し reset する。
+    // なぜ values か: 編集対象（serviceItem）が変わるたびに既存値をプリフィルする。
     values: toFormValues(serviceItem),
   });
 
@@ -64,7 +61,7 @@ export const ServiceItemModal = ({
     onClose();
   };
 
-  // なぜ watch() ではなく useWatch か: VendorModal.tsx と同じ理由（react-compiler lint対策）。
+  // なぜ watch() ではなく useWatch か: react-compiler lint対策のため。
   const execution = useWatch({ control, name: "execution" });
 
   const calibratorVendors = Object.values(vendors).filter((vendor) => vendor.isCalibrator);
@@ -75,8 +72,6 @@ export const ServiceItemModal = ({
 
   const activePersons = Object.values(persons).filter((person) => person.isActive);
   const currentPerson = serviceItem ? persons[serviceItem.personId] : undefined;
-  // なぜ: D-012。現担当が無効化済みの項目編集時のみ、選択肢末尾に「(無効)」付きで含める
-  // （新規時はcurrentPerson===undefinedのため含まれない）。
   const currentPersonIsInactive = currentPerson !== undefined && !currentPerson.isActive;
   const personOptions = [
     ...activePersons.map((person) => ({ value: person.id, label: person.name })),
@@ -157,8 +152,8 @@ export const ServiceItemModal = ({
           required
           options={EXECUTION_OPTIONS}
           error={errors.execution?.message}
-          // なぜ onChange か: state 変化に反応する effect ではなくユーザー操作イベントで直接クリアする
-          // (You Might Not Need an Effect)。bufferDays は必須属性のためクリアしない。
+          // なぜ onChange か: state 変化に反応する effect ではなくユーザー操作イベントで直接クリアする。
+          // bufferDays は必須属性のためクリアしない。
           {...register("execution", {
             onChange: (event: ChangeEvent<HTMLInputElement>) => {
               if (event.target.value === EXECUTION.INTERNAL) {

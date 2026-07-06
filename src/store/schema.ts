@@ -35,10 +35,8 @@ const isoDateStringSchema = z
   .string()
   .refine(isIsoDateString, { message: "YYYY-MM-DD形式の日付ではありません" });
 
-/** 空文字を許可しない必須文字列（名称・IDなど） */
 const requiredStringSchema = z.string().min(1);
 
-/** 日数（納期・余裕日数など）。負の日数はドメイン上あり得ない */
 const dayCountSchema = z.number().int().nonnegative();
 
 export const vendorSchema = z.object({
@@ -90,8 +88,7 @@ export const serviceItemSchema = z
     nextDueDate: isoDateStringSchema,
     isActive: z.boolean(),
   })
-  // なぜ superRefine か: 「external の場合 vendorId 必須」（domain-model.md §3.4）は
-  // 型では表現していない相関制約のため、スキーマ側で強制する。
+  // 「external の場合 vendorId 必須」（domain-model.md §3.4）は型で表現していない相関制約のため、スキーマ側で強制する。
   .superRefine((serviceItem, context) => {
     if (serviceItem.execution === EXECUTION.EXTERNAL && (serviceItem.vendorId ?? "") === "") {
       context.addIssue({

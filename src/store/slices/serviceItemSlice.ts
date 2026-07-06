@@ -1,6 +1,5 @@
 /**
- * 点検校正項目スライス（store.md「スライス構成」）。
- * 項目は物理削除せず isActive で無効化する（store.md「アクション仕様」の実装判断）。
+ * 項目は物理削除せず isActive で無効化する。
  */
 
 import type { AppSliceCreator } from "@/store/storeState";

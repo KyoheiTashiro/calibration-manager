@@ -7,7 +7,6 @@ type ActivatableRowProps = {
   className: string;
 };
 
-/** クリック/Enter/Space で行をアクティベートする tr 用 props 一式(D-026) */
 export const activatableRowProps = (onActivate: () => void): ActivatableRowProps => ({
   tabIndex: 0,
   onClick: onActivate,

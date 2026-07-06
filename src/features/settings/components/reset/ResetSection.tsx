@@ -1,9 +1,3 @@
-/**
- * 設定画面の危険な操作セクション(screen-design/11-settings.md §11、D-031)。
- * [データを全削除] → モーダル(警告 + 同意チェック)→ チェックで[削除]活性化 → resetAll()。
- * ConfirmModal の追加多重確認はしない(チェック自体が §0.6 の2段階目、D-031)。
- */
-
 import { Button, Checkbox, Modal } from "@/components/ui";
 import { useAppStore } from "@/store/useAppStore";
 import { type ChangeEvent, type ReactElement, useState } from "react";

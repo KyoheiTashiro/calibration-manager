@@ -1,9 +1,3 @@
-/**
- * useSafeNavigate の検証。
- * navigate() の戻り値（void | Promise<void>）を無視して遷移だけが実際に起きることを、
- * モックではなく MemoryRouter + Routes 上での画面遷移結果で確認する。
- */
-
 import { useSafeNavigate } from "@/utils/navigation";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -12,11 +6,6 @@ import type { ReactElement } from "react";
 import { MemoryRouter, Route, Routes, useLocation } from "react-router-dom";
 import { describe, expect, it } from "vitest";
 
-/**
- * 遷移元("/")・遷移先("/next")の両方を1コンポーネントで表現する(react/no-multi-comp対策)。
- * 現在地は useLocation から判定し、"/" では文字列パス・オブジェクトパスへの遷移ボタンを、
- * "/next" では navigate(-1) 相当(履歴デルタ)で戻るボタンを出し分ける。
- */
 const Screen = (): ReactElement => {
   const safeNavigate = useSafeNavigate();
   const location = useLocation();

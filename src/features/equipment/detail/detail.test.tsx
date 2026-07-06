@@ -1,9 +1,3 @@
-/**
- * EquipmentDetail(/equipment/:id)の検証(screen-design/04-equipment-detail.md)。
- * 基本情報カード・編集遷移・存在しないid・空状態、点検校正項目テーブル、実施記録、
- * 点検校正項目モーダル・実施記録登録モーダルの起動を扱う。
- */
-
 import { ROUTES, equipmentDetailPath } from "@/constants/routes";
 import { EquipmentDetail } from "@/features/equipment/detail";
 import {
@@ -21,14 +15,12 @@ import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 // なぜ: tsc -b はプロジェクト参照ごとに独立したプログラムのため、vitest.setup.ts
 // （tsconfig.node.json側）の副作用importだけではtsconfig.app.json側の型解決に
-// jest-domのmatcher拡張が伝播しない。テストファイル側でも明示的にimportし型を解決する
-// （coding-standards.md §6・.oxlintrc.jsonのallowリストで明示的に許容されているパターン）。
+// jest-domのmatcher拡張が伝播しない。テストファイル側でも明示的にimportし型を解決する。
 import "@testing-library/jest-dom/vitest";
 import type { ReactElement } from "react";
 import { MemoryRouter, Route, Routes, useParams } from "react-router-dom";
 import { beforeEach, describe, expect, it } from "vitest";
 
-/** 遷移先確認用ダミー: 機器編集(:id を表示) */
 const DummyEquipmentEdit = (): ReactElement => {
   const { id } = useParams();
   return <p>機器編集:{id}</p>;
@@ -122,12 +114,7 @@ describe("EquipmentDetail: 空状態", () => {
   });
 });
 
-/**
- * EquipmentDetail: 実施記録テーブルの検証(screen-design/04-equipment-detail.md)。
- * 全項目横断マージ・doneDate降順(同日はid昇順)・結果の日本語ラベル・空備考の「—」を扱う。
- */
 const getHistoryRows = (): HTMLElement[] => {
-  // なぜ2つ目のtableか: 画面には項目テーブルと実施記録テーブルの2つがある
   const historyTable = screen.getAllByRole("table").at(1);
   if (!historyTable) throw new Error("実施記録テーブルが見つかりません");
   const [, ...dataRows] = within(historyTable).getAllByRole("row");
@@ -175,12 +162,6 @@ describe("EquipmentDetail: 実施記録", () => {
   });
 });
 
-/**
- * EquipmentDetail: 点検校正項目テーブルの検証(screen-design/04-equipment-detail.md)。
- * 列内容・並び順(isActive優先→nextDueDate昇順)・淡色表示・ステータスバッジの
- * D-014両分岐(稼働=導出表示 / 休止=「—」)・担当者の「(無効)」注記(D-001)・
- * 記録ボタンの活性(Phase 7でServiceRecordModalへ接続)を扱う。
- */
 describe("EquipmentDetail: 項目テーブルの列内容", () => {
   it("種別・内外・周期・担当者名・次回期限が表示される", () => {
     seedEquipmentFullMasters();
@@ -272,13 +253,6 @@ describe("EquipmentDetail: 記録ボタン", () => {
   });
 });
 
-/**
- * EquipmentDetail: 点検校正項目モーダル(ServiceItemModal)の起動結節点の検証
- * (screen-design/04-equipment-detail.md「操作・アクション」)。
- * 「+ 項目を追加」=新規モード(equipmentIdプリセット)、行「編集」=編集モード(プリフィル)。
- * モーダル自体の入力・検証は ServiceItemModal.test.tsx の責務。
- */
-/** モーダルタイトルからdialog要素を特定し、開いていることを検証して返す */
 const getOpenDialog = (title: string): HTMLElement => {
   const dialogElement = screen.getByText(title).closest("dialog");
   if (!dialogElement) throw new Error("dialog要素が見つかりません");

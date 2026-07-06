@@ -2,10 +2,6 @@
   "compilerOptions": {
     "target": "ES2022",
     "useDefineForClassFields": true,
-    // なぜ lib だけ ES2023 か: unicorn/no-array-sort が推奨する非破壊の Array#toSorted() は
-    // ES2023 API であり、型定義が無いと typescript/no-unsafe-call と衝突する。
-    // toSorted は2023年以降の主要ブラウザ・Node 20+ で実装済みのため lib のみ引き上げる
-    // （target は coding-standards.md §10 の指定どおり ES2022 のまま）。
     "lib": ["ES2023", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "moduleResolution": "bundler",
@@ -15,17 +11,11 @@
     "moduleDetection": "force",
     "noEmit": true,
     "jsx": "react-jsx",
-
     "strict": true,
-    // なぜ: coding-standards.md §10「noUncheckedIndexedAccess は意図的に無効」。
-    // 有効化はまだ未対応点として明記されており、本フェーズでは設定しない。
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "skipLibCheck": true,
-
-    // なぜ: directory-structure.md の `@/*` エイリアス方針（coding-standards.md §6の絶対パス原則）に対応。
-    // vite.config.ts の resolve.alias と一致させる必要がある。
     "paths": {
       "@/*": ["./src/*"]
     }

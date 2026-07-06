@@ -1,9 +1,3 @@
-/**
- * useEntityModal の検証。persons/vendors 双方で同一パターンだった
- * 「追加/編集モーダルの開閉状態」をジェネリックフックへ集約した（D-049）ため、
- * entity 型に依存しない挙動として確認する。
- */
-
 import { useEntityModal } from "@/utils/modal";
 import { act, renderHook } from "@testing-library/react";
 import { describe, expect, it } from "vitest";

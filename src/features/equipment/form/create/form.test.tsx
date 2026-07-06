@@ -1,9 +1,3 @@
-/**
- * EquipmentCreateForm（/equipment/create）の検証（screen-design/03-equipment-form.md）。
- * 新規登録・管理番号ユニーク検証・必須エラー・メーカーセレクト（フィルタ/空状態）・
- * 廃棄にするボタン非表示を扱う。
- */
-
 import { ROUTES } from "@/constants/routes";
 import { EquipmentCreateForm } from "@/features/equipment/form/create";
 import { EQUIPMENT_STATUS, type Equipment, type Vendor } from "@/store/types";
@@ -13,8 +7,7 @@ import { screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 // なぜ: tsc -b はプロジェクト参照ごとに独立したプログラムのため、vitest.setup.ts
 // （tsconfig.node.json側）の副作用importだけではtsconfig.app.json側の型解決に
-// jest-domのmatcher拡張が伝播しない。テストファイル側でも明示的にimportし型を解決する
-// （coding-standards.md §6・.oxlintrc.jsonのallowリストで明示的に許容されているパターン）。
+// jest-domのmatcher拡張が伝播しない。テストファイル側でも明示的にimportし型を解決する。
 import "@testing-library/jest-dom/vitest";
 import type { ReactElement } from "react";
 import { Route, Routes, useParams } from "react-router-dom";
@@ -51,7 +44,6 @@ const otherEquipment: Equipment = {
   status: EQUIPMENT_STATUS.ACTIVE,
 };
 
-/** 遷移先確認用ダミー: 機器詳細(:id を表示) */
 const DummyEquipmentDetail = (): ReactElement => {
   const { id } = useParams();
   return <p>機器詳細:{id}</p>;

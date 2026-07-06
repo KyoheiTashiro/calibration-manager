@@ -1,7 +1,5 @@
 import type { ReactElement, ReactNode } from "react";
 
-// なぜ: ui-guidelines.md §6「空状態」・screen-design README §0.7準拠で
-// アイコン + 説明文 + 主要CTA を中央寄せで統一表示する汎用コンポーネント。
 type Props = {
   icon?: ReactNode;
   message: string;

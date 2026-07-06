@@ -17,7 +17,6 @@ import {
   type Vendor,
 } from "@/store/types";
 
-/** 導出の基準日(2026-07-03) */
 export const TODAY = "2026-07-03";
 
 export const activePerson: Person = {
@@ -40,7 +39,6 @@ export const calibrator: Vendor = {
   standardLeadTimeDays: 20,
 };
 
-/** 既定は稼働機器・内部点検・有効の項目。over で個別に上書きする */
 export const makeServiceItem = (
   over: Partial<ServiceItem> & Pick<ServiceItem, "id">,
 ): ServiceItem => ({
@@ -57,12 +55,11 @@ export const makeServiceItem = (
   ...over,
 });
 
-/** id をキーにした Record へ畳み込む(store の正規化形へ整形する) */
+/** store の正規化形へ整形する */
 export const toRecord = <Entry extends { id: string }>(
   list: readonly Entry[],
 ): Record<string, Entry> => Object.fromEntries(list.map((entry) => [entry.id, entry]));
 
-/** serviceItems / serviceOrders を渡して残りは固定機器・依頼先・担当者で埋めた state を作る */
 export const makeState = (
   serviceItems: readonly ServiceItem[],
   serviceOrders: readonly ServiceOrder[] = [],
@@ -74,6 +71,6 @@ export const makeState = (
   persons: toRecord([activePerson, inactivePerson]),
 });
 
-/** 行配列から serviceItem.id 列を取り出す(並び順・絞り込みの検証に使う) */
+/** 並び順・絞り込みの検証に使う */
 export const ids = (rows: readonly ServiceItemRow[]): string[] =>
   rows.map((row) => row.serviceItem.id);

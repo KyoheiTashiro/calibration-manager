@@ -1,8 +1,6 @@
 /**
- * 項目一覧(screen-design/05-service-item-list.md)固有のフィルタ解釈・適用ロジックの検証。
  * 行導出(serviceItemRowsOf)の検証は昇格先の store/selectors.test.ts に移設済み(D-024)。
  * today は serviceItemRowsOf の引数注入なので固定日付で決定的にする(flakiness 回避)。
- * URLクエリ=フィルタ真実源(D-022)を扱う。
  */
 
 import { SERVICE_ITEM_STATUS } from "@/domain/serviceItemStatus";

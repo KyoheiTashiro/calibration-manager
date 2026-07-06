@@ -1,8 +1,3 @@
-/**
- * 機器登録・編集フォーム（create/edit 共通）のセレクト選択肢・ストア入力変換
- * （screen-design/03-equipment-form.md）。
- */
-
 import { EQUIPMENT_STATUS_LABELS } from "@/features/equipment/constants";
 import type { FormType } from "@/features/equipment/form/shared/schema";
 import type { Equipment } from "@/store/types";
@@ -13,7 +8,6 @@ export const statusOptions: SelectOption[] = Object.entries(EQUIPMENT_STATUS_LAB
   ([value, label]) => ({ value, label }),
 );
 
-/** フォーム値(string ベース)をストア入力へ変換。空文字の任意項目は undefined に落とす */
 export const toEquipmentPayload = (values: FormType): Omit<Equipment, "id"> => ({
   managementNo: values.managementNo,
   name: values.name,

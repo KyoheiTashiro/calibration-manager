@@ -1,9 +1,3 @@
-/**
- * 機器一覧画面（screen-design/02-equipment-list.md）。
- * 検索・状態フィルタ・行クリック遷移のみを扱う（廃棄・削除・編集はこの画面の責務外）。
- * フィルタ・導出ロジックは hooks.ts（useEquipmentList）に切り出し、このファイルは薄いビューに保つ。
- */
-
 import {
   Badge,
   Button,

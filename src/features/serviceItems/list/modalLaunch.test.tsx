@@ -1,9 +1,3 @@
-/**
- * ServiceItemList: 行アクションからのモーダル起動結節点の検証(screen-design/05-service-item-list.md「操作」)。
- * [記録]→ServiceRecordModal / [案件]→ServiceOrderModal / [編集]→ServiceItemModal が正しい対象で開くことを確認する。
- * モーダル内部の入力・検証は各モーダルの単体テストの責務。
- */
-
 import { ServiceItemList } from "@/features/serviceItems/list";
 import { renderWithStore, setupStoreIsolation } from "@/test/renderWithStore";
 import { serviceItemExternalOverdue, seedServiceItemList } from "@/test/serviceItemListFixtures";
@@ -15,7 +9,6 @@ import { beforeEach, describe, expect, it } from "vitest";
 const renderList = (): ReturnType<typeof renderWithStore> =>
   renderWithStore(<ServiceItemList />, { initialEntries: ["/service-items"] });
 
-/** モーダルタイトルから dialog を特定し、開いていることを検証して返す */
 const getOpenDialog = (title: string): HTMLElement => {
   const dialogElement = screen.getByText(title).closest("dialog");
   if (!dialogElement) throw new Error("dialog要素が見つかりません");
@@ -23,7 +16,6 @@ const getOpenDialog = (title: string): HTMLElement => {
   return dialogElement;
 };
 
-/** 対象行(年次校正)の指定ボタンを押す */
 const clickRowAction = async (buttonName: string): Promise<void> => {
   const user = userEvent.setup();
   const row = screen.getByRole("row", { name: /年次校正/u });

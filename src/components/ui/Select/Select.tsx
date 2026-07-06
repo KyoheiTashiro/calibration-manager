@@ -9,9 +9,6 @@ type Props = {
   ref?: Ref<HTMLSelectElement>;
 } & SelectHTMLAttributes<HTMLSelectElement>;
 
-// なぜ: ui-guidelines.md §7「エラーはtext-xs text-red-600・入力枠はborder-red-500・
-// フィールドとエラー文言はaria-describedbyで関連付ける」に対応する汎用セレクト。
-// react-hook-formのregister()戻り値（name/onChange/onBlur/ref）をrest経由でそのまま素通しする。
 export const Select = ({
   label,
   error,

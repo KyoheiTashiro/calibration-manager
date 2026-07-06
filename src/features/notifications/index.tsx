@@ -1,13 +1,3 @@
-/**
- * 通知センター画面（screen-design/10-notifications.md）。
- * 未読/既読タブでアプリ内通知を閲覧し、行クリックで対象へ遷移・既読化する。
- *
- * - 並び替え・タブ絞り込み・遷移先解決は hooks.ts の純関数へ委譲し、本コンポーネントは薄いビューに保つ。
- * - 種別バッジは NOTIFICATION_TYPE_BADGE_CLASSES + NOTIFICATION_TYPE_LABELS で「色 + 日本語ラベル」を
- *   併記する（README §0.3。色のみ禁止）。
- * - 行クリックは D-027 に従い、まず markAsRead、次に遷移先が解決できれば navigate する。
- */
-
 import { Badge, Button, EmptyState, Tabs } from "@/components/ui";
 import {
   NOTIFICATION_TYPE_BADGE_CLASSES,
@@ -39,7 +29,6 @@ export const NotificationCenter = (): ReactElement => {
 
   const rows = selectTabNotifications(Object.values(notifications), activeTab);
 
-  // 行クリック（D-027）: まず既読化、次に遷移先が解決できれば遷移。dangling serviceItem は既読化のみ。
   const handleRowClick = (notification: Notification): void => {
     markAsRead(notification.id);
     const target = resolveNotificationTarget(notification, serviceItems);

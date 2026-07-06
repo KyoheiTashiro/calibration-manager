@@ -7,8 +7,6 @@ type Props = {
   ref?: Ref<HTMLInputElement>;
 } & InputHTMLAttributes<HTMLInputElement>;
 
-// なぜ: ui-guidelines.md §7・§9「日付はYYYY-MM-DD文字列」に対応する<input type="date">ラッパー。
-// Selectと同じラベル・必須マーク・エラー表示パターンで統一する。
 export const DateField = ({ label, error, required, ref, ...rest }: Props): ReactElement => {
   const generatedId = useId();
   const inputId = rest.id ?? generatedId;

@@ -29,8 +29,6 @@ const STATUS_BADGE_LABELS = {
   [SERVICE_ITEM_STATUS.OK]: "正常",
 } as const satisfies Record<ServiceItemStatus, string>;
 
-/** バッジのTailwindクラス文字列を返す */
 export const statusBadgeClass = (status: ServiceItemStatus): string => STATUS_BADGE_CLASSES[status];
 
-/** バッジの日本語ラベルを返す */
 export const statusBadgeLabel = (status: ServiceItemStatus): string => STATUS_BADGE_LABELS[status];

@@ -1,8 +1,3 @@
-/**
- * 設定画面のPWAインストール案内セクション(usePwaInstall の状態を表示に反映するだけの薄いビュー)の結線検証。
- * beforeinstallprompt / appinstalled の非標準イベントを疑似発火し、案内文・ボタンの出し分けを確認する。
- */
-
 import { PwaInstallSection } from "@/features/settings/components/pwa/PwaInstallSection";
 import {
   resetPwaInstallStateForTest,
@@ -17,7 +12,6 @@ const createMockEvent = (): BeforeInstallPromptEvent & { prompt: ReturnType<type
   Object.assign(new Event("beforeinstallprompt"), {
     platforms: [],
     userChoice: Promise.resolve({ outcome: "accepted" as const, platform: "web" }),
-    // oxlint-disable-next-line unicorn/no-useless-undefined -- mockResolvedValue は Promise<void> の解決値として引数必須
     prompt: vi.fn().mockResolvedValue(undefined),
   });
 

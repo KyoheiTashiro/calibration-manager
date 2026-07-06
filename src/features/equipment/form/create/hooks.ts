@@ -1,9 +1,3 @@
-/**
- * 機器新規登録画面（screen-design/03-equipment-form.md、URL `/equipment/create`）の状態管理フック。
- * フォーム状態そのものは shared/useFormCore.ts の useEquipmentFormCore に委譲し、
- * 保存後の遷移・キャンセルのみここで扱う。
- */
-
 import { equipmentDetailPath } from "@/constants/routes";
 import { toEquipmentPayload, type SelectOption } from "@/features/equipment/form/shared/mapping";
 import { defaultValues, type FormType } from "@/features/equipment/form/shared/schema";

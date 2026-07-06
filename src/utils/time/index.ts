@@ -1,6 +1,6 @@
 /**
  * 日付ユーティリティ。アプリ全域で日付は `YYYY-MM-DD`（ISO 8601 日付）の文字列で扱い、
- * 時刻・タイムゾーンは扱わない（screen-design/README.md §0.4）。
+ * 時刻・タイムゾーンは扱わない。
  * ISO形式の日付文字列は辞書順比較（`<` `>`）がそのまま日付の前後比較になるため、
  * 比較専用の関数は設けない。
  */
@@ -27,8 +27,7 @@ export const daysInMonth = (year: number, month: number): number =>
 
 /**
  * `YYYY-MM-DD` 文字列を年月日に分解する。
- * 形式不正・暦上あり得ない日付（例: 2026-02-30）は例外を投げず null を返す
- * （coding-standards.md §8「例外を投げない」）。
+ * 形式不正・暦上あり得ない日付（例: 2026-02-30）は例外を投げず null を返す。
  */
 export const parseIsoDate = (value: string): CalendarDate | null => {
   const matched = ISO_DATE_PATTERN.exec(value)?.groups;

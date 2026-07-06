@@ -1,9 +1,3 @@
-/**
- * NotificationCenter（/notifications、screen-design/10-notifications.md）の検証。
- * タブ切替・並び順（createdDate 降順/同日 id 昇順）・種別バッジ・全て既読・
- * 行クリック遷移（serviceOrder/serviceItem/dangling, D-027）・空状態2種を扱う。
- */
-
 import { ROUTES } from "@/constants/routes";
 import { NotificationCenter } from "@/features/notifications";
 import {
@@ -25,7 +19,6 @@ import type { ReactElement } from "react";
 import { Route, Routes, useParams } from "react-router-dom";
 import { beforeEach, describe, expect, it } from "vitest";
 
-/** 遷移先確認用のダミー機器詳細画面 */
 const DummyEquipmentDetail = (): ReactElement => {
   const { id } = useParams();
   return <p>機器詳細:{id}</p>;
@@ -151,9 +144,7 @@ describe("NotificationCenter: 種別バッジ", () => {
     });
     renderCenter();
 
-    // アイコングリフ自体は装飾のためスクリーンリーダーから隠す
     expect(screen.getByText("🟣")).toHaveAttribute("aria-hidden", "true");
-    // ラベルは別要素(別テキストノード)であり aria-hidden を持たない
     expect(screen.getByText("納期接近")).not.toHaveAttribute("aria-hidden");
   });
 });
@@ -232,10 +223,8 @@ describe("NotificationCenter: 行クリック遷移（D-027）", () => {
 
     await user.click(screen.getByRole("button", { name: /dangling通知/u }));
 
-    // 遷移していない（通知センターに留まる）
     expect(screen.getByRole("heading", { name: "通知センター" })).toBeInTheDocument();
     expect(screen.queryByText("機器詳細:")).not.toBeInTheDocument();
-    // 既読化された（未読タブから消え、既読タブに現れる）
     expect(screen.getByText("未読の通知はありません")).toBeInTheDocument();
     await user.click(screen.getByRole("tab", { name: "既読" }));
     expect(screen.getByText("dangling通知")).toBeInTheDocument();

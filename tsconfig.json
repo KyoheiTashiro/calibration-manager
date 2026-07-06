@@ -1,7 +1,4 @@
 {
-  // なぜ: Viteの標準テンプレート構成（references方式）を踏襲し、アプリコード用(tsconfig.app.json)と
-  // 設定ファイル用(tsconfig.node.json)でNode/DOMという異なる実行環境の型を分離する。
-  // ルートのtsconfig.jsonは`tsc -b`のエントリポイントとしてreferencesのみを持つ。
   "files": [],
   "references": [{ "path": "./tsconfig.app.json" }, { "path": "./tsconfig.node.json" }]
 }

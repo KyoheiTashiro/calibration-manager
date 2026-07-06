@@ -1,6 +1,5 @@
 /**
- * メーカー/取引先スライス（store.md「スライス構成」）。
- * removeVendor は参照整合カスケード（store.md「アクション仕様」）を持つ。
+ * removeVendor は参照整合カスケードを持つ。
  */
 
 import { isVendorReferenced } from "@/store/selectors";
@@ -16,7 +15,7 @@ export type VendorSlice = {
   updateVendor: (id: string, patch: Partial<Omit<Vendor, "id">>) => void;
   /**
    * Equipment.manufacturerId / ServiceItem.vendorId / ServiceOrder.vendorId の
-   * いずれかから参照されている場合は削除せず false を返す（store.md「アクション仕様」）。
+   * いずれかから参照されている場合は削除せず false を返す。
    * @returns 削除できたら true
    */
   removeVendor: (id: string) => boolean;
@@ -46,7 +45,7 @@ export const createVendorSlice: AppSliceCreator<VendorSlice> = (set, get) => ({
     if (recordValue(currentState.vendors, id) === undefined) return false;
     if (isVendorReferenced(currentState, id)) return false;
     set((state) => {
-      // 動的キーへの delete は Immer ドラフト上のエンティティ削除イディオム（coding-standards.md §5）
+      // 動的キーへの delete は Immer ドラフト上のエンティティ削除イディオム
       // oxlint-disable-next-line typescript/no-dynamic-delete
       delete state.vendors[id];
     });
