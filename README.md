@@ -20,7 +20,3 @@ npm run dev
 ## ドキュメント
 
 仕様・設計・規約の詳細は [`docs/`](docs/README.md) 参照。
-
-## ライセンス
-
-[MIT](LICENSE)
