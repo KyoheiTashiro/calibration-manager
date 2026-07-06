@@ -1,12 +1,5 @@
 @import "tailwindcss";
 
-/* なぜ: Google Fonts CDNを使うとPWAオフライン起動時にフォントが読み込めない。
-   node_modules同梱のセルフホストフォントをビルド成果物に含めることで、
-   初回アクセス後は完全オフラインでも標準フォントで表示できるようにする
-   （docs/infra/pwa.md §5「全機能オフライン動作」）。
-   通常ウェイト(400)のみを読み込み、未使用ウェイトの転送量を避ける。 */
-@import "@fontsource/noto-sans-jp/400.css";
-
 /* なぜ: ui-guidelines.md §3・§12 の色トークンをTailwind 4の @theme でユーティリティクラス化する
    （bg-primary / text-primary / hover:bg-primaryHover 等が生成される）。 */
 @theme {
@@ -21,8 +14,9 @@
   --height-rowSm: 2.5rem;
   --height-rowMd: 2.75rem;
 
-  /* なぜ: ui-guidelines.md §2 の書体指定。明朝体を使わず、
-     セルフホストしたNoto Sans JPをアプリ全体の既定書体にする。 */
+  /* なぜ: ui-guidelines.md §2 の書体指定。明朝体を使わず、OS標準のゴシック体を
+     既定書体にする。フォントは配布しない（バンドル削減、D-052）。
+     Noto Sans JP はOSにインストール済みの場合のみ使われる。 */
   --font-sans: "Noto Sans JP", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 

@@ -27,7 +27,7 @@ calibration-manager は**業務用の機器管理アプリ**である。
 | 見出しh1                | `text-xl` 〜 `text-2xl` (20〜24px) | ページタイトル                                     |
 | KPI数値(ダッシュボード) | `text-3xl` (30px)                  | 期限切れ件数等のサマリーカード                     |
 
-- 書体: `"Noto Sans JP", system-ui, -apple-system, "Segoe UI", sans-serif`。明朝体は使用しない。
+- 書体: `"Noto Sans JP", system-ui, -apple-system, "Segoe UI", sans-serif`。明朝体は使用しない。フォントファイルは配布せず（バンドル削減、D-052）、OS標準のゴシック体で表示する（Noto Sans JP はOSにインストール済みの場合のみ使用）。
 - 数値列(管理番号、件数、金額、日付)は `font-variant-numeric: tabular-nums` で桁を揃える。テーブルの可読性に直結するため必須。
 - テーブル本文は既定 `text-sm` とする(1画面あたりの表示行数を優先)。
 
