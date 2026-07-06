@@ -1,13 +1,12 @@
 /**
- * CSV インポートの行単位検証(§11、D-029 / D-030)。
+ * CSV インポートの行単位検証(§11、D-029 / D-030 / D-053)。
  * 検証順: ヘッダ一致 → 行ごとに [列数 → セル変換 → zod(store/schema.ts)] →
  * ファイル内ユニーク(id + uniqueKeys) → 外向き参照の存在チェック(現在ストアと突合)。
+ * 数式インジェクション様セル(D-053)は警告のみで取り込みを妨げない。
  * エラーが1件でもあれば取り込み不可(entities = null、D-030)。
  * 行番号はファイル上の行番号(ヘッダ = 1行目、データ先頭 = 行2)。
  */
 
-import { collectFormulaWarnings } from "@/features/settings/components/csv/csvFormulaWarning";
-import { REFERENCE_CHECKS } from "@/features/settings/components/csv/csvReferenceChecks";
 import {
   CSV_COLUMN_KIND,
   type CsvColumnKind,
@@ -19,6 +18,7 @@ import {
 } from "@/features/settings/components/csv/entityCsv";
 import type { AppState } from "@/store/types";
 import { parseCsv } from "@/utils/csv";
+import { recordValue } from "@/utils/record";
 import type { z } from "zod";
 
 export type ImportRowError = {
@@ -107,6 +107,31 @@ const preflightCsv = <Kind extends CsvEntityKind>(
   return { dataRows };
 };
 
+/** Excel等が数式として解釈し得るセル先頭文字(CSVインジェクション、D-053) */
+const FORMULA_LIKE_PATTERN = /^[=+\-@\t\r]/u;
+
+/** 数式として解釈され得るセルの警告(D-053)。正当な負数(`-20`等)と列数不正行(呼び出し側で除外)は対象外 */
+const collectFormulaWarnings = <Kind extends CsvEntityKind>(
+  spec: EntityCsvSpec<Kind>,
+  cells: string[],
+  line: number,
+): ImportRowError[] => {
+  const warnings: ImportRowError[] = [];
+  for (const [columnIndex, column] of spec.columns.entries()) {
+    if (column.kind !== CSV_COLUMN_KIND.STRING && column.kind !== CSV_COLUMN_KIND.OPTIONAL_STRING) {
+      continue;
+    }
+    const cell = cells[columnIndex];
+    if (FORMULA_LIKE_PATTERN.test(cell) && !NUMBER_CELL_PATTERN.test(cell)) {
+      warnings.push({
+        line,
+        message: `${column.key}: 数式として解釈され得る値です(Excel等で開く際は注意)`,
+      });
+    }
+  }
+  return warnings;
+};
+
 /** 1データ行をエンティティへ変換する(列数 → セル変換 → zod)。失敗時はメッセージ一覧 */
 const rowToEntity = <Kind extends CsvEntityKind>(
   spec: EntityCsvSpec<Kind>,
@@ -155,6 +180,23 @@ const checkUniqueness = <Kind extends CsvEntityKind>(
   return messages;
 };
 
+/** spec.references に基づき外向き参照(FK)の存在を現在のストアと突合する(D-029)。値が未設定(optional FK)の行は対象外 */
+const referenceErrors = <Kind extends CsvEntityKind>(
+  spec: EntityCsvSpec<Kind>,
+  entity: EntityOf<Kind>,
+  state: AppState,
+): string[] =>
+  spec.references.flatMap((ref) => {
+    const value = entity[ref.key];
+    if (typeof value !== "string") return [];
+    const kind = typeof ref.target === "function" ? ref.target(entity) : ref.target;
+    // state[kind] は AppState[CsvEntityKind](7種の Record の union)で、recordValue の
+    // Value をその union へ単一の型として推論できない(union 引数から単一候補への推論限界)。
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- 上記推論限界の回避。実体は Record<string, unknown>
+    const exists = recordValue(state[kind] as Record<string, unknown>, value) !== undefined;
+    return exists ? [] : [`${ref.key}: 参照先が存在しません '${value}'`];
+  });
+
 /** 1データ行の変換結果(rowToEntity → ユニーク・参照整合)をまとめた判定 */
 type RowOutcome<Kind extends CsvEntityKind> =
   | { ok: true; entity: EntityOf<Kind> }
@@ -162,7 +204,6 @@ type RowOutcome<Kind extends CsvEntityKind> =
 
 /** evaluateRow がまとめて受け取る、行ごとに不変な検証コンテキスト(max-params 対策) */
 type RowContext<Kind extends CsvEntityKind> = {
-  kind: Kind;
   spec: EntityCsvSpec<Kind>;
   seenValues: Map<string, Map<string, number>>;
   state: AppState;
@@ -178,7 +219,7 @@ const evaluateRow = <Kind extends CsvEntityKind>(
   if ("messages" in outcome) return { ok: false, messages: outcome.messages };
   const rowMessages = [
     ...checkUniqueness(outcome.entity, ctx.seenValues, line),
-    ...REFERENCE_CHECKS[ctx.kind](outcome.entity, ctx.state),
+    ...referenceErrors(ctx.spec, outcome.entity, ctx.state),
   ];
   if (rowMessages.length > 0) return { ok: false, messages: rowMessages };
   return { ok: true, entity: outcome.entity };
@@ -202,7 +243,7 @@ const collectRows = <Kind extends CsvEntityKind>(
   const seenValues = new Map<string, Map<string, number>>(
     ["id", ...spec.uniqueKeys].map((key) => [key, new Map<string, number>()]),
   );
-  const ctx: RowContext<Kind> = { kind, spec, seenValues, state };
+  const ctx: RowContext<Kind> = { spec, seenValues, state };
   let validCount = 0;
   for (const [dataIndex, cells] of dataRows.entries()) {
     const line = dataIndex + 2;

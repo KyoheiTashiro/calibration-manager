@@ -14,6 +14,7 @@ import {
   type ImportValidationResult,
   validateEntityCsv,
 } from "@/features/settings/components/csv/importValidation";
+import { IssueList } from "@/features/settings/components/csv/IssueList";
 import type { AppState } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
 import { type ChangeEvent, type ReactElement, type ReactNode, useRef, useState } from "react";
@@ -111,28 +112,20 @@ export const ImportSection = ({ state }: Props): ReactElement => {
       <div className="flex flex-col gap-1">
         <p className="text-green-700">✓ {result.validCount}行 取り込み可</p>
         {result.errorRowCount > 0 && (
-          <>
-            <p className="text-danger">✗ {result.errorRowCount}行 エラー</p>
-            <ul className="text-danger flex flex-col gap-0.5">
-              {result.errors.map((error) => (
-                <li key={`${error.line}-${error.message}`}>
-                  行{error.line}: {error.message}
-                </li>
-              ))}
-            </ul>
-          </>
+          <IssueList
+            heading={`✗ ${result.errorRowCount}行 エラー`}
+            headingClassName="text-danger"
+            listClassName="text-danger flex flex-col gap-0.5"
+            items={result.errors}
+          />
         )}
         {result.warningRowCount > 0 && (
-          <>
-            <p className="text-amber-600">⚠ {result.warningRowCount}行 警告</p>
-            <ul className="flex flex-col gap-0.5 text-amber-600">
-              {result.warnings.map((warning) => (
-                <li key={`${warning.line}-${warning.message}`}>
-                  行{warning.line}: {warning.message}
-                </li>
-              ))}
-            </ul>
-          </>
+          <IssueList
+            heading={`⚠ ${result.warningRowCount}行 警告`}
+            headingClassName="text-amber-600"
+            listClassName="flex flex-col gap-0.5 text-amber-600"
+            items={result.warnings}
+          />
         )}
       </div>
     );

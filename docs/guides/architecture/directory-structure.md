@@ -76,7 +76,7 @@ src/
 │   └── settings/                   // '/settings'（screen-design §11。CSVエクスポート/インポート・データ全削除）
 │       ├── index.tsx
 │       └── components/
-│           ├── csv/                // ExportSection / ImportSection / entityCsv.ts（エンティティ⇔CSV列仕様レジストリ。utils/csv の低水準処理を利用）/ importValidation.ts（行単位検証）
+│           ├── csv/                // ExportSection / ImportSection / IssueList（プレビューのエラー・警告一覧）/ entityCsv.ts（エンティティ⇔CSV列仕様レジストリ。列はstore/schema.tsのshapeから導出。utils/csv の低水準処理を利用）/ importValidation.ts（行単位検証）
 │           ├── pwa/                // PwaInstallSection / usePwaInstall（D-037）
 │           └── reset/              // ResetSection（データ全削除。D-031）
 ├── store/

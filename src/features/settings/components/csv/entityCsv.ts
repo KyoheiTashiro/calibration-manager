@@ -1,22 +1,22 @@
 /**
  * エンティティ ⇔ CSV の列仕様(§11、D-028)。
- * 列 = store/types.ts のフィールド宣言順、ヘッダ = フィールド名の英語キー。
+ * 列 = store/schema.ts の zod shape 定義順、ヘッダ = フィールド名の英語キー。
  * boolean は true/false、optional 未設定は空セル、数値は10進文字列。
  * CSV 文字列レベルの直列化・パースは utils/csv.ts、行の検証は ./importValidation.ts が担う。
  */
 
 import {
-  serviceOrderSchema,
   equipmentSchema,
-  serviceItemSchema,
-  serviceRecordSchema,
   notificationSchema,
   personSchema,
+  serviceItemSchema,
+  serviceOrderSchema,
+  serviceRecordSchema,
   vendorSchema,
 } from "@/store/schema";
-import type { AppState } from "@/store/types";
+import { type AppState, NOTIFICATION_TARGET_TYPE } from "@/store/types";
 import { serializeCsv } from "@/utils/csv";
-import type { z } from "zod";
+import { z } from "zod";
 
 /** CSV 対象エンティティ種別 = AppState のキー */
 export type CsvEntityKind = keyof AppState;
@@ -42,13 +42,13 @@ export const CSV_COLUMN_KIND = {
 } as const;
 export type CsvColumnKind = (typeof CSV_COLUMN_KIND)[keyof typeof CSV_COLUMN_KIND];
 
-/** 種別 Kind のエンティティ型。列仕様のほか importValidation / csvReferenceChecks が共用する */
+/** 種別 Kind のエンティティ型。列仕様のほか importValidation が共用する */
 export type EntityOf<Kind extends CsvEntityKind> = AppState[Kind][string];
 
 /**
  * 10進数値として解釈可能なセルの判定(D-028 の数値セル規則)。
  * importValidation の数値変換(`Number("") === 0` の誤変換防止)と、
- * csvFormulaWarning の負数除外(`-20` は数式扱いしない、D-053)が共用する。
+ * 数式インジェクション警告の負数除外(`-20` は数式扱いしない、D-053)が共用する。
  */
 export const NUMBER_CELL_PATTERN = /^-?\d+(?:\.\d+)?$/u;
 
@@ -57,144 +57,133 @@ export type CsvColumn<Entity> = {
   kind: CsvColumnKind;
 };
 
+/** 外向き参照(FK)1件の宣言。target は固定種別、またはエンティティの値で分岐する関数(notifications.targetId 等) */
+export type CsvReference<Entity> = {
+  key: keyof Entity & string;
+  target: CsvEntityKind | ((entity: Entity) => CsvEntityKind);
+};
+
 export type EntityCsvSpec<Kind extends CsvEntityKind> = {
   /** UI 表示用の日本語ラベル(§11 のボタン文言) */
   label: string;
-  /** ヘッダ行と一致すべき列定義(宣言順) */
+  /** ヘッダ行と一致すべき列定義(宣言順 = schema.shape の宣言順) */
   columns: readonly CsvColumn<EntityOf<Kind>>[];
   /** 行単位バリデーション用スキーマ(store/schema.ts 流用) */
   schema: z.ZodType<EntityOf<Kind>>;
   /** id 以外のファイル内ユニーク制約(equipment.managementNo など) */
   uniqueKeys: readonly (keyof EntityOf<Kind> & string)[];
-};
-
-export const ENTITY_CSV_SPECS: { [Kind in CsvEntityKind]: EntityCsvSpec<Kind> } = {
-  equipment: {
-    label: "機器",
-    columns: [
-      { key: "id", kind: CSV_COLUMN_KIND.STRING },
-      { key: "managementNo", kind: CSV_COLUMN_KIND.STRING },
-      { key: "name", kind: CSV_COLUMN_KIND.STRING },
-      { key: "model", kind: CSV_COLUMN_KIND.OPTIONAL_STRING },
-      { key: "serialNo", kind: CSV_COLUMN_KIND.OPTIONAL_STRING },
-      { key: "manufacturerId", kind: CSV_COLUMN_KIND.OPTIONAL_STRING },
-      { key: "location", kind: CSV_COLUMN_KIND.OPTIONAL_STRING },
-      { key: "status", kind: CSV_COLUMN_KIND.STRING },
-      { key: "note", kind: CSV_COLUMN_KIND.OPTIONAL_STRING },
-    ],
-    schema: equipmentSchema,
-    uniqueKeys: ["managementNo"],
-  },
-  serviceItems: {
-    label: "点検校正項目",
-    columns: [
-      { key: "id", kind: CSV_COLUMN_KIND.STRING },
-      { key: "equipmentId", kind: CSV_COLUMN_KIND.STRING },
-      { key: "type", kind: CSV_COLUMN_KIND.STRING },
-      { key: "name", kind: CSV_COLUMN_KIND.STRING },
-      { key: "cycle", kind: CSV_COLUMN_KIND.STRING },
-      { key: "execution", kind: CSV_COLUMN_KIND.STRING },
-      { key: "vendorId", kind: CSV_COLUMN_KIND.OPTIONAL_STRING },
-      { key: "leadTimeDays", kind: CSV_COLUMN_KIND.OPTIONAL_NUMBER },
-      { key: "bufferDays", kind: CSV_COLUMN_KIND.NUMBER },
-      { key: "personId", kind: CSV_COLUMN_KIND.STRING },
-      { key: "noticeDaysBefore", kind: CSV_COLUMN_KIND.NUMBER },
-      { key: "lastDoneDate", kind: CSV_COLUMN_KIND.OPTIONAL_STRING },
-      { key: "nextDueDate", kind: CSV_COLUMN_KIND.STRING },
-      { key: "isActive", kind: CSV_COLUMN_KIND.BOOLEAN },
-    ],
-    schema: serviceItemSchema,
-    uniqueKeys: [],
-  },
-  serviceRecords: {
-    label: "実施記録",
-    columns: [
-      { key: "id", kind: CSV_COLUMN_KIND.STRING },
-      { key: "serviceItemId", kind: CSV_COLUMN_KIND.STRING },
-      { key: "doneDate", kind: CSV_COLUMN_KIND.STRING },
-      { key: "doneBy", kind: CSV_COLUMN_KIND.STRING },
-      { key: "result", kind: CSV_COLUMN_KIND.STRING },
-      { key: "serviceOrderId", kind: CSV_COLUMN_KIND.OPTIONAL_STRING },
-      { key: "note", kind: CSV_COLUMN_KIND.OPTIONAL_STRING },
-    ],
-    schema: serviceRecordSchema,
-    uniqueKeys: [],
-  },
-  serviceOrders: {
-    label: "点検校正外部案件",
-    columns: [
-      { key: "id", kind: CSV_COLUMN_KIND.STRING },
-      { key: "serviceItemId", kind: CSV_COLUMN_KIND.STRING },
-      { key: "vendorId", kind: CSV_COLUMN_KIND.STRING },
-      { key: "status", kind: CSV_COLUMN_KIND.STRING },
-      { key: "orderedDate", kind: CSV_COLUMN_KIND.OPTIONAL_STRING },
-      { key: "dueDate", kind: CSV_COLUMN_KIND.OPTIONAL_STRING },
-      { key: "returnedDate", kind: CSV_COLUMN_KIND.OPTIONAL_STRING },
-      { key: "cost", kind: CSV_COLUMN_KIND.OPTIONAL_NUMBER },
-      { key: "note", kind: CSV_COLUMN_KIND.OPTIONAL_STRING },
-    ],
-    schema: serviceOrderSchema,
-    uniqueKeys: [],
-  },
-  vendors: {
-    label: "メーカー/取引先",
-    columns: [
-      { key: "id", kind: CSV_COLUMN_KIND.STRING },
-      { key: "name", kind: CSV_COLUMN_KIND.STRING },
-      { key: "isManufacturer", kind: CSV_COLUMN_KIND.BOOLEAN },
-      { key: "isCalibrator", kind: CSV_COLUMN_KIND.BOOLEAN },
-      { key: "contactPerson", kind: CSV_COLUMN_KIND.OPTIONAL_STRING },
-      { key: "email", kind: CSV_COLUMN_KIND.OPTIONAL_STRING },
-      { key: "phone", kind: CSV_COLUMN_KIND.OPTIONAL_STRING },
-      { key: "standardLeadTimeDays", kind: CSV_COLUMN_KIND.OPTIONAL_NUMBER },
-      { key: "note", kind: CSV_COLUMN_KIND.OPTIONAL_STRING },
-    ],
-    schema: vendorSchema,
-    uniqueKeys: [],
-  },
-  persons: {
-    label: "担当者",
-    columns: [
-      { key: "id", kind: CSV_COLUMN_KIND.STRING },
-      { key: "name", kind: CSV_COLUMN_KIND.STRING },
-      { key: "email", kind: CSV_COLUMN_KIND.STRING },
-      { key: "department", kind: CSV_COLUMN_KIND.OPTIONAL_STRING },
-      { key: "isActive", kind: CSV_COLUMN_KIND.BOOLEAN },
-    ],
-    schema: personSchema,
-    uniqueKeys: [],
-  },
-  notifications: {
-    label: "通知",
-    columns: [
-      { key: "id", kind: CSV_COLUMN_KIND.STRING },
-      { key: "type", kind: CSV_COLUMN_KIND.STRING },
-      { key: "targetType", kind: CSV_COLUMN_KIND.STRING },
-      { key: "targetId", kind: CSV_COLUMN_KIND.STRING },
-      { key: "personId", kind: CSV_COLUMN_KIND.STRING },
-      { key: "message", kind: CSV_COLUMN_KIND.STRING },
-      { key: "createdDate", kind: CSV_COLUMN_KIND.STRING },
-      { key: "isRead", kind: CSV_COLUMN_KIND.BOOLEAN },
-    ],
-    schema: notificationSchema,
-    uniqueKeys: [],
-  },
+  /** 外向き参照(FK)の一覧。突合先の存在チェックは importValidation.ts が行う(D-029) */
+  references: readonly CsvReference<EntityOf<Kind>>[];
 };
 
 /**
- * フィールド値をセル文字列へ変換する(D-028: undefined → 空、boolean → true/false)。
- * 引数を unknown にしているのは、呼び出し側の `entity[column.key]` がジェネリックな
- * `Kind` 越しのインデックスアクセスで具体型(string/number/boolean/undefined)へ
- * TS上解決しきれないため(型引数を固定しない限り原理的に不可能)。実体は
- * ENTITY_CSV_SPECS の columns 定義により必ずこの4種のいずれかである。
+ * schema.shape の1フィールドから CSV 列種別を判定する(D-028)。
+ * ZodOptional でラップされていれば optional 判定して unwrap し、inner が
+ * ZodNumber → 数値、ZodBoolean → 真偽値、それ以外(ZodString・ZodEnum・refine付き)→ 文字列とする。
+ */
+const columnKindOf = (field: z.ZodType): CsvColumnKind => {
+  const isOptional = field instanceof z.ZodOptional;
+  const inner = isOptional ? field.unwrap() : field;
+  if (inner instanceof z.ZodNumber) {
+    return isOptional ? CSV_COLUMN_KIND.OPTIONAL_NUMBER : CSV_COLUMN_KIND.NUMBER;
+  }
+  if (inner instanceof z.ZodBoolean) return CSV_COLUMN_KIND.BOOLEAN;
+  return isOptional ? CSV_COLUMN_KIND.OPTIONAL_STRING : CSV_COLUMN_KIND.STRING;
+};
+
+/**
+ * ZodObject の shape を取り出す。EntityCsvSpec.schema の型は z.ZodType<Entity> だが、
+ * 実体は必ず store/schema.ts の z.object(...)(必要なら .superRefine 付き、this を返すため shape は保持される)。
+ * 型 z.ZodType には shape が無いため取り出しにアサーションを要する。
+ */
+const shapeOf = (schema: z.ZodType): Record<string, z.ZodType> =>
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- 上記コメントの理由により実体は必ず ZodObject
+  (schema as unknown as { shape: Record<string, z.ZodType> }).shape;
+
+/** schema.shape から columns を導出する(キー順 = shape の宣言順、現行 columns 順と一致・検証済み) */
+const columnsOf = <Entity>(schema: z.ZodType<Entity>): readonly CsvColumn<Entity>[] =>
+  Object.entries(shapeOf(schema)).map(([key, field]) => ({
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- schema.ts の AssertEqual 群が shape のキー集合 = エンティティキー集合であることを保証する
+    key: key as keyof Entity & string,
+    kind: columnKindOf(field),
+  }));
+
+/** ENTITY_CSV_SPECS の1エントリを組み立てる(columns は schema から導出するため引数に含めない) */
+const defineSpec = <Kind extends CsvEntityKind>(
+  label: string,
+  schema: z.ZodType<EntityOf<Kind>>,
+  uniqueKeys: readonly (keyof EntityOf<Kind> & string)[],
+  references: readonly CsvReference<EntityOf<Kind>>[],
+): EntityCsvSpec<Kind> => ({
+  label,
+  columns: columnsOf(schema),
+  schema,
+  uniqueKeys,
+  references,
+});
+
+export const ENTITY_CSV_SPECS: { [Kind in CsvEntityKind]: EntityCsvSpec<Kind> } = {
+  equipment: defineSpec<"equipment">(
+    "機器",
+    equipmentSchema,
+    ["managementNo"],
+    [{ key: "manufacturerId", target: "vendors" }],
+  ),
+  serviceItems: defineSpec<"serviceItems">(
+    "点検校正項目",
+    serviceItemSchema,
+    [],
+    [
+      { key: "equipmentId", target: "equipment" },
+      { key: "vendorId", target: "vendors" },
+      { key: "personId", target: "persons" },
+    ],
+  ),
+  serviceRecords: defineSpec<"serviceRecords">(
+    "実施記録",
+    serviceRecordSchema,
+    [],
+    [
+      { key: "serviceItemId", target: "serviceItems" },
+      { key: "serviceOrderId", target: "serviceOrders" },
+    ],
+  ),
+  serviceOrders: defineSpec<"serviceOrders">(
+    "点検校正外部案件",
+    serviceOrderSchema,
+    [],
+    [
+      { key: "serviceItemId", target: "serviceItems" },
+      { key: "vendorId", target: "vendors" },
+    ],
+  ),
+  vendors: defineSpec<"vendors">("メーカー/取引先", vendorSchema, [], []),
+  persons: defineSpec<"persons">("担当者", personSchema, [], []),
+  notifications: defineSpec<"notifications">(
+    "通知",
+    notificationSchema,
+    [],
+    [
+      {
+        key: "targetId",
+        target: (entity) =>
+          entity.targetType === NOTIFICATION_TARGET_TYPE.SERVICE_ITEM
+            ? "serviceItems"
+            : "serviceOrders",
+      },
+      { key: "personId", target: "persons" },
+    ],
+  ),
+};
+
+/**
+ * フィールド値をセル文字列へ変換する(D-028: undefined → 空、boolean → true/false、数値 → 10進文字列。
+ * いずれも String() の既定表現と一致)。columns の kind 定義上 value は下記3種 + undefined のみで、
+ * §8 の例外禁止方針に従い万一の想定外値は空セルとして扱う。
  */
 const cellOfValue = (value: unknown): string => {
-  if (value === undefined) return "";
-  if (typeof value === "boolean") return value ? "true" : "false";
-  if (typeof value === "number") return String(value);
   if (typeof value === "string") return value;
-  // 型上到達しない(CsvColumn の kind 定義により value は上記4種のみ)。
-  // §8 の例外禁止方針に従い、万一の想定外値は空セルとして扱う。
+  if (typeof value === "number" || typeof value === "boolean") return String(value);
   return "";
 };
 

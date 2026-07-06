@@ -19,93 +19,49 @@ const serializeCsvField = (value: string): string =>
 export const serializeCsv = (rows: readonly (readonly string[])[]): string =>
   rows.map((row) => `${row.map((cell) => serializeCsvField(cell)).join(",")}\r\n`).join("");
 
-/** parseCsv の走査状態。ヘルパ関数が直接書き換える(1回のパース内でのみ生存) */
-type CsvParseState = {
-  content: string;
-  index: number;
-  field: string;
-  inQuotes: boolean;
-  row: string[];
-  rows: string[][];
-};
-
-const endField = (state: CsvParseState): void => {
-  state.row.push(state.field);
-  state.field = "";
-};
-
-const endRow = (state: CsvParseState): void => {
-  endField(state);
-  state.rows.push(state.row);
-  state.row = [];
-};
-
-/** 引用フィールド内の1文字を消費する。不正な引用(閉じ引用直後の余分な文字)は false */
-const consumeQuotedChar = (state: CsvParseState): boolean => {
-  const char = state.content[state.index];
-  if (char !== '"') {
-    state.field += char;
-    state.index += 1;
-    return true;
-  }
-  if (state.content[state.index + 1] === '"') {
-    // `""` はエスケープされた引用符1文字
-    state.field += '"';
-    state.index += 2;
-    return true;
-  }
-  // 閉じ引用の直後はカンマ・改行・終端のみ許す(`"a"b` は不正)。
-  // 文字列の添字アクセスは範囲外でも型上 string になる(noUncheckedIndexedAccess とは無関係の
-  // TS の仕様)ため、`next !== undefined` は型上つねに true。終端かどうかは長さで判定する。
-  const hasNext = state.index + 1 < state.content.length;
-  const next = state.content[state.index + 1];
-  if (hasNext && next !== "," && next !== "\r" && next !== "\n") return false;
-  state.inQuotes = false;
-  state.index += 1;
-  return true;
-};
-
-/** 引用フィールド外の1文字を消費する(引用開始・区切り・改行・通常文字) */
-const consumeUnquotedChar = (state: CsvParseState): void => {
-  const char = state.content[state.index];
-  if (char === '"' && state.field === "") {
-    state.inQuotes = true;
-    state.index += 1;
-    return;
-  }
-  if (char === ",") {
-    endField(state);
-    state.index += 1;
-    return;
-  }
-  if (char === "\r" || char === "\n") {
-    endRow(state);
-    state.index += char === "\r" && state.content[state.index + 1] === "\n" ? 2 : 1;
-    return;
-  }
-  state.field += char;
-  state.index += 1;
-};
+/**
+ * 1フィールド + 直後の区切りにマッチする sticky 正規表現。
+ * 名前付きグループ `raw` が生フィールド(引用符込み)、`delimiter` が区切り
+ * (`,` / 改行 / 終端の空文字列)。
+ * 引用フィールドの中身(`"..."`)と非引用フィールドを `raw` 1つのグループにまとめているのは、
+ * 2グループに分けると「どちらが undefined か」の判定が必要になり、
+ * noUncheckedIndexedAccess を無効化している本プロジェクトでは
+ * typescript/no-unnecessary-condition に抵触するため。代わりに `raw.startsWith('"')` で判定する。
+ * `(?:[^"]|"")*` は先頭文字で分岐が確定するためバックトラック爆発は起きない。
+ */
+const FIELD_PATTERN = /(?<raw>"(?:[^"]|"")*"|[^",\r\n][^,\r\n]*|)(?<delimiter>,|\r\n|[\r\n]|$)/uy;
 
 /**
- * CSV 文字列をセル二次元配列へパースする。先頭 BOM は除去し、行末は CRLF / LF の両方を受理、
- * 末尾の改行は無視する。引用フィールド内のカンマ・改行・`""` を扱う。
+ * CSV 文字列をセル二次元配列へパースする。先頭 BOM は除去し、行末は CRLF / LF / 単独 CR の
+ * いずれも受理、末尾の改行は無視する。引用フィールド内のカンマ・改行・`""` を扱う。
  * 不正な引用(閉じ引用の欠落、閉じ引用直後の余分な文字)は例外を投げず null を返す
  * (coding-standards.md §8「例外を投げない」)。
  */
 export const parseCsv = (text: string): string[][] | null => {
   const content = text.startsWith(CSV_BOM) ? text.slice(CSV_BOM.length) : text;
   if (content === "") return [];
-  const state: CsvParseState = { content, index: 0, field: "", inQuotes: false, row: [], rows: [] };
-  while (state.index < state.content.length) {
-    if (state.inQuotes) {
-      if (!consumeQuotedChar(state)) return null;
-    } else {
-      consumeUnquotedChar(state);
+
+  const rows: string[][] = [];
+  let row: string[] = [];
+  let index = 0;
+  // 直前の区切りがカンマだった(=行の途中)かどうか。終端直後の空フィールドを拾うため
+  // index が content.length に達した後も1回だけループを回す必要がある
+  let pending = false;
+
+  while (index < content.length || pending) {
+    FIELD_PATTERN.lastIndex = index;
+    const match = FIELD_PATTERN.exec(content);
+    if (match === null) return null;
+    const { raw = "", delimiter = "" } = match.groups ?? {};
+    row.push(raw.startsWith('"') ? raw.slice(1, -1).replaceAll('""', '"') : raw);
+    index += match[0].length;
+    if (delimiter === ",") {
+      pending = true;
+      continue;
     }
+    rows.push(row);
+    row = [];
+    pending = index < content.length;
   }
-  if (state.inQuotes) return null;
-  // 末尾が改行で終わらない場合のみ最終行が確定していない
-  if (state.field !== "" || state.row.length > 0) endRow(state);
-  return state.rows;
+  return rows;
 };
