@@ -115,6 +115,9 @@
     // なぜ: coding-standards.md §8 の不変スタイル「入力を変更せず `{ ...item, ... }` で新値を返す」は
     // オブジェクトspreadが前提のイディオムであり、Object.assign への書き換え強制は規約と矛盾する。
     "oxc/no-rest-spread-properties": "off",
+    // なぜ: 逐次の非同期処理は async/await の方が Promise チェーンより読みやすく、
+    // テスト(user-event 等で await 必須)と本体で書き方が割れるのも避けたいため全面的に許可する。
+    "oxc/no-async-await": "off",
     // なぜ: ドメイン上意味を持つ既定値は domain/constants.ts へのJSDoc付き集約（coding-standards.md §8）
     // で担保する。一方で暦計算の「1年=12ヶ月」「月は1始まり」やゼロ埋め桁数のような文脈自明の数まで
     // 定数化を強制すると、かえって可読性を損なうため機械的な全数検出は行わない。
@@ -229,9 +232,6 @@
         // なぜ: テストはケース網羅で行数が自然に嵩み、行数上限で機械分割すると同一対象のテストが
         // 複数ファイルに散って見通しが悪化するため、テストファイルに限り行数上限を適用しない。
         "eslint/max-lines": "off",
-        // なぜ: user-event 等 Testing Library の操作APIはPromiseを返しawaitが必須であり、
-        // テストでは async/await を避けようがない（全テストで同一のdisableが106箇所必要になっていた）。
-        "oxc/no-async-await": "off",
         // なぜ: 遷移先ダミー画面など、テスト内で複数の小さなコンポーネントを同一ファイルに
         // 並べるのはルーティングテストの標準パターンのため、テストに限り複数コンポーネントを許容する。
         "react/no-multi-comp": "off"

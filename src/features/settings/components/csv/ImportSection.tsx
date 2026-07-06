@@ -95,25 +95,22 @@ export const ImportSection = ({ state }: Props): ReactElement => {
     clearSelection();
   };
 
-  const handleFileChange = (event: ChangeEvent<HTMLInputElement>): void => {
+  const handleFileChange = async (event: ChangeEvent<HTMLInputElement>): Promise<void> => {
     const file = event.target.files?.[0];
     if (!file) return;
     validationSeq.current += 1;
     const seq = validationSeq.current;
-    // なぜ .then か: oxc(no-async-await) 方針のため async/await ではなく Promise チェーンで扱う。
-    file
-      .text()
-      .then((text) => {
-        if (seq !== validationSeq.current) return;
-        setViewState({
-          step: IMPORT_STEP.PREVIEW,
-          fileName: file.name,
-          result: validateEntityCsv(kind, text, state),
-        });
-      })
-      .catch(() => {
-        // 読み取り失敗は例外を投げず無視する(coding-standards §8)
+    try {
+      const text = await file.text();
+      if (seq !== validationSeq.current) return;
+      setViewState({
+        step: IMPORT_STEP.PREVIEW,
+        fileName: file.name,
+        result: validateEntityCsv(kind, text, state),
       });
+    } catch {
+      // 読み取り失敗は例外を投げず無視する(coding-standards §8)
+    }
   };
 
   const handleCancel = (): void => {
