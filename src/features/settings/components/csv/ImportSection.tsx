@@ -122,6 +122,18 @@ export const ImportSection = ({ state }: Props): ReactElement => {
             </ul>
           </>
         )}
+        {result.warningRowCount > 0 && (
+          <>
+            <p className="text-amber-600">⚠ {result.warningRowCount}行 警告</p>
+            <ul className="flex flex-col gap-0.5 text-amber-600">
+              {result.warnings.map((warning) => (
+                <li key={`${warning.line}-${warning.message}`}>
+                  行{warning.line}: {warning.message}
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
       </div>
     );
   };

@@ -42,7 +42,15 @@ export const CSV_COLUMN_KIND = {
 } as const;
 export type CsvColumnKind = (typeof CSV_COLUMN_KIND)[keyof typeof CSV_COLUMN_KIND];
 
-type EntityOf<Kind extends CsvEntityKind> = AppState[Kind][string];
+/** 種別 Kind のエンティティ型。列仕様のほか importValidation / csvReferenceChecks が共用する */
+export type EntityOf<Kind extends CsvEntityKind> = AppState[Kind][string];
+
+/**
+ * 10進数値として解釈可能なセルの判定(D-028 の数値セル規則)。
+ * importValidation の数値変換(`Number("") === 0` の誤変換防止)と、
+ * csvFormulaWarning の負数除外(`-20` は数式扱いしない、D-053)が共用する。
+ */
+export const NUMBER_CELL_PATTERN = /^-?\d+(?:\.\d+)?$/u;
 
 export type CsvColumn<Entity> = {
   key: keyof Entity & string;

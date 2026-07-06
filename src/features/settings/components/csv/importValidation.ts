@@ -6,16 +6,19 @@
  * 行番号はファイル上の行番号(ヘッダ = 1行目、データ先頭 = 行2)。
  */
 
+import { collectFormulaWarnings } from "@/features/settings/components/csv/csvFormulaWarning";
+import { REFERENCE_CHECKS } from "@/features/settings/components/csv/csvReferenceChecks";
 import {
   CSV_COLUMN_KIND,
   type CsvColumnKind,
   type CsvEntityKind,
   ENTITY_CSV_SPECS,
   type EntityCsvSpec,
+  type EntityOf,
+  NUMBER_CELL_PATTERN,
 } from "@/features/settings/components/csv/entityCsv";
-import { type AppState, NOTIFICATION_TARGET_TYPE } from "@/store/types";
+import type { AppState } from "@/store/types";
 import { parseCsv } from "@/utils/csv";
-import { recordValue } from "@/utils/record";
 import type { z } from "zod";
 
 export type ImportRowError = {
@@ -33,12 +36,11 @@ export type ImportValidationResult<Kind extends CsvEntityKind> = {
   errors: ImportRowError[];
   /** エラー0件のときのみ非 null。replaceEntities へそのまま渡せる Record(D-029) */
   entities: AppState[Kind] | null;
+  /** 数式インジェクション警告(D-053)。取り込みは妨げない */
+  warnings: ImportRowError[];
+  /** 警告を含む行数(プレビューの「⚠ N行 警告」用) */
+  warningRowCount: number;
 };
-
-type EntityOf<Kind extends CsvEntityKind> = AppState[Kind][string];
-
-/** 10進数値として解釈可能なセルの判定(Number("") === 0 の誤変換を防ぐ) */
-const NUMBER_CELL_PATTERN = /^-?\d+(?:\.\d+)?$/u;
 
 type CellConversion =
   | { ok: true; value: string | number | boolean | undefined }
@@ -81,75 +83,6 @@ const formatZodIssue = (issue: z.core.$ZodIssue, raw: Record<string, unknown>): 
   const path = issue.path.join(".");
   const detail = zodIssueDetail(issue, raw);
   return path === "" ? detail : `${path}: ${detail}`;
-};
-
-/**
- * インポート行の外向き参照(FK)が現在のストアに存在するかを検証する(D-029)。
- * 対象種別自身への参照を持つエンティティは存在しないため、突合先は常に「他エンティティの現在値」。
- */
-const REFERENCE_CHECKS: {
-  [Kind in CsvEntityKind]: (entity: EntityOf<Kind>, state: AppState) => string[];
-} = {
-  equipment: (entity, state) =>
-    entity.manufacturerId !== undefined &&
-    recordValue(state.vendors, entity.manufacturerId) === undefined
-      ? [`manufacturerId: 参照先が存在しません '${entity.manufacturerId}'`]
-      : [],
-  serviceItems: (entity, state) => {
-    const messages: string[] = [];
-    if (recordValue(state.equipment, entity.equipmentId) === undefined) {
-      messages.push(`equipmentId: 参照先が存在しません '${entity.equipmentId}'`);
-    }
-    if (
-      entity.vendorId !== undefined &&
-      recordValue(state.vendors, entity.vendorId) === undefined
-    ) {
-      messages.push(`vendorId: 参照先が存在しません '${entity.vendorId}'`);
-    }
-    if (recordValue(state.persons, entity.personId) === undefined) {
-      messages.push(`personId: 参照先が存在しません '${entity.personId}'`);
-    }
-    return messages;
-  },
-  serviceRecords: (entity, state) => {
-    const messages: string[] = [];
-    if (recordValue(state.serviceItems, entity.serviceItemId) === undefined) {
-      messages.push(`serviceItemId: 参照先が存在しません '${entity.serviceItemId}'`);
-    }
-    if (
-      entity.serviceOrderId !== undefined &&
-      recordValue(state.serviceOrders, entity.serviceOrderId) === undefined
-    ) {
-      messages.push(`serviceOrderId: 参照先が存在しません '${entity.serviceOrderId}'`);
-    }
-    return messages;
-  },
-  serviceOrders: (entity, state) => {
-    const messages: string[] = [];
-    if (recordValue(state.serviceItems, entity.serviceItemId) === undefined) {
-      messages.push(`serviceItemId: 参照先が存在しません '${entity.serviceItemId}'`);
-    }
-    if (recordValue(state.vendors, entity.vendorId) === undefined) {
-      messages.push(`vendorId: 参照先が存在しません '${entity.vendorId}'`);
-    }
-    return messages;
-  },
-  vendors: () => [],
-  persons: () => [],
-  notifications: (entity, state) => {
-    const messages: string[] = [];
-    const targetExists =
-      entity.targetType === NOTIFICATION_TARGET_TYPE.SERVICE_ITEM
-        ? recordValue(state.serviceItems, entity.targetId) !== undefined
-        : recordValue(state.serviceOrders, entity.targetId) !== undefined;
-    if (!targetExists) {
-      messages.push(`targetId: 参照先が存在しません '${entity.targetId}'`);
-    }
-    if (recordValue(state.persons, entity.personId) === undefined) {
-      messages.push(`personId: 参照先が存在しません '${entity.personId}'`);
-    }
-    return messages;
-  },
 };
 
 /** パースとヘッダ検証。データ行に進めない場合はファイル全体エラー(行1)を返す */
@@ -222,38 +155,69 @@ const checkUniqueness = <Kind extends CsvEntityKind>(
   return messages;
 };
 
-/** 全データ行を検証し、取り込み可能行の Record とエラーを収集する */
+/** 1データ行の変換結果(rowToEntity → ユニーク・参照整合)をまとめた判定 */
+type RowOutcome<Kind extends CsvEntityKind> =
+  | { ok: true; entity: EntityOf<Kind> }
+  | { ok: false; messages: string[] };
+
+/** evaluateRow がまとめて受け取る、行ごとに不変な検証コンテキスト(max-params 対策) */
+type RowContext<Kind extends CsvEntityKind> = {
+  kind: Kind;
+  spec: EntityCsvSpec<Kind>;
+  seenValues: Map<string, Map<string, number>>;
+  state: AppState;
+};
+
+/** rowToEntity の結果にファイル内ユニーク・参照整合チェックまで適用する(collectRows のループ本体の分離) */
+const evaluateRow = <Kind extends CsvEntityKind>(
+  ctx: RowContext<Kind>,
+  cells: string[],
+  line: number,
+): RowOutcome<Kind> => {
+  const outcome = rowToEntity(ctx.spec, cells);
+  if ("messages" in outcome) return { ok: false, messages: outcome.messages };
+  const rowMessages = [
+    ...checkUniqueness(outcome.entity, ctx.seenValues, line),
+    ...REFERENCE_CHECKS[ctx.kind](outcome.entity, ctx.state),
+  ];
+  if (rowMessages.length > 0) return { ok: false, messages: rowMessages };
+  return { ok: true, entity: outcome.entity };
+};
+
+/** 全データ行を検証し、取り込み可能行の Record とエラー・警告を収集する */
 const collectRows = <Kind extends CsvEntityKind>(
   kind: Kind,
   dataRows: string[][],
   state: AppState,
-): { validCount: number; errors: ImportRowError[]; entities: Record<string, EntityOf<Kind>> } => {
+): {
+  validCount: number;
+  errors: ImportRowError[];
+  warnings: ImportRowError[];
+  entities: Record<string, EntityOf<Kind>>;
+} => {
   const spec = ENTITY_CSV_SPECS[kind];
   const errors: ImportRowError[] = [];
+  const warnings: ImportRowError[] = [];
   const entities: Record<string, EntityOf<Kind>> = {};
   const seenValues = new Map<string, Map<string, number>>(
     ["id", ...spec.uniqueKeys].map((key) => [key, new Map<string, number>()]),
   );
+  const ctx: RowContext<Kind> = { kind, spec, seenValues, state };
   let validCount = 0;
   for (const [dataIndex, cells] of dataRows.entries()) {
     const line = dataIndex + 2;
-    const outcome = rowToEntity(spec, cells);
-    if ("messages" in outcome) {
-      errors.push(...outcome.messages.map((message) => ({ line, message })));
-      continue;
+    if (cells.length === spec.columns.length) {
+      warnings.push(...collectFormulaWarnings(spec, cells, line));
     }
-    const rowMessages = [
-      ...checkUniqueness(outcome.entity, seenValues, line),
-      ...REFERENCE_CHECKS[kind](outcome.entity, state),
-    ];
-    if (rowMessages.length > 0) {
-      errors.push(...rowMessages.map((message) => ({ line, message })));
+    const outcome = evaluateRow(ctx, cells, line);
+    if (!outcome.ok) {
+      errors.push(...outcome.messages.map((message) => ({ line, message })));
       continue;
     }
     entities[outcome.entity.id] = outcome.entity;
     validCount += 1;
   }
-  return { validCount, errors, entities };
+  return { validCount, errors, warnings, entities };
 };
 
 /**
@@ -267,9 +231,16 @@ export const validateEntityCsv = <Kind extends CsvEntityKind>(
 ): ImportValidationResult<Kind> => {
   const preflighted = preflightCsv(ENTITY_CSV_SPECS[kind], csvText);
   if ("errors" in preflighted) {
-    return { validCount: 0, errorRowCount: 1, errors: preflighted.errors, entities: null };
+    return {
+      validCount: 0,
+      errorRowCount: 1,
+      errors: preflighted.errors,
+      entities: null,
+      warnings: [],
+      warningRowCount: 0,
+    };
   }
-  const { validCount, errors, entities } = collectRows(kind, preflighted.dataRows, state);
+  const { validCount, errors, warnings, entities } = collectRows(kind, preflighted.dataRows, state);
   return {
     validCount,
     errorRowCount: new Set(errors.map((error) => error.line)).size,
@@ -278,5 +249,7 @@ export const validateEntityCsv = <Kind extends CsvEntityKind>(
     // 同値性を TS は証明できない(correlated union 制限)。具体化された各 Kind では構造的に一致する。
     // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- 上記 correlated union 制限のため
     entities: errors.length === 0 ? (entities as AppState[Kind]) : null,
+    warnings,
+    warningRowCount: new Set(warnings.map((warning) => warning.line)).size,
   };
 };

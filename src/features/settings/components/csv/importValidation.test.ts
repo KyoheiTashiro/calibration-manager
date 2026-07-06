@@ -105,7 +105,14 @@ describe("validateEntityCsv: 取り込み成功", () => {
 
   it("ヘッダのみ(データ0行)は取り込み可の空 Record を返す", () => {
     const result = validateEntityCsv("equipment", joinCsv(EQUIPMENT_HEADER), emptyAppState());
-    expect(result).toEqual({ validCount: 0, errorRowCount: 0, errors: [], entities: {} });
+    expect(result).toEqual({
+      validCount: 0,
+      errorRowCount: 0,
+      errors: [],
+      entities: {},
+      warnings: [],
+      warningRowCount: 0,
+    });
   });
 
   it("数値・boolean のセルをフィールド値へ変換する(serviceItems)", () => {
@@ -299,5 +306,76 @@ describe("validateEntityCsv: 件数集計と取り込み可否(D-030)", () => {
     expect(result.validCount).toBe(2);
     expect(result.errorRowCount).toBe(1);
     expect(result.entities).toBeNull();
+  });
+});
+
+describe("validateEntityCsv: 数式インジェクション警告(D-053)", () => {
+  it("`=`始まりの文字列セルを行番号・列名付きで警告する(取り込みは妨げない)", () => {
+    const csv = joinCsv(EQUIPMENT_HEADER, "eq-1,EQ-101,ノギスA,,,,,active,=HYPERLINK(evil)");
+    const result = validateEntityCsv("equipment", csv, emptyAppState());
+    expect(result.errors).toEqual([]);
+    expect(result.warnings).toEqual([
+      { line: 2, message: "note: 数式として解釈され得る値です(Excel等で開く際は注意)" },
+    ]);
+    expect(result.entities).not.toBeNull();
+  });
+
+  it("`-20`のような数値解釈可能なセルは警告対象外", () => {
+    const csv = joinCsv(EQUIPMENT_HEADER, "eq-1,EQ-101,ノギスA,,,,,active,-20");
+    const result = validateEntityCsv("equipment", csv, emptyAppState());
+    expect(result.warnings).toEqual([]);
+    expect(result.entities?.["eq-1"]).toMatchObject({ note: "-20" });
+  });
+
+  it("`-`始まりでも数値として解釈できない文字列は警告対象", () => {
+    const csv = joinCsv(EQUIPMENT_HEADER, "eq-1,EQ-101,ノギスA,,,,,active,-20℃で保管");
+    const result = validateEntityCsv("equipment", csv, emptyAppState());
+    expect(result.warnings).toEqual([
+      { line: 2, message: "note: 数式として解釈され得る値です(Excel等で開く際は注意)" },
+    ]);
+  });
+
+  it("`@`始まりのセルも警告対象", () => {
+    const csv = joinCsv(EQUIPMENT_HEADER, "eq-1,EQ-101,ノギスA,,,,,active,@SUM(1+1)");
+    const result = validateEntityCsv("equipment", csv, emptyAppState());
+    expect(result.warnings).toEqual([
+      { line: 2, message: "note: 数式として解釈され得る値です(Excel等で開く際は注意)" },
+    ]);
+  });
+
+  it("警告のみの場合は validCount / entities とも従来どおり取り込み可能", () => {
+    const csv = joinCsv(EQUIPMENT_HEADER, "eq-1,EQ-101,ノギスA,,,,,active,=B1");
+    const result = validateEntityCsv("equipment", csv, emptyAppState());
+    expect(result.errors).toEqual([]);
+    expect(result.validCount).toBe(1);
+    expect(result.entities).not.toBeNull();
+    expect(result.warningRowCount).toBe(1);
+  });
+
+  it("エラー行と警告行が混在しても両方を報告し、entities は null のまま", () => {
+    const csv = joinCsv(EQUIPMENT_HEADER, "eq-1,EQ-101,ノギスA,,,,,broken,=B1");
+    const result = validateEntityCsv("equipment", csv, emptyAppState());
+    expect(result.errors).toEqual([{ line: 2, message: "status: 不正値 'broken'" }]);
+    expect(result.warnings).toEqual([
+      { line: 2, message: "note: 数式として解釈され得る値です(Excel等で開く際は注意)" },
+    ]);
+    expect(result.entities).toBeNull();
+  });
+
+  it("列数不正の行は警告判定の対象外", () => {
+    const csv = joinCsv(EQUIPMENT_HEADER, "eq-1,EQ-101,=A1");
+    const result = validateEntityCsv("equipment", csv, emptyAppState());
+    expect(result.errors).toEqual([{ line: 2, message: "列数が不正です(期待9・実際3)" }]);
+    expect(result.warnings).toEqual([]);
+  });
+
+  it("warningRowCount は行単位で重複排除する(同一行の複数セルが対象でも1)", () => {
+    const csv = joinCsv(EQUIPMENT_HEADER, "eq-1,EQ-101,ノギスA,,,,=A1,active,=B1");
+    const result = validateEntityCsv("equipment", csv, emptyAppState());
+    expect(result.warnings).toEqual([
+      { line: 2, message: "location: 数式として解釈され得る値です(Excel等で開く際は注意)" },
+      { line: 2, message: "note: 数式として解釈され得る値です(Excel等で開く際は注意)" },
+    ]);
+    expect(result.warningRowCount).toBe(1);
   });
 });

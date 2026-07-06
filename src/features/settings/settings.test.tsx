@@ -135,6 +135,21 @@ describe("インポート(§11、D-029 / D-030)", () => {
     expect(screen.getByRole("button", { name: "確定" })).toBeEnabled();
   });
 
+  it("数式インジェクション様CSVで警告を表示しつつ確定は活性のまま(D-053)", async () => {
+    renderWithStore(<Settings />);
+    const suspiciousEquipment: Equipment = {
+      ...sampleEquipment,
+      note: '=HYPERLINK("https://evil.example")',
+    };
+    await userEvent.upload(
+      screen.getByLabelText("ファイル"),
+      equipmentCsvFile(suspiciousEquipment),
+    );
+
+    expect(await screen.findByText("⚠ 1行 警告")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "確定" })).toBeEnabled();
+  });
+
   it("エラーCSVで行メッセージを表示し確定を非活性にする", async () => {
     renderWithStore(<Settings />);
     const badCsv = `${buildEntityCsv("equipment", {})}e1,M-001,ノギス,,,,,broken,\r\n`;
