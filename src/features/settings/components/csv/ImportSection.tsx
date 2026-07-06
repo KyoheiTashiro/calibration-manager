@@ -14,7 +14,7 @@ import {
   type ImportValidationResult,
   validateEntityCsv,
 } from "@/features/settings/components/csv/importValidation";
-import { IssueList } from "@/features/settings/components/csv/IssueList";
+import { IssueList, type IssueTone } from "@/features/settings/components/csv/IssueList";
 import type { AppState } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
 import { type ChangeEvent, type ReactElement, type ReactNode, useRef, useState } from "react";
@@ -27,6 +27,26 @@ const ENTITY_OPTIONS = CSV_ENTITY_KINDS.map((kind) => ({
 /** Select の onChange が渡す string を CsvEntityKind へ型ガードする */
 const isCsvEntityKind = (value: string): value is CsvEntityKind =>
   CSV_ENTITY_KINDS.some((kind) => kind === value);
+
+const IMPORT_STEP = { IDLE: "idle", PREVIEW: "preview", DONE: "done" } as const;
+
+// なぜ IssueList.tsx で export しないか: 同ファイルに tone 用の as-const オブジェクトを
+// export すると oxlint の react/only-export-components(Fast Refresh 対応)に抵触するため、
+// 値は呼び出し側であるここで持つ(型 IssueTone のみ IssueList.tsx から import する)。
+const ISSUE_TONE = { ERROR: "error", WARNING: "warning" } as const satisfies Record<
+  string,
+  IssueTone
+>;
+
+/** 未選択・プレビュー・完了の3状態を1つの判別可能 union で管理する(組合せ不整合を排除) */
+type ViewState =
+  | { step: typeof IMPORT_STEP.IDLE }
+  | {
+      step: typeof IMPORT_STEP.PREVIEW;
+      fileName: string;
+      result: ImportValidationResult<CsvEntityKind>;
+    }
+  | { step: typeof IMPORT_STEP.DONE; message: string };
 
 type Props = {
   /** 参照整合の突合先となる現在のストア全状態(D-029) */
@@ -41,19 +61,16 @@ export const ImportSection = ({ state }: Props): ReactElement => {
   // クリアのたびに世代を進め、古い検証結果は破棄する。
   const validationSeq = useRef(0);
   const [kind, setKind] = useState<CsvEntityKind>(CSV_ENTITY_KINDS[0]);
-  const [fileName, setFileName] = useState<string>();
-  const [result, setResult] = useState<ImportValidationResult<CsvEntityKind> | null>(null);
+  const [viewState, setViewState] = useState<ViewState>({ step: IMPORT_STEP.IDLE });
   const [confirmOpen, setConfirmOpen] = useState(false);
-  const [doneMessage, setDoneMessage] = useState<string>();
 
   const { label } = ENTITY_CSV_SPECS[kind];
-  const canConfirm = fileName !== undefined && result !== null && result.entities !== null;
+  const canConfirm = viewState.step === IMPORT_STEP.PREVIEW && viewState.result.entities !== null;
 
   // なぜ: 検証結果の陳腐化を防ぐため、選択済みファイル・プレビュー・input値をまとめて破棄する。
   const clearSelection = (): void => {
     validationSeq.current += 1;
-    setFileName(undefined);
-    setResult(null);
+    setViewState({ step: IMPORT_STEP.IDLE });
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
@@ -61,7 +78,6 @@ export const ImportSection = ({ state }: Props): ReactElement => {
     const { value } = event.target;
     if (!isCsvEntityKind(value)) return;
     setKind(value);
-    setDoneMessage(undefined);
     clearSelection();
   };
 
@@ -75,9 +91,11 @@ export const ImportSection = ({ state }: Props): ReactElement => {
       .text()
       .then((text) => {
         if (seq !== validationSeq.current) return;
-        setDoneMessage(undefined);
-        setFileName(file.name);
-        setResult(validateEntityCsv(kind, text, state));
+        setViewState({
+          step: IMPORT_STEP.PREVIEW,
+          fileName: file.name,
+          result: validateEntityCsv(kind, text, state),
+        });
       })
       .catch(() => {
         // 読み取り失敗は例外を投げず無視する(coding-standards §8)
@@ -85,45 +103,45 @@ export const ImportSection = ({ state }: Props): ReactElement => {
   };
 
   const handleCancel = (): void => {
-    setDoneMessage(undefined);
     clearSelection();
   };
 
   const handleConfirmImport = (): void => {
     setConfirmOpen(false);
-    const entities = result?.entities;
-    if (entities === null || entities === undefined) return;
+    if (viewState.step !== IMPORT_STEP.PREVIEW) return;
+    const { entities, validCount } = viewState.result;
+    if (entities === null) return;
     replaceEntities(kind, entities);
-    const message = `${label}を ${result?.validCount ?? 0} 件取り込みました`;
-    clearSelection();
-    setDoneMessage(message);
+    const message = `${label}を ${validCount} 件取り込みました`;
+    validationSeq.current += 1;
+    if (fileInputRef.current) fileInputRef.current.value = "";
+    setViewState({ step: IMPORT_STEP.DONE, message });
   };
 
   const renderPreview = (): ReactNode => {
-    if (doneMessage !== undefined) {
-      return <output className="text-green-700">{doneMessage}</output>;
+    if (viewState.step === IMPORT_STEP.DONE) {
+      return <output className="text-green-700">{viewState.message}</output>;
     }
-    if (result === null) {
+    if (viewState.step === IMPORT_STEP.IDLE) {
       return (
         <p className="text-slate-500">CSVファイルを選択すると、ここに検証結果が表示されます</p>
       );
     }
+    const { result } = viewState;
     return (
       <div className="flex flex-col gap-1">
         <p className="text-green-700">✓ {result.validCount}行 取り込み可</p>
         {result.errorRowCount > 0 && (
           <IssueList
             heading={`✗ ${result.errorRowCount}行 エラー`}
-            headingClassName="text-danger"
-            listClassName="text-danger flex flex-col gap-0.5"
+            tone={ISSUE_TONE.ERROR}
             items={result.errors}
           />
         )}
         {result.warningRowCount > 0 && (
           <IssueList
             heading={`⚠ ${result.warningRowCount}行 警告`}
-            headingClassName="text-amber-600"
-            listClassName="flex flex-col gap-0.5 text-amber-600"
+            tone={ISSUE_TONE.WARNING}
             items={result.warnings}
           />
         )}
@@ -152,7 +170,9 @@ export const ImportSection = ({ state }: Props): ReactElement => {
           <Button variant="secondary" onClick={() => fileInputRef.current?.click()}>
             ファイルを選択
           </Button>
-          <span className="text-sm text-slate-500">{fileName ?? "未選択"}</span>
+          <span className="text-sm text-slate-500">
+            {viewState.step === IMPORT_STEP.PREVIEW ? viewState.fileName : "未選択"}
+          </span>
         </div>
       </div>
 
