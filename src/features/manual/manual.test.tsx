@@ -37,6 +37,31 @@ describe("Manual", () => {
     }
   });
 
+  it.each([
+    "CSVエクスポート",
+    "CSVインポート(復元)の手順",
+    "インポート時にチェックされる内容",
+    "複数の種類を復元する順番",
+  ])("バックアップと復元の小見出し「%s」(h3)が表示される", (heading) => {
+    renderWithStore(<Manual />);
+
+    expect(screen.getByRole("heading", { level: 3, name: heading })).toBeInTheDocument();
+  });
+
+  it("インポートの全置換の説明と依存順の復元順が表示される", () => {
+    renderWithStore(<Manual />);
+
+    expect(
+      screen.getByText(/CSVの内容でまるごと置き換えられます/u, { exact: false }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "メーカー/取引先・担当者 → 機器 → 点検校正項目 → 点検校正外部案件 → 実施記録 → 通知",
+        { exact: false },
+      ),
+    ).toBeInTheDocument();
+  });
+
   it("主要画面へのリンクが存在する", () => {
     renderWithStore(<Manual />);
 

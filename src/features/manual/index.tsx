@@ -1,3 +1,4 @@
+/* oxlint-disable eslint/max-lines -- 利用マニュアルは静的な文章の集合で、行数上限による機械分割は文章の見通しを損なうため(D-054) */
 import { StatusBadge } from "@/components/domain";
 import { ROUTES } from "@/constants/routes";
 import { SERVICE_ITEM_STATUS, type ServiceItemStatus } from "@/domain/serviceItemStatus";
@@ -202,13 +203,75 @@ export const Manual = (): ReactElement => (
         <Link to={ROUTES.SETTINGS} className="text-primary underline">
           設定画面
         </Link>
-        から、データの種類ごとにCSVファイルとしてエクスポートできます(UTF-8
-        BOM付きで、Excelでもそのまま開けます)。同じ画面からCSVインポートによる復元もできます。
-      </p>
-      <p>
+        から、CSVファイルによるデータのバックアップ(エクスポート)と復元(インポート)ができます。
         端末の変更やブラウザーデータの消去でデータが失われる場合に備え、定期的にエクスポートして
         おくことをおすすめします。
       </p>
+
+      <h3 className="border-primary border-l-4 pl-2 font-semibold">CSVエクスポート</h3>
+      <p>
+        データの種類(機器・点検校正項目・実施記録・点検校正外部案件・メーカー/取引先・担当者・
+        通知)ごとに、1つのCSVファイルをダウンロードできます。ファイルはUTF-8(BOM付き)で、
+        Excelでもそのまま開けます。ファイル名は「equipment_2025-01-31.csv」のように、
+        種類と出力日の組み合わせになります。データが1件もない種類でも、列名だけのCSVを出力できます。
+      </p>
+      <p>
+        エクスポートしたCSVは、そのまま同じ種類のインポートで復元できます。1行目は列名の行
+        (英語の項目名)で、インポート時に種類の照合に使われるため変更しないでください。
+      </p>
+
+      <h3 className="border-primary border-l-4 pl-2 font-semibold">CSVインポート(復元)の手順</h3>
+      <ol className="flex list-decimal flex-col gap-2 pl-5">
+        <li>
+          <Link to={ROUTES.SETTINGS} className="text-primary underline">
+            設定画面
+          </Link>
+          の「CSVインポート」で、対象となるデータの種類を選択します。
+        </li>
+        <li>
+          CSVファイルを選択すると内容が自動でチェックされ、取り込み可能な行数と、エラー・警告が
+          行番号付きでプレビューに表示されます。
+        </li>
+        <li>
+          エラーが1件でもあると「確定」ボタンは押せません。エラーの行だけを除いて取り込む機能は
+          ないため、CSVファイルを修正してから選び直してください。
+        </li>
+        <li>
+          エラーがなければ「確定」を押し、確認ダイアログで取り込みを実行します。選択した種類の
+          既存データは、CSVの内容でまるごと置き換えられます(追記や部分的な更新ではありません)。
+        </li>
+      </ol>
+
+      <h3 className="border-primary border-l-4 pl-2 font-semibold">
+        インポート時にチェックされる内容
+      </h3>
+      <ul className="flex list-disc flex-col gap-2 pl-5">
+        <li>1行目の列名が、選択した種類のものと一致しているか(別の種類のCSVの取り違え防止)</li>
+        <li>各行の列数が正しいか</li>
+        <li>
+          各セルの値の形式(必須項目が空でないか、日付は YYYY-MM-DD 形式か、数値・true/false・
+          選択肢として正しい値か)
+        </li>
+        <li>ファイル内での重複(id の重複。機器は管理番号の重複も)</li>
+        <li>
+          参照先の存在(例: 機器のメーカーが、現在登録されているメーカー/取引先にあるか)
+        </li>
+      </ul>
+      <p>
+        このほか、「=」などで始まりExcel等で数式として解釈されるおそれのある値は、警告として
+        表示されます。警告は取り込みを妨げませんが、心当たりのない値の場合は取り込む前に内容を
+        確認してください。
+      </p>
+
+      <h3 className="border-primary border-l-4 pl-2 font-semibold">複数の種類を復元する順番</h3>
+      <p>
+        参照先の存在チェックは「現在登録されているデータ」に対して行われるため、複数の種類を
+        まとめて復元するときは、参照される側から次の順にインポートしてください。
+      </p>
+      <p>
+        メーカー/取引先・担当者 → 機器 → 点検校正項目 → 点検校正外部案件 → 実施記録 → 通知
+      </p>
+
       <p>
         出所の分からないCSVファイルはインポートしないでください。また、エクスポートしたCSVを
         Excel等の表計算ソフトで開いた際に数式の実行を確認する警告が表示された場合は、
