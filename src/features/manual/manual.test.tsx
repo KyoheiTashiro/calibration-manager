@@ -1,6 +1,10 @@
 import { SERVICE_ITEM_STATUS } from "@/domain/serviceItemStatus";
 import { statusBadgeLabel } from "@/domain/statusBadge";
 import { Manual } from "@/features/manual";
+import {
+  CSV_ENTITY_KINDS,
+  entityCsvFileName,
+} from "@/features/settings/components/csv/entityCsv";
 import { renderWithStore, setupStoreIsolation } from "@/test/renderWithStore";
 import { fireEvent, screen } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
@@ -84,6 +88,24 @@ describe("Manual", () => {
     renderWithStore(<Manual />);
 
     expect(screen.getByRole("heading", { level: 3, name: heading })).toBeInTheDocument();
+  });
+
+  it("エクスポートファイル名の一覧表に全7種のファイル名が推奨インポート順で表示される(D-065)", () => {
+    renderWithStore(<Manual />);
+
+    expect(screen.getByRole("columnheader", { name: "データの種類" })).toBeInTheDocument();
+    expect(screen.getByRole("columnheader", { name: "ファイル名" })).toBeInTheDocument();
+
+    const fileNames = CSV_ENTITY_KINDS.map((kind) => entityCsvFileName(kind, "YYYY-MM-DD"));
+    const cells = fileNames.map((name) => screen.getByText(name));
+    for (const cell of cells) expect(cell).toBeInTheDocument();
+
+    /* DOM上の出現順 = CSV_ENTITY_KINDS(推奨インポート順)であること */
+    const ordered = [...cells].toSorted((left, right) =>
+      // oxlint-disable-next-line no-bitwise -- compareDocumentPosition はビットマスクを返す仕様
+      left.compareDocumentPosition(right) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1,
+    );
+    expect(ordered.map((cell) => cell.textContent)).toEqual(fileNames);
   });
 
   it("新しいデータの一括登録の説明(D-055)が表示される", () => {

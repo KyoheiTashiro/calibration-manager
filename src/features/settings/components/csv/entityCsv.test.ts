@@ -2,6 +2,7 @@ import {
   buildEntityCsv,
   CSV_ENTITY_KINDS,
   ENTITY_CSV_SPECS,
+  entityCsvFileName,
 } from "@/features/settings/components/csv/entityCsv";
 import { EQUIPMENT_STATUS, type Equipment, type Vendor } from "@/store/types";
 import { describe, expect, it } from "vitest";
@@ -20,6 +21,13 @@ const vendorB: Vendor = {
   isManufacturer: false,
   isCalibrator: true,
 };
+
+describe("entityCsvFileName", () => {
+  it("種類と日付を「種類_日付.csv」に組み立てる(D-065)", () => {
+    expect(entityCsvFileName("equipment", "2025-01-31")).toBe("equipment_2025-01-31.csv");
+    expect(entityCsvFileName("vendors", "YYYY-MM-DD")).toBe("vendors_YYYY-MM-DD.csv");
+  });
+});
 
 describe("buildEntityCsv", () => {
   it("1行目に列キーのヘッダを出力する(D-028)", () => {

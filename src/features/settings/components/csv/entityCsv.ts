@@ -127,6 +127,10 @@ export const ENTITY_CSV_SPECS: { [Kind in CsvEntityKind]: EntityCsvSpec<EntityOf
   ),
 };
 
+/** エクスポートファイル名。設定画面のダウンロードとマニュアルのファイル名表が共有する(D-065) */
+export const entityCsvFileName = (kind: CsvEntityKind, isoDate: string): string =>
+  `${kind}_${isoDate}.csv`;
+
 /** shape の型定義上 value は下記3種 + undefined のみで、想定外値は空セルとして扱う */
 const cellOfValue = (value: unknown): string => {
   if (typeof value === "string") return value;

@@ -1,8 +1,14 @@
 /* oxlint-disable eslint/max-lines -- 利用マニュアルは静的な文章の集合で、行数上限による機械分割は文章の見通しを損なうため(D-054) */
 import { StatusBadge } from "@/components/domain";
 import { ArrowUpIcon } from "@/components/icons";
+import { Table, TableBody, TableHead, Td, Th } from "@/components/ui/Table";
 import { ROUTES } from "@/constants/routes";
 import { SERVICE_ITEM_STATUS, type ServiceItemStatus } from "@/domain/serviceItemStatus";
+import {
+  CSV_ENTITY_KINDS,
+  ENTITY_CSV_SPECS,
+  entityCsvFileName,
+} from "@/features/settings/components/csv/entityCsv";
 import type { ReactElement } from "react";
 import { Link } from "react-router-dom";
 
@@ -296,9 +302,33 @@ export const Manual = (): ReactElement => (
       <p>
         データの種類(機器・点検校正項目・実施記録・点検校正外部案件・メーカー/取引先・担当者・
         通知)ごとに、1つのCSVファイルをダウンロードできます。ファイルはUTF-8(BOM付き)で、
-        Excelでもそのまま開けます。ファイル名は「equipment_2025-01-31.csv」のように、
-        種類と出力日の組み合わせになります。データが1件もない場合でも、1行目(項目名)だけのCSVを出力できます。
+        Excelでもそのまま開けます。データが1件もない場合でも、1行目(項目名)だけのCSVを出力できます。
       </p>
+      <p>
+        ファイル名は次の表のとおり、種類と出力日の組み合わせになります。「YYYY-MM-DD」の部分には
+        出力した日付が入ります(例: equipment_2025-01-31.csv)。
+      </p>
+      {/* 行順は CSV_ENTITY_KINDS(推奨インポート順)。列仕様タブ・インポート順の記載と共通(D-058 / D-060 / D-065) */}
+      <Table>
+        <TableHead>
+          <tr>
+            <Th>データの種類</Th>
+            <Th>ファイル名</Th>
+          </tr>
+        </TableHead>
+        <TableBody>
+          {CSV_ENTITY_KINDS.map((kind) => (
+            <tr key={kind}>
+              <Td>{ENTITY_CSV_SPECS[kind].label}</Td>
+              <Td>
+                <code className="rounded bg-slate-100 px-1 py-0.5">
+                  {entityCsvFileName(kind, "YYYY-MM-DD")}
+                </code>
+              </Td>
+            </tr>
+          ))}
+        </TableBody>
+      </Table>
       <p>
         エクスポートしたCSVは、そのまま同じ種類のインポートで復元できます。1行目の英語の項目名は、
         インポート時にどの種類のCSVかを確認するために使われます。編集せず、そのまま残してください。

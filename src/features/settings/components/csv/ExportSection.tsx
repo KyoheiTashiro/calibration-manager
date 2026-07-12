@@ -4,6 +4,7 @@ import {
   CSV_ENTITY_KINDS,
   type CsvEntityKind,
   ENTITY_CSV_SPECS,
+  entityCsvFileName,
 } from "@/features/settings/components/csv/entityCsv";
 import type { AppState } from "@/store/types";
 import { CSV_BOM } from "@/utils/csv";
@@ -16,7 +17,7 @@ const downloadEntityCsv = (kind: CsvEntityKind, state: AppState): void => {
   const url = URL.createObjectURL(blob);
   const anchor = document.createElement("a");
   anchor.href = url;
-  anchor.download = `${kind}_${todayIsoDate()}.csv`;
+  anchor.download = entityCsvFileName(kind, todayIsoDate());
   anchor.click();
   URL.revokeObjectURL(url);
 };
