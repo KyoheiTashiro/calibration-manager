@@ -221,7 +221,7 @@ export const Manual = (): ReactElement => (
         行で、インポート時に種類の照合に使われるため変更しないでください。
       </p>
 
-      <h3 className="border-primary border-l-4 pl-2 font-semibold">CSVインポートの手順</h3>
+      <h3 className="border-primary border-l-4 pl-2 font-semibold">CSVインポート</h3>
       <ol className="flex list-decimal flex-col gap-2 pl-5">
         <li>
           <Link to={ROUTES.SETTINGS} className="text-primary underline">
@@ -243,16 +243,14 @@ export const Manual = (): ReactElement => (
         </li>
       </ol>
 
-      <h3 className="border-primary border-l-4 pl-2 font-semibold">新しいデータの一括登録</h3>
       <p>
         インポートできるのは、エクスポートしたCSVだけではありません。1行目の列名と各セルの形式が
         合っていれば、Excel等の表計算ソフトで作成したCSVから新しいデータを一括登録することも
         できます。id の列には、ファイル内で重複しない任意の文字列を入力してください。
       </p>
       <p>
-        なお、インポートは選択した種類の既存データをまるごと置き換えるため、いまあるデータに
-        追加したい場合は、先に同じ種類をエクスポートし、そのファイルに行を追記してから
-        インポートしてください。
+        いまあるデータに追加したい場合は、先に同じ種類をエクスポートし、
+        そのファイルに行を追記してからインポートしてください。
       </p>
 
       <h3 className="border-primary border-l-4 pl-2 font-semibold">
