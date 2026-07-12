@@ -192,7 +192,7 @@ describe("Dashboard: 最新の通知", () => {
     targetType: NOTIFICATION_TARGET_TYPE.SERVICE_ITEM,
     targetId: overdueServiceItemA.id,
     personId: tanaka.id,
-    message: "EQ-001 年次校正が期限超過",
+    message: "EQ-001 年次校正が期限を過ぎています",
     createdDate: "2026-07-01",
     isRead: false,
   };
@@ -201,16 +201,18 @@ describe("Dashboard: 最新の通知", () => {
     seedStore({ notifications: { [overdueNotification.id]: overdueNotification } });
     renderDashboardWithRoutes();
 
-    expect(screen.getByText("EQ-001 年次校正が期限超過")).toBeInTheDocument();
-    expect(screen.getByText("2026-07-01")).toBeInTheDocument();
-    expect(screen.getByText("期限超過")).toBeInTheDocument();
+    // ラベル「期限切れ」はKPIカードにも存在するため通知リスト内にスコープする
+    const list = within(screen.getByRole("list"));
+    expect(list.getByText("EQ-001 年次校正が期限を過ぎています")).toBeInTheDocument();
+    expect(list.getByText("2026-07-01")).toBeInTheDocument();
+    expect(list.getByText("期限切れ")).toBeInTheDocument();
   });
 
   it("SVGアイコンを aria-hidden 付きで描画し、ラベルはスクリーンリーダーから読める", () => {
     seedStore({ notifications: { [overdueNotification.id]: overdueNotification } });
     renderDashboardWithRoutes();
 
-    const badge = screen.getByText("期限超過");
+    const badge = within(screen.getByRole("list")).getByText("期限切れ");
     expect(badge.querySelector("svg")).toHaveAttribute("aria-hidden", "true");
     expect(badge).not.toHaveAttribute("aria-hidden");
   });
