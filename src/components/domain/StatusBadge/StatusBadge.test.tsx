@@ -23,4 +23,16 @@ describe("StatusBadge", () => {
       unmount();
     }
   });
+
+  it("5ステータスすべてでアイコン(aria-hidden svg)を表示する", () => {
+    for (const status of ALL_STATUSES) {
+      const { container, unmount } = render(<StatusBadge status={status} />);
+
+      const svg = container.querySelector("svg");
+      expect(svg).not.toBeNull();
+      expect(svg).toHaveAttribute("aria-hidden", "true");
+
+      unmount();
+    }
+  });
 });
