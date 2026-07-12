@@ -16,9 +16,7 @@ export const Tabs = ({ tabs, activeKey, onChange }: Props): ReactElement => {
     event.preventDefault();
     const offset = event.key === "ArrowLeft" ? -1 : 1;
     const nextIndex = (index + offset + tabs.length) % tabs.length;
-    const nextTab = tabs[nextIndex];
-    if (nextTab === undefined) return;
-    onChange(nextTab.key);
+    onChange(tabs[nextIndex].key);
     tabRefs.current[nextIndex]?.focus();
   };
 

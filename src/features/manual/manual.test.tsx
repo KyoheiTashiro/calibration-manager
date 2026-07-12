@@ -1,10 +1,7 @@
 import { SERVICE_ITEM_STATUS } from "@/domain/serviceItemStatus";
 import { statusBadgeLabel } from "@/domain/statusBadge";
 import { Manual } from "@/features/manual";
-import {
-  CSV_ENTITY_KINDS,
-  entityCsvFileName,
-} from "@/features/settings/components/csv/entityCsv";
+import { CSV_ENTITY_KINDS, entityCsvFileName } from "@/features/settings/components/csv/entityCsv";
 import { renderWithStore, setupStoreIsolation } from "@/test/renderWithStore";
 import { fireEvent, screen } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
@@ -19,11 +16,13 @@ describe("Manual", () => {
     expect(screen.getByRole("heading", { level: 1, name: "利用マニュアル" })).toBeInTheDocument();
   });
 
-  it("目次(詳細/summary)に7つのセクションへのリンクボタンが表示される", () => {
+  it("「目次」ボタンをクリックするとポップオーバーに「ページ上部へ戻る」と7つのセクションへのボタンが表示される", () => {
     renderWithStore(<Manual />);
 
-    expect(screen.getByText("目次")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "目次" }));
+
     for (const title of [
+      "ページ上部へ戻る",
       "ご利用にあたって",
       "基本の流れ",
       "ステータスの見方",
@@ -36,24 +35,38 @@ describe("Manual", () => {
     }
   });
 
-  it("目次のボタンをクリックすると対象セクションが scrollIntoView される", () => {
+  it("目次のボタンをクリックすると対象セクションが scrollIntoView され、ポップオーバーが閉じる", () => {
     const scrollIntoView = vi.fn<() => void>();
     Element.prototype.scrollIntoView = scrollIntoView;
 
     renderWithStore(<Manual />);
+    fireEvent.click(screen.getByRole("button", { name: "目次" }));
     fireEvent.click(screen.getByRole("button", { name: "ステータスの見方" }));
 
     expect(scrollIntoView).toHaveBeenCalledWith({ behavior: "smooth" });
+    expect(screen.queryByRole("button", { name: "ステータスの見方" })).not.toBeInTheDocument();
   });
 
-  it("「ページ上部へ戻る」ボタンをクリックすると最上部見出しが scrollIntoView される", () => {
+  it("目次を開いた状態でEscキーを押すとポップオーバーが閉じる", () => {
+    renderWithStore(<Manual />);
+    fireEvent.click(screen.getByRole("button", { name: "目次" }));
+    expect(screen.getByRole("button", { name: "ステータスの見方" })).toBeInTheDocument();
+
+    fireEvent.keyDown(document, { key: "Escape" });
+
+    expect(screen.queryByRole("button", { name: "ステータスの見方" })).not.toBeInTheDocument();
+  });
+
+  it("目次の「ページ上部へ戻る」をクリックすると最上部見出しが scrollIntoView され、ポップオーバーが閉じる(D-067)", () => {
     const scrollIntoView = vi.fn<() => void>();
     Element.prototype.scrollIntoView = scrollIntoView;
 
     renderWithStore(<Manual />);
+    fireEvent.click(screen.getByRole("button", { name: "目次" }));
     fireEvent.click(screen.getByRole("button", { name: "ページ上部へ戻る" }));
 
     expect(scrollIntoView).toHaveBeenCalledWith({ behavior: "smooth" });
+    expect(screen.queryByRole("button", { name: "ページ上部へ戻る" })).not.toBeInTheDocument();
   });
 
   it.each([

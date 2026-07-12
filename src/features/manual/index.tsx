@@ -1,6 +1,5 @@
 /* oxlint-disable eslint/max-lines -- 利用マニュアルは静的な文章の集合で、行数上限による機械分割は文章の見通しを損なうため(D-054) */
 import { StatusBadge } from "@/components/domain";
-import { ArrowUpIcon } from "@/components/icons";
 import { Table, TableBody, TableHead, Td, Th } from "@/components/ui/Table";
 import { ROUTES } from "@/constants/routes";
 import { SERVICE_ITEM_STATUS, type ServiceItemStatus } from "@/domain/serviceItemStatus";
@@ -13,10 +12,11 @@ import type { ReactElement } from "react";
 import { Link } from "react-router-dom";
 
 import { ImportCheckTabs } from "./importCheck/ImportCheckTabs";
+import { TocFab } from "./TocFab";
 
 /* スクロール先。レイアウトのスクロールコンテナは window ではなく main 要素のため、
-   window.scrollTo ではなく目次と同じ scrollIntoView 方式で最上部へ戻す */
-const MANUAL_TOP_ID = "manual-top";
+   window.scrollTo ではなく目次と同じ scrollIntoView 方式で最上部へ戻す(D-067) */
+const MANUAL_TOP_SECTION = { id: "manual-top", title: "ページ上部へ戻る" } as const;
 
 const MANUAL_SECTIONS = {
   INTRO: { id: "introduction", title: "ご利用にあたって" },
@@ -87,39 +87,13 @@ const SCREEN_GUIDES = [
 
 export const Manual = (): ReactElement => (
   <div className="flex flex-col gap-4">
-    <h1 id={MANUAL_TOP_ID} className="text-xl font-bold">
+    <h1 id={MANUAL_TOP_SECTION.id} className="text-xl font-bold">
       利用マニュアル
     </h1>
 
-    <button
-      type="button"
-      aria-label="ページ上部へ戻る"
-      className="border-primary text-primary fixed right-4 bottom-4 z-10 rounded-full border bg-white p-3 shadow-md"
-      onClick={() => {
-        document.querySelector(`#${MANUAL_TOP_ID}`)?.scrollIntoView({ behavior: "smooth" });
-      }}
-    >
-      <ArrowUpIcon className="h-5 w-5" />
-    </button>
-
-    <details className="rounded border border-slate-200 p-4">
-      <summary className="cursor-pointer font-semibold">目次</summary>
-      <ul className="mt-2 flex flex-col gap-1 pl-5">
-        {Object.values(MANUAL_SECTIONS).map((section) => (
-          <li key={section.id}>
-            <button
-              type="button"
-              className="text-primary underline"
-              onClick={() => {
-                document.querySelector(`#${section.id}`)?.scrollIntoView({ behavior: "smooth" });
-              }}
-            >
-              {section.title}
-            </button>
-          </li>
-        ))}
-      </ul>
-    </details>
+    <div className="fixed right-4 bottom-4 z-10">
+      <TocFab sections={Object.values(MANUAL_SECTIONS)} topSection={MANUAL_TOP_SECTION} />
+    </div>
 
     <section
       id={MANUAL_SECTIONS.INTRO.id}
