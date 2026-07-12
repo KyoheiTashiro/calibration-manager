@@ -5,7 +5,17 @@ import { SERVICE_ITEM_STATUS, type ServiceItemStatus } from "@/domain/serviceIte
 import type { ReactElement } from "react";
 import { Link } from "react-router-dom";
 
-import { ManualSection } from "./components/ManualSection";
+import { ImportCheckTabs } from "./importCheck/ImportCheckTabs";
+
+const MANUAL_SECTIONS = {
+  INTRO: { id: "introduction", title: "ご利用にあたって" },
+  FLOW: { id: "basic-flow", title: "基本の流れ" },
+  STATUS: { id: "status-guide", title: "ステータスの見方" },
+  DUE_DATES: { id: "due-date-calculation", title: "期限と発注推奨日の計算" },
+  SCREENS: { id: "screen-guides", title: "各画面の説明" },
+  CSV: { id: "csv-export-import", title: "CSVエクスポートとインポート" },
+  LICENSE: { id: "license", title: "ライセンスとソースコード" },
+} as const;
 
 const STATUS_DESCRIPTIONS = {
   [SERVICE_ITEM_STATUS.OVERDUE]: "次回期限を過ぎています",
@@ -68,7 +78,32 @@ export const Manual = (): ReactElement => (
   <div className="flex flex-col gap-4">
     <h1 className="text-xl font-bold">利用マニュアル</h1>
 
-    <ManualSection title="ご利用にあたって">
+    <details className="rounded border border-slate-200 p-4">
+      <summary className="cursor-pointer font-semibold">目次</summary>
+      <ul className="mt-2 flex flex-col gap-1 pl-5">
+        {Object.values(MANUAL_SECTIONS).map((section) => (
+          <li key={section.id}>
+            <button
+              type="button"
+              className="text-primary underline"
+              onClick={() => {
+                document.querySelector(`#${section.id}`)?.scrollIntoView({ behavior: "smooth" });
+              }}
+            >
+              {section.title}
+            </button>
+          </li>
+        ))}
+      </ul>
+    </details>
+
+    <section
+      id={MANUAL_SECTIONS.INTRO.id}
+      className="flex flex-col gap-3 rounded border border-slate-200 p-4"
+    >
+      <h2 className="border-b border-slate-200 pb-2 text-lg font-semibold">
+        {MANUAL_SECTIONS.INTRO.title}
+      </h2>
       <p>このアプリは、機器の点検・校正の期限をまとめて管理するツールです。</p>
       <p>
         データはすべてお使いのブラウザー内(LocalStorage)に保存されます。外部のサーバーには
@@ -80,11 +115,17 @@ export const Manual = (): ReactElement => (
         <Link to={ROUTES.SETTINGS} className="text-primary mx-1 underline">
           設定画面
         </Link>
-        から定期的にCSVエクスポートでバックアップを取ることをおすすめします。
+        から定期的にCSVエクスポートでバックアップを取ることを推奨します。
       </p>
-    </ManualSection>
+    </section>
 
-    <ManualSection title="基本の流れ">
+    <section
+      id={MANUAL_SECTIONS.FLOW.id}
+      className="flex flex-col gap-3 rounded border border-slate-200 p-4"
+    >
+      <h2 className="border-b border-slate-200 pb-2 text-lg font-semibold">
+        {MANUAL_SECTIONS.FLOW.title}
+      </h2>
       <ol className="flex list-decimal flex-col gap-2 pl-5">
         <li>
           はじめに、機器の登録で使う基本情報(
@@ -133,9 +174,15 @@ export const Manual = (): ReactElement => (
           画面のボードに表示され、発注から返却・記録の登録までの進み具合を管理できます。
         </li>
       </ol>
-    </ManualSection>
+    </section>
 
-    <ManualSection title="ステータスの見方">
+    <section
+      id={MANUAL_SECTIONS.STATUS.id}
+      className="flex flex-col gap-3 rounded border border-slate-200 p-4"
+    >
+      <h2 className="border-b border-slate-200 pb-2 text-lg font-semibold">
+        {MANUAL_SECTIONS.STATUS.title}
+      </h2>
       <ul className="flex flex-col gap-2">
         {Object.values(SERVICE_ITEM_STATUS).map((status) => (
           <li key={status} className="flex items-center gap-2">
@@ -144,9 +191,15 @@ export const Manual = (): ReactElement => (
           </li>
         ))}
       </ul>
-    </ManualSection>
+    </section>
 
-    <ManualSection title="期限と発注推奨日の計算">
+    <section
+      id={MANUAL_SECTIONS.DUE_DATES.id}
+      className="flex flex-col gap-3 rounded border border-slate-200 p-4"
+    >
+      <h2 className="border-b border-slate-200 pb-2 text-lg font-semibold">
+        {MANUAL_SECTIONS.DUE_DATES.title}
+      </h2>
       <h3 className="border-primary border-l-4 pl-2 font-semibold">次回期限</h3>
       <p>
         次回期限は「前回実施日 + 周期」で自動計算されます。項目を登録した直後はまだ実施記録が
@@ -183,9 +236,15 @@ export const Manual = (): ReactElement => (
         から44日さかのぼった 8/17 になります。この日を過ぎても発注していない項目が「要発注」として
         表示されます。
       </p>
-    </ManualSection>
+    </section>
 
-    <ManualSection title="各画面の説明">
+    <section
+      id={MANUAL_SECTIONS.SCREENS.id}
+      className="flex flex-col gap-3 rounded border border-slate-200 p-4"
+    >
+      <h2 className="border-b border-slate-200 pb-2 text-lg font-semibold">
+        {MANUAL_SECTIONS.SCREENS.title}
+      </h2>
       {SCREEN_GUIDES.map((guide) => (
         <div key={guide.route}>
           <h3 className="font-semibold">
@@ -196,9 +255,15 @@ export const Manual = (): ReactElement => (
           <p>{guide.description}</p>
         </div>
       ))}
-    </ManualSection>
+    </section>
 
-    <ManualSection title="CSVエクスポートとインポート">
+    <section
+      id={MANUAL_SECTIONS.CSV.id}
+      className="flex flex-col gap-3 rounded border border-slate-200 p-4"
+    >
+      <h2 className="border-b border-slate-200 pb-2 text-lg font-semibold">
+        {MANUAL_SECTIONS.CSV.title}
+      </h2>
       <p>
         <Link to={ROUTES.SETTINGS} className="text-primary underline">
           設定画面
@@ -206,7 +271,7 @@ export const Manual = (): ReactElement => (
         から、CSVファイルでデータのエクスポート(書き出し)とインポート(取り込み)ができます。
         エクスポートはデータのバックアップとして、インポートはバックアップからの復元や、
         新しいデータの一括登録に利用できます。端末の故障・変更やブラウザーデータの消去に備え、
-        定期的にエクスポートしておくことをおすすめします。
+        定期的にエクスポートしておくことを推奨します。
       </p>
 
       <h3 className="border-primary border-l-4 pl-2 font-semibold">CSVエクスポート</h3>
@@ -214,11 +279,11 @@ export const Manual = (): ReactElement => (
         データの種類(機器・点検校正項目・実施記録・点検校正外部案件・メーカー/取引先・担当者・
         通知)ごとに、1つのCSVファイルをダウンロードできます。ファイルはUTF-8(BOM付き)で、
         Excelでもそのまま開けます。ファイル名は「equipment_2025-01-31.csv」のように、
-        種類と出力日の組み合わせになります。データが1件もない種類でも、列名だけのCSVを出力できます。
+        種類と出力日の組み合わせになります。データが1件もない場合でも、1行目(項目名)だけのCSVを出力できます。
       </p>
       <p>
-        エクスポートしたCSVは、そのまま同じ種類のインポートで復元できます。1行目は英語の列名の
-        行で、インポート時に種類の照合に使われるため変更しないでください。
+        エクスポートしたCSVは、そのまま同じ種類のインポートで復元できます。1行目の英語の項目名は、
+        インポート時にどの種類のCSVかを確認するために使われます。編集せず、そのまま残してください。
       </p>
 
       <h3 className="border-primary border-l-4 pl-2 font-semibold">CSVインポート</h3>
@@ -239,14 +304,14 @@ export const Manual = (): ReactElement => (
         </li>
         <li>
           エラーがなければ「確定」を押し、確認ダイアログで取り込みを実行します。選択した種類の
-          既存データは、CSVの内容でまるごと置き換えられます(追記や部分的な更新ではありません)。
+          既存データは、CSVの内容でまるごと置き換えられます(※追記や部分的な更新ではありません)。
         </li>
       </ol>
 
       <p>
-        インポートできるのは、エクスポートしたCSVだけではありません。1行目の列名と各セルの形式が
+        インポートできるのは、エクスポートしたCSVだけではありません。1行目の項目名と各セルの形式が
         合っていれば、Excel等の表計算ソフトで作成したCSVから新しいデータを一括登録することも
-        できます。id の列には、ファイル内で重複しない任意の文字列を入力してください。
+        できます。
       </p>
       <p>
         いまあるデータに追加したい場合は、先に同じ種類をエクスポートし、
@@ -257,15 +322,20 @@ export const Manual = (): ReactElement => (
         インポート時にチェックされる内容
       </h3>
       <ul className="flex list-disc flex-col gap-2 pl-5">
-        <li>1行目の列名が、選択した種類のものと一致しているか(別の種類のCSVの取り違え防止)</li>
-        <li>各行の列数が正しいか</li>
+        <li>1行目の項目名が、選択した種類のものと一致しているか(別の種類のCSVの取り違え防止)</li>
+        <li>各行の項目数が正しいか</li>
         <li>
           各セルの値の形式(必須項目が空でないか、日付は YYYY-MM-DD 形式か、数値・true/false・
           選択肢として正しい値か)
         </li>
-        <li>ファイル内での重複(id の重複。機器は管理番号の重複も)</li>
+        <li>ファイル内での重複(id の重複など)</li>
         <li>参照先の存在(例: 機器のメーカーが、現在登録されているメーカー/取引先にあるか)</li>
       </ul>
+      <p>
+        各項目の必須・形式は、種類ごとに次の表のとおりです。「項目名」は、CSVの1行目(見出し行)に
+        記載する英語の列名です。
+      </p>
+      <ImportCheckTabs />
       <p>
         このほか、「=」などで始まりExcel等で数式として解釈されるおそれのある値は、警告として
         表示されます。警告は取り込みを妨げませんが、心当たりのない値の場合は取り込む前に内容を
@@ -279,17 +349,24 @@ export const Manual = (): ReactElement => (
         参照先の存在チェックは「現在登録されているデータ」に対して行われるため、複数の種類を
         まとめてインポートするときは、参照される側から次の順にインポートしてください。
       </p>
-      <p>メーカー/取引先・担当者 → 機器 → 点検校正項目 → 点検校正外部案件 → 実施記録 → 通知</p>
+      <p>メーカー/取引先 → 担当者 → 機器 → 点検校正項目 → 点検校正外部案件 → 実施記録 → 通知</p>
 
       <h3 className="border-primary border-l-4 pl-2 font-semibold">セキュリティ上の注意</h3>
       <p>
-        出所の分からないCSVファイルはインポートしないでください。また、エクスポートしたCSVを
-        Excel等の表計算ソフトで開いた際に数式の実行を確認する警告が表示された場合は、
-        内容を確認するまで許可しないでください。
+        インポートするCSVファイルは、ご自身でエクスポートしたものや、入手元が信頼できるもの
+        だけにしてください。また、エクスポートしたCSVをExcel等の表計算ソフトで開いたときに、
+        数式の実行を確認する警告が表示されることがあります。その場合は、内容に心当たりがあるか
+        確認できるまで「許可しない」を選ぶことを推奨します。
       </p>
-    </ManualSection>
+    </section>
 
-    <ManualSection title="ライセンスとソースコード">
+    <section
+      id={MANUAL_SECTIONS.LICENSE.id}
+      className="flex flex-col gap-3 rounded border border-slate-200 p-4"
+    >
+      <h2 className="border-b border-slate-200 pb-2 text-lg font-semibold">
+        {MANUAL_SECTIONS.LICENSE.title}
+      </h2>
       <p>
         このアプリはオープンソースソフトウェアです。ソースコードはMITライセンスのもと、
         <a
@@ -314,6 +391,6 @@ export const Manual = (): ReactElement => (
         </a>
         に従い、ソースコードを自由に改変・拡張してご利用いただけます。
       </p>
-    </ManualSection>
+    </section>
   </div>
 );

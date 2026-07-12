@@ -55,7 +55,8 @@ src/
 │   │   ├── constants.ts            // 種別・実施区分等の日本語ラベル定数（機器詳細・項目一覧・モーダルで共用）
 │   │   └── list/                   // index.tsx + hooks.ts + components/（FilterBar / ServiceItemTable）
 │   ├── manual/                      // '/manual'（利用マニュアル。静的コンテンツ・store参照なし。screen-design §12。D-035）
-│   │   └── index.tsx
+│   │   ├── index.tsx               // 本文 + アコーディオン目次（D-057）
+│   │   └── importCheck/            // 種類別の列仕様表（データ columns.ts + 表示 ImportCheckTabs を colocate。columns.ts は ENTITY_CSV_SPECS の shape と一致をテストで強制。D-056）
 │   ├── serviceOrder/            // '/service-orders'（かんばん。screen-design §8）
 │   │   ├── index.tsx
 │   │   ├── hooks.ts                // useOrderKanban（store購読・表示列導出・ダイアログ状態・状態遷移アクション）

@@ -65,13 +65,14 @@ afterEach(() => {
 });
 
 describe("エクスポート(§11)", () => {
-  it("7エンティティ分のダウンロードボタンを表示する", () => {
+  it("7エンティティ分のダウンロードボタンを推奨インポート順で表示する(D-060)", () => {
     renderWithStore(<Settings />);
-    for (const kind of CSV_ENTITY_KINDS) {
-      expect(
-        screen.getByRole("button", { name: ENTITY_CSV_SPECS[kind].label }),
-      ).toBeInTheDocument();
-    }
+    const entityLabels = CSV_ENTITY_KINDS.map((kind) => ENTITY_CSV_SPECS[kind].label);
+    const buttonNames = screen
+      .getAllByRole("button")
+      .map((button) => button.textContent)
+      .filter((name) => entityLabels.includes(name));
+    expect(buttonNames).toEqual(entityLabels);
   });
 
   it("機器ボタンで BOM付き・ヘッダを含む CSV を日付付きファイル名で生成する", async () => {
@@ -111,7 +112,17 @@ const equipmentCsvFile = (equipment: Equipment): File =>
     type: "text/csv",
   });
 
+// なぜ: 対象の初期値は先頭のメーカー/取引先(D-060)のため、機器CSVの検証には明示選択が要る。
+const selectEquipmentKind = async (): Promise<void> => {
+  await userEvent.selectOptions(screen.getByLabelText("対象"), "equipment");
+};
+
 describe("インポート(§11、D-029 / D-030)", () => {
+  it("対象の初期値は推奨インポート順の先頭(メーカー/取引先)(D-060)", () => {
+    renderWithStore(<Settings />);
+    expect(screen.getByLabelText("対象")).toHaveValue("vendors");
+  });
+
   it("未選択時はプレビューに案内文を表示する", () => {
     renderWithStore(<Settings />);
     expect(
@@ -121,6 +132,7 @@ describe("インポート(§11、D-029 / D-030)", () => {
 
   it("正常CSVで取り込み可を表示し確定を活性化する", async () => {
     renderWithStore(<Settings />);
+    await selectEquipmentKind();
     await userEvent.upload(screen.getByLabelText("ファイル"), equipmentCsvFile(sampleEquipment));
 
     expect(await screen.findByText("✓ 1行 取り込み可")).toBeInTheDocument();
@@ -129,6 +141,7 @@ describe("インポート(§11、D-029 / D-030)", () => {
 
   it("数式インジェクション様CSVで警告を表示しつつ確定は活性のまま(D-053)", async () => {
     renderWithStore(<Settings />);
+    await selectEquipmentKind();
     const suspiciousEquipment: Equipment = {
       ...sampleEquipment,
       note: '=HYPERLINK("https://evil.example")',
@@ -144,6 +157,7 @@ describe("インポート(§11、D-029 / D-030)", () => {
 
   it("エラーCSVで行メッセージを表示し確定を非活性にする", async () => {
     renderWithStore(<Settings />);
+    await selectEquipmentKind();
     const badCsv = `${buildEntityCsv("equipment", {})}e1,M-001,ノギス,,,,,broken,\r\n`;
     const file = new File([badCsv], "equipment.csv", { type: "text/csv" });
     await userEvent.upload(screen.getByLabelText("ファイル"), file);
@@ -156,6 +170,7 @@ describe("インポート(§11、D-029 / D-030)", () => {
   it("確定 → 確認 → 取り込みで対象Recordを全置換する", async () => {
     seedStore({ equipment: { old: { ...sampleEquipment, id: "old", managementNo: "M-OLD" } } });
     renderWithStore(<Settings />);
+    await selectEquipmentKind();
     await userEvent.upload(screen.getByLabelText("ファイル"), equipmentCsvFile(sampleEquipment));
     await screen.findByText("✓ 1行 取り込み可");
 
@@ -168,6 +183,7 @@ describe("インポート(§11、D-029 / D-030)", () => {
 
   it("キャンセルでプレビューをクリアする", async () => {
     renderWithStore(<Settings />);
+    await selectEquipmentKind();
     await userEvent.upload(screen.getByLabelText("ファイル"), equipmentCsvFile(sampleEquipment));
     await screen.findByText("✓ 1行 取り込み可");
 
@@ -179,6 +195,7 @@ describe("インポート(§11、D-029 / D-030)", () => {
 
   it("対象エンティティ変更でプレビューをクリアする", async () => {
     renderWithStore(<Settings />);
+    await selectEquipmentKind();
     await userEvent.upload(screen.getByLabelText("ファイル"), equipmentCsvFile(sampleEquipment));
     await screen.findByText("✓ 1行 取り込み可");
 

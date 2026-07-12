@@ -13,13 +13,17 @@ import type { z } from "zod";
 
 export type CsvEntityKind = keyof AppState;
 
+/**
+ * 並びは推奨インポート順(D-054 の依存順: 参照される側が先)。
+ * エクスポートボタン・インポート対象セレクト・マニュアルの列仕様タブが共有する(D-060)。
+ */
 export const CSV_ENTITY_KINDS = [
-  "equipment",
-  "serviceItems",
-  "serviceRecords",
-  "serviceOrders",
   "vendors",
   "persons",
+  "equipment",
+  "serviceItems",
+  "serviceOrders",
+  "serviceRecords",
   "notifications",
 ] as const satisfies readonly CsvEntityKind[];
 

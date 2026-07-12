@@ -2,9 +2,9 @@ import { SERVICE_ITEM_STATUS } from "@/domain/serviceItemStatus";
 import { statusBadgeLabel } from "@/domain/statusBadge";
 import { Manual } from "@/features/manual";
 import { renderWithStore, setupStoreIsolation } from "@/test/renderWithStore";
-import { screen } from "@testing-library/react";
+import { fireEvent, screen } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 describe("Manual", () => {
   beforeEach(setupStoreIsolation);
@@ -13,6 +13,33 @@ describe("Manual", () => {
     renderWithStore(<Manual />);
 
     expect(screen.getByRole("heading", { level: 1, name: "利用マニュアル" })).toBeInTheDocument();
+  });
+
+  it("目次(詳細/summary)に7つのセクションへのリンクボタンが表示される", () => {
+    renderWithStore(<Manual />);
+
+    expect(screen.getByText("目次")).toBeInTheDocument();
+    for (const title of [
+      "ご利用にあたって",
+      "基本の流れ",
+      "ステータスの見方",
+      "期限と発注推奨日の計算",
+      "各画面の説明",
+      "CSVエクスポートとインポート",
+      "ライセンスとソースコード",
+    ]) {
+      expect(screen.getByRole("button", { name: title })).toBeInTheDocument();
+    }
+  });
+
+  it("目次のボタンをクリックすると対象セクションが scrollIntoView される", () => {
+    const scrollIntoView = vi.fn<() => void>();
+    Element.prototype.scrollIntoView = scrollIntoView;
+
+    renderWithStore(<Manual />);
+    fireEvent.click(screen.getByRole("button", { name: "ステータスの見方" }));
+
+    expect(scrollIntoView).toHaveBeenCalledWith({ behavior: "smooth" });
   });
 
   it.each([
@@ -68,7 +95,7 @@ describe("Manual", () => {
     ).toBeInTheDocument();
     expect(
       screen.getByText(
-        "メーカー/取引先・担当者 → 機器 → 点検校正項目 → 点検校正外部案件 → 実施記録 → 通知",
+        "メーカー/取引先 → 担当者 → 機器 → 点検校正項目 → 点検校正外部案件 → 実施記録 → 通知",
         { exact: false },
       ),
     ).toBeInTheDocument();
