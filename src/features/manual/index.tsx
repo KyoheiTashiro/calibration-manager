@@ -60,7 +60,7 @@ const SCREEN_GUIDES = [
     route: ROUTES.SETTINGS,
     title: "設定",
     description:
-      "アプリのインストール(PWA)、CSVでのデータのバックアップ(エクスポート)と復元(インポート)、データの全削除を行います。",
+      "アプリのインストール(PWA)、CSVでのデータのエクスポート(バックアップ)とインポート(復元・一括登録)、データの全削除を行います。",
   },
 ] as const;
 
@@ -76,7 +76,7 @@ export const Manual = (): ReactElement => (
         ブラウザーごとに独立しており、別の環境から同じデータを見ることはできません。
       </p>
       <p>
-        端末の故障やブラウザーデータの消去でデータが失われる可能性があるため、
+        端末の故障・変更やブラウザーデータの消去に備え、
         <Link to={ROUTES.SETTINGS} className="text-primary mx-1 underline">
           設定画面
         </Link>
@@ -198,14 +198,15 @@ export const Manual = (): ReactElement => (
       ))}
     </ManualSection>
 
-    <ManualSection title="バックアップと復元">
+    <ManualSection title="CSVエクスポートとインポート">
       <p>
         <Link to={ROUTES.SETTINGS} className="text-primary underline">
           設定画面
         </Link>
-        から、CSVファイルによるデータのバックアップ(エクスポート)と復元(インポート)ができます。
-        端末の変更やブラウザーデータの消去でデータが失われる場合に備え、定期的にエクスポートして
-        おくことをおすすめします。
+        から、CSVファイルでデータのエクスポート(書き出し)とインポート(取り込み)ができます。
+        エクスポートはデータのバックアップとして、インポートはバックアップからの復元や、
+        新しいデータの一括登録に利用できます。端末の故障・変更やブラウザーデータの消去に備え、
+        定期的にエクスポートしておくことをおすすめします。
       </p>
 
       <h3 className="border-primary border-l-4 pl-2 font-semibold">CSVエクスポート</h3>
@@ -216,11 +217,11 @@ export const Manual = (): ReactElement => (
         種類と出力日の組み合わせになります。データが1件もない種類でも、列名だけのCSVを出力できます。
       </p>
       <p>
-        エクスポートしたCSVは、そのまま同じ種類のインポートで復元できます。1行目は列名の行
-        (英語の項目名)で、インポート時に種類の照合に使われるため変更しないでください。
+        エクスポートしたCSVは、そのまま同じ種類のインポートで復元できます。1行目は英語の列名の
+        行で、インポート時に種類の照合に使われるため変更しないでください。
       </p>
 
-      <h3 className="border-primary border-l-4 pl-2 font-semibold">CSVインポート(復元)の手順</h3>
+      <h3 className="border-primary border-l-4 pl-2 font-semibold">CSVインポートの手順</h3>
       <ol className="flex list-decimal flex-col gap-2 pl-5">
         <li>
           <Link to={ROUTES.SETTINGS} className="text-primary underline">
@@ -242,6 +243,18 @@ export const Manual = (): ReactElement => (
         </li>
       </ol>
 
+      <h3 className="border-primary border-l-4 pl-2 font-semibold">新しいデータの一括登録</h3>
+      <p>
+        インポートできるのは、エクスポートしたCSVだけではありません。1行目の列名と各セルの形式が
+        合っていれば、Excel等の表計算ソフトで作成したCSVから新しいデータを一括登録することも
+        できます。id の列には、ファイル内で重複しない任意の文字列を入力してください。
+      </p>
+      <p>
+        なお、インポートは選択した種類の既存データをまるごと置き換えるため、いまあるデータに
+        追加したい場合は、先に同じ種類をエクスポートし、そのファイルに行を追記してから
+        インポートしてください。
+      </p>
+
       <h3 className="border-primary border-l-4 pl-2 font-semibold">
         インポート時にチェックされる内容
       </h3>
@@ -253,9 +266,7 @@ export const Manual = (): ReactElement => (
           選択肢として正しい値か)
         </li>
         <li>ファイル内での重複(id の重複。機器は管理番号の重複も)</li>
-        <li>
-          参照先の存在(例: 機器のメーカーが、現在登録されているメーカー/取引先にあるか)
-        </li>
+        <li>参照先の存在(例: 機器のメーカーが、現在登録されているメーカー/取引先にあるか)</li>
       </ul>
       <p>
         このほか、「=」などで始まりExcel等で数式として解釈されるおそれのある値は、警告として
@@ -263,15 +274,16 @@ export const Manual = (): ReactElement => (
         確認してください。
       </p>
 
-      <h3 className="border-primary border-l-4 pl-2 font-semibold">複数の種類を復元する順番</h3>
+      <h3 className="border-primary border-l-4 pl-2 font-semibold">
+        複数の種類をインポートする順番
+      </h3>
       <p>
         参照先の存在チェックは「現在登録されているデータ」に対して行われるため、複数の種類を
-        まとめて復元するときは、参照される側から次の順にインポートしてください。
+        まとめてインポートするときは、参照される側から次の順にインポートしてください。
       </p>
-      <p>
-        メーカー/取引先・担当者 → 機器 → 点検校正項目 → 点検校正外部案件 → 実施記録 → 通知
-      </p>
+      <p>メーカー/取引先・担当者 → 機器 → 点検校正項目 → 点検校正外部案件 → 実施記録 → 通知</p>
 
+      <h3 className="border-primary border-l-4 pl-2 font-semibold">セキュリティ上の注意</h3>
       <p>
         出所の分からないCSVファイルはインポートしないでください。また、エクスポートしたCSVを
         Excel等の表計算ソフトで開いた際に数式の実行を確認する警告が表示された場合は、

@@ -21,7 +21,7 @@ describe("Manual", () => {
     "ステータスの見方",
     "期限と発注推奨日の計算",
     "各画面の説明",
-    "バックアップと復元",
+    "CSVエクスポートとインポート",
     "ライセンスとソースコード",
   ])("見出し「%s」(h2)が表示される", (heading) => {
     renderWithStore(<Manual />);
@@ -39,16 +39,29 @@ describe("Manual", () => {
 
   it.each([
     "CSVエクスポート",
-    "CSVインポート(復元)の手順",
+    "CSVインポートの手順",
+    "新しいデータの一括登録",
     "インポート時にチェックされる内容",
-    "複数の種類を復元する順番",
-  ])("バックアップと復元の小見出し「%s」(h3)が表示される", (heading) => {
+    "複数の種類をインポートする順番",
+    "セキュリティ上の注意",
+  ])("CSVエクスポートとインポートの小見出し「%s」(h3)が表示される", (heading) => {
     renderWithStore(<Manual />);
 
     expect(screen.getByRole("heading", { level: 3, name: heading })).toBeInTheDocument();
   });
 
-  it("インポートの全置換の説明と依存順の復元順が表示される", () => {
+  it("新しいデータの一括登録の説明(D-055)が表示される", () => {
+    renderWithStore(<Manual />);
+
+    expect(
+      screen.getByText(/表計算ソフトで作成したCSVから新しいデータを一括登録/u, { exact: false }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/そのファイルに行を追記してから/u, { exact: false }),
+    ).toBeInTheDocument();
+  });
+
+  it("インポートの全置換の説明と依存順のインポート順が表示される", () => {
     renderWithStore(<Manual />);
 
     expect(
