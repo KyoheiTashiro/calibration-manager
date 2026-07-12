@@ -1,7 +1,9 @@
 import { SERVICE_ITEM_STATUS } from "@/domain/serviceItemStatus";
 import { statusBadgeLabel } from "@/domain/statusBadge";
 import { Manual } from "@/features/manual";
+import { NOTIFICATION_TYPE_LABELS } from "@/features/notifications/constants";
 import { CSV_ENTITY_KINDS, entityCsvFileName } from "@/features/settings/components/csv/entityCsv";
+import { NOTIFICATION_TYPE } from "@/store/types";
 import { renderWithStore, setupStoreIsolation } from "@/test/renderWithStore";
 import { fireEvent, screen } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
@@ -91,6 +93,26 @@ describe("Manual", () => {
     }
   });
 
+  it.each(["点検校正項目のステータス", "通知の種類"])(
+    "ステータスの見方の小見出し「%s」(h3)が表示される(D-068)",
+    (heading) => {
+      renderWithStore(<Manual />);
+
+      expect(screen.getByRole("heading", { level: 3, name: heading })).toBeInTheDocument();
+    },
+  );
+
+  it("全通知種別のバッジ日本語ラベルと発生条件の説明が表示される(D-068)", () => {
+    renderWithStore(<Manual />);
+
+    for (const type of Object.values(NOTIFICATION_TYPE)) {
+      expect(screen.getAllByText(NOTIFICATION_TYPE_LABELS[type]).length).toBeGreaterThan(0);
+    }
+    expect(
+      screen.getByText(/返却予定日が近づいています\(7日前から\)/u, { exact: false }),
+    ).toBeInTheDocument();
+  });
+
   it.each([
     "CSVエクスポート",
     "CSVインポート",
@@ -154,6 +176,7 @@ describe("Manual", () => {
     expect(screen.getByRole("link", { name: "機器一覧" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "機器一覧・機器詳細" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "通知" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "通知センター" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "設定" })).toBeInTheDocument();
 
     expect(screen.getAllByRole("link", { name: "点検校正項目一覧" }).length).toBeGreaterThanOrEqual(

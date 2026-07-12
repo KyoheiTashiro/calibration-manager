@@ -1,13 +1,21 @@
 /* oxlint-disable eslint/max-lines -- 利用マニュアルは静的な文章の集合で、行数上限による機械分割は文章の見通しを損なうため(D-054) */
 import { StatusBadge } from "@/components/domain";
+import { Badge } from "@/components/ui";
 import { Table, TableBody, TableHead, Td, Th } from "@/components/ui/Table";
 import { ROUTES } from "@/constants/routes";
+import { DELIVERY_DUE_SOON_NOTICE_DAYS } from "@/domain/constants";
 import { SERVICE_ITEM_STATUS, type ServiceItemStatus } from "@/domain/serviceItemStatus";
+import {
+  NOTIFICATION_TYPE_BADGE_CLASSES,
+  NOTIFICATION_TYPE_ICONS,
+  NOTIFICATION_TYPE_LABELS,
+} from "@/features/notifications/constants";
 import {
   CSV_ENTITY_KINDS,
   ENTITY_CSV_SPECS,
   entityCsvFileName,
 } from "@/features/settings/components/csv/entityCsv";
+import { NOTIFICATION_TYPE, type NotificationType } from "@/store/types";
 import type { ReactElement } from "react";
 import { Link } from "react-router-dom";
 
@@ -36,6 +44,16 @@ const STATUS_DESCRIPTIONS = {
   [SERVICE_ITEM_STATUS.DUE_SOON]: "次回期限が近づいています(通知開始日数に到達)",
   [SERVICE_ITEM_STATUS.OK]: "上記のいずれにも当てはまりません",
 } as const satisfies Record<ServiceItemStatus, string>;
+
+const NOTIFICATION_TYPE_DESCRIPTIONS = {
+  [NOTIFICATION_TYPE.DUE_SOON]: "点検校正項目の次回期限が近づいています(通知開始日数に到達)",
+  [NOTIFICATION_TYPE.OVERDUE]: "点検校正項目の次回期限を過ぎています",
+  [NOTIFICATION_TYPE.ORDER_RECOMMENDED]:
+    "外部点検校正の発注推奨日を過ぎていて、まだ進行中の点検校正外部案件がありません",
+  [NOTIFICATION_TYPE.DELIVERY_DUE_SOON]: `点検校正外部案件の返却予定日が近づいています(${String(DELIVERY_DUE_SOON_NOTICE_DAYS)}日前から)`,
+  [NOTIFICATION_TYPE.DELIVERY_OVERDUE]:
+    "点検校正外部案件の返却予定日を過ぎています(未返却のもののみ)",
+} as const satisfies Record<NotificationType, string>;
 
 const SCREEN_GUIDES = [
   {
@@ -181,6 +199,11 @@ export const Manual = (): ReactElement => (
       <h2 className="border-b border-slate-200 pb-2 text-lg font-semibold">
         {MANUAL_SECTIONS.STATUS.title}
       </h2>
+      <h3 className="border-primary border-l-4 pl-2 font-semibold">点検校正項目のステータス</h3>
+      <p>
+        点検校正項目一覧やダッシュボードなどで表示されるステータスです。複数に当てはまる場合は、
+        上にあるものほど優先して表示されます。
+      </p>
       <ul className="flex flex-col gap-2">
         {Object.values(SERVICE_ITEM_STATUS).map((status) => (
           <li key={status} className="flex items-center gap-2">
@@ -188,6 +211,28 @@ export const Manual = (): ReactElement => (
             <span>{STATUS_DESCRIPTIONS[status]}</span>
           </li>
         ))}
+      </ul>
+      <h3 className="border-primary border-l-4 pl-2 font-semibold">通知の種類</h3>
+      <p>
+        対応が必要になった項目・案件については、
+        <Link to={ROUTES.NOTIFICATION_LIST} className="text-primary mx-1 underline">
+          通知センター
+        </Link>
+        に次の5種類の通知が自動で作られます。
+      </p>
+      <ul className="flex flex-col gap-2">
+        {Object.values(NOTIFICATION_TYPE).map((type) => {
+          const TypeIcon = NOTIFICATION_TYPE_ICONS[type];
+          return (
+            <li key={type} className="flex items-center gap-2">
+              <Badge className={NOTIFICATION_TYPE_BADGE_CLASSES[type]}>
+                <TypeIcon className="mr-1 h-3.5 w-3.5" />
+                {NOTIFICATION_TYPE_LABELS[type]}
+              </Badge>
+              <span>{NOTIFICATION_TYPE_DESCRIPTIONS[type]}</span>
+            </li>
+          );
+        })}
       </ul>
     </section>
 
