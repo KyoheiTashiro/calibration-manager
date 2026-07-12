@@ -42,6 +42,16 @@ describe("Manual", () => {
     expect(scrollIntoView).toHaveBeenCalledWith({ behavior: "smooth" });
   });
 
+  it("「ページ上部へ戻る」ボタンをクリックすると最上部見出しが scrollIntoView される", () => {
+    const scrollIntoView = vi.fn<() => void>();
+    Element.prototype.scrollIntoView = scrollIntoView;
+
+    renderWithStore(<Manual />);
+    fireEvent.click(screen.getByRole("button", { name: "ページ上部へ戻る" }));
+
+    expect(scrollIntoView).toHaveBeenCalledWith({ behavior: "smooth" });
+  });
+
   it.each([
     "ご利用にあたって",
     "基本の流れ",
