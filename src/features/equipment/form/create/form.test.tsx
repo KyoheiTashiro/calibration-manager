@@ -76,7 +76,7 @@ describe("EquipmentCreateForm: 新規登録", () => {
     if (!created) throw new Error("Equipment が作成されていません");
     expect(created.name).toBe("トルクレンチ");
     expect(created.status).toBe(EQUIPMENT_STATUS.ACTIVE);
-    expect(screen.getByText(`機器詳細:${created.id}`)).toBeInTheDocument();
+    expect(await screen.findByText(`機器詳細:${created.id}`)).toBeInTheDocument();
   });
 });
 
