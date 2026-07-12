@@ -38,11 +38,12 @@ describe("Tabs", () => {
     expect(inactiveTab).toHaveAttribute("aria-selected", "false");
   });
 
-  it("アクティブなタブには border-primary text-primary クラスが付与される", () => {
+  it("アクティブなタブにはカード連結用の bg-white text-primary クラスが付与される", () => {
     render(<Tabs tabs={TABS} activeKey="detail" onChange={vi.fn<() => void>()} />);
 
     const activeTab = screen.getByRole("tab", { name: "詳細" });
-    expect(activeTab.className).toContain("border-primary");
+    expect(activeTab.className).toContain("bg-white");
+    expect(activeTab.className).toContain("border-b-white");
     expect(activeTab.className).toContain("text-primary");
   });
 
@@ -70,5 +71,42 @@ describe("Tabs", () => {
     for (const tab of screen.getAllByRole("tab")) {
       expect(tab).toHaveAttribute("type", "button");
     }
+  });
+
+  it("roving tabindex: アクティブタブのみ tabIndex=0 になる", () => {
+    render(<Tabs tabs={TABS} activeKey="detail" onChange={vi.fn<() => void>()} />);
+
+    expect(screen.getByRole("tab", { name: "詳細" })).toHaveAttribute("tabindex", "0");
+    expect(screen.getByRole("tab", { name: "履歴" })).toHaveAttribute("tabindex", "-1");
+  });
+
+  it("→ キーで次のタブの key で onChange が呼ばれフォーカスが移る", () => {
+    const handleChange = vi.fn<() => void>();
+    render(<Tabs tabs={TABS} activeKey="detail" onChange={handleChange} />);
+
+    fireEvent.keyDown(screen.getByRole("tab", { name: "詳細" }), { key: "ArrowRight" });
+
+    expect(handleChange).toHaveBeenCalledWith("history");
+    expect(screen.getByRole("tab", { name: "履歴" })).toHaveFocus();
+  });
+
+  it("← キーで先頭タブから末尾タブへループする", () => {
+    const handleChange = vi.fn<() => void>();
+    render(<Tabs tabs={TABS} activeKey="detail" onChange={handleChange} />);
+
+    fireEvent.keyDown(screen.getByRole("tab", { name: "詳細" }), { key: "ArrowLeft" });
+
+    expect(handleChange).toHaveBeenCalledWith("history");
+    expect(screen.getByRole("tab", { name: "履歴" })).toHaveFocus();
+  });
+
+  it("←→ 以外のキーでは onChange が呼ばれない", () => {
+    const handleChange = vi.fn<() => void>();
+    render(<Tabs tabs={TABS} activeKey="detail" onChange={handleChange} />);
+
+    fireEvent.keyDown(screen.getByRole("tab", { name: "詳細" }), { key: "Enter" });
+    fireEvent.keyDown(screen.getByRole("tab", { name: "詳細" }), { key: "ArrowDown" });
+
+    expect(handleChange).not.toHaveBeenCalled();
   });
 });
