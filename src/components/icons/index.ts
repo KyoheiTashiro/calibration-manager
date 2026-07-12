@@ -1,4 +1,9 @@
+export { AlertTriangleIcon } from "./AlertTriangleIcon";
 export { ArrowUpIcon } from "./ArrowUpIcon";
 export { BellIcon } from "./BellIcon";
+export { CartIcon } from "./CartIcon";
+export { ClockIcon } from "./ClockIcon";
 export { CloseIcon } from "./CloseIcon";
 export { MenuIcon } from "./MenuIcon";
+export { TruckAlertIcon } from "./TruckAlertIcon";
+export { TruckIcon } from "./TruckIcon";

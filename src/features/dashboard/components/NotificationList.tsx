@@ -25,19 +25,21 @@ export const NotificationList = ({ notifications }: Props): ReactElement => (
       <EmptyState message="新しい通知はありません" />
     ) : (
       <ul className="divide-y divide-slate-200 rounded-lg border border-slate-200">
-        {notifications.map((notification) => (
-          <li key={notification.id} className="flex items-center gap-3 px-3 py-2">
-            <Badge className={NOTIFICATION_TYPE_BADGE_CLASSES[notification.type]}>
-              {/* Badge は inline-flex のため空白テキストノードが消える。間隔は margin で確保 */}
-              <span aria-hidden="true" className="mr-1">
-                {NOTIFICATION_TYPE_ICONS[notification.type]}
+        {notifications.map((notification) => {
+          const TypeIcon = NOTIFICATION_TYPE_ICONS[notification.type];
+          return (
+            <li key={notification.id} className="flex items-center gap-3 px-3 py-2">
+              <Badge className={NOTIFICATION_TYPE_BADGE_CLASSES[notification.type]}>
+                <TypeIcon className="mr-1 h-3.5 w-3.5" />
+                {NOTIFICATION_TYPE_LABELS[notification.type]}
+              </Badge>
+              <span className="flex-1 text-sm">{notification.message}</span>
+              <span className="text-xs text-slate-500 tabular-nums">
+                {notification.createdDate}
               </span>
-              {NOTIFICATION_TYPE_LABELS[notification.type]}
-            </Badge>
-            <span className="flex-1 text-sm">{notification.message}</span>
-            <span className="text-xs text-slate-500 tabular-nums">{notification.createdDate}</span>
-          </li>
-        ))}
+            </li>
+          );
+        })}
       </ul>
     )}
   </section>

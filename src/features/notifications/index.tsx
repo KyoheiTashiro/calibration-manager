@@ -72,29 +72,29 @@ export const NotificationCenter = (): ReactElement => {
         <EmptyState message={emptyMessage} />
       ) : (
         <ul className="flex flex-col divide-y divide-slate-200 border-b border-slate-200">
-          {rows.map((notification) => (
-            <li key={notification.id}>
-              <button
-                type="button"
-                onClick={(): void => {
-                  handleRowClick(notification);
-                }}
-                className="flex w-full flex-col gap-1 px-2 py-3 text-left hover:bg-slate-50"
-              >
-                <div className="flex items-center gap-2">
-                  <Badge className={NOTIFICATION_TYPE_BADGE_CLASSES[notification.type]}>
-                    {/* Badge は inline-flex のため空白テキストノードが消える。間隔は margin で確保 */}
-                    <span aria-hidden="true" className="mr-1">
-                      {NOTIFICATION_TYPE_ICONS[notification.type]}
-                    </span>
-                    {NOTIFICATION_TYPE_LABELS[notification.type]}
-                  </Badge>
-                  <span className="text-sm text-slate-800">{notification.message}</span>
-                </div>
-                <span className="text-xs text-slate-500">{notification.createdDate}</span>
-              </button>
-            </li>
-          ))}
+          {rows.map((notification) => {
+            const TypeIcon = NOTIFICATION_TYPE_ICONS[notification.type];
+            return (
+              <li key={notification.id}>
+                <button
+                  type="button"
+                  onClick={(): void => {
+                    handleRowClick(notification);
+                  }}
+                  className="flex w-full flex-col gap-1 px-2 py-3 text-left hover:bg-slate-50"
+                >
+                  <div className="flex items-center gap-2">
+                    <Badge className={NOTIFICATION_TYPE_BADGE_CLASSES[notification.type]}>
+                      <TypeIcon className="mr-1 h-3.5 w-3.5" />
+                      {NOTIFICATION_TYPE_LABELS[notification.type]}
+                    </Badge>
+                    <span className="text-sm text-slate-800">{notification.message}</span>
+                  </div>
+                  <span className="text-xs text-slate-500">{notification.createdDate}</span>
+                </button>
+              </li>
+            );
+          })}
         </ul>
       )}
     </div>

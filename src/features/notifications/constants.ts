@@ -1,4 +1,13 @@
+import {
+  AlertTriangleIcon,
+  CartIcon,
+  ClockIcon,
+  TruckAlertIcon,
+  TruckIcon,
+} from "@/components/icons";
+import type { IconProps } from "@/components/icons/base";
 import { NOTIFICATION_TYPE, type NotificationType } from "@/store/types";
+import type { ComponentType } from "react";
 
 export const NOTIFICATION_TYPE_LABELS = {
   [NOTIFICATION_TYPE.DUE_SOON]: "期限接近",
@@ -22,14 +31,14 @@ export const NOTIFICATION_TYPE_BADGE_CLASSES = {
 } as const satisfies Record<NotificationType, string>;
 
 /**
- * 通知種別→アイコングリフ（screen-design/10-notifications.md の表と一致させる）。
- * overdue と deliveryOverdue は色相としては同じ🔴だが、区別は上記バッジの濃淡（-100/-800 と
- * -200/-900）が担うため、グリフ自体は表の通り両方🔴のままでよい。
+ * 通知種別→アイコンコンポーネント（screen-design/10-notifications.md の表と一致させる）。
+ * 色は NOTIFICATION_TYPE_BADGE_CLASSES の text 色を currentColor で継承する。overdue と
+ * deliveryOverdue は色相が同じ赤のため、形状（警告三角 vs トラック+警告）で区別する(D-064)。
  */
 export const NOTIFICATION_TYPE_ICONS = {
-  [NOTIFICATION_TYPE.DUE_SOON]: "🟡",
-  [NOTIFICATION_TYPE.OVERDUE]: "🔴",
-  [NOTIFICATION_TYPE.ORDER_RECOMMENDED]: "🟠",
-  [NOTIFICATION_TYPE.DELIVERY_DUE_SOON]: "🟣",
-  [NOTIFICATION_TYPE.DELIVERY_OVERDUE]: "🔴",
-} as const satisfies Record<NotificationType, string>;
+  [NOTIFICATION_TYPE.DUE_SOON]: ClockIcon,
+  [NOTIFICATION_TYPE.OVERDUE]: AlertTriangleIcon,
+  [NOTIFICATION_TYPE.ORDER_RECOMMENDED]: CartIcon,
+  [NOTIFICATION_TYPE.DELIVERY_DUE_SOON]: TruckIcon,
+  [NOTIFICATION_TYPE.DELIVERY_OVERDUE]: TruckAlertIcon,
+} as const satisfies Record<NotificationType, ComponentType<IconProps>>;

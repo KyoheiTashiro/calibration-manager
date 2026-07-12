@@ -206,12 +206,13 @@ describe("Dashboard: 最新の通知", () => {
     expect(screen.getByText("期限超過")).toBeInTheDocument();
   });
 
-  it("アイコングリフを aria-hidden 付きで描画し、ラベルはスクリーンリーダーから読める", () => {
+  it("SVGアイコンを aria-hidden 付きで描画し、ラベルはスクリーンリーダーから読める", () => {
     seedStore({ notifications: { [overdueNotification.id]: overdueNotification } });
     renderDashboardWithRoutes();
 
-    expect(screen.getByText("🔴")).toHaveAttribute("aria-hidden", "true");
-    expect(screen.getByText("期限超過")).not.toHaveAttribute("aria-hidden");
+    const badge = screen.getByText("期限超過");
+    expect(badge.querySelector("svg")).toHaveAttribute("aria-hidden", "true");
+    expect(badge).not.toHaveAttribute("aria-hidden");
   });
 
   it("「通知センターへ」で通知センターへ遷移する", async () => {

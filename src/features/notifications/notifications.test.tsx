@@ -136,7 +136,7 @@ describe("NotificationCenter: 種別バッジ", () => {
     expect(badge.className).toContain("text-purple-800");
   });
 
-  it("アイコングリフを aria-hidden 付きで描画し、ラベルはスクリーンリーダーから読める", () => {
+  it("SVGアイコンを aria-hidden 付きで描画し、ラベルはスクリーンリーダーから読める", () => {
     seedStore({
       notifications: {
         d1: makeNotif({ id: "d1", type: NOTIFICATION_TYPE.DELIVERY_DUE_SOON }),
@@ -144,8 +144,9 @@ describe("NotificationCenter: 種別バッジ", () => {
     });
     renderCenter();
 
-    expect(screen.getByText("🟣")).toHaveAttribute("aria-hidden", "true");
-    expect(screen.getByText("納期接近")).not.toHaveAttribute("aria-hidden");
+    const badge = screen.getByText("納期接近");
+    expect(badge.querySelector("svg")).toHaveAttribute("aria-hidden", "true");
+    expect(badge).not.toHaveAttribute("aria-hidden");
   });
 });
 

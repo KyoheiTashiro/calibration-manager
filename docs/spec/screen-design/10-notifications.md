@@ -28,13 +28,15 @@
 
 **通知種別のアイコン/色**:
 
-| type               | ラベル   | 色        | 対象       |
-| ------------------ | -------- | --------- | ---------- |
-| `dueSoon`          | 期限接近 | 🟡 黄     | serviceItem       |
-| `overdue`          | 期限超過 | 🔴 赤     | serviceItem       |
-| `orderRecommended` | 要発注   | 🟠 橙     | serviceItem(外部) |
-| `deliveryDueSoon`  | 納期接近 | 🟣 紫     | serviceOrder |
-| `deliveryOverdue`  | 納期超過 | 🔴 赤(濃) | serviceOrder |
+| type               | ラベル   | アイコン        | 色        | 対象              |
+| ------------------ | -------- | --------------- | --------- | ----------------- |
+| `dueSoon`          | 期限接近 | 時計            | 黄        | serviceItem       |
+| `overdue`          | 期限超過 | 警告三角        | 赤        | serviceItem       |
+| `orderRecommended` | 要発注   | カート          | 橙        | serviceItem(外部) |
+| `deliveryDueSoon`  | 納期接近 | トラック        | 紫        | serviceOrder      |
+| `deliveryOverdue`  | 納期超過 | トラック+警告   | 赤(濃)    | serviceOrder      |
+
+アイコンは絵文字ではなく自前インラインSVG(src/components/icons)。色はバッジ文字色を currentColor で継承する(D-064)。
 
 ## 操作・アクション
 
