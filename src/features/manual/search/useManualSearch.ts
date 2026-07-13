@@ -1,5 +1,6 @@
 import { useEffect, useState, type RefObject } from "react";
 
+import { dispatchSearchReveal } from "./revealEvent";
 import { collectMatchRanges } from "./textSearch";
 
 /* CSS Custom Highlight API の ::highlight() 名。src/styles/index.css の定義と一致させること。 */
@@ -23,7 +24,23 @@ type ManualSearchState = {
    window.scrollTo ではなく目次(TocFab)と同じ scrollIntoView 方式を使う。
    center 指定は、ジャンプ先が画面上端ぎりぎりで見切れないようにするため。 */
 const scrollToRange = (range: Range): void => {
-  range.startContainer.parentElement?.scrollIntoView({ behavior: "smooth", block: "center" });
+  const { parentElement } = range.startContainer;
+  if (parentElement === null) {
+    return;
+  }
+
+  const hiddenAncestor = parentElement.closest<HTMLElement>("[hidden]");
+  if (hiddenAncestor === null) {
+    parentElement.scrollIntoView({ behavior: "smooth", block: "center" });
+    return;
+  }
+
+  // hidden なパネル内へのジャンプ: 表示を所有側に依頼し、React の state 更新が
+  // commit された後(マクロタスク)にスクロールする
+  dispatchSearchReveal(hiddenAncestor);
+  globalThis.setTimeout(() => {
+    parentElement.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, 0);
 };
 
 /* CSS Custom Highlight API に対応しているか判定する。非対応ブラウザではハイライト表示を
@@ -48,7 +65,10 @@ const useHighlightRegistration = (matches: Range[], currentIndex: number): void 
 
     CSS.highlights.set(MANUAL_SEARCH_HIGHLIGHT.MATCH, new Highlight(...matches));
 
-    const currentRange = matches[currentIndex];
+    /* なぜ .at() か: noUncheckedIndexedAccess 無効のため添字アクセスは undefined を含まない
+       型になり、undefined ガードが lint(no-unnecessary-condition)と矛盾する。
+       .at() は `Range | undefined` を返すためガードと整合する(以下同様)。 */
+    const currentRange = currentIndex >= 0 ? matches.at(currentIndex) : undefined;
     if (currentRange === undefined) {
       CSS.highlights.delete(MANUAL_SEARCH_HIGHLIGHT.CURRENT);
     } else {
@@ -69,9 +89,8 @@ const useHighlightRegistration = (matches: Range[], currentIndex: number): void 
 };
 
 /*
- * マニュアル内検索(D-072)。既知の制約: マニュアル内のタブ切替(ImportCheckTabs)などで
- * 検索対象の DOM が変わっても matches は自動再計算しない。次に検索語を入力し直した
- * タイミングで再計算される割り切り。
+ * マニュアル内検索(D-072)。ImportCheckTabs は全パネルを hidden で DOM に保持するため
+ * (D-073)、タブ切替で Range は失効しない。
  */
 export const useManualSearch = (contentRef: RefObject<HTMLElement | null>): ManualSearchState => {
   const [query, setQuery] = useState("");
@@ -91,7 +110,7 @@ export const useManualSearch = (contentRef: RefObject<HTMLElement | null>): Manu
     const nextIndex = nextMatches.length > 0 ? 0 : -1;
     setCurrentIndex(nextIndex);
 
-    const [firstMatch] = nextMatches;
+    const firstMatch = nextMatches.at(0);
     if (firstMatch !== undefined) {
       scrollToRange(firstMatch);
     }
@@ -105,7 +124,7 @@ export const useManualSearch = (contentRef: RefObject<HTMLElement | null>): Manu
     const nextIndex = (currentIndex + step + matches.length) % matches.length;
     setCurrentIndex(nextIndex);
 
-    const nextRange = matches[nextIndex];
+    const nextRange = matches.at(nextIndex);
     if (nextRange !== undefined) {
       scrollToRange(nextRange);
     }

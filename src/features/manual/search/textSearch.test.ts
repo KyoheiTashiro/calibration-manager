@@ -70,14 +70,14 @@ describe("collectMatchRanges", () => {
     expect(ranges).toHaveLength(2);
 
     const [firstRange, secondRange] = ranges;
-    expect(firstRange?.startContainer.textContent).toBe("点検校正の期限を管理します。");
-    expect(firstRange?.startOffset).toBe(0);
-    expect(firstRange?.endOffset).toBe(4);
+    expect(firstRange.startContainer.textContent).toBe("点検校正の期限を管理します。");
+    expect(firstRange.startOffset).toBe(0);
+    expect(firstRange.endOffset).toBe(4);
 
     // 2つ目の一致は <a> タグの中のテキストノード全体("点検校正")
-    expect(secondRange?.startContainer.textContent).toBe("点検校正");
-    expect(secondRange?.startOffset).toBe(0);
-    expect(secondRange?.endOffset).toBe(4);
+    expect(secondRange.startContainer.textContent).toBe("点検校正");
+    expect(secondRange.startOffset).toBe(0);
+    expect(secondRange.endOffset).toBe(4);
   });
 
   it("要素境界をまたぐ語は一致しない(D-072の割り切り)", () => {
