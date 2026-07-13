@@ -68,3 +68,17 @@ input:disabled,
     transition-duration: 0.01ms !important;
   }
 }
+
+/* なぜ: マニュアル内検索(D-072)の一致ハイライト。CSS Custom Highlight API は DOM を
+   改変しないため React のレンダリング結果と衝突しない。名前は
+   features/manual/search/useManualSearch.ts の MANUAL_SEARCH_HIGHLIGHT と一致させる。
+   非対応ブラウザではハイライトなしでジャンプのみ動作する(段階的機能低下)。 */
+::highlight(manual-search-match) {
+  background-color: #fef08a; /* yellow-200。本文色 slate-900 とのコントラストを保つ */
+  color: #0f172a;
+}
+
+::highlight(manual-search-current) {
+  background-color: #fdba74; /* orange-300。現在位置を周囲の一致と区別する */
+  color: #0f172a;
+}
