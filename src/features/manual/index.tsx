@@ -5,6 +5,7 @@ import { Table, TableBody, TableHead, Td, Th } from "@/components/ui/Table";
 import { ROUTES } from "@/constants/routes";
 import { DELIVERY_DUE_SOON_NOTICE_DAYS } from "@/domain/constants";
 import { SERVICE_ITEM_STATUS, type ServiceItemStatus } from "@/domain/serviceItemStatus";
+import { statusBadgeLabel } from "@/domain/statusBadge";
 import {
   NOTIFICATION_TYPE_BADGE_CLASSES,
   NOTIFICATION_TYPE_ICONS,
@@ -44,6 +45,22 @@ const STATUS_DESCRIPTIONS = {
   [SERVICE_ITEM_STATUS.DUE_SOON]: "次回期限が近づいています(通知開始日数に到達)",
   [SERVICE_ITEM_STATUS.OK]: "上記のいずれにも当てはまりません",
 } as const satisfies Record<ServiceItemStatus, string>;
+
+/* 通知種別と項目ステータスの対応関係を本文で明示するためのラベル列。
+   文言は通知バッジと同じ定数から導出し、名称変更時の乖離を防ぐ */
+const joinNotificationLabels = (types: readonly NotificationType[]): string =>
+  types.map((type) => `「${NOTIFICATION_TYPE_LABELS[type]}」`).join("");
+
+const ITEM_NOTIFICATION_LABELS = joinNotificationLabels([
+  NOTIFICATION_TYPE.DUE_SOON,
+  NOTIFICATION_TYPE.OVERDUE,
+  NOTIFICATION_TYPE.ORDER_RECOMMENDED,
+]);
+
+const ORDER_NOTIFICATION_LABELS = joinNotificationLabels([
+  NOTIFICATION_TYPE.DELIVERY_DUE_SOON,
+  NOTIFICATION_TYPE.DELIVERY_OVERDUE,
+]);
 
 const NOTIFICATION_TYPE_DESCRIPTIONS = {
   [NOTIFICATION_TYPE.DUE_SOON]: "点検校正項目の次回期限が近づいています(通知開始日数に到達)",
@@ -220,6 +237,15 @@ export const Manual = (): ReactElement => (
         </Link>
         に次の5種類の通知が自動で作られます。
       </p>
+      <p>
+        このうち{ITEM_NOTIFICATION_LABELS}
+        の3種類は点検校正項目に関する通知で、同じ名前の項目ステータスと同じ条件で作られます。
+        {ORDER_NOTIFICATION_LABELS}
+        の2種類は点検校正外部案件に関する通知で、対応する項目ステータスはありません。また、項目ステータスの「
+        {statusBadgeLabel(SERVICE_ITEM_STATUS.IN_PROGRESS)}」「
+        {statusBadgeLabel(SERVICE_ITEM_STATUS.OK)}
+        」は対応が不要な状態のため、対応する通知はありません。
+      </p>
       <ul className="flex flex-col gap-2">
         {Object.values(NOTIFICATION_TYPE).map((type) => {
           const TypeIcon = NOTIFICATION_TYPE_ICONS[type];
@@ -349,7 +375,7 @@ export const Manual = (): ReactElement => (
         </TableBody>
       </Table>
       <p>
-        エクスポートしたCSVは、そのまま同じ種類のインポートで復元できます。1行目の英語の項目名は、
+        エクスポートしたCSVは、そのまま同じ種類のインポートで復元できます。見出し行である1行目の英語の項目名は、
         インポート時にどの種類のCSVかを確認するために使われます。編集せず、そのまま残してください。
       </p>
 

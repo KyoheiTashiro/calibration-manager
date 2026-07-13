@@ -113,6 +113,17 @@ describe("Manual", () => {
     ).toBeInTheDocument();
   });
 
+  it("通知の種類と項目ステータスの対応関係の説明が表示される", () => {
+    renderWithStore(<Manual />);
+
+    expect(
+      screen.getByText(/同じ名前の項目ステータスと同じ条件で作られます/u, { exact: false }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/対応する項目ステータスはありません/u, { exact: false }),
+    ).toBeInTheDocument();
+  });
+
   it.each([
     "CSVエクスポート",
     "CSVインポート",
