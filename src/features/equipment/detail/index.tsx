@@ -97,7 +97,7 @@ export const EquipmentDetail = (): ReactElement => {
       </div>
 
       <div className="flex flex-col gap-2">
-        <h2 className="text-lg font-semibold">実施記録(全項目横断・新しい順)</h2>
+        <h2 className="text-lg font-semibold">実施記録</h2>
 
         <ServiceRecordTable serviceRecordRows={serviceRecordRows} />
       </div>
