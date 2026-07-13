@@ -33,7 +33,6 @@ type UseEditEquipmentFormResult = {
   onFormSubmit: ReturnType<UseFormHandleSubmit<FormType>>;
   manufacturerOptions: SelectOption[];
   retireConfirmOpen: boolean;
-  openRetireConfirm: () => void;
   closeRetireConfirm: () => void;
   handleRetireConfirm: () => void;
   handleCancel: () => void;
@@ -45,10 +44,12 @@ export const useEditEquipmentForm = (): UseEditEquipmentFormResult => {
 
   const equipmentMap = useAppStore((state) => state.equipment);
   const updateEquipment = useAppStore((state) => state.updateEquipment);
-  const setEquipmentStatus = useAppStore((state) => state.setEquipmentStatus);
 
   const currentEquipment = id === undefined ? undefined : equipmentMap[id];
 
+  // 廃棄（retired）への変更確認ダイアログを表示中、保存待ちの入力値を保持しておく。
+  // ダイアログを経由しない通常保存では使わない。
+  const [pendingValues, setPendingValues] = useState<FormType | null>(null);
   const [retireConfirmOpen, setRetireConfirmOpen] = useState(false);
 
   const currentFormValues = toFormValues(currentEquipment);
@@ -61,17 +62,31 @@ export const useEditEquipmentForm = (): UseEditEquipmentFormResult => {
     excludeEquipmentId: id,
   });
 
-  const onSubmit = (values: FormType): void => {
+  const persist = (values: FormType): void => {
     if (currentEquipment === undefined) return;
     updateEquipment(currentEquipment.id, toEquipmentPayload(values));
     safeNavigate(equipmentDetailPath(currentEquipment.id));
   };
 
-  const handleRetireConfirm = (): void => {
+  const onSubmit = (values: FormType): void => {
     if (currentEquipment === undefined) return;
-    setEquipmentStatus(currentEquipment.id, EQUIPMENT_STATUS.RETIRED);
+    // status セレクトで retired 以外から retired への変更のみ確認ダイアログを挟む。
+    // 既に retired の機器を retired のまま保存する場合は確認不要で即保存する。
+    const isRetiring =
+      currentEquipment.status !== EQUIPMENT_STATUS.RETIRED &&
+      values.status === EQUIPMENT_STATUS.RETIRED;
+    if (isRetiring) {
+      setPendingValues(values);
+      setRetireConfirmOpen(true);
+      return;
+    }
+    persist(values);
+  };
+
+  const handleRetireConfirm = (): void => {
+    if (pendingValues !== null) persist(pendingValues);
     setRetireConfirmOpen(false);
-    safeNavigate(equipmentDetailPath(currentEquipment.id));
+    setPendingValues(null);
   };
 
   return {
@@ -83,11 +98,11 @@ export const useEditEquipmentForm = (): UseEditEquipmentFormResult => {
     onFormSubmit: handleSubmit(onSubmit),
     manufacturerOptions,
     retireConfirmOpen,
-    openRetireConfirm: (): void => {
-      setRetireConfirmOpen(true);
-    },
     closeRetireConfirm: (): void => {
+      // キャンセル時は保存しない。フォームの編集内容はRHF側の状態のまま保持されるため
+      // pendingValues を破棄するだけでよい。
       setRetireConfirmOpen(false);
+      setPendingValues(null);
     },
     handleRetireConfirm,
     handleCancel: (): void => {

@@ -155,11 +155,3 @@ describe("EquipmentCreateForm: メーカーセレクト", () => {
     expect(created).toBeDefined();
   });
 });
-
-describe("EquipmentCreateForm: 廃棄ボタン", () => {
-  it("新規登録モードでは廃棄にするボタンが表示されない", () => {
-    renderCreateForm();
-
-    expect(screen.queryByRole("button", { name: "廃棄にする" })).not.toBeInTheDocument();
-  });
-});

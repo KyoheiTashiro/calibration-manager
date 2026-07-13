@@ -14,7 +14,6 @@ export const EquipmentEditForm = (): ReactElement => {
     onFormSubmit,
     manufacturerOptions,
     retireConfirmOpen,
-    openRetireConfirm,
     closeRetireConfirm,
     handleRetireConfirm,
     handleCancel,
@@ -42,25 +41,18 @@ export const EquipmentEditForm = (): ReactElement => {
           manufacturerOptions={manufacturerOptions}
         />
 
-        <div className="flex items-center justify-between pt-2">
-          <div>
-            <Button type="button" variant="danger" onClick={openRetireConfirm}>
-              廃棄にする
-            </Button>
-          </div>
-          <div className="flex gap-2">
-            <Button type="button" variant="secondary" onClick={handleCancel}>
-              キャンセル
-            </Button>
-            <Button type="submit">保存</Button>
-          </div>
+        <div className="flex justify-end gap-2 pt-2">
+          <Button type="button" variant="secondary" onClick={handleCancel}>
+            キャンセル
+          </Button>
+          <Button type="submit">保存</Button>
         </div>
       </form>
 
       <ConfirmModal
         open={retireConfirmOpen}
         title="機器の廃棄"
-        message="この機器を廃棄にしますか?"
+        message="この機器を廃棄にして保存しますか?"
         confirmLabel="廃棄"
         onConfirm={handleRetireConfirm}
         onCancel={closeRetireConfirm}
