@@ -178,13 +178,6 @@ export const Manual = (): ReactElement => {
             送信されないため、インターネット接続がなくても利用できます。一方で、データは端末・
             ブラウザーごとに独立しており、別の環境から同じデータを見ることはできません。
           </p>
-          <p>
-            端末の故障・変更やブラウザーデータの消去に備え、
-            <Link to={ROUTES.SETTINGS} className="text-primary mx-1 underline">
-              設定画面
-            </Link>
-            から定期的にCSVエクスポートでバックアップを取ることを推奨します。
-          </p>
         </section>
 
         <section
@@ -213,11 +206,11 @@ export const Manual = (): ReactElement => {
               します。
             </li>
             <li>
-              機器に点検校正項目(周期・内外区分など)を追加します。入力画面(モーダル)は、
+              機器に点検校正項目を追加します。入力画面は、
               <Link to={ROUTES.EQUIPMENT_LIST} className="text-primary underline">
                 機器一覧
               </Link>
-              から対象機器の詳細を開くと表示されます。
+              から対象機器の詳細を開くと表示できます。
             </li>
             <li>
               点検・校正を実施したら、
