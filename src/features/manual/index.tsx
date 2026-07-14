@@ -43,7 +43,7 @@ const STATUS_DESCRIPTIONS = {
   [SERVICE_ITEM_STATUS.OVERDUE]: "次回期限を過ぎています",
   [SERVICE_ITEM_STATUS.ORDER_NOW]:
     "外部点検校正の発注推奨日を過ぎていて、まだ進行中の点検校正外部案件がありません",
-  [SERVICE_ITEM_STATUS.IN_PROGRESS]: "外部点検校正で発注済み・校正中の案件があります",
+  [SERVICE_ITEM_STATUS.IN_PROGRESS]: "発注済み・校正中の点検校正外部案件があります",
   [SERVICE_ITEM_STATUS.DUE_SOON]: "次回期限が近づいています(通知開始日数に到達)",
   [SERVICE_ITEM_STATUS.OK]: "上記のいずれにも当てはまりません",
 } as const satisfies Record<ServiceItemStatus, string>;
@@ -79,13 +79,13 @@ const SCREEN_GUIDES = [
     route: ROUTES.DASHBOARD,
     title: "ダッシュボード",
     description:
-      "対応が必要な項目の全体像をひと目で確認し、そこから各項目へすぐに移動できる画面です。",
+      "対応が必要な点検校正項目の全体像をひと目で確認し、そこから対象の点検校正項目へすぐに移動できる画面です。",
   },
   {
     route: ROUTES.EQUIPMENT_LIST,
     title: "機器一覧・機器詳細",
     description:
-      "登録した機器の一覧表示と検索ができます。機器詳細では、1台の機器の基本情報・点検校正項目・実施記録をまとめて確認でき、項目の管理や記録の登録もここから行います。",
+      "登録した機器の一覧表示と検索ができます。機器詳細では、1台の機器の基本情報・点検校正項目・実施記録をまとめて確認でき、点検校正項目の管理や実施記録の登録もここから行います。",
   },
   {
     route: ROUTES.SERVICE_ITEM_LIST,
@@ -97,12 +97,12 @@ const SCREEN_GUIDES = [
     route: ROUTES.SERVICE_ORDER_LIST,
     title: "点検校正外部案件",
     description:
-      "外部点検校正の発注から返却・記録までの進み具合を、状態ごとのボード(かんばん)で管理します。",
+      "外部点検校正の発注から返却・実施記録の登録までの進み具合を、状態ごとのボード(かんばん)で管理します。",
   },
   {
     route: ROUTES.VENDOR_LIST,
     title: "メーカー/取引先",
-    description: "機器のメーカーや、校正の依頼先となる取引先を追加・編集します。",
+    description: "機器のメーカーや、外部点検校正の依頼先となる取引先を追加・編集します。",
   },
   {
     route: ROUTES.PERSON_LIST,
@@ -224,22 +224,22 @@ export const Manual = (): ReactElement => {
               <Link to={ROUTES.SERVICE_ITEM_LIST} className="text-primary underline">
                 点検校正項目一覧
               </Link>
-              から実施記録を登録します。記録を登録すると、次回期限が自動で更新されます。
+              から実施記録を登録します。実施記録を登録すると、次回期限が自動で更新されます。
             </li>
             <li>
-              外部の点検・校正が必要な項目は、
+              外部点検校正が必要な点検校正項目は、
               <Link to={ROUTES.SERVICE_ITEM_LIST} className="text-primary underline">
                 点検校正項目一覧
               </Link>
-              の各行にある「案件」ボタンから案件を作成します(「案件」ボタンは外部の点検・校正の項目で、
-              まだ進行中の案件がないときに表示されます)。
+              の各行にある「案件」ボタンから点検校正外部案件を作成します(「案件」ボタンは
+              外部点検校正の点検校正項目で、まだ進行中の点検校正外部案件がないときに表示されます)。
             </li>
             <li>
-              作成した案件は
+              作成した点検校正外部案件は
               <Link to={ROUTES.SERVICE_ORDER_LIST} className="text-primary underline">
                 点検校正外部案件
               </Link>
-              画面のボードに表示され、発注から返却・記録の登録までの進み具合を管理できます。
+              画面のボードに表示され、発注から返却・実施記録の登録までの進み具合を管理できます。
             </li>
           </ol>
         </section>
@@ -266,7 +266,7 @@ export const Manual = (): ReactElement => {
           </ul>
           <h3 className="border-primary border-l-4 pl-2 font-semibold">通知の種類</h3>
           <p>
-            対応が必要になった項目・案件については、
+            対応が必要になった点検校正項目・点検校正外部案件については、
             <Link to={ROUTES.NOTIFICATION_LIST} className="text-primary mx-1 underline">
               通知センター
             </Link>
@@ -274,9 +274,9 @@ export const Manual = (): ReactElement => {
           </p>
           <p>
             このうち{ITEM_NOTIFICATION_LABELS}
-            の3種類は点検校正項目に関する通知で、同じ名前の項目ステータスと同じ条件で作られます。
+            の3種類は点検校正項目に関する通知で、同じ名前の点検校正項目のステータスと同じ条件で作られます。
             {ORDER_NOTIFICATION_LABELS}
-            の2種類は点検校正外部案件に関する通知で、対応する項目ステータスはありません。また、項目ステータスの「
+            の2種類は点検校正外部案件に関する通知で、対応する点検校正項目のステータスはありません。また、点検校正項目のステータスの「
             {statusBadgeLabel(SERVICE_ITEM_STATUS.IN_PROGRESS)}」「
             {statusBadgeLabel(SERVICE_ITEM_STATUS.OK)}
             」は対応が不要な状態のため、対応する通知はありません。
@@ -306,12 +306,12 @@ export const Manual = (): ReactElement => {
           </h2>
           <h3 className="border-primary border-l-4 pl-2 font-semibold">次回期限</h3>
           <p>
-            次回期限は「前回実施日 + 周期」で自動計算されます。項目を登録した直後はまだ実施記録が
+            次回期限は「前回実施日 + 周期」で自動計算されます。点検校正項目を登録した直後はまだ実施記録が
             ないため、初回の次回期限だけは手で入力します。以降は実施記録を登録するたびに、その実施日を
             起点に自動で更新されます。
           </p>
           <p>
-            ただし、結果が「不合格」の記録では次回期限は更新されません。合格するまで期限は据え置かれ、
+            ただし、結果が「不合格」の実施記録では次回期限は更新されません。合格するまで期限は据え置かれ、
             要対応の状態として扱われます。
           </p>
           <p>
@@ -320,25 +320,25 @@ export const Manual = (): ReactElement => {
           </p>
 
           <h3 className="border-primary border-l-4 pl-2 font-semibold">
-            発注推奨日(外部の点検・校正のみ)
+            発注推奨日(外部点検校正のみ)
           </h3>
           <p>
-            外部の点検・校正の項目には、期限に間に合うようにいつまでに発注すべきかの目安として発注推奨日が
+            外部点検校正の点検校正項目には、いつまでに発注すれば期限に間に合うかの目安として発注推奨日が
             あり、「次回期限 − 納期(リードタイム) − 発注余裕日数」で計算されます。
           </p>
           <p>
-            納期は、項目ごとに個別の設定があればそれを、なければ依頼先(メーカー/取引先)の標準納期を
+            納期は、点検校正項目ごとに個別の設定があればそれを、なければ依頼先(メーカー/取引先)の標準納期を
             使います。どちらも設定されていない場合は発注推奨日を計算できないため、「要発注」の判定や
             発注をうながす通知は行われません。
           </p>
           <p>
             発注余裕日数は、発注してから業者に機器を引き渡すまでの社内手続きなどを見込んだ余裕分で、
-            項目ごとに設定できます(はじめは14日)。
+            点検校正項目ごとに設定できます(はじめは14日)。
           </p>
           <p>
             例: 次回期限が 9/30、納期が30日、発注余裕日数が14日の場合、発注推奨日は 9/30
             から44日さかのぼった 8/17
-            になります。この日を過ぎても発注していない項目が「要発注」として 表示されます。
+            になります。この日を過ぎても発注していない点検校正項目が「要発注」として表示されます。
           </p>
         </section>
 
@@ -380,8 +380,7 @@ export const Manual = (): ReactElement => {
 
           <h3 className="border-primary border-l-4 pl-2 font-semibold">CSVエクスポート</h3>
           <p>
-            データの種類(機器・点検校正項目・実施記録・点検校正外部案件・メーカー/取引先・担当者・
-            通知)ごとに、1つのCSVファイルをダウンロードできます。ファイルはUTF-8(BOM付き)で、
+            データの種類ごとに、1つのCSVファイルをダウンロードできます。ファイルはUTF-8(BOM付き)で、
             Excelでもそのまま開けます。データが1件もない場合でも、1行目(項目名)だけのCSVを出力できます。
           </p>
           <p>
