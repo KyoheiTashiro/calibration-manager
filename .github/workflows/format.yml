@@ -1,13 +1,13 @@
-# なぜ: lint失敗がデプロイをブロックしないよう、独立したワークフローとして分離する
+# なぜ: format失敗がlintやデプロイをブロックしないよう、独立したワークフローとして分離する
 # （docs/architecture/tech-stack.md「CI構成の方針」）。
-name: lint
+name: format
 
 on:
   push:
   pull_request:
 
 jobs:
-  lint:
+  format:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -16,4 +16,4 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
-      - run: npm run lint:typed
+      - run: npm run format:check

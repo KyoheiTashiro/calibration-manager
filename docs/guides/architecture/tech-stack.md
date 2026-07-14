@@ -35,7 +35,7 @@ calibration-manager はバックエンドを持たず、機器台帳という性
 
 ## CI構成の方針
 
-GitHub Actions を3ワークフローに分割している。`test`（Vitestによるテスト・カバレッジ・ビルド確認）、`lint`（oxlint typed モード + oxfmt のフォーマットチェック）、`deploy`（GitHub Pagesへのデプロイ）をそれぞれ独立させることで、lintの失敗がデプロイをブロックしない・逆にデプロイの失敗原因を切り分けやすい、といった構成上のメリットを得ている。
+GitHub Actions を4ワークフローに分割している。`test`（Vitestによるテスト・カバレッジ・ビルド確認）、`lint`（oxlint typed モード）、`format`（oxfmt のフォーマットチェック）、`deploy`（GitHub Pagesへのデプロイ）をそれぞれ独立させることで、lintの失敗がデプロイをブロックしない・逆にデプロイの失敗原因を切り分けやすい、といった構成上のメリットを得ている。
 
 ## テスト戦略の方針
 
