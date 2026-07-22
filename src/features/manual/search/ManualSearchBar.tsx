@@ -4,14 +4,6 @@ import { useManualSearch } from "./useManualSearch";
 
 type Props = { contentRef: RefObject<HTMLElement | null> };
 
-/*
- * 「前へ」「次へ」ボタンは src/components/ui/Button を使わない: variant が
- * primary/secondary/danger のみで、この検索バーのような小さな補助操作向けの見た目が
- * ないため、素の <button> に TextField 等と同系のボーダースタイルを直接当てる。
- */
-const navigationButtonClassName =
-  "rounded border border-slate-300 px-2 py-1 text-sm disabled:opacity-50";
-
 export const ManualSearchBar = ({ contentRef }: Props): ReactElement => {
   const {
     query,
@@ -55,10 +47,13 @@ export const ManualSearchBar = ({ contentRef }: Props): ReactElement => {
           }}
           onKeyDown={handleKeyDown}
         />
+        {/* 「前へ」「次へ」は src/components/ui/Button を使わない: variant が
+            primary/secondary/danger のみで小さな補助操作向けの見た目がないため、
+            素の <button> に TextField 等と同系のボーダースタイルを直接当てる。 */}
         <button
           type="button"
           aria-label="前の一致へ"
-          className={navigationButtonClassName}
+          className="rounded border border-slate-300 px-2 py-1 text-sm disabled:opacity-50"
           disabled={matchCount === 0}
           onClick={moveToPreviousMatch}
         >
@@ -67,7 +62,7 @@ export const ManualSearchBar = ({ contentRef }: Props): ReactElement => {
         <button
           type="button"
           aria-label="次の一致へ"
-          className={navigationButtonClassName}
+          className="rounded border border-slate-300 px-2 py-1 text-sm disabled:opacity-50"
           disabled={matchCount === 0}
           onClick={moveToNextMatch}
         >
