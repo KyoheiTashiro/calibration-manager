@@ -11,13 +11,11 @@ If you discover a security vulnerability, please report it via GitHub's
 [Private Vulnerability Reporting](https://github.com/KyoheiTashiro/calibration-manager/security/advisories/new)
 instead of opening a public issue.
 
-## 対応方針 / Response
+## 対応方針
 
 - 個人メンテナンスのプロジェクトのため、確認・修正はベストエフォートで対応します
 - 報告受領後、おおむね 1 週間以内に一次返信します
 
-## サポート対象 / Supported Versions
+## サポート対象
 
 `main` ブランチ(GitHub Pages にデプロイされている最新版)のみを対象とします。
-
-Only the latest version on the `main` branch (deployed to GitHub Pages) is supported.
