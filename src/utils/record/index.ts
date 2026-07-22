@@ -5,8 +5,10 @@
  * typescript/no-unnecessary-condition に「不要な条件」と誤検知される。
  * このヘルパを介すと戻り値が `T | undefined` になり、不在の可能性が型に現れる。
  */
-export const recordValue = <Value>(record: Record<string, Value>, key: string): Value | undefined =>
-  Object.hasOwn(record, key) ? record[key] : undefined;
+export const recordValue = <Value>(
+  record: Record<string, Value>,
+  key: string,
+): Value | undefined => (Object.hasOwn(record, key) ? record[key] : undefined);
 
 /**
  * unknown 値がプレーンオブジェクト(null を除く object 型)かどうかの型ガード。
