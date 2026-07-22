@@ -29,18 +29,20 @@ const scrollToRange = (range: Range): void => {
     return;
   }
 
+  const scroll = (): void => {
+    parentElement.scrollIntoView({ behavior: "smooth", block: "center" });
+  };
+
   const hiddenAncestor = parentElement.closest<HTMLElement>("[hidden]");
   if (hiddenAncestor === null) {
-    parentElement.scrollIntoView({ behavior: "smooth", block: "center" });
+    scroll();
     return;
   }
 
   // hidden なパネル内へのジャンプ: 表示を所有側に依頼し、React の state 更新が
   // commit された後(マクロタスク)にスクロールする
   dispatchSearchReveal(hiddenAncestor);
-  globalThis.setTimeout(() => {
-    parentElement.scrollIntoView({ behavior: "smooth", block: "center" });
-  }, 0);
+  globalThis.setTimeout(scroll, 0);
 };
 
 /* CSS Custom Highlight API に対応しているか判定する。非対応ブラウザではハイライト表示を
@@ -49,17 +51,10 @@ const isHighlightApiSupported = (): boolean =>
   typeof Highlight !== "undefined" && typeof CSS !== "undefined" && "highlights" in CSS;
 
 /* matches・currentIndex の変化に応じてハイライト登録を同期する。
-   なぜ effect 分割か: 「登録」と「アンマウント時の後始末」の責務を分け、
-   後始末は依存配列を空にして一度だけ登録することを明確にするため。 */
+   cleanup は再実行前・アンマウント時に必ず走るため、削除は cleanup に一本化する。 */
 const useHighlightRegistration = (matches: Range[], currentIndex: number): void => {
   useEffect(() => {
-    if (!isHighlightApiSupported()) {
-      return;
-    }
-
-    if (matches.length === 0) {
-      CSS.highlights.delete(MANUAL_SEARCH_HIGHLIGHT.MATCH);
-      CSS.highlights.delete(MANUAL_SEARCH_HIGHLIGHT.CURRENT);
+    if (!isHighlightApiSupported() || matches.length === 0) {
       return;
     }
 
@@ -67,25 +62,23 @@ const useHighlightRegistration = (matches: Range[], currentIndex: number): void 
 
     /* なぜ .at() か: noUncheckedIndexedAccess 無効のため添字アクセスは undefined を含まない
        型になり、undefined ガードが lint(no-unnecessary-condition)と矛盾する。
-       .at() は `Range | undefined` を返すためガードと整合する(以下同様)。 */
+       .at() は `Range | undefined` を返すためガードと整合する(以下同様)。
+       currentIndex >= 0 ガードは .at(-1) が末尾要素を返すため必須。 */
     const currentRange = currentIndex >= 0 ? matches.at(currentIndex) : undefined;
-    if (currentRange === undefined) {
-      CSS.highlights.delete(MANUAL_SEARCH_HIGHLIGHT.CURRENT);
-    } else {
+    if (currentRange !== undefined) {
       CSS.highlights.set(MANUAL_SEARCH_HIGHLIGHT.CURRENT, new Highlight(currentRange));
     }
-  }, [matches, currentIndex]);
 
-  useEffect(
-    () => (): void => {
+    return (): void => {
+      /* cleanup 時にも再判定する: テスト等で CSS.highlights のスタブが
+         effect 実行後〜cleanup 前に解除されるケースがあるため */
       if (!isHighlightApiSupported()) {
         return;
       }
       CSS.highlights.delete(MANUAL_SEARCH_HIGHLIGHT.MATCH);
       CSS.highlights.delete(MANUAL_SEARCH_HIGHLIGHT.CURRENT);
-    },
-    [],
-  );
+    };
+  }, [matches, currentIndex]);
 };
 
 /*
@@ -130,14 +123,6 @@ export const useManualSearch = (contentRef: RefObject<HTMLElement | null>): Manu
     }
   };
 
-  const moveToNextMatch = (): void => {
-    moveToMatch(1);
-  };
-
-  const moveToPreviousMatch = (): void => {
-    moveToMatch(-1);
-  };
-
   const clearSearch = (): void => {
     setQuery("");
     setMatches([]);
@@ -149,8 +134,12 @@ export const useManualSearch = (contentRef: RefObject<HTMLElement | null>): Manu
     matchCount: matches.length,
     currentMatchNumber: currentIndex === -1 ? 0 : currentIndex + 1,
     handleQueryChange,
-    moveToNextMatch,
-    moveToPreviousMatch,
+    moveToNextMatch: (): void => {
+      moveToMatch(1);
+    },
+    moveToPreviousMatch: (): void => {
+      moveToMatch(-1);
+    },
     clearSearch,
   };
 };

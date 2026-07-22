@@ -76,21 +76,19 @@ export const collectMatchRanges = (rootElement: HTMLElement, query: string): Ran
   const ranges: Range[] = [];
   const walker = document.createTreeWalker(rootElement, NodeFilter.SHOW_TEXT);
 
-  let currentNode = walker.nextNode();
-  while (currentNode !== null) {
+  for (let node = walker.nextNode(); node !== null; node = walker.nextNode()) {
     // NodeFilter.SHOW_TEXT で絞り込み済みのため実行時は必ず Text ノードだが、
     // TreeWalker#nextNode() の型は Node | null までしか narrow されないため
     // 型アサーションではなく instanceof で絞る
-    if (currentNode instanceof Text) {
-      const offsets = findMatchOffsets(currentNode.data, query);
+    if (node instanceof Text) {
+      const offsets = findMatchOffsets(node.data, query);
       for (const offset of offsets) {
         const range = document.createRange();
-        range.setStart(currentNode, offset.start);
-        range.setEnd(currentNode, offset.end);
+        range.setStart(node, offset.start);
+        range.setEnd(node, offset.end);
         ranges.push(range);
       }
     }
-    currentNode = walker.nextNode();
   }
 
   return ranges;
