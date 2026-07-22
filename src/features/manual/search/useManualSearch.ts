@@ -54,19 +54,17 @@ const isHighlightApiSupported = (): boolean =>
    cleanup は再実行前・アンマウント時に必ず走るため、削除は cleanup に一本化する。 */
 const useHighlightRegistration = (matches: Range[], currentIndex: number): void => {
   useEffect(() => {
-    if (!isHighlightApiSupported() || matches.length === 0) {
-      return;
-    }
+    if (isHighlightApiSupported() && matches.length > 0) {
+      CSS.highlights.set(MANUAL_SEARCH_HIGHLIGHT.MATCH, new Highlight(...matches));
 
-    CSS.highlights.set(MANUAL_SEARCH_HIGHLIGHT.MATCH, new Highlight(...matches));
-
-    /* なぜ .at() か: noUncheckedIndexedAccess 無効のため添字アクセスは undefined を含まない
-       型になり、undefined ガードが lint(no-unnecessary-condition)と矛盾する。
-       .at() は `Range | undefined` を返すためガードと整合する(以下同様)。
-       currentIndex >= 0 ガードは .at(-1) が末尾要素を返すため必須。 */
-    const currentRange = currentIndex >= 0 ? matches.at(currentIndex) : undefined;
-    if (currentRange !== undefined) {
-      CSS.highlights.set(MANUAL_SEARCH_HIGHLIGHT.CURRENT, new Highlight(currentRange));
+      /* なぜ .at() か: noUncheckedIndexedAccess 無効のため添字アクセスは undefined を含まない
+         型になり、undefined ガードが lint(no-unnecessary-condition)と矛盾する。
+         .at() は `Range | undefined` を返すためガードと整合する(以下同様)。
+         currentIndex >= 0 ガードは .at(-1) が末尾要素を返すため必須。 */
+      const currentRange = currentIndex >= 0 ? matches.at(currentIndex) : undefined;
+      if (currentRange !== undefined) {
+        CSS.highlights.set(MANUAL_SEARCH_HIGHLIGHT.CURRENT, new Highlight(currentRange));
+      }
     }
 
     return (): void => {
