@@ -1,64 +1,16 @@
-// oxlint-disable react/no-multi-comp -- MatchCountLabel/MatchNavigationButtons は
-// ManualSearchBar 内でのみ使う小さな表示専用の内部部品のため同ファイルに置く
 import type { KeyboardEvent, ReactElement, RefObject } from "react";
 
 import { useManualSearch } from "./useManualSearch";
 
 type Props = { contentRef: RefObject<HTMLElement | null> };
 
-/* 件数表示。query が空のときは非表示にする(検索前は案内不要なため)。
-   aria-live="polite" で件数変化をスクリーンリーダーに通知する。 */
-const MatchCountLabel = ({
-  matchCount,
-  currentMatchNumber,
-}: {
-  matchCount: number;
-  currentMatchNumber: number;
-}): ReactElement => (
-  <span aria-live="polite" className="text-sm whitespace-nowrap text-slate-600">
-    {matchCount === 0 ? "一致なし" : `${String(currentMatchNumber)} / ${String(matchCount)} 件`}
-  </span>
-);
-
 /*
- * 「前へ」「次へ」ボタン。src/components/ui/Button は variant が primary/secondary/danger
- * のみで、この検索バーのような小さな補助操作向けの見た目がないため、素の <button> に
- * TextField 等と同系のボーダースタイルを直接当てる。
+ * 「前へ」「次へ」ボタンは src/components/ui/Button を使わない: variant が
+ * primary/secondary/danger のみで、この検索バーのような小さな補助操作向けの見た目が
+ * ないため、素の <button> に TextField 等と同系のボーダースタイルを直接当てる。
  */
-const MatchNavigationButtons = ({
-  matchCount,
-  onMoveToPrevious,
-  onMoveToNext,
-}: {
-  matchCount: number;
-  onMoveToPrevious: () => void;
-  onMoveToNext: () => void;
-}): ReactElement => {
-  const buttonClassName = "rounded border border-slate-300 px-2 py-1 text-sm disabled:opacity-50";
-
-  return (
-    <>
-      <button
-        type="button"
-        aria-label="前の一致へ"
-        className={buttonClassName}
-        disabled={matchCount === 0}
-        onClick={onMoveToPrevious}
-      >
-        前へ
-      </button>
-      <button
-        type="button"
-        aria-label="次の一致へ"
-        className={buttonClassName}
-        disabled={matchCount === 0}
-        onClick={onMoveToNext}
-      >
-        次へ
-      </button>
-    </>
-  );
-};
+const navigationButtonClassName =
+  "rounded border border-slate-300 px-2 py-1 text-sm disabled:opacity-50";
 
 export const ManualSearchBar = ({ contentRef }: Props): ReactElement => {
   const {
@@ -103,13 +55,32 @@ export const ManualSearchBar = ({ contentRef }: Props): ReactElement => {
           }}
           onKeyDown={handleKeyDown}
         />
-        <MatchNavigationButtons
-          matchCount={matchCount}
-          onMoveToPrevious={moveToPreviousMatch}
-          onMoveToNext={moveToNextMatch}
-        />
+        <button
+          type="button"
+          aria-label="前の一致へ"
+          className={navigationButtonClassName}
+          disabled={matchCount === 0}
+          onClick={moveToPreviousMatch}
+        >
+          前へ
+        </button>
+        <button
+          type="button"
+          aria-label="次の一致へ"
+          className={navigationButtonClassName}
+          disabled={matchCount === 0}
+          onClick={moveToNextMatch}
+        >
+          次へ
+        </button>
+        {/* 件数表示。query が空のときは非表示(検索前は案内不要なため)。
+            aria-live="polite" で件数変化をスクリーンリーダーに通知する。 */}
         {query !== "" && (
-          <MatchCountLabel matchCount={matchCount} currentMatchNumber={currentMatchNumber} />
+          <span aria-live="polite" className="text-sm whitespace-nowrap text-slate-600">
+            {matchCount === 0
+              ? "一致なし"
+              : `${String(currentMatchNumber)} / ${String(matchCount)} 件`}
+          </span>
         )}
       </div>
     </div>
