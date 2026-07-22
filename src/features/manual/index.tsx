@@ -376,7 +376,7 @@ export const Manual = (): ReactElement => {
           <h3 className="border-primary border-l-4 pl-2 font-semibold">CSVエクスポート</h3>
           <p>
             データの種類ごとに、1つのCSVファイルをダウンロードできます。ファイルはUTF-8(BOM付き)で、
-            Excelでもそのまま開けます。データが1件もない場合でも、1行目(項目名)だけのCSVを出力できます。
+            Excelでもそのまま開けます。データが1件もない場合でも、1行目の英語の項目名だけのCSVを出力できます。
           </p>
           <p>
             ファイル名は次の表のとおり、種類と出力日の組み合わせになります。「YYYY-MM-DD」の部分には
@@ -384,8 +384,8 @@ export const Manual = (): ReactElement => {
           </p>
           <CsvFileNameTable />
           <p>
-            エクスポートしたCSVは、そのまま同じ種類のインポートで復元できます。見出し行である1行目の英語の項目名は、
-            インポート時にどの種類のCSVかを確認するために使われます。編集せず、そのまま残してください。
+            エクスポートしたCSVは、そのまま同じ種類のインポートで復元できます。1行目の英語の項目名は、
+            インポート時にどの種類のCSVかを判定するために使われます。編集せず、そのまま残してください。
           </p>
 
           <h3 className="border-primary border-l-4 pl-2 font-semibold">CSVインポート</h3>
@@ -411,7 +411,7 @@ export const Manual = (): ReactElement => {
           </ol>
 
           <p>
-            インポートできるのは、エクスポートしたCSVだけではありません。1行目の項目名と各セルの形式が
+            インポートできるのは、エクスポートしたCSVだけではありません。1行目の英語の項目名と各セルの形式が
             合っていれば、Excel等の表計算ソフトで作成したCSVから新しいデータを一括登録することも
             できます。
           </p>
@@ -425,7 +425,7 @@ export const Manual = (): ReactElement => {
           </h3>
           <ul className="flex list-disc flex-col gap-2 pl-5">
             <li>
-              1行目の項目名が、選択した種類のものと一致しているか(別の種類のCSVの取り違え防止)
+              1行目の英語の項目名が、選択した種類のものと一致しているか(別の種類のCSVの取り違え防止)
             </li>
             <li>各行の項目数が正しいか</li>
             <li>
@@ -436,7 +436,7 @@ export const Manual = (): ReactElement => {
             <li>参照先の存在(例: 機器のメーカーが、現在登録されているメーカー/取引先にあるか)</li>
           </ul>
           <p>
-            各項目の必須・形式は、種類ごとに次の表のとおりです。「項目名」は、CSVの1行目(見出し行)に
+            各項目の必須・形式は、種類ごとに次の表のとおりです。「項目名」は、CSVの1行目に
             記載する英語の列名です。
           </p>
           <ImportCheckTabs />
@@ -481,7 +481,7 @@ export const Manual = (): ReactElement => {
             アクセスログ(IPアドレスなど)を取得する場合があります。
           </p>
           <p>
-            保存したデータは、ブラウザーのサイトデータ削除のほか、
+            保存したデータは、
             <Link to={ROUTES.SETTINGS} className="text-primary underline">
               設定画面
             </Link>
