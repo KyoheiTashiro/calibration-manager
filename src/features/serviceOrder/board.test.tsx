@@ -1,11 +1,11 @@
 /**
- * かんばん（screen-design/08-service-orders.md）のうち integration.test.tsx が覆わない観点:
+ * ボード（screen-design/08-service-orders.md）のうち integration.test.tsx が覆わない観点:
  * 中止フロー・トグルON表示・カード表示解決・dangling参照・空状態2種・発注ダイアログの整合警告・列内ソート。
  */
 
 import { ServiceOrderList } from "@/features/serviceOrder";
 import {
-  KANBAN_ACTIVE_COLUMNS,
+  BOARD_ACTIVE_COLUMNS,
   SERVICE_ORDER_STATUS_LABELS,
 } from "@/features/serviceOrder/constants";
 import {
@@ -138,10 +138,10 @@ describe("完了/中止も表示 トグル", () => {
     expect(
       screen.queryByText("点検校正外部案件はありません。点検校正項目一覧から案件を追加できます"),
     ).not.toBeInTheDocument();
-    for (const status of KANBAN_ACTIVE_COLUMNS) {
+    for (const status of BOARD_ACTIVE_COLUMNS) {
       expect(screen.getByText(SERVICE_ORDER_STATUS_LABELS[status])).toBeInTheDocument();
     }
-    expect(screen.getAllByText("なし")).toHaveLength(KANBAN_ACTIVE_COLUMNS.length);
+    expect(screen.getAllByText("なし")).toHaveLength(BOARD_ACTIVE_COLUMNS.length);
 
     await user.click(screen.getByLabelText("完了/中止も表示"));
 
@@ -215,7 +215,7 @@ describe("空状態", () => {
     expect(
       screen.queryByText("点検校正外部案件はありません。点検校正項目一覧から案件を追加できます"),
     ).not.toBeInTheDocument();
-    for (const status of KANBAN_ACTIVE_COLUMNS) {
+    for (const status of BOARD_ACTIVE_COLUMNS) {
       expect(screen.getByText(SERVICE_ORDER_STATUS_LABELS[status])).toBeInTheDocument();
     }
     // 4列とも0件のため「なし」が4つ

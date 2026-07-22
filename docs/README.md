@@ -24,7 +24,7 @@ docs/
 - [screen-design/README.md](spec/screen-design/README.md) — 画面設計書 目次・共通仕様(レイアウト/ルーティング一覧/バッジ色/モーダル/確認ダイアログ)
   - [01 ダッシュボード](spec/screen-design/01-dashboard.md) / [02 機器一覧](spec/screen-design/02-equipment-list.md) / [03 機器登録・編集](spec/screen-design/03-equipment-form.md) / [04 機器詳細](spec/screen-design/04-equipment-detail.md)
   - [05 点検校正項目一覧(中核)](spec/screen-design/05-service-item-list.md) / [06 点検校正項目モーダル](spec/screen-design/06-service-item-modal.md) / [07 実施記録登録モーダル](spec/screen-design/07-service-record-modal.md)
-  - [08 点検校正外部案件(かんばん)](spec/screen-design/08-service-orders.md) / [09 マスタ管理](spec/screen-design/09-masters.md) / [10 通知センター](spec/screen-design/10-notifications.md) / [11 設定](spec/screen-design/11-settings.md) / [12 利用マニュアル](spec/screen-design/12-manual.md)
+  - [08 点検校正外部案件(ボード)](spec/screen-design/08-service-orders.md) / [09 マスタ管理](spec/screen-design/09-masters.md) / [10 通知センター](spec/screen-design/10-notifications.md) / [11 設定](spec/screen-design/11-settings.md) / [12 利用マニュアル](spec/screen-design/12-manual.md)
 
 ### guides/ — 規約・設計・運用
 
@@ -38,7 +38,7 @@ docs/
 
 ### 実装判断の記録(D-xxx)
 
-コード・docs 中の「(D-xxx)」は実装中に確定した判断のタグ。判断の実質は該当する spec/guides の本文に反映済み。新たな判断が発生したら該当 docs へ直接反映し、必要なら (D-xxx) 形式で採番してタグ付けする(既存最終番号: D-074)。
+コード・docs 中の「(D-xxx)」は実装中に確定した判断のタグ。判断の実質は該当する spec/guides の本文に反映済み。新たな判断が発生したら該当 docs へ直接反映し、必要なら (D-xxx) 形式で採番してタグ付けする(既存最終番号: D-075)。
 
 ---
 

@@ -98,7 +98,7 @@ export const ServiceRecordModal = ({
       : "対象:(項目情報が見つかりません)";
 
   // なぜ: submitFailed を閉時にリセットし、同一対象で開き直した際の残留エラー表示を防ぐ
-  // （起動元の key remount に依存させない。かんばん等どのマウント方法でも安全にする）。
+  // （起動元の key remount に依存させない。ボード等どのマウント方法でも安全にする）。
   const handleClose = (): void => {
     setSubmitFailed(false);
     onClose();

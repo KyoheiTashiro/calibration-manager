@@ -46,7 +46,7 @@
 | `/equipment/:id`      | 機器詳細(項目・記録含む)   | [§4](./04-equipment-detail.md) |                                    |
 | `/equipment/:id/edit` | 機器編集                   | [§3](./03-equipment-form.md)   | フォーム画面                       |
 | `/service-items`              | 点検校正項目一覧(中核)     | [§5](./05-service-item-list.md)        | クエリでステータスフィルタ受け取り |
-| `/service-orders`             | 点検校正外部案件(かんばん) | [§8](./08-service-orders.md)           |                                    |
+| `/service-orders`             | 点検校正外部案件(ボード) | [§8](./08-service-orders.md)           |                                    |
 | `/vendors`            | メーカー/取引先マスタ      | [§9](./09-masters.md)          |                                    |
 | `/persons`            | 担当者マスタ               | [§9](./09-masters.md)          |                                    |
 | `/notifications`      | 通知センター               | [§10](./10-notifications.md)   |                                    |

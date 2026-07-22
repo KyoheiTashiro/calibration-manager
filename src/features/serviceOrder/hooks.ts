@@ -1,11 +1,11 @@
 /**
- * 点検校正外部案件（かんばん、screen-design/08-service-orders.md）の状態管理フック。
+ * 点検校正外部案件（ボード、screen-design/08-service-orders.md）の状態管理フック。
  */
 
 import {
   CARD_ACTION,
-  KANBAN_ACTIVE_COLUMNS,
-  KANBAN_CLOSED_COLUMNS,
+  BOARD_ACTIVE_COLUMNS,
+  BOARD_CLOSED_COLUMNS,
   type CardAction,
   type DialogState,
 } from "@/features/serviceOrder/constants";
@@ -32,7 +32,7 @@ const compareServiceOrdersForColumn = (left: ServiceOrder, right: ServiceOrder):
   return left.id.localeCompare(right.id);
 };
 
-type UseServiceOrderKanbanResult = {
+type UseServiceOrderBoardResult = {
   serviceItems: Record<string, ServiceItem>;
   equipment: Record<string, Equipment>;
   vendors: Record<string, Vendor>;
@@ -47,7 +47,7 @@ type UseServiceOrderKanbanResult = {
   handleConfirmCancel: () => void;
 };
 
-export const useServiceOrderKanban = (): UseServiceOrderKanbanResult => {
+export const useServiceOrderBoard = (): UseServiceOrderBoardResult => {
   const serviceOrders = useAppStore((state) => state.serviceOrders);
   const serviceItems = useAppStore((state) => state.serviceItems);
   const equipment = useAppStore((state) => state.equipment);
@@ -58,8 +58,8 @@ export const useServiceOrderKanban = (): UseServiceOrderKanbanResult => {
   const [dialog, setDialog] = useState<DialogState | null>(null);
 
   const displayedColumns: readonly ServiceOrderStatus[] = showClosed
-    ? [...KANBAN_ACTIVE_COLUMNS, ...KANBAN_CLOSED_COLUMNS]
-    : KANBAN_ACTIVE_COLUMNS;
+    ? [...BOARD_ACTIVE_COLUMNS, ...BOARD_CLOSED_COLUMNS]
+    : BOARD_ACTIVE_COLUMNS;
 
   const serviceOrdersByStatus = useMemo(() => {
     const grouped: Record<ServiceOrderStatus, ServiceOrder[]> = {

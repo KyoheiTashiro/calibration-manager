@@ -98,7 +98,7 @@ const SCREEN_GUIDES = [
     route: ROUTES.SERVICE_ORDER_LIST,
     title: "点検校正外部案件",
     description:
-      "外部点検校正の発注から返却・実施記録の登録までの進み具合を、状態ごとのボード(かんばん)で管理します。",
+      "外部点検校正の発注から返却・実施記録の登録までの進み具合を、状態ごとのボードで管理します。",
   },
   {
     route: ROUTES.VENDOR_LIST,

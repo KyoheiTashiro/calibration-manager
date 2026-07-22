@@ -1,5 +1,5 @@
 /**
- * 点検校正外部案件かんばんのカード（screen-design/08-service-orders.md）。
+ * 点検校正外部案件ボードのカード（screen-design/08-service-orders.md）。
  */
 
 import { Button } from "@/components/ui";

@@ -57,10 +57,10 @@ src/
 │   ├── manual/                      // '/manual'（利用マニュアル。静的コンテンツ・store参照なし。screen-design §12。D-035）
 │   │   ├── index.tsx               // 本文 + アコーディオン目次（D-057）
 │   │   └── importCheck/            // 種類別の列仕様表（データ columns.ts + 表示 ImportCheckTabs を colocate。columns.ts は ENTITY_CSV_SPECS の shape と一致をテストで強制。D-056）
-│   ├── serviceOrder/            // '/service-orders'（かんばん。screen-design §8）
+│   ├── serviceOrder/            // '/service-orders'（ボード。screen-design §8）
 │   │   ├── index.tsx
-│   │   ├── hooks.ts                // useOrderKanban（store購読・表示列導出・ダイアログ状態・状態遷移アクション）
-│   │   ├── constants.ts            // 状態ラベル・かんばん列順
+│   │   ├── hooks.ts                // useServiceOrderBoard（store購読・表示列導出・ダイアログ状態・状態遷移アクション）
+│   │   ├── constants.ts            // 状態ラベル・ボード列順
 │   │   ├── schema.ts               // 遷移ダイアログ（発注/返却）のRHF+zodフォームスキーマ
 │   │   └── components/             // ServiceOrderCard / TransitionDialogs
 │   ├── vendors/                    // '/vendors'（screen-design §9）
@@ -112,7 +112,7 @@ src/
 
 - ルーターは `main.tsx` の `HashRouter`。ルート定義は `App.tsx` に置く。12画面のルーティング対応表は screen-design/README.md §0.2 を参照し、本書では再掲しない。
 - モーダル群（ServiceItemModal/ServiceRecordModal/ServiceOrderModal/VendorModal/PersonModal）は特定の1画面に属さず複数画面から起動されるため `components/domain/` に配置している（screen-design §0.2「モーダルで行う操作」）。`components/domain/` の役割が広いのは、calibration-managerの画面設計上モーダル起動元が多い（機器詳細・点検校正項目一覧・案件一覧など）ことによる設計判断である。
-- React Hook Form + Zod用のフォームスキーマは**フォームを持つ画面/コンポーネントの直近に colocate する**（D-043）。feature 内のフォーム（機器登録編集の `equipment/form/shared/schema.ts`、かんばん遷移ダイアログの `serviceOrder/orderDialog/schema.ts`・`serviceOrder/returnDialog/schema.ts`）は features 側、`components/domain/` のモーダル（ServiceItemModal / ServiceOrderModal / ServiceRecordModal / VendorModal / PersonModal）は各モーダルディレクトリ内の `schema.ts` に置く。永続化データの構造検証（`store/schema.ts`）とは別物。RHF 用 `schema.ts` の公開名（`Schema`/`FormType`/`defaultValues`）は D-051 参照。
+- React Hook Form + Zod用のフォームスキーマは**フォームを持つ画面/コンポーネントの直近に colocate する**（D-043）。feature 内のフォーム（機器登録編集の `equipment/form/shared/schema.ts`、ボード遷移ダイアログの `serviceOrder/orderDialog/schema.ts`・`serviceOrder/returnDialog/schema.ts`）は features 側、`components/domain/` のモーダル（ServiceItemModal / ServiceOrderModal / ServiceRecordModal / VendorModal / PersonModal）は各モーダルディレクトリ内の `schema.ts` に置く。永続化データの構造検証（`store/schema.ts`）とは別物。RHF 用 `schema.ts` の公開名（`Schema`/`FormType`/`defaultValues`）は D-051 参照。
 - `store/schema.ts` はCSVインポートの行バリデーションにも再利用している（[tech-stack.md](./tech-stack.md) 参照）。
 - Storybookのstoryはコンポーネント隣に `*.stories.tsx` で配置する（colocation）。上記ツリーでは省略している。
 - `src/test/` にテスト支援ユーティリティを置く（詳細は省略）。

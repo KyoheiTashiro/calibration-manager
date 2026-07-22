@@ -1,10 +1,10 @@
 /**
- * かんばんの入力付き遷移ダイアログ（screen-design/08-service-orders.md、README §0.5）。RHF + zodResolver。
+ * ボードの入力付き遷移ダイアログ（screen-design/08-service-orders.md、README §0.5）。RHF + zodResolver。
  * updateServiceOrderStatus が true のときのみ属性を updateServiceOrder で patch する。false（遷移不可・競合）なら
  * patch せず閉じる（silent no-op）。日付整合の不一致は警告表示のみでブロックしない（D-019）。
  */
 
-// oxlint-disable react/no-multi-comp -- ServiceOrderDialog/ReturnDialog はかんばんの入力付き遷移ダイアログを
+// oxlint-disable react/no-multi-comp -- ServiceOrderDialog/ReturnDialog はボードの入力付き遷移ダイアログを
 // 対で扱う密結合コンポーネント（同一スキーマ設計・同一 updateServiceOrderStatus→updateServiceOrder パターン）であり、
 // coding-standards.md §2「サブコンポーネントが複数なら…」の範囲内でこの1ファイルに集約する設計判断のため緩和する。
 

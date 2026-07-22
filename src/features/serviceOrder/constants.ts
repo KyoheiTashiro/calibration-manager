@@ -1,6 +1,6 @@
 /**
  * 点検校正外部案件の表示定数(screen-design/08-service-orders.md、domain-model.md §3.6)。
- * 状態ラベルをここに一元化し、かんばん・記録モーダル・通知等で重複定義しない
+ * 状態ラベルをここに一元化し、ボード・記録モーダル・通知等で重複定義しない
  * (features/equipment/constants.ts / features/serviceItems/constants.ts と同じ運用)。
  */
 
@@ -33,8 +33,8 @@ export const SERVICE_ORDER_STATUS_LABELS = {
   [SERVICE_ORDER_STATUS.CANCELLED]: "中止",
 } as const satisfies Record<ServiceOrderStatus, string>;
 
-/** かんばんの進行中4列(左→右の表示順。08-service-orders.md 準拠) */
-export const KANBAN_ACTIVE_COLUMNS = [
+/** ボードの進行中4列(左→右の表示順。08-service-orders.md 準拠) */
+export const BOARD_ACTIVE_COLUMNS = [
   SERVICE_ORDER_STATUS.PLANNED,
   SERVICE_ORDER_STATUS.ORDERED,
   SERVICE_ORDER_STATUS.IN_CALIBRATION,
@@ -42,7 +42,7 @@ export const KANBAN_ACTIVE_COLUMNS = [
 ] as const;
 
 /** 「完了/中止も表示」トグルONで右側に追加する終端2列(D-018) */
-export const KANBAN_CLOSED_COLUMNS = [
+export const BOARD_CLOSED_COLUMNS = [
   SERVICE_ORDER_STATUS.COMPLETED,
   SERVICE_ORDER_STATUS.CANCELLED,
 ] as const;

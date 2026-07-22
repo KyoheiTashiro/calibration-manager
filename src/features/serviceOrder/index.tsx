@@ -1,5 +1,5 @@
 /**
- * 点検校正外部案件（かんばん、screen-design/08-service-orders.md）。
+ * 点検校正外部案件（ボード、screen-design/08-service-orders.md）。
  * 状態別の4列（発注準備/発注済/校正中/返却済）でカードを表示し、隣接遷移のみをアクションで提供する。
  * 案件作成の導線は本画面には持たず、起動元は項目一覧（Phase 8）。状態遷移・属性更新はストア
  * （updateServiceOrderStatus / updateServiceOrder）が最終検証する。
@@ -14,7 +14,7 @@ import {
   ReturnDialog,
 } from "@/features/serviceOrder/components/TransitionDialogs";
 import { DIALOG_TYPE, SERVICE_ORDER_STATUS_LABELS } from "@/features/serviceOrder/constants";
-import { useServiceOrderKanban } from "@/features/serviceOrder/hooks";
+import { useServiceOrderBoard } from "@/features/serviceOrder/hooks";
 import { SERVICE_ORDER_STATUS, type ServiceOrderStatus } from "@/store/types";
 import { useSafeNavigate } from "@/utils/navigation";
 import type { ReactElement } from "react";
@@ -44,7 +44,7 @@ export const ServiceOrderList = (): ReactElement => {
     closeDialog,
     handleCardAction,
     handleConfirmCancel,
-  } = useServiceOrderKanban();
+  } = useServiceOrderBoard();
 
   return (
     <div className="flex flex-col gap-4">

@@ -1,6 +1,6 @@
 /**
  * 発注ダイアログ用フォームスキーマの検証(screen-design/08-service-orders.md、D-021)。
- * 画面経由の検証は kanban.test.tsx / integration.test.tsx が担い、ここでは
+ * 画面経由の検証は board.test.tsx / integration.test.tsx が担い、ここでは
  * 費用の整数粒度(D-021)等、境界値をスキーマ単体で固定する。
  */
 

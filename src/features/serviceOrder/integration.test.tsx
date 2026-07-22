@@ -1,6 +1,6 @@
 /**
- * かんばん×記録モーダルの結合シナリオ。
- * かんばん(screen-design/08-service-orders.md)→ 実施記録登録モーダル(07-service-record-modal.md)→
+ * ボード×記録モーダルの結合シナリオ。
+ * ボード(screen-design/08-service-orders.md)→ 実施記録登録モーダル(07-service-record-modal.md)→
  * ストアカスケード(record 追加 → 期限再計算 → ServiceOrder completed 連鎖)を画面操作で貫通検証する。
  * 各モーダル・ダイアログ単体の入力検証は ServiceRecordModal.test.tsx / serviceOrders の各テストの責務。
  */
@@ -162,7 +162,7 @@ describe("結合: returned 案件 → 記録登録 → カスケード", () => {
   });
 });
 
-describe("結合: かんばんの隣接遷移チェーン planned → returned", () => {
+describe("結合: ボードの隣接遷移チェーン planned → returned", () => {
   it("発注する(orderedDate 既定=今日)→ 校正中へ → 返却する(returnedDate)で順に遷移する", async () => {
     const user = userEvent.setup();
     seedWithServiceOrder({
