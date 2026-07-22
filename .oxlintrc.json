@@ -33,6 +33,12 @@
     // なぜ: PWA manifestの記述順をdocs/infra/pwa.md §2の正本と一言一句一致させる必要があるなど、
     // 意味のある記述順（ドキュメント上の正・可読性）を優先し、アルファベット順は強制しない。
     "eslint/sort-keys": "off",
+    // なぜ: coding-standards.md §4「アロー関数コンポーネントが原則。function 宣言は使わない」のため、
+    // 既定の function 宣言強制を反転して arrow を正とする（App.tsx の例外は overrides 参照）。
+    "react/function-component-definition": [
+      "error",
+      { "namedComponents": "arrow-function", "unnamedComponents": "arrow-function" }
+    ],
     // なぜ: Viteの標準構成でJSXは `.tsx` 拡張子に書く前提のため
     // （`.jsx` へのリネームを促すルールは本プロジェクトの規約と矛盾する）。
     "react/jsx-filename-extension": "off",
@@ -172,7 +178,8 @@
       // coding-standards.md §4 の例外規定に対応する。
       "files": ["src/App.tsx"],
       "rules": {
-        "eslint/func-style": "off"
+        "eslint/func-style": "off",
+        "react/function-component-definition": "off"
       }
     },
     {
