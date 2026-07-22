@@ -18,7 +18,7 @@ describe("Manual", () => {
     expect(screen.getByRole("heading", { level: 1, name: "利用マニュアル" })).toBeInTheDocument();
   });
 
-  it("「目次」ボタンをクリックするとポップオーバーに「ページ上部へ戻る」と7つのセクションへのボタンが表示される", () => {
+  it("「目次」ボタンをクリックするとポップオーバーに「ページ上部へ戻る」と8つのセクションへのボタンが表示される", () => {
     renderWithStore(<Manual />);
 
     fireEvent.click(screen.getByRole("button", { name: "目次" }));
@@ -31,6 +31,7 @@ describe("Manual", () => {
       "期限と発注推奨日の計算",
       "各画面の説明",
       "CSVエクスポートとインポート",
+      "プライバシーとデータの取り扱い",
       "ライセンスとソースコード",
     ]) {
       expect(screen.getByRole("button", { name: title })).toBeInTheDocument();
@@ -78,6 +79,7 @@ describe("Manual", () => {
     "期限と発注推奨日の計算",
     "各画面の説明",
     "CSVエクスポートとインポート",
+    "プライバシーとデータの取り扱い",
     "ライセンスとソースコード",
   ])("見出し「%s」(h2)が表示される", (heading) => {
     renderWithStore(<Manual />);
@@ -210,6 +212,18 @@ describe("Manual", () => {
 
     const link = screen.getByRole("link", { name: "GitHubリポジトリ" });
     expect(link).toHaveAttribute("href", "https://github.com/KyoheiTashiro/calibration-manager");
+    expect(link).toHaveAttribute("target", "_blank");
+    expect(link).toHaveAttribute("rel", "noreferrer");
+  });
+
+  it("プライバシーポリシーへのリンクがPRIVACY.mdファイルを新規タブで開く形で存在する(D-074)", () => {
+    renderWithStore(<Manual />);
+
+    const link = screen.getByRole("link", { name: "プライバシーポリシー" });
+    expect(link).toHaveAttribute(
+      "href",
+      "https://github.com/KyoheiTashiro/calibration-manager/blob/main/PRIVACY.md",
+    );
     expect(link).toHaveAttribute("target", "_blank");
     expect(link).toHaveAttribute("rel", "noreferrer");
   });

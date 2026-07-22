@@ -36,6 +36,7 @@ const MANUAL_SECTIONS = {
   DUE_DATES: { id: "due-date-calculation", title: "期限と発注推奨日の計算" },
   SCREENS: { id: "screen-guides", title: "各画面の説明" },
   CSV: { id: "csv-export-import", title: "CSVエクスポートとインポート" },
+  PRIVACY: { id: "privacy", title: "プライバシーとデータの取り扱い" },
   LICENSE: { id: "license", title: "ライセンスとソースコード" },
 } as const;
 
@@ -460,6 +461,40 @@ export const Manual = (): ReactElement => {
             だけにしてください。また、エクスポートしたCSVをExcel等の表計算ソフトで開いたときに、
             数式の実行を確認する警告が表示されることがあります。その場合は、内容に心当たりがあるか
             確認できるまで「許可しない」を選ぶことを推奨します。
+          </p>
+        </section>
+
+        <section
+          id={MANUAL_SECTIONS.PRIVACY.id}
+          className="flex flex-col gap-3 rounded border border-slate-200 p-4"
+        >
+          <h2 className="border-b border-slate-200 pb-2 text-lg font-semibold">
+            {MANUAL_SECTIONS.PRIVACY.title}
+          </h2>
+          <p>
+            このアプリは、利用者の個人情報や利用状況を収集しません。入力したデータはすべて
+            お使いのブラウザー内(LocalStorage)にのみ保存され、外部のサーバーには送信されません。
+            アクセス解析・広告・トラッキングCookieも使用していません。
+          </p>
+          <p>
+            アプリの配信にはGitHub Pagesを利用しているため、ページの読み込み時にGitHubが
+            アクセスログ(IPアドレスなど)を取得する場合があります。
+          </p>
+          <p>
+            保存したデータは、ブラウザーのサイトデータ削除のほか、
+            <Link to={ROUTES.SETTINGS} className="text-primary underline">
+              設定画面
+            </Link>
+            のデータ全削除でいつでも削除できます。詳しくは
+            <a
+              href="https://github.com/KyoheiTashiro/calibration-manager/blob/main/PRIVACY.md"
+              target="_blank"
+              rel="noreferrer"
+              className="text-primary mx-1 underline"
+            >
+              プライバシーポリシー
+            </a>
+            を参照してください。
           </p>
         </section>
 
