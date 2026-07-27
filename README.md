@@ -1,27 +1,24 @@
 <h1 align="center">calibration-manager</h1>
 
 <p align="center">
-  機器の点検・校正の期限を一元管理し、対応が必要なものを見逃さないための業務アプリ。<br />
-  <b>点検・校正業務のための、インストール不要な期限管理ボード</b>です。
+  点検・校正の期限、もう見逃さない。<br />
+  ブラウザーで開くだけ。<b>今すぐ使える期限管理アプリ</b>です。<br />
+  データ保存先は端末内のみ、外部送信なし。
 </p>
 
 <p align="center">
   <a href="https://github.com/KyoheiTashiro/calibration-manager/actions/workflows/deploy.yml"><img src="https://github.com/KyoheiTashiro/calibration-manager/actions/workflows/deploy.yml/badge.svg" alt="deploy" /></a>
   <a href="https://github.com/KyoheiTashiro/calibration-manager/actions/workflows/test.yml"><img src="https://github.com/KyoheiTashiro/calibration-manager/actions/workflows/test.yml/badge.svg" alt="test" /></a>
-  <a href="https://github.com/KyoheiTashiro/calibration-manager/actions/workflows/lint.yml"><img src="https://github.com/KyoheiTashiro/calibration-manager/actions/workflows/lint.yml/badge.svg" alt="lint" /></a>
-  <a href="https://github.com/KyoheiTashiro/calibration-manager/actions/workflows/format.yml"><img src="https://github.com/KyoheiTashiro/calibration-manager/actions/workflows/format.yml/badge.svg" alt="format" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="MIT License" /></a>
 </p>
 
 ---
 
-バックエンドなし・LocalStorage 永続化・CSV バックアップ。PWA として完全オフラインで動作し、データは端末の外に出ません。
+## こんな方におすすめ
 
-## こんな現場を想定しています
-
-- 中小規模の製造業・品質管理部門
-- 測定器・試験機の校正期限をExcelや紙の台帳で管理している現場
-- 単一端末でのローカル運用(マルチユーザー同期なし)
+- 製造・検査部門の品質管理担当者
+- 点検・校正の期限を Excel や紙の台帳で管理していて、更新漏れが不安な現場
+- 1 台の PC で完結する運用(複数端末間の同期は非対応)
 
 ## 🌐 今すぐ使う
 
@@ -56,13 +53,13 @@ PWA としてインストールすれば、オフラインでも起動できま�
 
 ### 💾 データ管理
 
-- 📤 種類ごとの CSV エクスポート(UTF-8 BOM 付き、Excel でそのまま開ける)
-- 📥 CSV インポート(バックアップ復元・表計算ソフトからの一括登録)
-- 🔒 データはすべてブラウザー内(LocalStorage)。外部サーバーへ送信しません
+- 📤 CSV エクスポート(UTF-8 BOM 付き、Excel でそのまま開ける)
+- 📥 CSV インポート(バックアップ復元・一括登録)
+- 🔒 データ保存先はブラウザー内(LocalStorage)のみ。外部送信なし
 
 ### 📖 利用マニュアル内蔵
 
-- 画面の説明・ステータスの見方・CSV 仕様をアプリ内で参照可能(検索付き)
+- 画面の説明・ステータスの見方・CSV 仕様をアプリ内で参照可能
 
 ## 🚀 ローカルで動かす
 
@@ -80,10 +77,10 @@ npm run dev
 ## 🏗️ 技術スタック
 
 - **フロントエンド**: React 19 + TypeScript + Vite
-- **状態管理**: Zustand(LocalStorage 永続化)
+- **状態管理**: Zustand
 - **スタイリング**: Tailwind CSS 4
 - **テスト**: Vitest + Testing Library + fast-check
-- **ホスティング**: GitHub Pages(PWA / 完全オフライン動作)
+- **ホスティング**: GitHub Pages
 
 ## 📚 ドキュメント
 
