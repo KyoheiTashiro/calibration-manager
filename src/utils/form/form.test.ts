@@ -2,6 +2,7 @@ import {
   createFormSubmitHandler,
   createSaveHandler,
   emptyToUndefined,
+  maxLengthMessage,
   optionalNonNegativeIntegerString,
 } from "@/utils/form";
 import { describe, expect, it, vi } from "vitest";
@@ -101,5 +102,11 @@ describe("optionalNonNegativeIntegerString", () => {
   it("数値に変換できない文字列は拒否する", () => {
     const result = schema.safeParse("abc");
     expect(result.success).toBe(false);
+  });
+});
+
+describe("maxLengthMessage", () => {
+  it("ラベルと上限値を埋め込んだ文言を返す", () => {
+    expect(maxLengthMessage("備考", 500)).toBe("備考は500文字以内で入力してください");
   });
 });

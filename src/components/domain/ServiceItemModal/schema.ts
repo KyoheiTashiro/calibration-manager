@@ -9,9 +9,10 @@
  * preprocess/transform による resolver の入出力型ズレを避ける。
  */
 
+import { TEXT_LIMIT } from "@/constants/textLimits";
 import { DEFAULT_BUFFER_DAYS, DEFAULT_NOTICE_DAYS_BEFORE } from "@/domain/constants";
 import { CYCLE, EXECUTION, SERVICE_ITEM_TYPE, type ServiceItem } from "@/store/types";
-import { optionalNonNegativeIntegerString } from "@/utils/form";
+import { maxLengthMessage, optionalNonNegativeIntegerString } from "@/utils/form";
 import { isIsoDateString } from "@/utils/time";
 import { z } from "zod";
 
@@ -29,7 +30,10 @@ const requiredNonNegativeIntegerString = (requiredMessage: string, invalidMessag
 
 export const Schema = z
   .object({
-    name: z.string().min(1, "項目名は必須です"),
+    name: z
+      .string()
+      .min(1, "項目名は必須です")
+      .max(TEXT_LIMIT.name, maxLengthMessage("項目名", TEXT_LIMIT.name)),
     type: z.enum(SERVICE_ITEM_TYPE),
     cycle: z.enum(CYCLE),
     execution: z.enum(EXECUTION),

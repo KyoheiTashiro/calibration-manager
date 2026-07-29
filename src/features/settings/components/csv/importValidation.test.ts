@@ -293,6 +293,58 @@ describe("validateEntityCsv: 件数集計と取り込み可否(D-030)", () => {
   });
 });
 
+describe("validateEntityCsv: フィールド別ルール(文字数上限・形式)", () => {
+  const VENDORS_HEADER =
+    "id,name,isManufacturer,isCalibrator,contactPerson,email,phone,standardLeadTimeDays,note";
+
+  it("文字数上限を超えた note の行をエラーにする(entities は null)", () => {
+    const csv = joinCsv(VENDORS_HEADER, `vendor-1,校正社,true,true,,,,,${"あ".repeat(501)}`);
+    const result = validateEntityCsv("vendors", csv, emptyAppState());
+    expect(result.errors).toEqual([
+      { line: 2, message: "note: 500文字以内で指定してください(実際501文字)" },
+    ]);
+    expect(result.validCount).toBe(0);
+    expect(result.entities).toBeNull();
+  });
+
+  it("文字数上限ちょうどの name はエラーにしない", () => {
+    const csv = joinCsv(VENDORS_HEADER, `vendor-1,${"あ".repeat(50)},true,true,,,,,`);
+    const result = validateEntityCsv("vendors", csv, emptyAppState());
+    expect(result.errors).toEqual([]);
+    expect(result.entities).not.toBeNull();
+  });
+
+  it("phone が形式(半角数字・ハイフン)に一致しない行をエラーにする", () => {
+    const csv = joinCsv(VENDORS_HEADER, "vendor-1,校正社,true,true,,,03(1234)5678,,");
+    const result = validateEntityCsv("vendors", csv, emptyAppState());
+    expect(result.errors).toEqual([
+      { line: 2, message: "phone: 半角数字またはハイフンで指定してください" },
+    ]);
+  });
+
+  it("phone が半角数字・ハイフンのみならエラーにしない", () => {
+    const csv = joinCsv(VENDORS_HEADER, "vendor-1,校正社,true,true,,,03-1234-5678,,");
+    const result = validateEntityCsv("vendors", csv, emptyAppState());
+    expect(result.errors).toEqual([]);
+  });
+
+  it("phone が空セルならエラーにしない", () => {
+    const csv = joinCsv(VENDORS_HEADER, "vendor-1,校正社,true,true,,,,,");
+    const result = validateEntityCsv("vendors", csv, emptyAppState());
+    expect(result.errors).toEqual([]);
+  });
+
+  it("1行で zod エラーとルールエラーが同時に発生する場合、両方を報告する", () => {
+    const csv = joinCsv(VENDORS_HEADER, "vendor-1,校正社,broken,true,,,03(1234)5678,,");
+    const result = validateEntityCsv("vendors", csv, emptyAppState());
+    expect(result.errors).toEqual([
+      { line: 2, message: "phone: 半角数字またはハイフンで指定してください" },
+      { line: 2, message: "isManufacturer: true/false のいずれかを指定してください" },
+    ]);
+    expect(result.entities).toBeNull();
+  });
+});
+
 describe("validateEntityCsv: 数式インジェクション警告(D-053)", () => {
   it("`=`始まりの文字列セルを行番号・列名付きで警告する(取り込みは妨げない)", () => {
     const csv = joinCsv(EQUIPMENT_HEADER, "eq-1,EQ-101,ノギスA,,,,,active,=HYPERLINK(evil)");

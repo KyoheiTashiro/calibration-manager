@@ -183,6 +183,24 @@ planned(発注準備) → ordered(発注済) → inCalibration(校正中) → re
 - `orderRecommended` の「未発注」は「有効な案件(`planned`〜`returned`)が1件もない」と解釈する。`planned` の案件があれば発注準備は着手済みであり再通知は不要なため(§4.3 orderNow の「有効な案件なし」と同じ判定。D-042)。
 - 担当者(Person)を無効化しても宛先はフォールバックせず元 personId のまま。無効化後も通知は生成・表示し続ける(D-001)。
 
+### 3.8 自由文字列フィールドの入力制約(D-086)
+
+LocalStorage 容量(約5MB)の無制限消費を防ぐため、自由文字列フィールドに文字数上限を設ける。
+上限値の単一の真実源はコードの `src/constants/textLimits.ts`(`TEXT_LIMIT`)。
+
+| 区分            | 上限 | 対象フィールド                                                                                                      |
+| --------------- | ---- | ------------------------------------------------------------------------------------------------------------------- |
+| 識別子系(code)  | 50   | Equipment.managementNo、Vendor.phone                                                                                 |
+| 名称系(name)    | 50   | Equipment.name/model/serialNo/location、Vendor.name/contactPerson、Person.name/department、ServiceItem.name、ServiceRecord.doneBy |
+| メール(email)   | 254  | Vendor.email、Person.email(RFC 5321 の上限)                                                                          |
+| 備考(note)      | 500  | Equipment.note、Vendor.note、ServiceOrder.note、ServiceRecord.note                                                   |
+
+- 文字数は UTF-16 コードユニットで数える(zod `.max()` 準拠)。サロゲートペア(絵文字等)は2文字換算になるが、上限値に余裕があるため許容。
+- Vendor.phone は半角数字とハイフンのみ許容(全角数字・スペース・`+`・`()` は不許可)。入力者に半角統一を強制し表記ゆれを防ぐ。
+- 適用箇所はデータの入口 2 経路: フォームの zod スキーマと CSV インポート検証。LocalStorage 読込(`src/store/schema.ts`)はサルベージ用途のため構造検証に徹し、上限・形式は適用しない(入口 2 経路で防げば上限超過データは保存され得ないため)。
+- 入力欄に native `maxLength` 属性は付けない(ペースト時のサイレント切り捨てを避け、zod エラーメッセージ表示で統一)。
+- 数値系(cost・leadTimeDays 等)の上限は本制約のスコープ外。
+
 ## 4. 期限計算ロジック
 
 ### 4.1 次回期限

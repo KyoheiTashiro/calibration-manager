@@ -9,20 +9,35 @@
  * preprocess/transform による resolver の入出力型ズレを避ける。
  */
 
+import { PHONE_PATTERN, TEXT_LIMIT } from "@/constants/textLimits";
+import { maxLengthMessage } from "@/utils/form";
 import { z } from "zod";
 
 export const Schema = z.object({
-  name: z.string().min(1, "名称は必須です"),
+  name: z
+    .string()
+    .min(1, "名称は必須です")
+    .max(TEXT_LIMIT.name, maxLengthMessage("名称", TEXT_LIMIT.name)),
   isManufacturer: z.boolean(),
   isCalibrator: z.boolean(),
-  contactPerson: z.string().optional(),
+  contactPerson: z
+    .string()
+    .max(TEXT_LIMIT.name, maxLengthMessage("窓口担当者", TEXT_LIMIT.name))
+    .optional(),
   email: z
     .string()
+    .max(TEXT_LIMIT.email, maxLengthMessage("メールアドレス", TEXT_LIMIT.email))
     .optional()
     .refine((value) => value === undefined || value === "" || z.email().safeParse(value).success, {
       message: "メールアドレスの形式が不正です",
     }),
-  phone: z.string().optional(),
+  phone: z
+    .string()
+    .max(TEXT_LIMIT.code, maxLengthMessage("電話番号", TEXT_LIMIT.code))
+    .optional()
+    .refine((value) => value === undefined || value === "" || PHONE_PATTERN.test(value), {
+      message: "電話番号は半角数字またはハイフンで入力してください",
+    }),
   standardLeadTimeDays: z
     .string()
     .optional()
@@ -33,7 +48,7 @@ export const Schema = z.object({
         message: "0以上の数値を入力してください",
       },
     ),
-  note: z.string().optional(),
+  note: z.string().max(TEXT_LIMIT.note, maxLengthMessage("備考", TEXT_LIMIT.note)).optional(),
 });
 
 export type FormType = z.infer<typeof Schema>;

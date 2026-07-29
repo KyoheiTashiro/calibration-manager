@@ -14,7 +14,9 @@
  * 参照可能な Vendor 一覧もストアの状態に依存するため。
  */
 
+import { TEXT_LIMIT } from "@/constants/textLimits";
 import { EQUIPMENT_STATUS, type Vendor } from "@/store/types";
+import { maxLengthMessage } from "@/utils/form";
 import { z } from "zod";
 
 // なぜ戻り値の型注釈を付けないか: z.infer<ReturnType<typeof createSchema>> で
@@ -27,12 +29,19 @@ export const createSchema = (existingManagementNumbers: string[], vendors: Vendo
     managementNo: z
       .string()
       .min(1, "管理番号は必須です")
+      .max(TEXT_LIMIT.code, maxLengthMessage("管理番号", TEXT_LIMIT.code))
       .refine((value) => !existingManagementNumbers.includes(value), {
         message: "この管理番号は既に使用されています",
       }),
-    name: z.string().min(1, "機器名は必須です"),
-    model: z.string().optional(),
-    serialNo: z.string().optional(),
+    name: z
+      .string()
+      .min(1, "機器名は必須です")
+      .max(TEXT_LIMIT.name, maxLengthMessage("機器名", TEXT_LIMIT.name)),
+    model: z.string().max(TEXT_LIMIT.name, maxLengthMessage("型式", TEXT_LIMIT.name)).optional(),
+    serialNo: z
+      .string()
+      .max(TEXT_LIMIT.name, maxLengthMessage("シリアル番号", TEXT_LIMIT.name))
+      .optional(),
     manufacturerId: z
       .string()
       .optional()
@@ -41,9 +50,12 @@ export const createSchema = (existingManagementNumbers: string[], vendors: Vendo
           value === undefined || value === "" || vendors.some((vendor) => vendor.id === value),
         { message: "存在しないメーカーが指定されています" },
       ),
-    location: z.string().optional(),
+    location: z
+      .string()
+      .max(TEXT_LIMIT.name, maxLengthMessage("設置場所", TEXT_LIMIT.name))
+      .optional(),
     status: z.enum(EQUIPMENT_STATUS),
-    note: z.string().optional(),
+    note: z.string().max(TEXT_LIMIT.note, maxLengthMessage("備考", TEXT_LIMIT.note)).optional(),
   });
 
 export type FormType = z.infer<ReturnType<typeof createSchema>>;

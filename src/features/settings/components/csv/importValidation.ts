@@ -106,6 +106,22 @@ const checkUniqueness = (
     return [`${key}: 重複しています(行${firstLine}と同じ値)`];
   });
 
+/** フィールド別の追加検証ルール(文字数上限・形式)違反メッセージ(D-086: store側スキーマは寛容なため入口で後付け) */
+const fieldRuleMessages = <Entity>(spec: EntityCsvSpec<Entity>, cells: string[]): string[] =>
+  Object.keys(spec.shape).flatMap((key, columnIndex) => {
+    const rule = recordValue(spec.fieldRules, key);
+    if (!rule) return [];
+    const cell = cells[columnIndex];
+    const messages: string[] = [];
+    if (rule.maxLength !== undefined && cell.length > rule.maxLength) {
+      messages.push(`${key}: ${rule.maxLength}文字以内で指定してください(実際${cell.length}文字)`);
+    }
+    if (rule.pattern && cell !== "" && !rule.pattern.regex.test(cell)) {
+      messages.push(`${key}: ${rule.pattern.message}`);
+    }
+    return messages;
+  });
+
 const referenceErrors = <Entity>(
   spec: EntityCsvSpec<Entity>,
   entity: Entity,
@@ -136,11 +152,15 @@ const validateRow = <Kind extends CsvEntityKind>(
       cellToValue(cells[columnIndex], field),
     ]),
   );
+  const ruleMessages = fieldRuleMessages(spec, cells);
   const result = spec.schema.safeParse(raw, { reportInput: true });
   if (!result.success) {
-    return { messages: result.error.issues.map((issue) => formatZodIssue(issue)) };
+    return {
+      messages: [...ruleMessages, ...result.error.issues.map((issue) => formatZodIssue(issue))],
+    };
   }
   const messages = [
+    ...ruleMessages,
     ...checkUniqueness(result.data, ["id", ...spec.uniqueKeys], seen, line),
     ...referenceErrors(spec, result.data, state),
   ];

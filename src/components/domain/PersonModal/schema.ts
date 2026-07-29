@@ -4,17 +4,23 @@
  * 永続化データの構造検証は `src/store/schema.ts` の personSchema が別途担う。
  */
 
+import { TEXT_LIMIT } from "@/constants/textLimits";
+import { maxLengthMessage } from "@/utils/form";
 import { z } from "zod";
 
 export const Schema = z.object({
-  name: z.string().min(1, "氏名は必須です"),
+  name: z
+    .string()
+    .min(1, "氏名は必須です")
+    .max(TEXT_LIMIT.name, maxLengthMessage("氏名", TEXT_LIMIT.name)),
   email: z
     .string()
     .min(1, "メールアドレスは必須です")
+    .max(TEXT_LIMIT.email, maxLengthMessage("メールアドレス", TEXT_LIMIT.email))
     .refine((value) => z.email().safeParse(value).success, {
       message: "メールアドレスの形式が不正です",
     }),
-  department: z.string().optional(),
+  department: z.string().max(TEXT_LIMIT.name, maxLengthMessage("部署", TEXT_LIMIT.name)).optional(),
   isActive: z.boolean(),
 });
 

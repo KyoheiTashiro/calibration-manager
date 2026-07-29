@@ -37,6 +37,10 @@ export const createFormSubmitHandler =
     });
   };
 
+/** 文字数上限エラーの統一文言(`${label}は${max}文字以内で入力してください`) */
+export const maxLengthMessage = (label: string, max: number): string =>
+  `${label}は${max}文字以内で入力してください`;
+
 /** 空欄可・0以上の整数文字列（納期(日)・費用等、フォーム入力向け zod ヘルパ） */
 // なぜ戻り値の型注釈を付けないか: refine() 済みの具体的な Zod スキーマ形状を
 // TypeScript の推論に委ねる必要があるため。

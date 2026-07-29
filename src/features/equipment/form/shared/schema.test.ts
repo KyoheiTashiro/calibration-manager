@@ -1,5 +1,7 @@
+import { TEXT_LIMIT } from "@/constants/textLimits";
 import { createSchema } from "@/features/equipment/form/shared/schema";
 import { EQUIPMENT_STATUS, type Vendor } from "@/store/types";
+import { maxLengthMessage } from "@/utils/form";
 import { describe, expect, it } from "vitest";
 
 const mitutoyo: Vendor = {
@@ -40,6 +42,77 @@ describe("createSchema: manufacturerId の存在チェック", () => {
   it("実在するVendor IDを指定した場合はエラーにならない", () => {
     const schema = createSchema([], [mitutoyo]);
     const result = schema.safeParse({ ...base, manufacturerId: mitutoyo.id });
+
+    expect(result.success).toBe(true);
+  });
+});
+
+describe("createSchema: 文字数上限バリデーション", () => {
+  it("managementNoが51文字だとエラーになる", () => {
+    const schema = createSchema([], [mitutoyo]);
+    const result = schema.safeParse({
+      ...base,
+      managementNo: "あ".repeat(TEXT_LIMIT.code + 1),
+    });
+
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues[0]?.message).toBe(maxLengthMessage("管理番号", TEXT_LIMIT.code));
+    }
+  });
+
+  it("managementNoが50文字ちょうどなら通る", () => {
+    const schema = createSchema([], [mitutoyo]);
+    const result = schema.safeParse({
+      ...base,
+      managementNo: "あ".repeat(TEXT_LIMIT.code),
+    });
+
+    expect(result.success).toBe(true);
+  });
+
+  it("nameが51文字だとエラーになる", () => {
+    const schema = createSchema([], [mitutoyo]);
+    const result = schema.safeParse({
+      ...base,
+      name: "あ".repeat(TEXT_LIMIT.name + 1),
+    });
+
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues[0]?.message).toBe(maxLengthMessage("機器名", TEXT_LIMIT.name));
+    }
+  });
+
+  it("nameが50文字ちょうどなら通る", () => {
+    const schema = createSchema([], [mitutoyo]);
+    const result = schema.safeParse({
+      ...base,
+      name: "あ".repeat(TEXT_LIMIT.name),
+    });
+
+    expect(result.success).toBe(true);
+  });
+
+  it("noteが501文字だとエラーになる", () => {
+    const schema = createSchema([], [mitutoyo]);
+    const result = schema.safeParse({
+      ...base,
+      note: "あ".repeat(TEXT_LIMIT.note + 1),
+    });
+
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues[0]?.message).toBe(maxLengthMessage("備考", TEXT_LIMIT.note));
+    }
+  });
+
+  it("noteが500文字ちょうどなら通る", () => {
+    const schema = createSchema([], [mitutoyo]);
+    const result = schema.safeParse({
+      ...base,
+      note: "あ".repeat(TEXT_LIMIT.note),
+    });
 
     expect(result.success).toBe(true);
   });

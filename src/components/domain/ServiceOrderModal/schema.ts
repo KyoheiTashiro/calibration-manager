@@ -7,7 +7,8 @@
  * 変換するのは検証成功後（呼び出し側の submit ハンドラ）に限る。
  */
 
-import { optionalNonNegativeIntegerString } from "@/utils/form";
+import { TEXT_LIMIT } from "@/constants/textLimits";
+import { maxLengthMessage, optionalNonNegativeIntegerString } from "@/utils/form";
 import { isIsoDateString } from "@/utils/time";
 import { z } from "zod";
 
@@ -20,7 +21,7 @@ export const Schema = z.object({
       message: "返却予定日の形式が不正です",
     }),
   cost: optionalNonNegativeIntegerString("費用は0以上の数値で入力してください"),
-  note: z.string().optional(),
+  note: z.string().max(TEXT_LIMIT.note, maxLengthMessage("備考", TEXT_LIMIT.note)).optional(),
 });
 
 export type FormType = z.infer<typeof Schema>;

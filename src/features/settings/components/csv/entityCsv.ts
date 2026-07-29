@@ -1,3 +1,4 @@
+import { PHONE_PATTERN, TEXT_LIMIT } from "@/constants/textLimits";
 import {
   equipmentSchema,
   notificationSchema,
@@ -41,6 +42,12 @@ export type CsvReference<Entity> = {
   target: CsvEntityKind | ((entity: Entity) => CsvEntityKind);
 };
 
+/** フィールド別の追加検証ルール(文字数上限・形式)。store 側スキーマ(サルベージ用途で寛容)に置けない入口検証 */
+export type CsvFieldRule = {
+  maxLength?: number;
+  pattern?: { regex: RegExp; message: string };
+};
+
 export type EntityCsvSpec<Entity> = {
   label: string;
   schema: z.ZodType<Entity>;
@@ -49,6 +56,13 @@ export type EntityCsvSpec<Entity> = {
   uniqueKeys: readonly (keyof Entity & string)[];
   /** 外向き参照(FK)の一覧。突合先の存在チェックは importValidation.ts が行う(D-029) */
   references: readonly CsvReference<Entity>[];
+  /**
+   * フィールド別の追加検証ルール(文字数上限・形式)。importValidation.ts が zod 検証と併せて適用する。
+   * キーは string に広げて保持する(defineSpec の呼び出し側だけ Entity のキーで型チェックすれば十分で、
+   * 参照側(importValidation.ts)は列名文字列から引くため `keyof Entity` への絞り込みは不要かつ
+   * アサーションなしでは表現できない)。
+   */
+  fieldRules: Readonly<Record<string, CsvFieldRule>>;
 };
 
 /**
@@ -60,18 +74,39 @@ const shapeOf = (schema: z.ZodType): Record<string, z.ZodType> =>
   // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- 上記コメントの理由により実体は必ず ZodObject
   (schema as unknown as { shape: Record<string, z.ZodType> }).shape;
 
+/**
+ * Entity のキーに限定された fieldRules を string キーの Record へ広げる。
+ * Object.entries の戻り値は「値が undefined の可能性」を型上保持するため、
+ * 型ガードでの filter だけで `as` なしに Record<string, CsvFieldRule> を得られる。
+ */
+const widenFieldRules = <Entity>(
+  fieldRules: Partial<Record<keyof Entity & string, CsvFieldRule>>,
+): Readonly<Record<string, CsvFieldRule>> =>
+  Object.fromEntries(
+    Object.entries(fieldRules).filter(
+      (entry): entry is [string, CsvFieldRule] => entry[1] !== undefined,
+    ),
+  );
+
 const defineSpec = <Entity>(
   label: string,
   schema: z.ZodType<Entity>,
   uniqueKeys: readonly (keyof Entity & string)[],
   references: readonly CsvReference<Entity>[],
+  fieldRules: Partial<Record<keyof Entity & string, CsvFieldRule>>,
 ): EntityCsvSpec<Entity> => ({
   label,
   schema,
   shape: shapeOf(schema),
   uniqueKeys,
   references,
+  fieldRules: widenFieldRules(fieldRules),
 });
+
+const PHONE_RULE: CsvFieldRule = {
+  maxLength: TEXT_LIMIT.code,
+  pattern: { regex: PHONE_PATTERN, message: "半角数字またはハイフンで指定してください" },
+};
 
 export const ENTITY_CSV_SPECS: { [Kind in CsvEntityKind]: EntityCsvSpec<EntityOf<Kind>> } = {
   equipment: defineSpec(
@@ -79,6 +114,14 @@ export const ENTITY_CSV_SPECS: { [Kind in CsvEntityKind]: EntityCsvSpec<EntityOf
     equipmentSchema,
     ["managementNo"],
     [{ key: "manufacturerId", target: "vendors" }],
+    {
+      managementNo: { maxLength: TEXT_LIMIT.code },
+      name: { maxLength: TEXT_LIMIT.name },
+      model: { maxLength: TEXT_LIMIT.name },
+      serialNo: { maxLength: TEXT_LIMIT.name },
+      location: { maxLength: TEXT_LIMIT.name },
+      note: { maxLength: TEXT_LIMIT.note },
+    },
   ),
   serviceItems: defineSpec(
     "点検校正項目",
@@ -89,6 +132,7 @@ export const ENTITY_CSV_SPECS: { [Kind in CsvEntityKind]: EntityCsvSpec<EntityOf
       { key: "vendorId", target: "vendors" },
       { key: "personId", target: "persons" },
     ],
+    { name: { maxLength: TEXT_LIMIT.name } },
   ),
   serviceRecords: defineSpec(
     "実施記録",
@@ -98,6 +142,10 @@ export const ENTITY_CSV_SPECS: { [Kind in CsvEntityKind]: EntityCsvSpec<EntityOf
       { key: "serviceItemId", target: "serviceItems" },
       { key: "serviceOrderId", target: "serviceOrders" },
     ],
+    {
+      doneBy: { maxLength: TEXT_LIMIT.name },
+      note: { maxLength: TEXT_LIMIT.note },
+    },
   ),
   serviceOrders: defineSpec(
     "点検校正外部案件",
@@ -107,9 +155,20 @@ export const ENTITY_CSV_SPECS: { [Kind in CsvEntityKind]: EntityCsvSpec<EntityOf
       { key: "serviceItemId", target: "serviceItems" },
       { key: "vendorId", target: "vendors" },
     ],
+    { note: { maxLength: TEXT_LIMIT.note } },
   ),
-  vendors: defineSpec("メーカー/取引先", vendorSchema, [], []),
-  persons: defineSpec("担当者", personSchema, [], []),
+  vendors: defineSpec("メーカー/取引先", vendorSchema, [], [], {
+    name: { maxLength: TEXT_LIMIT.name },
+    contactPerson: { maxLength: TEXT_LIMIT.name },
+    email: { maxLength: TEXT_LIMIT.email },
+    phone: PHONE_RULE,
+    note: { maxLength: TEXT_LIMIT.note },
+  }),
+  persons: defineSpec("担当者", personSchema, [], [], {
+    name: { maxLength: TEXT_LIMIT.name },
+    department: { maxLength: TEXT_LIMIT.name },
+    email: { maxLength: TEXT_LIMIT.email },
+  }),
   notifications: defineSpec(
     "通知",
     notificationSchema,
@@ -124,6 +183,7 @@ export const ENTITY_CSV_SPECS: { [Kind in CsvEntityKind]: EntityCsvSpec<EntityOf
       },
       { key: "personId", target: "persons" },
     ],
+    {},
   ),
 };
 

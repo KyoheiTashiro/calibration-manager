@@ -4,6 +4,7 @@
  * 各テストファイルで生成器を重複定義しない。
  */
 
+import { PHONE_PATTERN } from "@/constants/textLimits";
 import {
   type ServiceOrder,
   CYCLE,
@@ -60,7 +61,8 @@ export const vendorArb: fc.Arbitrary<Vendor> = fc.record({
   isCalibrator: fc.boolean(),
   contactPerson: optionalArb(fc.string()),
   email: optionalArb(fc.string()),
-  phone: optionalArb(fc.string()),
+  // なぜ半角数字・ハイフンのみか: 電話番号形式チェック(PHONE_PATTERN)を通る値のみ生成するため
+  phone: optionalArb(fc.stringMatching(PHONE_PATTERN)),
   standardLeadTimeDays: optionalArb(dayCountArb),
   note: optionalArb(fc.string()),
 });

@@ -8,7 +8,9 @@
  * resolver の入出力型ズレを避ける（ServiceItemModal/schema.ts と同方針）。
  */
 
+import { TEXT_LIMIT } from "@/constants/textLimits";
 import { SERVICE_RECORD_RESULT } from "@/store/types";
+import { maxLengthMessage } from "@/utils/form";
 import { isIsoDateString } from "@/utils/time";
 import { z } from "zod";
 
@@ -17,11 +19,14 @@ export const Schema = z.object({
     .string()
     .min(1, "実施日は必須です")
     .refine(isIsoDateString, { message: "実施日の形式が不正です" }),
-  doneBy: z.string().min(1, "実施者は必須です"),
+  doneBy: z
+    .string()
+    .min(1, "実施者は必須です")
+    .max(TEXT_LIMIT.name, maxLengthMessage("実施者", TEXT_LIMIT.name)),
   // なぜ error パラメータで日本語文言か: 既定選択なし（未選択）で送信された場合も
   // この enum 検証に失敗し、統一した必須メッセージを返すため。
   result: z.enum(SERVICE_RECORD_RESULT, { error: "結果を選択してください" }),
-  note: z.string().optional(),
+  note: z.string().max(TEXT_LIMIT.note, maxLengthMessage("備考", TEXT_LIMIT.note)).optional(),
 });
 
 export type FormType = z.infer<typeof Schema>;
