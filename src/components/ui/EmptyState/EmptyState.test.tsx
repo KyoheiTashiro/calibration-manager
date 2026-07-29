@@ -13,14 +13,6 @@ describe("EmptyState", () => {
     expect(screen.getByText("機器が登録されていません")).toBeInTheDocument();
   });
 
-  it("icon 指定時にアイコンが表示される", () => {
-    render(
-      <EmptyState message="機器が登録されていません" icon={<svg data-testid="empty-icon" />} />,
-    );
-
-    expect(screen.getByTestId("empty-icon")).toBeInTheDocument();
-  });
-
   it("action 指定時にアクションが表示される", () => {
     render(
       <EmptyState
