@@ -69,7 +69,7 @@ export const EquipmentList = (): ReactElement => {
             <div className="w-1/2 min-w-64">
               <TextField
                 label="検索"
-                placeholder="管理番号/機器名/型式で検索"
+                placeholder="管理番号, 機器名, 型式で検索"
                 value={searchText}
                 onChange={(event) => {
                   setSearchText(event.target.value);

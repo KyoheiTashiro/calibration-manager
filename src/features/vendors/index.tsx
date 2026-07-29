@@ -55,7 +55,7 @@ export const VendorList = (): ReactElement => {
             <div className="w-1/2 min-w-64">
               <TextField
                 label="検索"
-                placeholder="名称/窓口担当者/電話/メールで検索"
+                placeholder="名称, 窓口担当者, 電話, メールで検索"
                 value={searchText}
                 onChange={(event) => {
                   setSearchText(event.target.value);
