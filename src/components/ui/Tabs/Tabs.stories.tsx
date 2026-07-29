@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { useState, type ReactElement } from "react";
+import { useState, type ReactElement, type ReactNode } from "react";
 
 import { Tabs } from "./Tabs";
 
@@ -19,10 +19,10 @@ const SAMPLE_TABS = [
 // なぜ: Tabsは制御コンポーネント（activeKey/onChangeを親から受け取る）のため、
 // Storybook上で実際にクリック操作を確認できるようuseStateで選択状態を持つ
 // デモ用ラッパーをストーリーファイル内に定義する。
-const TabsDemo = (): ReactElement => {
+const TabsDemo = ({ actions }: { actions?: ReactNode }): ReactElement => {
   const [activeKey, setActiveKey] = useState("tab-one");
 
-  return <Tabs tabs={SAMPLE_TABS} activeKey={activeKey} onChange={setActiveKey} />;
+  return <Tabs tabs={SAMPLE_TABS} activeKey={activeKey} onChange={setActiveKey} actions={actions} />;
 };
 
 export const Default: StoryObj<typeof meta> = {
@@ -34,4 +34,21 @@ export const Default: StoryObj<typeof meta> = {
     onChange: (): void => undefined,
   },
   render: (): ReactElement => <TabsDemo />,
+};
+
+export const WithActions: StoryObj<typeof meta> = {
+  args: {
+    tabs: SAMPLE_TABS,
+    activeKey: "tab-one",
+    onChange: (): void => undefined,
+  },
+  render: (): ReactElement => (
+    <TabsDemo
+      actions={
+        <button type="button" className="text-sm text-slate-600">
+          全て既読
+        </button>
+      }
+    />
+  ),
 };

@@ -100,6 +100,28 @@ describe("Tabs", () => {
     expect(screen.getByRole("tab", { name: "履歴" })).toHaveFocus();
   });
 
+  it("actions はタブバー右端に描画され、tablist の外に置かれる", () => {
+    render(
+      <Tabs
+        tabs={TABS}
+        activeKey="detail"
+        onChange={vi.fn<() => void>()}
+        actions={<button type="button">全て既読</button>}
+      />,
+    );
+
+    const action = screen.getByRole("button", { name: "全て既読" });
+    expect(action).toBeInTheDocument();
+    // tablist に tab 以外の子を含めない(ARIA仕様)
+    expect(screen.getByRole("tablist")).not.toContainElement(action);
+  });
+
+  it("actions 未指定でも描画できる", () => {
+    render(<Tabs tabs={TABS} activeKey="detail" onChange={vi.fn<() => void>()} />);
+
+    expect(screen.queryByRole("button", { name: "全て既読" })).not.toBeInTheDocument();
+  });
+
   it("←→ 以外のキーでは onChange が呼ばれない", () => {
     const handleChange = vi.fn<() => void>();
     render(<Tabs tabs={TABS} activeKey="detail" onChange={handleChange} />);

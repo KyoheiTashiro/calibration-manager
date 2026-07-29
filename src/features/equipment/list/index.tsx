@@ -58,10 +58,6 @@ export const EquipmentList = (): ReactElement => {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-end">
-        <Button onClick={handleAddClick}>+ 機器を追加</Button>
-      </div>
-
       {totalCount === 0 ? (
         <EmptyState
           message="機器が未登録です"
@@ -89,6 +85,9 @@ export const EquipmentList = (): ReactElement => {
                   if (isStatusFilter(value)) setStatusFilter(value);
                 }}
               />
+            </div>
+            <div className="ml-auto">
+              <Button onClick={handleAddClick}>+ 機器を追加</Button>
             </div>
           </div>
 

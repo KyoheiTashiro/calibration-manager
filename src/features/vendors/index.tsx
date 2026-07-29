@@ -44,10 +44,6 @@ export const VendorList = (): ReactElement => {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-end">
-        <Button onClick={handleAddClick}>+ 追加</Button>
-      </div>
-
       {totalCount === 0 ? (
         <EmptyState
           message="取引先が未登録です"
@@ -55,15 +51,20 @@ export const VendorList = (): ReactElement => {
         />
       ) : (
         <>
-          <div className="w-1/2 min-w-64">
-            <TextField
-              label="検索"
-              placeholder="名称/窓口担当者/電話/メールで検索"
-              value={searchText}
-              onChange={(event) => {
-                setSearchText(event.target.value);
-              }}
-            />
+          <div className="flex flex-wrap items-end gap-4">
+            <div className="w-1/2 min-w-64">
+              <TextField
+                label="検索"
+                placeholder="名称/窓口担当者/電話/メールで検索"
+                value={searchText}
+                onChange={(event) => {
+                  setSearchText(event.target.value);
+                }}
+              />
+            </div>
+            <div className="ml-auto">
+              <Button onClick={handleAddClick}>+ 追加</Button>
+            </div>
           </div>
 
           {filteredVendorList.length === 0 ? (

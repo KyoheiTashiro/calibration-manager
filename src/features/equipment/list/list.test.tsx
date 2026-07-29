@@ -256,7 +256,8 @@ describe("EquipmentList: 空状態", () => {
     renderWithStore(<EquipmentList />);
 
     expect(screen.getByText("機器が未登録です")).toBeInTheDocument();
-    expect(screen.getAllByRole("button", { name: "+ 機器を追加" })).toHaveLength(2);
+    // 追加ボタンは検索・フィルタ行に統合されたため、0件時はEmptyState内のCTAのみ
+    expect(screen.getByRole("button", { name: "+ 機器を追加" })).toBeInTheDocument();
     expect(screen.queryByLabelText("検索")).not.toBeInTheDocument();
     expect(screen.queryByLabelText("状態")).not.toBeInTheDocument();
   });

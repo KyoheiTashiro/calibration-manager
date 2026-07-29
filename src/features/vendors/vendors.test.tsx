@@ -67,7 +67,8 @@ describe("VendorList: 空状態", () => {
     renderWithStore(<VendorList />);
 
     expect(screen.getByText("取引先が未登録です")).toBeInTheDocument();
-    expect(screen.getAllByRole("button", { name: "+ 追加" })).toHaveLength(2);
+    // 追加ボタンは検索行に統合されたため、0件時はEmptyState内のCTAのみ
+    expect(screen.getByRole("button", { name: "+ 追加" })).toBeInTheDocument();
   });
 });
 

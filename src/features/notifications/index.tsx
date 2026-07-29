@@ -51,24 +51,23 @@ export const NotificationCenter = (): ReactElement => {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-end">
-        <Button
-          variant="secondary"
-          disabled={unreadCount === 0}
-          onClick={(): void => {
-            markAllAsRead();
-          }}
-        >
-          全て既読
-        </Button>
-      </div>
-
       <Tabs
         tabs={tabs}
         activeKey={activeTab}
         onChange={(key): void => {
           if (isNotificationTab(key)) setActiveTab(key);
         }}
+        actions={
+          <Button
+            variant="secondary"
+            disabled={unreadCount === 0}
+            onClick={(): void => {
+              markAllAsRead();
+            }}
+          >
+            全て既読
+          </Button>
+        }
       />
 
       {rows.length === 0 ? (
