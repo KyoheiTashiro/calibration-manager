@@ -150,8 +150,7 @@ describe("EquipmentList: 非稼働機器の期限", () => {
     expect(dueDateCellOf(row)).toHaveTextContent("—");
   });
 
-  it("retired機器はデフォルトフィルタで非表示だが、全てフィルタに切り替えても期限は—になる", async () => {
-    const user = userEvent.setup();
+  it("retired機器は有効項目があっても期限が—になる", () => {
     seedStore({
       equipment: { [retiredEquipment.id]: retiredEquipment },
       serviceItems: {
@@ -165,10 +164,6 @@ describe("EquipmentList: 非稼働機器の期限", () => {
     });
     renderWithStore(<EquipmentList />);
 
-    expect(screen.queryByText("EQ-004")).not.toBeInTheDocument();
-
-    await user.click(screen.getByRole("combobox", { name: "状態" }));
-    await user.click(screen.getByRole("option", { name: "全て" }));
     const row = screen.getByRole("row", { name: /EQ-004/u });
     expect(dueDateCellOf(row)).toHaveTextContent("—");
   });
@@ -196,7 +191,7 @@ describe("EquipmentList: active機器でisActive項目のみ", () => {
 });
 
 describe("EquipmentList: 状態フィルタ", () => {
-  it("デフォルトはretiredを表示せず、全てに切り替えると表示される", async () => {
+  it("デフォルト(全て)は全状態を表示し、稼働に切り替えるとretiredが隠れる", async () => {
     const user = userEvent.setup();
     seedStore({
       equipment: {
@@ -207,13 +202,13 @@ describe("EquipmentList: 状態フィルタ", () => {
     renderWithStore(<EquipmentList />);
 
     expect(screen.getByText("EQ-001")).toBeInTheDocument();
-    expect(screen.queryByText("EQ-004")).not.toBeInTheDocument();
+    expect(screen.getByText("EQ-004")).toBeInTheDocument();
 
     await user.click(screen.getByRole("combobox", { name: "状態" }));
-    await user.click(screen.getByRole("option", { name: "全て" }));
+    await user.click(screen.getByRole("option", { name: "稼働" }));
 
     expect(screen.getByText("EQ-001")).toBeInTheDocument();
-    expect(screen.getByText("EQ-004")).toBeInTheDocument();
+    expect(screen.queryByText("EQ-004")).not.toBeInTheDocument();
   });
 });
 

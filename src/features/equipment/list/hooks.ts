@@ -4,11 +4,10 @@ import { useAppStore } from "@/store/useAppStore";
 import { useMemo, useState } from "react";
 
 /**
- * ドメインの EquipmentStatus とは別軸（「稼働+休止」「全て」という複合値を持つ）のため
+ * ドメインの EquipmentStatus とは別軸（「全て」という複合値を持つ）のため
  * features/equipment/constants.ts には追加せずこのファイルに閉じたモジュールレベル定数とする。
  */
 const STATUS_FILTER = {
-  ACTIVE_AND_SUSPENDED: "activeAndSuspended",
   ALL: "all",
   ACTIVE: "active",
   SUSPENDED: "suspended",
@@ -17,7 +16,6 @@ const STATUS_FILTER = {
 export type StatusFilter = (typeof STATUS_FILTER)[keyof typeof STATUS_FILTER];
 
 export const STATUS_FILTER_OPTIONS: { value: StatusFilter; label: string }[] = [
-  { value: STATUS_FILTER.ACTIVE_AND_SUSPENDED, label: "稼働+休止" },
   { value: STATUS_FILTER.ALL, label: "全て" },
   { value: STATUS_FILTER.ACTIVE, label: "稼働" },
   { value: STATUS_FILTER.SUSPENDED, label: "休止" },
@@ -42,7 +40,6 @@ const MATCHES_STATUS_FILTER_RULES: Record<StatusFilter, (status: EquipmentStatus
   [STATUS_FILTER.ACTIVE]: (status) => status === EQUIPMENT_STATUS.ACTIVE,
   [STATUS_FILTER.SUSPENDED]: (status) => status === EQUIPMENT_STATUS.SUSPENDED,
   [STATUS_FILTER.RETIRED]: (status) => status === EQUIPMENT_STATUS.RETIRED,
-  [STATUS_FILTER.ACTIVE_AND_SUSPENDED]: (status) => status !== EQUIPMENT_STATUS.RETIRED,
 };
 
 const matchesStatusFilter = (status: EquipmentStatus, filter: StatusFilter): boolean =>
@@ -74,9 +71,7 @@ export const useEquipmentList = (): UseEquipmentListResult => {
   const serviceItems = useAppStore((state) => state.serviceItems);
 
   const [searchText, setSearchText] = useState("");
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>(
-    STATUS_FILTER.ACTIVE_AND_SUSPENDED,
-  );
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>(STATUS_FILTER.ALL);
 
   const totalCount = Object.keys(equipment).length;
 
