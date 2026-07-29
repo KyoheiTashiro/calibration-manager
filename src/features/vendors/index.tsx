@@ -84,7 +84,7 @@ export const VendorList = (): ReactElement => {
               </TableHead>
               <TableBody>
                 {pagedItems.map((vendor) => (
-                  <tr key={vendor.id} className="h-10 hover:bg-slate-50">
+                  <tr key={vendor.id}>
                     <Td>{vendor.name}</Td>
                     <Td>
                       <VendorTypeBadges vendor={vendor} />
