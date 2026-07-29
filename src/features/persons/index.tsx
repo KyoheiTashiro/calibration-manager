@@ -48,7 +48,7 @@ export const PersonList = (): ReactElement => {
             <div className="w-1/2 min-w-64">
               <TextField
                 label="検索"
-                placeholder="氏名/部署/メールで検索"
+                placeholder="氏名/部署/メール/状態で検索"
                 value={searchText}
                 onChange={(event) => {
                   setSearchText(event.target.value);

@@ -137,6 +137,27 @@ describe("PersonList", () => {
     expect(screen.queryByText("田中太郎")).not.toBeInTheDocument();
   });
 
+  it("状態ラベル(有効/無効)でも検索できる", async () => {
+    const user = userEvent.setup();
+    seedStore({
+      persons: {
+        "person-1": buildPerson({ id: "person-1", name: "田中太郎", isActive: true }),
+        "person-2": buildPerson({
+          id: "person-2",
+          name: "佐藤花子",
+          email: "sato@example.com",
+          isActive: false,
+        }),
+      },
+    });
+    renderWithStore(<PersonList />);
+
+    await user.type(screen.getByLabelText("検索", { exact: false }), "無効");
+
+    expect(screen.getByText("佐藤花子")).toBeInTheDocument();
+    expect(screen.queryByText("田中太郎")).not.toBeInTheDocument();
+  });
+
   it("一致0件時に専用メッセージを表示する", async () => {
     const user = userEvent.setup();
     seedStore({ persons: { "person-1": buildPerson() } });

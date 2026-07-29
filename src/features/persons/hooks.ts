@@ -4,7 +4,10 @@ import { useMemo, useState } from "react";
 
 const matchesSearch = (person: Person, normalizedSearch: string): boolean => {
   if (normalizedSearch === "") return true;
-  const haystack = [person.name, person.department ?? "", person.email].join("\n").toLowerCase();
+  const statusLabel = person.isActive ? "有効" : "無効";
+  const haystack = [person.name, person.department ?? "", person.email, statusLabel]
+    .join("\n")
+    .toLowerCase();
   return haystack.includes(normalizedSearch);
 };
 
