@@ -1,4 +1,5 @@
 import { buildSeedState, seedIfEmpty } from "@/dev/seed";
+import { SEED_EQUIPMENT_COUNT } from "@/dev/seedMasterData";
 import { deriveServiceItemStatus, type ServiceItemStatus } from "@/domain/serviceItemStatus";
 import { isActiveServiceOrderStatus } from "@/domain/serviceOrderStatus";
 import { appStateSchema } from "@/store/schema";
@@ -114,6 +115,37 @@ describe("buildSeedState", () => {
     }
     for (const count of activeServiceOrderCountByServiceItemId.values()) {
       expect(count).toBeLessThanOrEqual(1);
+    }
+  });
+
+  it("全equipmentに1件以上のserviceItemsが紐付く", () => {
+    const state = buildSeedState(TODAY);
+    const linkedEquipmentIds = new Set(
+      Object.values(state.serviceItems).map((serviceItem) => serviceItem.equipmentId),
+    );
+    for (const equipmentId of Object.keys(state.equipment)) {
+      expect(linkedEquipmentIds.has(equipmentId)).toBe(true);
+    }
+  });
+
+  it("全serviceItemsのlastDoneDateが基準日より過去である", () => {
+    const state = buildSeedState(TODAY);
+    for (const serviceItem of Object.values(state.serviceItems)) {
+      if (serviceItem.lastDoneDate === undefined) continue;
+      expect(serviceItem.lastDoneDate < TODAY).toBe(true);
+    }
+  });
+
+  it(`equipmentが${SEED_EQUIPMENT_COUNT}件作成される`, () => {
+    const state = buildSeedState(TODAY);
+    expect(Object.keys(state.equipment).length).toBe(SEED_EQUIPMENT_COUNT);
+  });
+
+  it("全equipmentのmanufacturerId指定がvendorsに存在しisManufacturerである", () => {
+    const state = buildSeedState(TODAY);
+    for (const equipment of Object.values(state.equipment)) {
+      if (equipment.manufacturerId === undefined) continue;
+      expect(state.vendors[equipment.manufacturerId]?.isManufacturer).toBe(true);
     }
   });
 

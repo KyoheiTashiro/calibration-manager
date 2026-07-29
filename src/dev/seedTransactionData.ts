@@ -145,6 +145,22 @@ export const buildSeedServiceItems = (today: IsoDateString): Record<string, Serv
     nextDueDate: addDays(today, 50) ?? today,
     isActive: false,
   },
+  // なぜ追加するか: 廃棄機器（EQ-006）にも履歴を紐付け、全シード機器が項目を持つ状態にする。
+  // 廃棄時の運用（項目は無効化して履歴保持）を画面確認できるよう isActive: false とする。
+  "seed-item-retired-eq": {
+    id: "seed-item-retired-eq",
+    equipmentId: "seed-equipment-006",
+    type: SERVICE_ITEM_TYPE.INSPECTION,
+    execution: EXECUTION.INTERNAL,
+    name: "定期点検",
+    cycle: CYCLE.Y1,
+    personId: "seed-person-tanaka",
+    bufferDays: DEFAULT_BUFFER_DAYS,
+    noticeDaysBefore: DEFAULT_NOTICE_DAYS_BEFORE,
+    nextDueDate: addDays(today, -30) ?? today,
+    lastDoneDate: addDays(today, -395) ?? today,
+    isActive: false,
+  },
   "seed-item-suspended-eq": {
     id: "seed-item-suspended-eq",
     equipmentId: "seed-equipment-005",
@@ -206,6 +222,14 @@ export const buildSeedRecords = (today: IsoDateString): Record<string, ServiceRe
     doneDate: addDays(today, -168) ?? today,
     doneBy: "佐藤 由紀子",
     result: SERVICE_RECORD_RESULT.PASS,
+  },
+  "seed-record-retired-eq": {
+    id: "seed-record-retired-eq",
+    serviceItemId: "seed-item-retired-eq",
+    doneDate: addDays(today, -395) ?? today,
+    doneBy: "田中 一郎",
+    result: SERVICE_RECORD_RESULT.PASS,
+    note: "廃棄前最終点検",
   },
   "seed-record-order-now-completed": {
     id: "seed-record-order-now-completed",

@@ -103,8 +103,9 @@ src/
 │   └── navigation/index.ts         // 複数featureで共有する遷移系フック。useSafeNavigate: navigate()の戻り値（void | Promise<void>）を無視して遷移する共通ラッパー（D-044）
 ├── dev/                            // DEV限定（本番バンドル非包含）。D-034
 │   ├── seed.ts                     // buildSeedState(today) / seedIfEmpty()。空ストア時のみ投入する開発用シーダー
-│   ├── seedMasterData.ts           // マスタ（vendors/persons/equipment等）のシードデータ
-│   └── seedTransactionData.ts      // 記録・案件・通知等トランザクションデータのシードデータ
+│   ├── seedMasterData.ts           // マスタ（vendors/persons/equipment等）のシードデータ。equipment は手作り6件 + 決定的生成で計50件（SEED_EQUIPMENT_COUNT）
+│   ├── seedTransactionData.ts      // 手作り機器向けの記録・案件等トランザクションデータのシードデータ
+│   └── seedGeneratedTransactionData.ts // 自動生成機器向けの項目・記録を決定的生成（全機器に項目1件以上紐付け）
 └── styles/index.css
 ```
 
