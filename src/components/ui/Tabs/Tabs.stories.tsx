@@ -22,7 +22,9 @@ const SAMPLE_TABS = [
 const TabsDemo = ({ actions }: { actions?: ReactNode }): ReactElement => {
   const [activeKey, setActiveKey] = useState("tab-one");
 
-  return <Tabs tabs={SAMPLE_TABS} activeKey={activeKey} onChange={setActiveKey} actions={actions} />;
+  return (
+    <Tabs tabs={SAMPLE_TABS} activeKey={activeKey} onChange={setActiveKey} actions={actions} />
+  );
 };
 
 export const Default: StoryObj<typeof meta> = {
