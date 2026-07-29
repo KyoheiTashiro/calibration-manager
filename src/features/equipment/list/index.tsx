@@ -58,8 +58,7 @@ export const EquipmentList = (): ReactElement => {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold">機器一覧</h1>
+      <div className="flex items-center justify-end">
         <Button onClick={handleAddClick}>+ 機器を追加</Button>
       </div>
 

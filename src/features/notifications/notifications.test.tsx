@@ -224,7 +224,7 @@ describe("NotificationCenter: 行クリック遷移（D-027）", () => {
 
     await user.click(screen.getByRole("button", { name: /dangling通知/u }));
 
-    expect(screen.getByRole("heading", { name: "通知センター" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: /未読/u })).toBeInTheDocument();
     expect(screen.queryByText("機器詳細:")).not.toBeInTheDocument();
     expect(screen.getByText("未読の通知はありません")).toBeInTheDocument();
     await user.click(screen.getByRole("tab", { name: "既読" }));

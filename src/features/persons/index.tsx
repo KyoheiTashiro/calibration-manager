@@ -37,8 +37,7 @@ export const PersonList = (): ReactElement => {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold">担当者</h1>
+      <div className="flex items-center justify-end">
         <Button onClick={handleAddClick}>+ 追加</Button>
       </div>
 
