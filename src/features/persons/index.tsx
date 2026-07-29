@@ -4,6 +4,7 @@ import {
   Button,
   EmptyState,
   Pagination,
+  Select,
   Table,
   TableBody,
   TableHead,
@@ -12,7 +13,7 @@ import {
   Th,
   usePagination,
 } from "@/components/ui";
-import { usePersonList } from "@/features/persons/hooks";
+import { STATUS_FILTER_OPTIONS, isStatusFilter, usePersonList } from "@/features/persons/hooks";
 import type { Person } from "@/store/types";
 import { useEntityModal } from "@/utils/modal";
 import type { ReactElement } from "react";
@@ -23,7 +24,14 @@ const INACTIVE_BADGE_CLASS_NAME = "bg-slate-100 text-slate-600";
 
 /** 物理削除は行わず、モーダル内の「有効」チェックボックストグルで無効化する。 */
 export const PersonList = (): ReactElement => {
-  const { totalCount, filteredPersonList, searchText, setSearchText } = usePersonList();
+  const {
+    totalCount,
+    filteredPersonList,
+    searchText,
+    setSearchText,
+    statusFilter,
+    setStatusFilter,
+  } = usePersonList();
   const {
     page,
     pageSize,
@@ -31,7 +39,7 @@ export const PersonList = (): ReactElement => {
     pagedItems,
     setPage,
     setPageSize,
-  } = usePagination(filteredPersonList, searchText);
+  } = usePagination(filteredPersonList, `${searchText}|${statusFilter}`);
   const { modalState, handleAddClick, handleEditClick, handleModalClose } =
     useEntityModal<Person>();
 
@@ -48,10 +56,20 @@ export const PersonList = (): ReactElement => {
             <div className="w-1/2 min-w-64">
               <TextField
                 label="検索"
-                placeholder="氏名/部署/メール/状態で検索"
+                placeholder="氏名/部署/メールで検索"
                 value={searchText}
                 onChange={(event) => {
                   setSearchText(event.target.value);
+                }}
+              />
+            </div>
+            <div className="w-40">
+              <Select
+                label="状態"
+                options={STATUS_FILTER_OPTIONS}
+                value={statusFilter}
+                onChange={(value) => {
+                  if (isStatusFilter(value)) setStatusFilter(value);
                 }}
               />
             </div>

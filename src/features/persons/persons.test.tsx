@@ -137,7 +137,7 @@ describe("PersonList", () => {
     expect(screen.queryByText("田中太郎")).not.toBeInTheDocument();
   });
 
-  it("状態ラベル(有効/無効)でも検索できる", async () => {
+  it("状態セレクトで有効/無効の絞り込みができ、「全て」で解除できる", async () => {
     const user = userEvent.setup();
     seedStore({
       persons: {
@@ -152,10 +152,20 @@ describe("PersonList", () => {
     });
     renderWithStore(<PersonList />);
 
-    await user.type(screen.getByLabelText("検索", { exact: false }), "無効");
-
+    await user.click(screen.getByRole("combobox", { name: "状態" }));
+    await user.click(screen.getByRole("option", { name: "無効" }));
     expect(screen.getByText("佐藤花子")).toBeInTheDocument();
     expect(screen.queryByText("田中太郎")).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole("combobox", { name: "状態" }));
+    await user.click(screen.getByRole("option", { name: "有効" }));
+    expect(screen.getByText("田中太郎")).toBeInTheDocument();
+    expect(screen.queryByText("佐藤花子")).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole("combobox", { name: "状態" }));
+    await user.click(screen.getByRole("option", { name: "全て" }));
+    expect(screen.getByText("田中太郎")).toBeInTheDocument();
+    expect(screen.getByText("佐藤花子")).toBeInTheDocument();
   });
 
   it("一致0件時に専用メッセージを表示する", async () => {
