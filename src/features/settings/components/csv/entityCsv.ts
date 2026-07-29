@@ -15,7 +15,7 @@ export type CsvEntityKind = keyof AppState;
 
 /**
  * 並びは推奨インポート順(D-054 の依存順: 参照される側が先)。
- * エクスポートボタン・インポート対象セレクト・マニュアルの列仕様タブが共有する(D-060)。
+ * エクスポートボタン・インポートの「データの種類」セレクト・マニュアルの列仕様タブが共有する(D-060)。
  */
 export const CSV_ENTITY_KINDS = [
   "vendors",

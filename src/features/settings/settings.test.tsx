@@ -112,16 +112,18 @@ const equipmentCsvFile = (equipment: Equipment): File =>
     type: "text/csv",
   });
 
-// なぜ: 対象の初期値は先頭のメーカー/取引先(D-060)のため、機器CSVの検証には明示選択が要る。
+// なぜ: データの種類の初期値は先頭のメーカー/取引先(D-060)のため、機器CSVの検証には明示選択が要る。
 const selectEquipmentKind = async (): Promise<void> => {
-  await userEvent.click(screen.getByRole("combobox", { name: "対象" }));
+  await userEvent.click(screen.getByRole("combobox", { name: "データの種類" }));
   await userEvent.click(screen.getByRole("option", { name: "機器" }));
 };
 
 describe("インポート(§11、D-029 / D-030)", () => {
-  it("対象の初期値は推奨インポート順の先頭(メーカー/取引先)(D-060)", () => {
+  it("データの種類の初期値は推奨インポート順の先頭(メーカー/取引先)(D-060)", () => {
     renderWithStore(<Settings />);
-    expect(screen.getByRole("combobox", { name: "対象" })).toHaveTextContent("メーカー/取引先");
+    expect(screen.getByRole("combobox", { name: "データの種類" })).toHaveTextContent(
+      "メーカー/取引先",
+    );
   });
 
   it("未選択時はプレビューに案内文を表示する", () => {
@@ -200,7 +202,7 @@ describe("インポート(§11、D-029 / D-030)", () => {
     await userEvent.upload(screen.getByLabelText("ファイル"), equipmentCsvFile(sampleEquipment));
     await screen.findByText("✓ 1行 取り込み可");
 
-    await userEvent.click(screen.getByRole("combobox", { name: "対象" }));
+    await userEvent.click(screen.getByRole("combobox", { name: "データの種類" }));
     await userEvent.click(screen.getByRole("option", { name: "メーカー/取引先" }));
     expect(
       screen.getByText("CSVファイルを選択すると、ここに検証結果が表示されます"),

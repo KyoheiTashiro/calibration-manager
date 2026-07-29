@@ -140,7 +140,12 @@ export const ImportSection = ({ state }: Props): ReactElement => {
       <h2 className="border-b border-slate-200 pb-2 text-lg font-semibold">CSVインポート</h2>
       <div className="flex flex-wrap items-end gap-3">
         <div className="w-40">
-          <Select label="対象" options={ENTITY_OPTIONS} value={kind} onChange={handleKindChange} />
+          <Select
+            label="データの種類"
+            options={ENTITY_OPTIONS}
+            value={kind}
+            onChange={handleKindChange}
+          />
         </div>
         <div className="flex items-center gap-2">
           {/* なぜ: ネイティブの file input は見た目をボタンに揃えられないため sr-only で隠し、
