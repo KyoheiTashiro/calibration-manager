@@ -88,7 +88,10 @@ export const PersonList = (): ReactElement => {
                         {person.isActive ? "有効" : "無効"}
                       </Badge>
                     </Td>
-                    <Td>
+                    {/* なぜ truncate 無効か: Td の truncate は子を div でラップするが、
+                        jsx-a11y(control-has-associated-label)の探索深度を超えて
+                        ボタン内テキストを検出できなくなるため td 直下に置く。 */}
+                    <Td truncate={false}>
                       <Button
                         size="sm"
                         variant="secondary"

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactElement } from "react";
 
-import { Table, TableBody, TableHead } from "./Table";
+import { Table, TableBody, TableHead, Td, Th } from "./Table";
 
 const meta = {
   title: "UI/Table",
@@ -81,6 +81,36 @@ export const WideScrollable: StoryObj<typeof meta> = {
               サンプル値
             </td>
           ))}
+        </tr>
+      </TableBody>
+    </Table>
+  ),
+};
+
+// なぜ: 長文セルの省略仕様(D-087)を確認するため、最大幅を超える文字列を含む行を用意する。
+// ホバーで title 属性による全文表示も確認できる。
+export const TruncatedCell: StoryObj<typeof meta> = {
+  // なぜargsが必要か: renderで独自のテーブル構造を描画するため個々のargsは使わないが、
+  // StoryObjの型上componentが要求するargsを満たす必要があるため代表値を渡す。
+  args: {
+    children: null,
+  },
+  render: (): ReactElement => (
+    <Table>
+      <TableHead>
+        <tr>
+          <Th>機器名</Th>
+          <Th>設置場所</Th>
+        </tr>
+      </TableHead>
+      <TableBody>
+        <tr>
+          <Td>超高精度レーザー干渉式三次元測定装置（恒温槽付きフルオプション構成モデル）</Td>
+          <Td>第1工場 精密測定室</Td>
+        </tr>
+        <tr>
+          <Td>トルクレンチ</Td>
+          <Td>第2工場</Td>
         </tr>
       </TableBody>
     </Table>

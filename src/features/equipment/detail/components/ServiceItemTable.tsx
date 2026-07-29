@@ -81,7 +81,7 @@ export const ServiceItemTable = ({
               <Td>{serviceItem.nextDueDate}</Td>
               {/* なぜ td 直下に Button を並べるか: equipment/list や VendorList と同様、
                   div でラップするとjsx-a11yのボタンラベル探索深度を超えるためtdをflex化する */}
-              <Td className="flex gap-2">
+              <Td className="flex gap-2" truncate={false}>
                 <Button
                   variant="secondary"
                   size="sm"

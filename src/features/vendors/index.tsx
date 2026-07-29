@@ -101,7 +101,7 @@ export const VendorList = (): ReactElement => {
                         jsx-a11y(control-has-associated-label) の既定探索深度(2)を超えて
                         ボタン内テキストを検出できず誤検知するため、td を flex コンテナ化して
                         ラッパーを1段省く。 */}
-                    <Td className="flex gap-2">
+                    <Td className="flex gap-2" truncate={false}>
                       <Button
                         variant="secondary"
                         size="sm"

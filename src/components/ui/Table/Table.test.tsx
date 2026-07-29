@@ -182,9 +182,10 @@ describe("Td", () => {
       </table>,
     );
 
-    const cell = screen.getByText("EQ-001");
-    expect(cell.className).toContain("px-3");
-    expect(cell.className).toContain("py-2");
+    const cell = screen.getByText("EQ-001").closest("td");
+    expect(cell).not.toBeNull();
+    expect(cell?.className).toContain("px-3");
+    expect(cell?.className).toContain("py-2");
   });
 
   it("className を渡すと px-3 py-2 に追加でマージされる", () => {
@@ -198,10 +199,64 @@ describe("Td", () => {
       </table>,
     );
 
-    const cell = screen.getByText("123");
-    expect(cell.className).toContain("px-3");
-    expect(cell.className).toContain("py-2");
-    expect(cell.className).toContain("text-right");
-    expect(cell.className).toContain("tabular-nums");
+    const cell = screen.getByText("123").closest("td");
+    expect(cell).not.toBeNull();
+    expect(cell?.className).toContain("px-3");
+    expect(cell?.className).toContain("py-2");
+    expect(cell?.className).toContain("text-right");
+    expect(cell?.className).toContain("tabular-nums");
+  });
+
+  it("既定で子を max-w-64 truncate の div でラップし、文字列は title に全文を設定する（D-087）", () => {
+    render(
+      <table>
+        <tbody>
+          <tr>
+            <Td>とても長い機器名称のサンプル</Td>
+          </tr>
+        </tbody>
+      </table>,
+    );
+
+    const wrapper = screen.getByText("とても長い機器名称のサンプル");
+    expect(wrapper.tagName).toBe("DIV");
+    expect(wrapper.className).toContain("max-w-64");
+    expect(wrapper.className).toContain("truncate");
+    expect(wrapper).toHaveAttribute("title", "とても長い機器名称のサンプル");
+  });
+
+  it("文字列以外の子には title を設定しない", () => {
+    render(
+      <table>
+        <tbody>
+          <tr>
+            <Td>
+              <span>バッジ</span>
+            </Td>
+          </tr>
+        </tbody>
+      </table>,
+    );
+
+    const wrapper = screen.getByText("バッジ").parentElement;
+    expect(wrapper?.className).toContain("truncate");
+    expect(wrapper).not.toHaveAttribute("title");
+  });
+
+  it("truncate={false} でラップせず td 直下に子を置く", () => {
+    render(
+      <table>
+        <tbody>
+          <tr>
+            <Td truncate={false}>
+              <button type="button">編集</button>
+            </Td>
+          </tr>
+        </tbody>
+      </table>,
+    );
+
+    const button = screen.getByRole("button", { name: "編集" });
+    expect(button.parentElement?.tagName).toBe("TD");
   });
 });

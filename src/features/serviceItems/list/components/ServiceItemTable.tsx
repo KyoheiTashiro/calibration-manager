@@ -55,7 +55,7 @@ export const ServiceItemTable = ({ rows, onRecord, onOrder, onEdit }: Props): Re
           <Td>{row.recommendedOrderDate ?? "—"}</Td>
           {/* なぜ td を flex 化して直下に Button を並べるか: equipment/detail と同様、
               div ラップだと jsx-a11y のボタンラベル探索深度を超えるため。 */}
-          <Td className="flex gap-2">
+          <Td className="flex gap-2" truncate={false}>
             <Button
               variant="secondary"
               size="sm"

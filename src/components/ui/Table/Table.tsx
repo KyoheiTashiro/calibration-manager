@@ -45,8 +45,24 @@ export const Th = ({ children, align = "left" }: ThProps): ReactElement => (
   </th>
 );
 
-type TdProps = { children?: ReactNode; className?: string };
+type TdProps = { children?: ReactNode; className?: string; truncate?: boolean };
 
-export const Td = ({ children, className }: TdProps): ReactElement => (
-  <td className={["px-3 py-2", className].filter(Boolean).join(" ")}>{children}</td>
-);
+// なぜ div ラップ: table-layout auto では td 自体の max-width が効かないため、
+// セル内ブロック要素に max-width を与えて溢れた分を「…」で省略する(D-087)。
+// 操作ボタン列など省略が不要なセルは truncate={false} で td 直下に子を置く。
+export const Td = ({ children, className, truncate = true }: TdProps): ReactElement => {
+  const tdClassName = ["px-3 py-2", className].filter(Boolean).join(" ");
+  if (!truncate) {
+    return <td className={tdClassName}>{children}</td>;
+  }
+  return (
+    <td className={tdClassName}>
+      <div
+        className="max-w-64 truncate"
+        title={typeof children === "string" ? children : undefined}
+      >
+        {children}
+      </div>
+    </td>
+  );
+};

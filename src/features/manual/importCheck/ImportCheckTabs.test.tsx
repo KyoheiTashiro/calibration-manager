@@ -47,7 +47,8 @@ describe("ImportCheckTabs", () => {
     expect(vendorsPanel.getByRole("columnheader", { name: "項目名" })).toBeInTheDocument();
     expect(vendorsPanel.getByRole("columnheader", { name: "画面での名前" })).toBeInTheDocument();
     expect(vendorsPanel.queryByRole("columnheader", { name: "列" })).not.toBeInTheDocument();
-    expect(vendorsPanel.getByText("窓口担当者", { selector: "td" })).toBeInTheDocument();
+    // Td は省略表示(D-087)のため文言を div でラップする。セル内表示の検証は closest("td") で行う
+    expect(vendorsPanel.getByText("窓口担当者").closest("td")).toBeInTheDocument();
   });
 
   it("必須項目は○の有無で表現される(必須は○、任意は空欄)", () => {
