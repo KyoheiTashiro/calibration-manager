@@ -6,13 +6,42 @@
 import { isVendorReferenced } from "@/store/selectors";
 import type { Vendor } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
-export const useVendorList = (): Vendor[] => {
+const matchesSearch = (vendor: Vendor, normalizedSearch: string): boolean => {
+  if (normalizedSearch === "") return true;
+  const haystack = [vendor.name, vendor.contactPerson ?? "", vendor.phone ?? ""]
+    .join("\n")
+    .toLowerCase();
+  return haystack.includes(normalizedSearch);
+};
+
+type UseVendorListResult = {
+  totalCount: number;
+  filteredVendorList: Vendor[];
+  searchText: string;
+  setSearchText: (value: string) => void;
+};
+
+export const useVendorList = (): UseVendorListResult => {
   const vendors = useAppStore((state) => state.vendors);
-  return Object.values(vendors).toSorted((left, right) =>
-    left.name.localeCompare(right.name, "ja"),
-  );
+  const [searchText, setSearchText] = useState("");
+
+  const totalCount = Object.keys(vendors).length;
+
+  const filteredVendorList = useMemo(() => {
+    const normalizedSearch = searchText.trim().toLowerCase();
+    return Object.values(vendors)
+      .filter((entry) => matchesSearch(entry, normalizedSearch))
+      .toSorted((left, right) => left.name.localeCompare(right.name, "ja"));
+  }, [vendors, searchText]);
+
+  return {
+    totalCount,
+    filteredVendorList,
+    searchText,
+    setSearchText,
+  };
 };
 
 type UseVendorDeleteResult = {

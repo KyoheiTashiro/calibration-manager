@@ -87,6 +87,66 @@ describe("PersonList", () => {
     expect(await screen.findByText("鈴木一郎")).toBeInTheDocument();
   });
 
+  it("name部分一致(大文字小文字無視)する行のみ表示する", async () => {
+    const user = userEvent.setup();
+    seedStore({
+      persons: {
+        "person-1": buildPerson({ id: "person-1", name: "田中太郎" }),
+        "person-2": buildPerson({
+          id: "person-2",
+          name: "Suzuki Ichiro",
+          email: "suzuki@example.com",
+        }),
+      },
+    });
+    renderWithStore(<PersonList />);
+
+    await user.type(screen.getByLabelText("検索", { exact: false }), "SUZUKI");
+
+    expect(screen.getByText("Suzuki Ichiro")).toBeInTheDocument();
+    expect(screen.queryByText("田中太郎")).not.toBeInTheDocument();
+  });
+
+  it("部署・メールでの一致も検索対象になる", async () => {
+    const user = userEvent.setup();
+    seedStore({
+      persons: {
+        "person-1": buildPerson({
+          id: "person-1",
+          name: "田中太郎",
+          department: "品質保証部",
+          email: "tanaka@example.com",
+        }),
+        "person-2": buildPerson({
+          id: "person-2",
+          name: "佐藤花子",
+          department: "製造部",
+          email: "sato@example.com",
+        }),
+      },
+    });
+    renderWithStore(<PersonList />);
+
+    await user.type(screen.getByLabelText("検索", { exact: false }), "品質保証部");
+    expect(screen.getByText("田中太郎")).toBeInTheDocument();
+    expect(screen.queryByText("佐藤花子")).not.toBeInTheDocument();
+
+    await user.clear(screen.getByLabelText("検索", { exact: false }));
+    await user.type(screen.getByLabelText("検索", { exact: false }), "sato@example.com");
+    expect(screen.getByText("佐藤花子")).toBeInTheDocument();
+    expect(screen.queryByText("田中太郎")).not.toBeInTheDocument();
+  });
+
+  it("一致0件時に専用メッセージを表示する", async () => {
+    const user = userEvent.setup();
+    seedStore({ persons: { "person-1": buildPerson() } });
+    renderWithStore(<PersonList />);
+
+    await user.type(screen.getByLabelText("検索", { exact: false }), "存在しない担当者");
+
+    expect(screen.getByText("条件に一致する担当者はありません")).toBeInTheDocument();
+  });
+
   it("既存担当者の「編集」からモーダルにプリフィルされ、変更して保存するとストア・一覧に反映される", async () => {
     const user = userEvent.setup();
     seedStore({

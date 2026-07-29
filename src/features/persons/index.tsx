@@ -8,6 +8,7 @@ import {
   TableBody,
   TableHead,
   Td,
+  TextField,
   Th,
   usePagination,
 } from "@/components/ui";
@@ -22,9 +23,15 @@ const INACTIVE_BADGE_CLASS_NAME = "bg-slate-100 text-slate-600";
 
 /** 物理削除は行わず、モーダル内の「有効」チェックボックストグルで無効化する。 */
 export const PersonList = (): ReactElement => {
-  const sortedPersons = usePersonList();
-  const { page, pageSize, totalCount, pagedItems, setPage, setPageSize } =
-    usePagination(sortedPersons);
+  const { totalCount, filteredPersonList, searchText, setSearchText } = usePersonList();
+  const {
+    page,
+    pageSize,
+    totalCount: pagedTotalCount,
+    pagedItems,
+    setPage,
+    setPageSize,
+  } = usePagination(filteredPersonList, searchText);
   const { modalState, handleAddClick, handleEditClick, handleModalClose } =
     useEntityModal<Person>();
 
@@ -35,62 +42,79 @@ export const PersonList = (): ReactElement => {
         <Button onClick={handleAddClick}>+ 追加</Button>
       </div>
 
-      {sortedPersons.length === 0 ? (
+      {totalCount === 0 ? (
         <EmptyState
           message="担当者が未登録です"
           action={<Button onClick={handleAddClick}>+ 追加</Button>}
         />
       ) : (
-        <Table>
-          <TableHead>
-            <tr>
-              <Th>氏名</Th>
-              <Th>部署</Th>
-              <Th>メール</Th>
-              <Th>状態</Th>
-              <Th>操作</Th>
-            </tr>
-          </TableHead>
-          <TableBody>
-            {pagedItems.map((person) => (
-              <tr key={person.id}>
-                <Td>{person.name}</Td>
-                <Td>{person.department ?? "—"}</Td>
-                <Td>{person.email}</Td>
-                <Td>
-                  <Badge
-                    className={
-                      person.isActive ? ACTIVE_BADGE_CLASS_NAME : INACTIVE_BADGE_CLASS_NAME
-                    }
-                  >
-                    {person.isActive ? "有効" : "無効"}
-                  </Badge>
-                </Td>
-                <Td>
-                  <Button
-                    size="sm"
-                    variant="secondary"
-                    onClick={() => {
-                      handleEditClick(person);
-                    }}
-                  >
-                    編集
-                  </Button>
-                </Td>
-              </tr>
-            ))}
-          </TableBody>
-        </Table>
-      )}
+        <>
+          <div className="w-1/2 min-w-64">
+            <TextField
+              label="検索"
+              placeholder="氏名/部署/メールで検索"
+              value={searchText}
+              onChange={(event) => {
+                setSearchText(event.target.value);
+              }}
+            />
+          </div>
 
-      {sortedPersons.length > 0 && (
-        <Pagination
-          page={page}
-          pageSize={pageSize}
-          totalCount={totalCount}
-          onPageChange={setPage}
-          onPageSizeChange={setPageSize}
-        />
+          {filteredPersonList.length === 0 ? (
+            <EmptyState message="条件に一致する担当者はありません" />
+          ) : (
+            <Table>
+              <TableHead>
+                <tr>
+                  <Th>氏名</Th>
+                  <Th>部署</Th>
+                  <Th>メール</Th>
+                  <Th>状態</Th>
+                  <Th>操作</Th>
+                </tr>
+              </TableHead>
+              <TableBody>
+                {pagedItems.map((person) => (
+                  <tr key={person.id}>
+                    <Td>{person.name}</Td>
+                    <Td>{person.department ?? "—"}</Td>
+                    <Td>{person.email}</Td>
+                    <Td>
+                      <Badge
+                        className={
+                          person.isActive ? ACTIVE_BADGE_CLASS_NAME : INACTIVE_BADGE_CLASS_NAME
+                        }
+                      >
+                        {person.isActive ? "有効" : "無効"}
+                      </Badge>
+                    </Td>
+                    <Td>
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        onClick={() => {
+                          handleEditClick(person);
+                        }}
+                      >
+                        編集
+                      </Button>
+                    </Td>
+                  </tr>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+
+          {filteredPersonList.length > 0 && (
+            <Pagination
+              page={page}
+              pageSize={pageSize}
+              totalCount={pagedTotalCount}
+              onPageChange={setPage}
+              onPageSizeChange={setPageSize}
+            />
+          )}
+        </>
       )}
 
       <PersonModal open={modalState.open} person={modalState.entity} onClose={handleModalClose} />

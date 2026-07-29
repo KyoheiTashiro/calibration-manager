@@ -109,6 +109,60 @@ describe("VendorList: 編集", () => {
   });
 });
 
+describe("VendorList: 検索", () => {
+  it("name部分一致(大文字小文字無視)する行のみ表示する", async () => {
+    const user = userEvent.setup();
+    const englishNamedVendor: Vendor = {
+      id: "vendor-3",
+      name: "ABC Calibration",
+      isManufacturer: false,
+      isCalibrator: true,
+    };
+    seedStore({
+      vendors: {
+        [manufacturerVendor.id]: manufacturerVendor,
+        [englishNamedVendor.id]: englishNamedVendor,
+      },
+    });
+    renderWithStore(<VendorList />);
+
+    await user.type(screen.getByLabelText("検索", { exact: false }), "abc");
+
+    expect(screen.getByRole("row", { name: /ABC Calibration/u })).toBeInTheDocument();
+    expect(screen.queryByRole("row", { name: /ミツトヨ/u })).not.toBeInTheDocument();
+  });
+
+  it("窓口担当者・電話番号での一致も検索対象になる", async () => {
+    const user = userEvent.setup();
+    seedStore({
+      vendors: {
+        [manufacturerVendor.id]: manufacturerVendor,
+        [calibratorOnlyVendor.id]: calibratorOnlyVendor,
+      },
+    });
+    renderWithStore(<VendorList />);
+
+    await user.type(screen.getByLabelText("検索", { exact: false }), "山田");
+    expect(screen.getByRole("row", { name: /ミツトヨ/u })).toBeInTheDocument();
+    expect(screen.queryByRole("row", { name: /日本測器/u })).not.toBeInTheDocument();
+
+    await user.clear(screen.getByLabelText("検索", { exact: false }));
+    await user.type(screen.getByLabelText("検索", { exact: false }), "03-1111-2222");
+    expect(screen.getByRole("row", { name: /ミツトヨ/u })).toBeInTheDocument();
+    expect(screen.queryByRole("row", { name: /日本測器/u })).not.toBeInTheDocument();
+  });
+
+  it("一致0件時に専用メッセージを表示する", async () => {
+    const user = userEvent.setup();
+    seedStore({ vendors: { [manufacturerVendor.id]: manufacturerVendor } });
+    renderWithStore(<VendorList />);
+
+    await user.type(screen.getByLabelText("検索", { exact: false }), "存在しない取引先");
+
+    expect(screen.getByText("条件に一致する取引先はありません")).toBeInTheDocument();
+  });
+});
+
 describe("VendorList: 削除ガード", () => {
   it("Equipment.manufacturerIdから参照中は削除できない旨を表示し削除されない", async () => {
     const user = userEvent.setup();
