@@ -71,10 +71,10 @@ export const EquipmentList = (): ReactElement => {
       ) : (
         <>
           <div className="flex flex-wrap items-end gap-4">
-            <div className="min-w-64 flex-1">
+            <div className="w-1/2 min-w-64">
               <TextField
                 label="検索"
-                placeholder="管理番号/名称/型式で検索"
+                placeholder="管理番号/機器名/型式で検索"
                 value={searchText}
                 onChange={(event) => {
                   setSearchText(event.target.value);
