@@ -105,7 +105,7 @@ export const EquipmentList = (): ReactElement => {
                   <Th>メーカー</Th>
                   <Th>設置場所</Th>
                   <Th>状態</Th>
-                  <Th align="right">項目数</Th>
+                  <Th align="right">点検校正項目数</Th>
                   <Th>次回期限</Th>
                 </tr>
               </TableHead>
