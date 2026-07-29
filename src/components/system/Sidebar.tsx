@@ -16,8 +16,8 @@ type NavItem = {
 
 const NAV_ITEMS: NavItem[] = [
   { path: ROUTES.DASHBOARD, label: "ダッシュボード", end: true },
-  { path: ROUTES.EQUIPMENT_LIST, label: "機器一覧" },
-  { path: ROUTES.SERVICE_ITEM_LIST, label: "点検校正項目一覧" },
+  { path: ROUTES.EQUIPMENT_LIST, label: "機器" },
+  { path: ROUTES.SERVICE_ITEM_LIST, label: "点検校正項目" },
   { path: ROUTES.SERVICE_ORDER_LIST, label: "点検校正外部案件" },
   { path: ROUTES.VENDOR_LIST, label: "メーカー/取引先" },
   { path: ROUTES.PERSON_LIST, label: "担当者" },
