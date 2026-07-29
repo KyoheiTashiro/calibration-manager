@@ -4,11 +4,12 @@ import { defaultValues, type FormType } from "@/features/equipment/form/shared/s
 import { useEquipmentFormCore } from "@/features/equipment/form/shared/useFormCore";
 import { useAppStore } from "@/store/useAppStore";
 import { useSafeNavigate } from "@/utils/navigation";
-import type { FieldErrors, UseFormHandleSubmit, UseFormRegister } from "react-hook-form";
+import type { Control, FieldErrors, UseFormHandleSubmit, UseFormRegister } from "react-hook-form";
 
 type UseCreateEquipmentFormResult = {
   register: UseFormRegister<FormType>;
   errors: FieldErrors<FormType>;
+  control: Control<FormType>;
   onFormSubmit: ReturnType<UseFormHandleSubmit<FormType>>;
   manufacturerOptions: SelectOption[];
   handleCancel: () => void;
@@ -18,7 +19,7 @@ export const useCreateEquipmentForm = (): UseCreateEquipmentFormResult => {
   const safeNavigate = useSafeNavigate();
   const addEquipment = useAppStore((state) => state.addEquipment);
 
-  const { register, errors, handleSubmit, manufacturerOptions } = useEquipmentFormCore({
+  const { register, errors, control, handleSubmit, manufacturerOptions } = useEquipmentFormCore({
     defaultValues,
   });
 
@@ -30,6 +31,7 @@ export const useCreateEquipmentForm = (): UseCreateEquipmentFormResult => {
   return {
     register,
     errors,
+    control,
     onFormSubmit: handleSubmit(onSubmit),
     manufacturerOptions,
     handleCancel: (): void => {

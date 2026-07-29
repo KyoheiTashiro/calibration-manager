@@ -86,10 +86,8 @@ export const EquipmentList = (): ReactElement => {
                 label="状態"
                 options={STATUS_FILTER_OPTIONS}
                 value={statusFilter}
-                onChange={(event) => {
-                  if (isStatusFilter(event.target.value)) {
-                    setStatusFilter(event.target.value);
-                  }
+                onChange={(value) => {
+                  if (isStatusFilter(value)) setStatusFilter(value);
                 }}
               />
             </div>

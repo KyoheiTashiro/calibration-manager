@@ -129,6 +129,12 @@
     // 全域の標準イディオムであり、全使用箇所への個別disable（52箇所）はノイズにしかならないため
     // 無効化する。意図しないprops混入はTypeScriptの型チェックで担保する。
     "react/jsx-props-no-spreading": "off",
+    // なぜ: react-hook-form の Controller は `render={({ field }) => <X onChange={field.onChange}
+    // onBlur={field.onBlur} ... />}` が公式イディオム(register spread と対をなす、Select等の
+    // カスタム制御コンポーネント向けAPI)であり、field 自体のプロパティ名がRHFのAPI仕様で
+    // onChange/onBlur に固定されているため、ハンドラ変数名に "handle" 接頭辞を強制するこのルールは
+    // 適用できない(個別disableは今後増える Controller 使用箇所すべてに波及しノイズになる)。
+    "react/jsx-handler-names": "off",
     // なぜ: className は「受け渡しAPIとして設計されたコンポーネント」に限り許可する。
     // Badge/Link/NavLink は色・リンク色を className で渡す設計（Badge.tsx参照。NavLinkは
     // isActiveでクラス出し分けする関数classNameが公式API）、Table は table要素カスタムが仕様、

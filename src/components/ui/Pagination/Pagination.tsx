@@ -1,4 +1,5 @@
-import type { ChangeEvent, ReactElement } from "react";
+import { Select } from "@/components/ui/Select";
+import type { ReactElement } from "react";
 
 import { buildPageItems, ELLIPSIS, PAGE_SIZE_OPTIONS } from "./pageItems";
 
@@ -15,6 +16,11 @@ const PAGER_BUTTON_BASE_CLASS =
   "rounded h-8 min-w-8 px-2 transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer inline-flex items-center justify-center";
 const PAGER_BUTTON_INACTIVE_CLASS = "border border-slate-300 text-slate-700 hover:bg-slate-50";
 const PAGER_BUTTON_ACTIVE_CLASS = "bg-primary text-white";
+
+const PAGE_SIZE_SELECT_OPTIONS = PAGE_SIZE_OPTIONS.map((option) => ({
+  value: String(option),
+  label: `${String(option)}件`,
+}));
 
 const buildCountLabel = (totalCount: number, currentPage: number, pageSize: number): string => {
   if (totalCount === 0) return "全0件";
@@ -34,10 +40,6 @@ export const Pagination = ({
   const currentPage = Math.min(Math.max(page, 1), totalPages);
   const countLabel = buildCountLabel(totalCount, currentPage, pageSize);
   const pageItems = buildPageItems(currentPage, totalPages);
-
-  const handlePageSizeChange = (event: ChangeEvent<HTMLSelectElement>): void => {
-    onPageSizeChange(Number(event.target.value));
-  };
 
   return (
     <nav
@@ -104,18 +106,17 @@ export const Pagination = ({
             </button>
           </div>
         )}
-        <select
-          aria-label="1ページの表示件数"
-          value={pageSize}
-          onChange={handlePageSizeChange}
-          className="rounded border border-slate-300 px-2 py-1 text-sm"
-        >
-          {PAGE_SIZE_OPTIONS.map((option) => (
-            <option key={option} value={option}>
-              {option}件
-            </option>
-          ))}
-        </select>
+        <div className="w-24">
+          <Select
+            label="1ページの表示件数"
+            labelHidden
+            options={PAGE_SIZE_SELECT_OPTIONS}
+            value={String(pageSize)}
+            onChange={(value) => {
+              onPageSizeChange(Number(value));
+            }}
+          />
+        </div>
       </div>
     </nav>
   );

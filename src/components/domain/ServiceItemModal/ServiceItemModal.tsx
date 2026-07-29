@@ -3,7 +3,15 @@
  */
 
 import { Schema, toFormValues, type FormType } from "@/components/domain/ServiceItemModal/schema";
-import { Button, Checkbox, DateField, Modal, RadioGroup, Select, TextField } from "@/components/ui";
+import {
+  Button,
+  Checkbox,
+  ControlledSelect,
+  DateField,
+  Modal,
+  RadioGroup,
+  TextField,
+} from "@/components/ui";
 import { ROUTES } from "@/constants/routes";
 import {
   CYCLE_OPTIONS,
@@ -140,12 +148,13 @@ export const ServiceItemModal = ({
           error={errors.type?.message}
           {...register("type")}
         />
-        <Select
+        <ControlledSelect
+          control={control}
+          name="cycle"
           label="周期"
           required
           options={CYCLE_OPTIONS}
           error={errors.cycle?.message}
-          {...register("cycle")}
         />
         <RadioGroup
           label="実施区分"
@@ -178,13 +187,14 @@ export const ServiceItemModal = ({
                 </p>
               </div>
             ) : (
-              <Select
+              <ControlledSelect
+                control={control}
+                name="vendorId"
                 label="校正依頼先"
                 required
                 placeholder="選択してください"
                 options={vendorOptions}
                 error={errors.vendorId?.message}
-                {...register("vendorId")}
               />
             )}
             <TextField
@@ -218,13 +228,14 @@ export const ServiceItemModal = ({
             </p>
           </div>
         ) : (
-          <Select
+          <ControlledSelect
+            control={control}
+            name="personId"
             label="担当者"
             required
             placeholder="選択してください"
             options={personOptions}
             error={errors.personId?.message}
-            {...register("personId")}
           />
         )}
         <TextField

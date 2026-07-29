@@ -6,7 +6,7 @@ import { EQUIPMENT_STATUS, type Equipment } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
 import { useSafeNavigate } from "@/utils/navigation";
 import { useState } from "react";
-import type { FieldErrors, UseFormHandleSubmit, UseFormRegister } from "react-hook-form";
+import type { Control, FieldErrors, UseFormHandleSubmit, UseFormRegister } from "react-hook-form";
 import { useParams } from "react-router-dom";
 
 // なぜ undefined を許容するか: Rules of Hooks により対象不在（dangling id・URL直打ち等）でも
@@ -30,6 +30,7 @@ type UseEditEquipmentFormResult = {
   shouldRedirectToList: boolean;
   register: UseFormRegister<FormType>;
   errors: FieldErrors<FormType>;
+  control: Control<FormType>;
   onFormSubmit: ReturnType<UseFormHandleSubmit<FormType>>;
   manufacturerOptions: SelectOption[];
   retireConfirmOpen: boolean;
@@ -56,7 +57,7 @@ export const useEditEquipmentForm = (): UseEditEquipmentFormResult => {
 
   // 編集画面はルートページで対象（currentEquipment）が変わる場合のみ内容を更新すればよいため
   // values を渡す。defaultValues は初回マウント時（currentEquipment 未確定タイミング含む）用に残す。
-  const { register, errors, handleSubmit, manufacturerOptions } = useEquipmentFormCore({
+  const { register, errors, control, handleSubmit, manufacturerOptions } = useEquipmentFormCore({
     defaultValues: currentFormValues,
     values: currentFormValues,
     excludeEquipmentId: id,
@@ -95,6 +96,7 @@ export const useEditEquipmentForm = (): UseEditEquipmentFormResult => {
     shouldRedirectToList: currentEquipment === undefined,
     register,
     errors,
+    control,
     onFormSubmit: handleSubmit(onSubmit),
     manufacturerOptions,
     retireConfirmOpen,

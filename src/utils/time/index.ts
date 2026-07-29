@@ -68,6 +68,13 @@ export const addDays = (isoDate: IsoDateString, days: number): IsoDateString | n
 };
 
 /**
+ * 指定年月日の曜日を返す(0=日曜〜6=土曜)。カレンダーUIの月グリッド構築用。
+ * なぜ Date.UTC 経由か: 実行環境のタイムゾーンに依存せず曜日を求めるため。
+ */
+export const weekdayOf = (year: number, month: number, day: number): number =>
+  new Date(Date.UTC(year, month - 1, day)).getUTCDay();
+
+/**
  * 今日の日付を端末ローカルタイムゾーンの `YYYY-MM-DD` で返す。
  * なぜローカルか: 現場担当者が見る「今日」と期限判定を一致させるため（UTCだと日本では朝9時まで前日になる）。
  */

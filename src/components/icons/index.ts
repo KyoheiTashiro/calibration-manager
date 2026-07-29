@@ -1,7 +1,9 @@
 export { AlertTriangleIcon } from "./AlertTriangleIcon";
 export { ArrowUpIcon } from "./ArrowUpIcon";
 export { BellIcon } from "./BellIcon";
+export { CalendarIcon } from "./CalendarIcon";
 export { CartIcon } from "./CartIcon";
+export { ChevronDownIcon } from "./ChevronDownIcon";
 export { CheckIcon } from "./CheckIcon";
 export { ClockIcon } from "./ClockIcon";
 export { CloseIcon } from "./CloseIcon";

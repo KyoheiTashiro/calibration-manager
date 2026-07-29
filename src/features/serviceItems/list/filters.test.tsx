@@ -39,11 +39,12 @@ describe("ServiceItemList: フィルタ", () => {
     expect(screen.queryByText("月次点検")).not.toBeInTheDocument();
   });
 
-  it("担当セレクトは name 昇順で無効者に「(無効)」注記を付ける", () => {
+  it("担当セレクトは name 昇順で無効者に「(無効)」注記を付ける", async () => {
+    const user = userEvent.setup();
     renderList();
 
-    const personSelect = screen.getByLabelText("担当");
-    expect(personSelect).toHaveTextContent(`${personSuzuki.name}(無効)`);
+    await user.click(screen.getByRole("combobox", { name: "担当" }));
+    expect(screen.getByRole("option", { name: `${personSuzuki.name}(無効)` })).toBeInTheDocument();
   });
 
   it("種別セレクトを変更すると行が絞られ URL に type が反映される", async () => {
@@ -51,7 +52,8 @@ describe("ServiceItemList: フィルタ", () => {
     renderList();
     expect(dataRowCount()).toBe(3);
 
-    await user.selectOptions(screen.getByLabelText("種別"), "点検");
+    await user.click(screen.getByRole("combobox", { name: "種別" }));
+    await user.click(screen.getByRole("option", { name: "点検" }));
 
     expect(dataRowCount()).toBe(1);
     expect(screen.getByRole("row", { name: /月次点検/u })).toBeInTheDocument();
@@ -63,7 +65,8 @@ describe("ServiceItemList: フィルタ", () => {
     renderList("?type=inspection");
     expect(dataRowCount()).toBe(1);
 
-    await user.selectOptions(screen.getByLabelText("種別"), "全て");
+    await user.click(screen.getByRole("combobox", { name: "種別" }));
+    await user.click(screen.getByRole("option", { name: "全て" }));
 
     expect(dataRowCount()).toBe(3);
     expect(searchValue()).not.toContain("type=");

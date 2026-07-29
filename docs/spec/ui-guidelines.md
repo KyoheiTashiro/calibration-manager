@@ -93,8 +93,8 @@ calibration-manager は**業務用の機器管理アプリ**である。
 - 送信ボタンはエラー有無で無効化しない([screen-design README §0.5](./screen-design/README.md#05-モーダルの共通挙動)準拠)。送信試行(`handleSubmit` の invalid コールバック)でエラーを表示し、最初のエラーフィールドへフォーカスを移す。
 - ヘルプテキスト(未入力時の補足)は `text-xs text-slate-500` でエラーと同じ位置に表示し、エラー発生時はヘルプをエラーに差し替える(同時表示しない)。
 - CSVインポート等のファイル系エラーは行番号付きの一覧表示とし、個別フィールドエラーと視覚的に区別する(赤背景の警告ボックス)。
-
-## 8. モーダル・確認ダイアログ
+- セレクトはネイティブ `<select>` ではなく ARIA 1.2 select-only combobox パターンの自前 listbox(`ui/Select`)で統一する(D-081)。選択中 option へのチェックマーク表示・キーボード操作(矢印/Home/End/Enter/Escape)・外側クリック閉じを備える。制御コンポーネント(`value`/`onChange(value)`)のため、RHF フォームでは `Controller` 経由で接続する。
+- 日付入力はテキスト入力(`YYYY-MM-DD`)+ カレンダーポップオーバーのハイブリッド(`ui/DateField`)で統一する(D-081)。手入力とカレンダー選択の両方を許容し、カレンダーは今日ボタン・月送り・キーボード操作(矢印=日移動 / PageUp・PageDown=月移動)を備える。`register` スプレッド互換(選択時はネイティブ value setter + `input` イベントで RHF へ伝播)。
 
 挙動・発火条件は再定義せず、[screen-design README §0.5](./screen-design/README.md#05-モーダルの共通挙動)(モーダル共通挙動)・[§0.6](./screen-design/README.md#06-確認ダイアログポリシー)(確認ダイアログポリシー)を参照する。見た目の規約のみ以下に定める。
 

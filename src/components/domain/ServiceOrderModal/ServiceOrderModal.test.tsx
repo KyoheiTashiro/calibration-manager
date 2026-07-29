@@ -91,11 +91,14 @@ describe("ServiceOrderModal", () => {
       />,
     );
 
-    expect(screen.getByLabelText("校正依頼先", { exact: false })).toHaveValue(calibratorVendor.id);
+    expect(screen.getByRole("combobox", { name: /校正依頼先/u })).toHaveTextContent(
+      calibratorVendor.name,
+    );
   });
 
-  it("依頼先の選択肢がisCalibrator=trueのVendorのみ", () => {
+  it("依頼先の選択肢がisCalibrator=trueのVendorのみ", async () => {
     seedBaseMasters();
+    const user = userEvent.setup();
     renderWithStore(
       <ServiceOrderModal
         open
@@ -104,6 +107,7 @@ describe("ServiceOrderModal", () => {
       />,
     );
 
+    await user.click(screen.getByRole("combobox", { name: /校正依頼先/u }));
     expect(screen.getByRole("option", { name: calibratorVendor.name })).toBeInTheDocument();
     expect(
       screen.queryByRole("option", { name: manufacturerOnlyVendor.name }),
@@ -180,7 +184,7 @@ describe("ServiceOrderModal", () => {
       "href",
       "/vendors",
     );
-    expect(screen.queryByLabelText("校正依頼先", { exact: false })).not.toBeInTheDocument();
+    expect(screen.queryByRole("combobox", { name: /校正依頼先/u })).not.toBeInTheDocument();
   });
 
   it("校正依頼先未選択のまま「保存」を押すとエラー表示されストアが変化しない", async () => {

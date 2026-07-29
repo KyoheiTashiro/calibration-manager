@@ -13,7 +13,7 @@ export {
   type PageSizeOption,
 } from "@/components/ui/Pagination";
 export { RadioGroup } from "@/components/ui/RadioGroup";
-export { Select } from "@/components/ui/Select";
+export { ControlledSelect, Select } from "@/components/ui/Select";
 export { Table, TableBody, TableHead, Th, Td, activatableRowProps } from "@/components/ui/Table";
 export { Tabs } from "@/components/ui/Tabs";
 export { TextField } from "@/components/ui/TextField";

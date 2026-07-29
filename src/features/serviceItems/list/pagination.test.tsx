@@ -93,7 +93,8 @@ describe("ServiceItemList: ページネーション", () => {
     expect(screen.getByText("定期点検021")).toBeInTheDocument();
 
     // 全件が該当する種別フィルタ(件数は変わらないがURLクエリ=resetKeyは変わる)
-    await user.selectOptions(screen.getByLabelText("種別"), "点検");
+    await user.click(screen.getByRole("combobox", { name: "種別" }));
+    await user.click(screen.getByRole("option", { name: "点検" }));
 
     expect(getBodyRowCount()).toBe(20);
     expect(screen.getByText("定期点検001")).toBeInTheDocument();

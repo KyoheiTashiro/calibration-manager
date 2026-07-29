@@ -76,8 +76,7 @@ export const ImportSection = ({ state }: Props): ReactElement => {
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  const handleKindChange = (event: ChangeEvent<HTMLSelectElement>): void => {
-    const { value } = event.target;
+  const handleKindChange = (value: string): void => {
     if (!isCsvEntityKind(value)) return;
     setKind(value);
     clearSelection();

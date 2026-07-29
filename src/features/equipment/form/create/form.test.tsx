@@ -3,7 +3,7 @@ import { EquipmentCreateForm } from "@/features/equipment/form/create";
 import { EQUIPMENT_STATUS, type Equipment, type Vendor } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
 import { renderWithStore, seedStore, setupStoreIsolation } from "@/test/renderWithStore";
-import { screen, within } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 // なぜ: tsc -b はプロジェクト参照ごとに独立したプログラムのため、vitest.setup.ts
 // （tsconfig.node.json側）の副作用importだけではtsconfig.app.json側の型解決に
@@ -117,7 +117,8 @@ describe("EquipmentCreateForm: 必須エラー", () => {
 });
 
 describe("EquipmentCreateForm: メーカーセレクト", () => {
-  it("isManufacturer=true の Vendor のみ選択肢に表示される", () => {
+  it("isManufacturer=true の Vendor のみ選択肢に表示される", async () => {
+    const user = userEvent.setup();
     seedStore({
       vendors: {
         [mitutoyo.id]: mitutoyo,
@@ -126,10 +127,8 @@ describe("EquipmentCreateForm: メーカーセレクト", () => {
     });
     renderCreateForm();
 
-    const select = screen.getByRole("combobox", { name: "メーカー" });
-    const optionLabels = within(select)
-      .getAllByRole("option")
-      .map((option) => option.textContent);
+    await user.click(screen.getByRole("combobox", { name: "メーカー" }));
+    const optionLabels = screen.getAllByRole("option").map((option) => option.textContent);
     expect(optionLabels).toContain(mitutoyo.name);
     expect(optionLabels).not.toContain(nonManufacturerVendor.name);
   });

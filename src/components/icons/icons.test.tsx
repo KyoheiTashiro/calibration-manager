@@ -1,7 +1,9 @@
 import {
   AlertTriangleIcon,
+  CalendarIcon,
   CartIcon,
   CheckIcon,
+  ChevronDownIcon,
   ClockIcon,
   RefreshIcon,
   TruckAlertIcon,
@@ -20,6 +22,8 @@ const icons: readonly { name: string; Icon: ComponentType<IconProps> }[] = [
   { name: "TruckAlertIcon", Icon: TruckAlertIcon },
   { name: "CheckIcon", Icon: CheckIcon },
   { name: "RefreshIcon", Icon: RefreshIcon },
+  { name: "CalendarIcon", Icon: CalendarIcon },
+  { name: "ChevronDownIcon", Icon: ChevronDownIcon },
 ];
 
 describe.each(icons)("$name", ({ Icon }) => {

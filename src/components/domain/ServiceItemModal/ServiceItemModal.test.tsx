@@ -5,6 +5,7 @@
  */
 
 import { ServiceItemModal } from "@/components/domain/ServiceItemModal";
+import { CYCLE_LABELS } from "@/features/serviceItems/constants";
 import {
   CYCLE,
   EQUIPMENT_STATUS,
@@ -107,7 +108,9 @@ describe("ServiceItemModal: 新規追加", () => {
     expect(screen.getByLabelText("項目名", { exact: false })).toBeInTheDocument();
     expect(screen.getByLabelText("点検")).toBeChecked();
     expect(screen.getByLabelText("校正")).not.toBeChecked();
-    expect(screen.getByLabelText("周期", { exact: false })).toHaveValue(CYCLE.Y1);
+    expect(screen.getByRole("combobox", { name: /周期/u })).toHaveTextContent(
+      CYCLE_LABELS[CYCLE.Y1],
+    );
     expect(screen.getByLabelText("内部")).toBeChecked();
     expect(screen.getByLabelText("外部")).not.toBeChecked();
     expect(screen.getByLabelText("担当者", { exact: false })).toBeInTheDocument();
@@ -155,20 +158,20 @@ describe("ServiceItemModal: 新規追加", () => {
     );
 
     await user.click(screen.getByLabelText("外部"));
-    expect(screen.getByLabelText("校正依頼先", { exact: false })).toBeInTheDocument();
+    expect(screen.getByRole("combobox", { name: /校正依頼先/u })).toBeInTheDocument();
 
-    await user.selectOptions(
-      screen.getByLabelText("校正依頼先", { exact: false }),
-      calibratorVendor.name,
-    );
+    await user.click(screen.getByRole("combobox", { name: /校正依頼先/u }));
+    await user.click(screen.getByRole("option", { name: calibratorVendor.name }));
     await user.type(screen.getByLabelText("納期(日)", { exact: false }), "20");
 
     await user.click(screen.getByLabelText("内部"));
-    expect(screen.queryByLabelText("校正依頼先", { exact: false })).not.toBeInTheDocument();
+    expect(screen.queryByRole("combobox", { name: /校正依頼先/u })).not.toBeInTheDocument();
     expect(screen.queryByLabelText("納期(日)", { exact: false })).not.toBeInTheDocument();
 
     await user.click(screen.getByLabelText("外部"));
-    expect(screen.getByLabelText("校正依頼先", { exact: false })).toHaveValue("");
+    expect(screen.getByRole("combobox", { name: /校正依頼先/u })).toHaveTextContent(
+      "選択してください",
+    );
     expect(screen.getByLabelText("納期(日)", { exact: false })).toHaveValue(null);
   });
 
@@ -209,7 +212,8 @@ describe("ServiceItemModal: 新規追加", () => {
     renderWithStore(<ServiceItemModal open equipmentId={equipment.id} onClose={onClose} />);
 
     await user.type(screen.getByLabelText("項目名", { exact: false }), "床上点検");
-    await user.selectOptions(screen.getByLabelText("担当者", { exact: false }), activePerson.name);
+    await user.click(screen.getByRole("combobox", { name: /担当者/u }));
+    await user.click(screen.getByRole("option", { name: activePerson.name }));
     await user.type(screen.getByLabelText("次回期限", { exact: false }), "2026-08-01");
     await user.click(screen.getByRole("button", { name: "保存" }));
 
@@ -242,15 +246,14 @@ describe("ServiceItemModal: 新規追加", () => {
 
     await user.type(screen.getByLabelText("項目名", { exact: false }), "外部点検校正項目");
     await user.click(screen.getByLabelText("外部"));
-    await user.selectOptions(
-      screen.getByLabelText("校正依頼先", { exact: false }),
-      calibratorVendor.name,
-    );
+    await user.click(screen.getByRole("combobox", { name: /校正依頼先/u }));
+    await user.click(screen.getByRole("option", { name: calibratorVendor.name }));
     await user.type(screen.getByLabelText("納期(日)", { exact: false }), "20");
     const bufferDaysField = screen.getByLabelText("発注余裕日", { exact: false });
     await user.clear(bufferDaysField);
     await user.type(bufferDaysField, "7");
-    await user.selectOptions(screen.getByLabelText("担当者", { exact: false }), activePerson.name);
+    await user.click(screen.getByRole("combobox", { name: /担当者/u }));
+    await user.click(screen.getByRole("option", { name: activePerson.name }));
     await user.type(screen.getByLabelText("次回期限", { exact: false }), "2026-08-01");
     await user.click(screen.getByRole("button", { name: "保存" }));
 
@@ -273,13 +276,13 @@ describe("ServiceItemModal: 新規追加", () => {
 
     await user.type(screen.getByLabelText("項目名", { exact: false }), "校正項目");
     await user.click(screen.getByLabelText("校正"));
-    await user.selectOptions(screen.getByLabelText("周期", { exact: false }), CYCLE.M3);
+    await user.click(screen.getByRole("combobox", { name: /周期/u }));
+    await user.click(screen.getByRole("option", { name: CYCLE_LABELS[CYCLE.M3] }));
     await user.click(screen.getByLabelText("外部"));
-    await user.selectOptions(
-      screen.getByLabelText("校正依頼先", { exact: false }),
-      calibratorVendor.name,
-    );
-    await user.selectOptions(screen.getByLabelText("担当者", { exact: false }), activePerson.name);
+    await user.click(screen.getByRole("combobox", { name: /校正依頼先/u }));
+    await user.click(screen.getByRole("option", { name: calibratorVendor.name }));
+    await user.click(screen.getByRole("combobox", { name: /担当者/u }));
+    await user.click(screen.getByRole("option", { name: activePerson.name }));
     await user.type(screen.getByLabelText("次回期限", { exact: false }), "2026-08-01");
     await user.click(screen.getByRole("button", { name: "保存" }));
 
@@ -310,10 +313,12 @@ describe("ServiceItemModal: 編集", () => {
     expect(screen.getByLabelText("項目名", { exact: false })).toHaveValue("年次校正");
     expect(screen.getByLabelText("校正")).toBeChecked();
     expect(screen.getByLabelText("外部")).toBeChecked();
-    expect(screen.getByLabelText("校正依頼先", { exact: false })).toHaveValue(calibratorVendor.id);
+    expect(screen.getByRole("combobox", { name: /校正依頼先/u })).toHaveTextContent(
+      calibratorVendor.name,
+    );
     expect(screen.getByLabelText("納期(日)", { exact: false })).toHaveValue(20);
     expect(screen.getByLabelText("発注余裕日", { exact: false })).toHaveValue(10);
-    expect(screen.getByLabelText("担当者", { exact: false })).toHaveValue(activePerson.id);
+    expect(screen.getByRole("combobox", { name: /担当者/u })).toHaveTextContent(activePerson.name);
     expect(screen.getByLabelText("通知開始日数", { exact: false })).toHaveValue(25);
     expect(screen.getByLabelText("次回期限", { exact: false })).toHaveValue("2026-06-01");
     expect(screen.getByLabelText("期限管理の対象にする")).toBeChecked();
@@ -371,8 +376,9 @@ describe("ServiceItemModal: 編集", () => {
     });
   });
 
-  it("D-012: 現担当が無効化済みの項目を編集すると「(無効)」付きで選択肢に現れ、他の無効担当者は現れない", () => {
+  it("D-012: 現担当が無効化済みの項目を編集すると「(無効)」付きで選択肢に現れ、他の無効担当者は現れない", async () => {
     seedBaseMasters();
+    const user = userEvent.setup();
     seedStore({
       persons: {
         [activePerson.id]: activePerson,
@@ -397,11 +403,13 @@ describe("ServiceItemModal: 編集", () => {
       />,
     );
 
-    const personSelect = screen.getByLabelText("担当者", { exact: false });
+    const personSelect = screen.getByRole("combobox", { name: /担当者/u });
+    expect(personSelect).toHaveTextContent("鈴木(無効)");
+
+    await user.click(personSelect);
     expect(screen.getByRole("option", { name: "鈴木(無効)" })).toBeInTheDocument();
-    expect(personSelect).toHaveValue(inactivePerson.id);
-    expect(screen.queryByText("佐藤(無効)")).not.toBeInTheDocument();
-    expect(screen.queryByText("佐藤")).not.toBeInTheDocument();
+    expect(screen.queryByRole("option", { name: "佐藤(無効)" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("option", { name: "佐藤" })).not.toBeInTheDocument();
   });
 });
 

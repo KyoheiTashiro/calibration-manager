@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMemo } from "react";
 import {
   useForm,
+  type Control,
   type FieldErrors,
   type UseFormHandleSubmit,
   type UseFormRegister,
@@ -24,6 +25,7 @@ type UseEquipmentFormCoreParams = {
 type UseEquipmentFormCoreResult = {
   register: UseFormRegister<FormType>;
   errors: FieldErrors<FormType>;
+  control: Control<FormType>;
   handleSubmit: UseFormHandleSubmit<FormType>;
   manufacturerOptions: SelectOption[];
 };
@@ -57,6 +59,7 @@ export const useEquipmentFormCore = ({
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors },
   } = useForm<FormType>({
     resolver,
@@ -69,5 +72,5 @@ export const useEquipmentFormCore = ({
     .toSorted((left, right) => left.name.localeCompare(right.name, "ja"))
     .map((vendor) => ({ value: vendor.id, label: vendor.name }));
 
-  return { register, errors, handleSubmit, manufacturerOptions };
+  return { register, errors, control, handleSubmit, manufacturerOptions };
 };

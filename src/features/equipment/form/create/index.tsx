@@ -5,7 +5,7 @@ import { createFormSubmitHandler } from "@/utils/form";
 import type { ReactElement } from "react";
 
 export const EquipmentCreateForm = (): ReactElement => {
-  const { register, errors, onFormSubmit, manufacturerOptions, handleCancel } =
+  const { register, errors, control, onFormSubmit, manufacturerOptions, handleCancel } =
     useCreateEquipmentForm();
 
   return (
@@ -23,6 +23,7 @@ export const EquipmentCreateForm = (): ReactElement => {
         <EquipmentFormFields
           register={register}
           errors={errors}
+          control={control}
           manufacturerOptions={manufacturerOptions}
         />
 

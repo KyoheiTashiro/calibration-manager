@@ -5,6 +5,7 @@ import {
   isIsoDateString,
   parseIsoDate,
   todayIsoDate,
+  weekdayOf,
 } from "@/utils/time";
 import { describe, expect, it } from "vitest";
 
@@ -94,6 +95,20 @@ describe("addDays", () => {
 
   it("不正な日付は null（例外を投げない）", () => {
     expect(addDays("2026-02-30", 1)).toBeNull();
+  });
+});
+
+describe("weekdayOf", () => {
+  it("日曜は0を返す", () => {
+    expect(weekdayOf(2026, 7, 26)).toBe(0);
+  });
+
+  it("土曜は6を返す", () => {
+    expect(weekdayOf(2026, 8, 1)).toBe(6);
+  });
+
+  it("閏日の曜日を正しく返す", () => {
+    expect(weekdayOf(2024, 2, 29)).toBe(4);
   });
 });
 

@@ -24,3 +24,14 @@ if (typeof HTMLDialogElement.prototype.showModal !== "function") {
 if (typeof HTMLDialogElement.prototype.close !== "function") {
   HTMLDialogElement.prototype.close = polyfillClose;
 }
+
+const polyfillScrollIntoView = function polyfillScrollIntoView(): void {
+  // テスト用スタブ(何もしない)
+};
+
+// jsdomは scrollIntoView 未実装のため、Select(components/ui/Select)のオプションフォーカス時の
+// 呼び出しなどで例外にならないようスタブ化する。Select使用箇所が全画面に及ぶため、
+// 個別テストファイルへの重複した beforeAll スタブではなくここに一本化する。
+if (typeof Element.prototype.scrollIntoView !== "function") {
+  Element.prototype.scrollIntoView = polyfillScrollIntoView;
+}

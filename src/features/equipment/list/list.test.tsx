@@ -167,7 +167,8 @@ describe("EquipmentList: 非稼働機器の期限", () => {
 
     expect(screen.queryByText("EQ-004")).not.toBeInTheDocument();
 
-    await user.selectOptions(screen.getByLabelText("状態"), "全て");
+    await user.click(screen.getByRole("combobox", { name: "状態" }));
+    await user.click(screen.getByRole("option", { name: "全て" }));
     const row = screen.getByRole("row", { name: /EQ-004/u });
     expect(dueDateCellOf(row)).toHaveTextContent("—");
   });
@@ -208,7 +209,8 @@ describe("EquipmentList: 状態フィルタ", () => {
     expect(screen.getByText("EQ-001")).toBeInTheDocument();
     expect(screen.queryByText("EQ-004")).not.toBeInTheDocument();
 
-    await user.selectOptions(screen.getByLabelText("状態"), "全て");
+    await user.click(screen.getByRole("combobox", { name: "状態" }));
+    await user.click(screen.getByRole("option", { name: "全て" }));
 
     expect(screen.getByText("EQ-001")).toBeInTheDocument();
     expect(screen.getByText("EQ-004")).toBeInTheDocument();

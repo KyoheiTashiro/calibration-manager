@@ -1,4 +1,5 @@
 import { ROUTES, equipmentEditPath } from "@/constants/routes";
+import { EQUIPMENT_STATUS_LABELS } from "@/features/equipment/constants";
 import { EquipmentEditForm } from "@/features/equipment/form/edit";
 import { EQUIPMENT_STATUS, type Equipment, type Vendor } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
@@ -128,9 +129,9 @@ describe("EquipmentEditForm: 廃棄確認ダイアログ", () => {
     });
     renderEditForm(existingEquipment.id);
 
-    await user.selectOptions(
-      screen.getByLabelText("状態", { exact: false }),
-      EQUIPMENT_STATUS.RETIRED,
+    await user.click(screen.getByRole("combobox", { name: /^状態/u }));
+    await user.click(
+      screen.getByRole("option", { name: EQUIPMENT_STATUS_LABELS[EQUIPMENT_STATUS.RETIRED] }),
     );
     await user.click(screen.getByRole("button", { name: "保存" }));
 
@@ -155,9 +156,9 @@ describe("EquipmentEditForm: 廃棄確認ダイアログ", () => {
     });
     renderEditForm(existingEquipment.id);
 
-    await user.selectOptions(
-      screen.getByLabelText("状態", { exact: false }),
-      EQUIPMENT_STATUS.RETIRED,
+    await user.click(screen.getByRole("combobox", { name: /^状態/u }));
+    await user.click(
+      screen.getByRole("option", { name: EQUIPMENT_STATUS_LABELS[EQUIPMENT_STATUS.RETIRED] }),
     );
     await user.click(screen.getByRole("button", { name: "保存" }));
 

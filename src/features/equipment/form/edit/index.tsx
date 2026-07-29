@@ -11,6 +11,7 @@ export const EquipmentEditForm = (): ReactElement => {
     shouldRedirectToList,
     register,
     errors,
+    control,
     onFormSubmit,
     manufacturerOptions,
     retireConfirmOpen,
@@ -38,6 +39,7 @@ export const EquipmentEditForm = (): ReactElement => {
         <EquipmentFormFields
           register={register}
           errors={errors}
+          control={control}
           manufacturerOptions={manufacturerOptions}
         />
 

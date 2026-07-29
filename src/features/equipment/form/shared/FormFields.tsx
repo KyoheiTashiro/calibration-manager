@@ -1,20 +1,22 @@
-import { Select, Textarea, TextField } from "@/components/ui";
+import { ControlledSelect, Textarea, TextField } from "@/components/ui";
 import { ROUTES } from "@/constants/routes";
 import { statusOptions, type SelectOption } from "@/features/equipment/form/shared/mapping";
 import type { FormType } from "@/features/equipment/form/shared/schema";
 import type { ReactElement } from "react";
-import type { FieldErrors, UseFormRegister } from "react-hook-form";
+import type { Control, FieldErrors, UseFormRegister } from "react-hook-form";
 import { Link } from "react-router-dom";
 
 type Props = {
   register: UseFormRegister<FormType>;
   errors: FieldErrors<FormType>;
+  control: Control<FormType>;
   manufacturerOptions: SelectOption[];
 };
 
 export const EquipmentFormFields = ({
   register,
   errors,
+  control,
   manufacturerOptions,
 }: Props): ReactElement => (
   <>
@@ -38,21 +40,23 @@ export const EquipmentFormFields = ({
         </p>
       </div>
     ) : (
-      <Select
+      <ControlledSelect
+        control={control}
+        name="manufacturerId"
         label="メーカー"
         placeholder="選択してください"
         options={manufacturerOptions}
         error={errors.manufacturerId?.message}
-        {...register("manufacturerId")}
       />
     )}
     <TextField label="設置場所" error={errors.location?.message} {...register("location")} />
-    <Select
+    <ControlledSelect
+      control={control}
+      name="status"
       label="状態"
       required
       options={statusOptions}
       error={errors.status?.message}
-      {...register("status")}
     />
     <Textarea label="備考" error={errors.note?.message} {...register("note")} />
   </>

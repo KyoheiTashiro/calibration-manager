@@ -1,5 +1,6 @@
 import { ArrowUpIcon, CloseIcon, MenuIcon } from "@/components/icons";
-import { useEffect, useRef, useState, type ReactElement, type RefObject } from "react";
+import { useOutsideClick } from "@/components/ui/hooks/useOutsideClick";
+import { useEffect, useRef, useState, type ReactElement } from "react";
 
 type TocSection = { id: string; title: string };
 
@@ -9,51 +10,32 @@ type TocFabProps = {
   topSection: TocSection;
 };
 
-/* なぜ pointerdown + keydown か: AppLayout のオーバーレイと同じく、外側クリックとEscの
-   両方で閉じる必要があるため。開いている間だけ購読し、閉じたら必ず解除する。 */
-const useCloseOnOutsideInteraction = (
-  isOpen: boolean,
-  containerRef: RefObject<HTMLDivElement | null>,
-  onClose: () => void,
-): void => {
-  useEffect(() => {
-    if (!isOpen) {
-      return (): void => {
-        // 非表示時はイベント購読していないため後始末は不要
-      };
-    }
-
-    const handlePointerDown = (event: PointerEvent): void => {
-      if (
-        containerRef.current &&
-        event.target instanceof Node &&
-        !containerRef.current.contains(event.target)
-      ) {
-        onClose();
-      }
-    };
-    const handleKeyDown = (event: KeyboardEvent): void => {
-      if (event.key === "Escape") {
-        onClose();
-      }
-    };
-
-    document.addEventListener("pointerdown", handlePointerDown);
-    document.addEventListener("keydown", handleKeyDown);
-    return (): void => {
-      document.removeEventListener("pointerdown", handlePointerDown);
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [isOpen, containerRef, onClose]);
-};
-
 export const TocFab = ({ sections, topSection }: TocFabProps): ReactElement => {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  useCloseOnOutsideInteraction(isOpen, containerRef, () => {
-    setIsOpen(false);
-  });
+  useOutsideClick(
+    containerRef,
+    () => {
+      setIsOpen(false);
+    },
+    isOpen,
+  );
+
+  // なぜ Escape だけ別購読か: AppLayout のオーバーレイと同様、外側クリックに加えEscでも
+  // 閉じる必要があるため。開いている間だけ購読し、閉じたら必ず解除する。
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (event: KeyboardEvent): void => {
+      if (event.key === "Escape") {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return (): void => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isOpen]);
 
   const handleSectionClick = (id: string): void => {
     document.querySelector(`#${id}`)?.scrollIntoView({ behavior: "smooth" });

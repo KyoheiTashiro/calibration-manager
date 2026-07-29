@@ -7,7 +7,7 @@
  */
 
 import { defaultValues, Schema, type FormType } from "@/components/domain/ServiceOrderModal/schema";
-import { Button, DateField, Modal, Select, TextField } from "@/components/ui";
+import { Button, ControlledSelect, DateField, Modal, TextField } from "@/components/ui";
 import { ROUTES } from "@/constants/routes";
 import { useAppStore } from "@/store/useAppStore";
 import { createSaveHandler, emptyToUndefined } from "@/utils/form";
@@ -41,6 +41,7 @@ export const ServiceOrderModal = ({ open, serviceItemId, onClose }: Props): Reac
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors, isDirty },
   } = useForm<FormType>({
     resolver: zodResolver(Schema),
@@ -110,13 +111,14 @@ export const ServiceOrderModal = ({ open, serviceItemId, onClose }: Props): Reac
             </p>
           </div>
         ) : (
-          <Select
+          <ControlledSelect
+            control={control}
+            name="vendorId"
             label="校正依頼先"
             required
             placeholder="選択してください"
             options={vendorOptions}
             error={errors.vendorId?.message}
-            {...register("vendorId")}
           />
         )}
         <DateField label="返却予定日" error={errors.dueDate?.message} {...register("dueDate")} />

@@ -5,6 +5,7 @@ import { buildPageItems, ELLIPSIS } from "@/components/ui/Pagination/pageItems";
 // jest-domのmatcher拡張が伝播しない。テストファイル側でも明示的にimportし型を解決する。
 import "@testing-library/jest-dom/vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
 describe("Pagination", () => {
@@ -208,7 +209,8 @@ describe("Pagination", () => {
     expect(handlePageChange).toHaveBeenCalledWith(4);
   });
 
-  it("表示件数セレクタを変更すると onPageSizeChange が数値で呼ばれる", () => {
+  it("表示件数セレクタを変更すると onPageSizeChange が数値で呼ばれる", async () => {
+    const user = userEvent.setup();
     const handlePageSizeChange = vi.fn<() => void>();
     render(
       <Pagination
@@ -220,8 +222,8 @@ describe("Pagination", () => {
       />,
     );
 
-    const select = screen.getByRole("combobox", { name: "1ページの表示件数" });
-    fireEvent.change(select, { target: { value: "50" } });
+    await user.click(screen.getByRole("combobox", { name: "1ページの表示件数" }));
+    await user.click(screen.getByRole("option", { name: "50件" }));
 
     expect(handlePageSizeChange).toHaveBeenCalledTimes(1);
     expect(handlePageSizeChange).toHaveBeenCalledWith(50);
