@@ -16,6 +16,7 @@ const manufacturerVendor: Vendor = {
   isCalibrator: true,
   contactPerson: "山田",
   phone: "03-1111-2222",
+  email: "yamada@mitutoyo.example.jp",
   standardLeadTimeDays: 30,
 };
 
@@ -52,11 +53,12 @@ describe("VendorList: 一覧表示", () => {
     expect(within(mitutoyoRow).getByText("30日")).toBeInTheDocument();
     expect(within(mitutoyoRow).getByText("山田")).toBeInTheDocument();
     expect(within(mitutoyoRow).getByText("03-1111-2222")).toBeInTheDocument();
+    expect(within(mitutoyoRow).getByText("yamada@mitutoyo.example.jp")).toBeInTheDocument();
 
     const nihonSokkiRow = screen.getByRole("row", { name: /日本測器/u });
     expect(within(nihonSokkiRow).getByText("校正業者")).toBeInTheDocument();
     expect(within(nihonSokkiRow).queryByText("メーカー")).not.toBeInTheDocument();
-    expect(within(nihonSokkiRow).getAllByText("—")).toHaveLength(3);
+    expect(within(nihonSokkiRow).getAllByText("—")).toHaveLength(4);
   });
 });
 
@@ -132,7 +134,7 @@ describe("VendorList: 検索", () => {
     expect(screen.queryByRole("row", { name: /ミツトヨ/u })).not.toBeInTheDocument();
   });
 
-  it("窓口担当者・電話番号での一致も検索対象になる", async () => {
+  it("窓口担当者・電話番号・メールでの一致も検索対象になる", async () => {
     const user = userEvent.setup();
     seedStore({
       vendors: {
@@ -148,6 +150,11 @@ describe("VendorList: 検索", () => {
 
     await user.clear(screen.getByLabelText("検索", { exact: false }));
     await user.type(screen.getByLabelText("検索", { exact: false }), "03-1111-2222");
+    expect(screen.getByRole("row", { name: /ミツトヨ/u })).toBeInTheDocument();
+    expect(screen.queryByRole("row", { name: /日本測器/u })).not.toBeInTheDocument();
+
+    await user.clear(screen.getByLabelText("検索", { exact: false }));
+    await user.type(screen.getByLabelText("検索", { exact: false }), "yamada@mitutoyo");
     expect(screen.getByRole("row", { name: /ミツトヨ/u })).toBeInTheDocument();
     expect(screen.queryByRole("row", { name: /日本測器/u })).not.toBeInTheDocument();
   });

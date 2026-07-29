@@ -10,7 +10,7 @@ import { useMemo, useState } from "react";
 
 const matchesSearch = (vendor: Vendor, normalizedSearch: string): boolean => {
   if (normalizedSearch === "") return true;
-  const haystack = [vendor.name, vendor.contactPerson ?? "", vendor.phone ?? ""]
+  const haystack = [vendor.name, vendor.contactPerson ?? "", vendor.phone ?? "", vendor.email ?? ""]
     .join("\n")
     .toLowerCase();
   return haystack.includes(normalizedSearch);

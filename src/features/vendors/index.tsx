@@ -59,7 +59,7 @@ export const VendorList = (): ReactElement => {
           <div className="w-1/2 min-w-64">
             <TextField
               label="検索"
-              placeholder="名称/窓口/連絡先で検索"
+              placeholder="名称/窓口担当者/電話/メールで検索"
               value={searchText}
               onChange={(event) => {
                 setSearchText(event.target.value);
@@ -76,8 +76,9 @@ export const VendorList = (): ReactElement => {
                   <Th>名称</Th>
                   <Th>種別</Th>
                   <Th align="right">標準納期</Th>
-                  <Th>窓口</Th>
-                  <Th>連絡先</Th>
+                  <Th>窓口担当者</Th>
+                  <Th>電話</Th>
+                  <Th>メール</Th>
                   <Th>操作</Th>
                 </tr>
               </TableHead>
@@ -95,6 +96,7 @@ export const VendorList = (): ReactElement => {
                     </Td>
                     <Td>{vendor.contactPerson ?? "—"}</Td>
                     <Td>{vendor.phone ?? "—"}</Td>
+                    <Td>{vendor.email ?? "—"}</Td>
                     {/* なぜ td 直下に Button を並べるか: div でラップして1階層深くすると
                         jsx-a11y(control-has-associated-label) の既定探索深度(2)を超えて
                         ボタン内テキストを検出できず誤検知するため、td を flex コンテナ化して
