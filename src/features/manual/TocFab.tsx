@@ -25,13 +25,14 @@ export const TocFab = ({ sections, topSection }: TocFabProps): ReactElement => {
   // なぜ Escape だけ別購読か: AppLayout のオーバーレイと同様、外側クリックに加えEscでも
   // 閉じる必要があるため。開いている間だけ購読し、閉じたら必ず解除する。
   useEffect(() => {
-    if (!isOpen) return;
     const handleKeyDown = (event: KeyboardEvent): void => {
       if (event.key === "Escape") {
         setIsOpen(false);
       }
     };
-    document.addEventListener("keydown", handleKeyDown);
+    if (isOpen) {
+      document.addEventListener("keydown", handleKeyDown);
+    }
     return (): void => {
       document.removeEventListener("keydown", handleKeyDown);
     };

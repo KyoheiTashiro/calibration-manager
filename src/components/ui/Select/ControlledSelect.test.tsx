@@ -48,7 +48,12 @@ const Harness = ({
 
 describe("ControlledSelect", () => {
   it("form の初期値が Select に表示される", () => {
-    render(<Harness defaultValues={{ vendorId: "vendorB" }} onValidSubmit={vi.fn()} />);
+    render(
+      <Harness
+        defaultValues={{ vendorId: "vendorB" }}
+        onValidSubmit={vi.fn<(values: FormValues) => void>()}
+      />,
+    );
 
     expect(screen.getByRole("combobox", { name: "取引先" })).toHaveTextContent("取引先B");
   });
@@ -69,7 +74,7 @@ describe("ControlledSelect", () => {
   });
 
   it('field.value が undefined のとき value="" として扱われ placeholder が表示される', () => {
-    render(<Harness defaultValues={{}} onValidSubmit={vi.fn()} />);
+    render(<Harness defaultValues={{}} onValidSubmit={vi.fn<(values: FormValues) => void>()} />);
 
     expect(screen.getByRole("combobox", { name: "取引先" })).toHaveTextContent("選択してください");
   });
