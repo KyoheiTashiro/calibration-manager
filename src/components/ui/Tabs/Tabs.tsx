@@ -4,7 +4,7 @@ type Props = {
   tabs: readonly { key: string; label: string }[];
   activeKey: string;
   onChange: (key: string) => void;
-  // タブバー右端に置く操作要素(例: 通知センターの「全て既読」)。
+  // タブバー右端に置く操作要素(例: 通知一覧の「全て既読」)。
   // role=tablist の外に置き、tab 以外の子を tablist に含めない(ARIA仕様)
   actions?: ReactNode;
 };

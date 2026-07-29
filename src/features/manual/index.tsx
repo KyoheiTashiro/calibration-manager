@@ -262,7 +262,7 @@ export const Manual = (): ReactElement => {
           <p>
             対応が必要になった点検校正項目・点検校正外部案件については、
             <Link to={ROUTES.NOTIFICATION_LIST} className="text-primary mx-1 underline">
-              通知センター
+              通知一覧
             </Link>
             に次の5種類の通知が自動で作られます。
           </p>

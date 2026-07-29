@@ -191,7 +191,7 @@ describe("Manual", () => {
     expect(screen.getByRole("link", { name: "機器一覧" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "機器一覧・機器詳細" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "通知" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "通知センター" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "通知一覧" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "設定" })).toBeInTheDocument();
 
     expect(screen.getAllByRole("link", { name: "点検校正項目一覧" }).length).toBeGreaterThanOrEqual(

@@ -18,7 +18,7 @@ export const NotificationList = ({ notifications }: Props): ReactElement => (
     <div className="flex items-center justify-between">
       <h2 className="text-lg font-semibold">最新の通知</h2>
       <Link to={ROUTES.NOTIFICATION_LIST} className="text-primary text-sm underline">
-        通知センターへ
+        通知一覧へ
       </Link>
     </div>
     {notifications.length === 0 ? (

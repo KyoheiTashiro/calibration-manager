@@ -36,7 +36,7 @@ const renderDashboardWithRoutes = (): void => {
       <Route path={ROUTES.DASHBOARD} element={<Dashboard />} />
       <Route path={ROUTES.SERVICE_ITEM_LIST} element={<DummyServiceItemList />} />
       <Route path={ROUTES.EQUIPMENT_DETAIL} element={<DummyEquipmentDetail />} />
-      <Route path={ROUTES.NOTIFICATION_LIST} element={<p>通知センター画面</p>} />
+      <Route path={ROUTES.NOTIFICATION_LIST} element={<p>通知一覧画面</p>} />
     </Routes>,
     { initialEntries: [ROUTES.DASHBOARD] },
   );
@@ -217,14 +217,14 @@ describe("Dashboard: 最新の通知", () => {
     expect(badge).not.toHaveAttribute("aria-hidden");
   });
 
-  it("「通知センターへ」で通知センターへ遷移する", async () => {
+  it("「通知一覧へ」で通知一覧へ遷移する", async () => {
     const user = userEvent.setup();
     seedStore({ notifications: { [overdueNotification.id]: overdueNotification } });
     renderDashboardWithRoutes();
 
-    await user.click(screen.getByRole("link", { name: "通知センターへ" }));
+    await user.click(screen.getByRole("link", { name: "通知一覧へ" }));
 
-    expect(screen.getByText("通知センター画面")).toBeInTheDocument();
+    expect(screen.getByText("通知一覧画面")).toBeInTheDocument();
   });
 });
 

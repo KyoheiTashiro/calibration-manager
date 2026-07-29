@@ -18,7 +18,7 @@
 - **共通レイアウト**:
   - 左サイドバーナビゲーション(全ルートへのリンク)。リンクラベルは画面見出しの「一覧」を省いた短縮表記(「機器」「点検校正項目」等。D-083)。
   - ヘッダー: アプリ名、右端に通知ベルアイコン + 未読件数バッジ(未読0のときバッジ非表示)。ベルクリックで `/notifications` へ遷移。
-  - 画面タイトル(h1)は表示しない(D-088)。現在地はサイドバーの選択状態で示す。例外: 利用マニュアル(長文ドキュメントで「ページ上部へ戻る」(D-067)のスクロール先が h1)と、機器詳細・機器フォーム等の内容を伴う見出し(機器名など)は維持。一覧画面の追加ボタンは検索・フィルタ行の右端に置き、通知センターの「全て既読」はタブバー右端(Tabs の actions スロット)に置く。
+  - 画面タイトル(h1)は表示しない(D-088)。現在地はサイドバーの選択状態で示す。例外: 利用マニュアル(長文ドキュメントで「ページ上部へ戻る」(D-067)のスクロール先が h1)と、機器詳細・機器フォーム等の内容を伴う見出し(機器名など)は維持。一覧画面の追加ボタンは検索・フィルタ行の右端に置き、通知一覧の「全て既読」はタブバー右端(Tabs の actions スロット)に置く。
   - モバイル幅ではサイドバーをハンバーガーメニューに畳む(オーバーレイ表示)。
 
 ```
@@ -50,7 +50,7 @@
 | `/service-orders`             | 点検校正外部案件(ボード) | [§8](./08-service-orders.md)           |                                    |
 | `/vendors`            | メーカー/取引先マスタ      | [§9](./09-masters.md)          |                                    |
 | `/persons`            | 担当者マスタ               | [§9](./09-masters.md)          |                                    |
-| `/notifications`      | 通知センター               | [§10](./10-notifications.md)   |                                    |
+| `/notifications`      | 通知一覧               | [§10](./10-notifications.md)   |                                    |
 | `/settings`           | 設定                       | [§11](./11-settings.md)        |                                    |
 | `/manual`             | 利用マニュアル             | [§12](./12-manual.md)          |                                    |
 
@@ -65,7 +65,7 @@
 - [7. 実施記録登録モーダル](./07-service-record-modal.md)
 - [8. 点検校正外部案件](./08-service-orders.md)
 - [9. マスタ管理(メーカー/取引先・担当者)](./09-masters.md)
-- [10. 通知センター](./10-notifications.md)
+- [10. 通知一覧](./10-notifications.md)
 - [11. 設定](./11-settings.md)
 - [12. 利用マニュアル](./12-manual.md)
 
@@ -112,7 +112,7 @@
 
 一覧画面の表示件数増加に備え、共通のページネーションを導入する。単一の共通コンポーネント(例: `src/components/ui/Pagination`)に集約し、全対象画面がこれを利用する。
 
-- **対象画面**: 機器一覧([§2](./02-equipment-list.md))、点検校正項目一覧([§5](./05-service-item-list.md))、メーカー/取引先・担当者マスタ([§9](./09-masters.md))、通知センター([§10](./10-notifications.md)。未読/既読の各タブ)、機器詳細([§4](./04-equipment-detail.md))内の点検校正項目・実施記録テーブル(各テーブルに個別適用。D-078)。
+- **対象画面**: 機器一覧([§2](./02-equipment-list.md))、点検校正項目一覧([§5](./05-service-item-list.md))、メーカー/取引先・担当者マスタ([§9](./09-masters.md))、通知一覧([§10](./10-notifications.md)。未読/既読の各タブ)、機器詳細([§4](./04-equipment-detail.md))内の点検校正項目・実施記録テーブル(各テーブルに個別適用。D-078)。
 - **対象外**: ダッシュボード(サマリー表示)、点検校正外部案件ボード([§8](./08-service-orders.md)。かんばん列単位の表示)。
 - **方式**: クライアントサイドのページ番号方式。検索・フィルタ・タブ・並び順を適用した**後**の結果リストをページ分割する。
 - **1ページ件数**: 既定 20 件。セレクタで 10 / 20 / 50 件から選択可(画面ローカル state、非永続)。
@@ -143,7 +143,7 @@
 ```mermaid
 flowchart TD
     Dash[ダッシュボード /] -->|サマリーカード| ServiceItems[点検校正項目一覧 /service-items]
-    Dash -->|通知| Notice[通知センター /notifications]
+    Dash -->|通知| Notice[通知一覧 /notifications]
     Sidebar((サイドバー)) --> Dash & EqList[機器一覧 /equipment] & ServiceItems & Orders[案件一覧 /service-orders] & Vendors[メーカー /vendors] & Persons[担当者 /persons] & Notice & Settings[設定 /settings] & Manual[利用マニュアル /manual]
     EqList -->|行クリック| EqDetail[機器詳細 /equipment/:id]
     EqList -->|追加| EqCreate[機器登録 /equipment/create]
