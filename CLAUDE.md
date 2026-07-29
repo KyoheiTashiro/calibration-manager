@@ -23,6 +23,7 @@
 - `npm run lint` エラー0
 - `npx vitest run` 全緑(新規コードはテスト同時作成)
 - 上記が通らない状態で「完了」と報告しない
+- 例外: 質問回答のみ・docs / Markdown のみの変更で `src/` 等のコードに触れていない場合、tsc / lint / vitest は不要
 
 ## 規約要点
 
