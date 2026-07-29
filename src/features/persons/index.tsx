@@ -1,5 +1,16 @@
 import { PersonModal } from "@/components/domain/PersonModal";
-import { Badge, Button, EmptyState, Table, TableBody, TableHead, Td, Th } from "@/components/ui";
+import {
+  Badge,
+  Button,
+  EmptyState,
+  Pagination,
+  Table,
+  TableBody,
+  TableHead,
+  Td,
+  Th,
+  usePagination,
+} from "@/components/ui";
 import { usePersonList } from "@/features/persons/hooks";
 import type { Person } from "@/store/types";
 import { useEntityModal } from "@/utils/modal";
@@ -12,6 +23,8 @@ const INACTIVE_BADGE_CLASS_NAME = "bg-slate-100 text-slate-600";
 /** 物理削除は行わず、モーダル内の「有効」チェックボックストグルで無効化する。 */
 export const PersonList = (): ReactElement => {
   const sortedPersons = usePersonList();
+  const { page, pageSize, totalCount, pagedItems, setPage, setPageSize } =
+    usePagination(sortedPersons);
   const { modalState, handleAddClick, handleEditClick, handleModalClose } =
     useEntityModal<Person>();
 
@@ -39,7 +52,7 @@ export const PersonList = (): ReactElement => {
             </tr>
           </TableHead>
           <TableBody>
-            {sortedPersons.map((person) => (
+            {pagedItems.map((person) => (
               <tr key={person.id}>
                 <Td>{person.name}</Td>
                 <Td>{person.department ?? "—"}</Td>
@@ -68,6 +81,16 @@ export const PersonList = (): ReactElement => {
             ))}
           </TableBody>
         </Table>
+      )}
+
+      {sortedPersons.length > 0 && (
+        <Pagination
+          page={page}
+          pageSize={pageSize}
+          totalCount={totalCount}
+          onPageChange={setPage}
+          onPageSizeChange={setPageSize}
+        />
       )}
 
       <PersonModal open={modalState.open} person={modalState.entity} onClose={handleModalClose} />

@@ -2,8 +2,8 @@ import { ServiceItemModal, ServiceRecordModal } from "@/components/domain";
 import { Button } from "@/components/ui";
 import { ROUTES, equipmentEditPath } from "@/constants/routes";
 import { EquipmentInfoCard } from "@/features/equipment/detail/components/EquipmentInfoCard";
-import { ServiceItemTable } from "@/features/equipment/detail/components/ServiceItemTable";
-import { ServiceRecordTable } from "@/features/equipment/detail/components/ServiceRecordTable";
+import { ServiceItemSection } from "@/features/equipment/detail/components/ServiceItemSection";
+import { ServiceRecordSection } from "@/features/equipment/detail/components/ServiceRecordSection";
 import {
   historyRowsOf,
   sortedServiceItemsOf,
@@ -81,7 +81,7 @@ export const EquipmentDetail = (): ReactElement => {
           <Button onClick={handleAddServiceItemClick}>+ 項目を追加</Button>
         </div>
 
-        <ServiceItemTable
+        <ServiceItemSection
           serviceItems={serviceItemList}
           equipmentStatus={currentEquipment.status}
           serviceOrders={serviceOrders}
@@ -99,7 +99,7 @@ export const EquipmentDetail = (): ReactElement => {
       <div className="flex flex-col gap-2">
         <h2 className="text-lg font-semibold">実施記録</h2>
 
-        <ServiceRecordTable serviceRecordRows={serviceRecordRows} />
+        <ServiceRecordSection serviceRecordRows={serviceRecordRows} />
       </div>
 
       {modal?.kind === MODAL_KIND.ADD ? (

@@ -1,4 +1,4 @@
-import { Badge, Button, EmptyState, Tabs } from "@/components/ui";
+import { Badge, Button, EmptyState, Pagination, Tabs, usePagination } from "@/components/ui";
 import {
   NOTIFICATION_TYPE_BADGE_CLASSES,
   NOTIFICATION_TYPE_ICONS,
@@ -28,6 +28,10 @@ export const NotificationCenter = (): ReactElement => {
   const [activeTab, setActiveTab] = useState<NotificationTab>(NOTIFICATION_TAB.UNREAD);
 
   const rows = selectTabNotifications(Object.values(notifications), activeTab);
+  const { page, pageSize, totalCount, pagedItems, setPage, setPageSize } = usePagination(
+    rows,
+    activeTab,
+  );
 
   const handleRowClick = (notification: Notification): void => {
     markAsRead(notification.id);
@@ -72,7 +76,7 @@ export const NotificationCenter = (): ReactElement => {
         <EmptyState message={emptyMessage} />
       ) : (
         <ul className="flex flex-col divide-y divide-slate-200 border-b border-slate-200">
-          {rows.map((notification) => {
+          {pagedItems.map((notification) => {
             const TypeIcon = NOTIFICATION_TYPE_ICONS[notification.type];
             return (
               <li key={notification.id}>
@@ -96,6 +100,16 @@ export const NotificationCenter = (): ReactElement => {
             );
           })}
         </ul>
+      )}
+
+      {rows.length > 0 && (
+        <Pagination
+          page={page}
+          pageSize={pageSize}
+          totalCount={totalCount}
+          onPageChange={setPage}
+          onPageSizeChange={setPageSize}
+        />
       )}
     </div>
   );

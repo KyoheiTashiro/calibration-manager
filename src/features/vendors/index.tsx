@@ -5,11 +5,13 @@ import {
   ConfirmModal,
   EmptyState,
   Modal,
+  Pagination,
   Table,
   TableBody,
   TableHead,
   Td,
   Th,
+  usePagination,
 } from "@/components/ui";
 import { useVendorDelete, useVendorList } from "@/features/vendors/hooks";
 import type { Vendor } from "@/store/types";
@@ -22,6 +24,8 @@ const CALIBRATOR_BADGE_CLASS_NAME = "bg-emerald-100 text-emerald-800 border bord
 
 export const VendorList = (): ReactElement => {
   const vendorList = useVendorList();
+  const { page, pageSize, totalCount, pagedItems, setPage, setPageSize } =
+    usePagination(vendorList);
 
   const { modalState, handleAddClick, handleEditClick, handleModalClose } =
     useEntityModal<Vendor>();
@@ -60,7 +64,7 @@ export const VendorList = (): ReactElement => {
             </tr>
           </TableHead>
           <TableBody>
-            {vendorList.map((vendor) => (
+            {pagedItems.map((vendor) => (
               <tr key={vendor.id} className="h-10 hover:bg-slate-50">
                 <Td>{vendor.name}</Td>
                 <Td>
@@ -112,6 +116,16 @@ export const VendorList = (): ReactElement => {
             ))}
           </TableBody>
         </Table>
+      )}
+
+      {vendorList.length > 0 && (
+        <Pagination
+          page={page}
+          pageSize={pageSize}
+          totalCount={totalCount}
+          onPageChange={setPage}
+          onPageSizeChange={setPageSize}
+        />
       )}
 
       <VendorModal open={modalState.open} vendor={modalState.entity} onClose={handleModalClose} />

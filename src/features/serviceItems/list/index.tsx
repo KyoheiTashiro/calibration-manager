@@ -1,5 +1,5 @@
 import { ServiceItemModal, ServiceOrderModal, ServiceRecordModal } from "@/components/domain";
-import { Button, EmptyState } from "@/components/ui";
+import { Button, EmptyState, Pagination, usePagination } from "@/components/ui";
 import { FilterBar } from "@/features/serviceItems/list/components/FilterBar";
 import { ServiceItemTable } from "@/features/serviceItems/list/components/ServiceItemTable";
 import {
@@ -43,6 +43,14 @@ export const ServiceItemList = (): ReactElement => {
     [serviceItems, equipment, serviceOrders, vendors, persons],
   );
   const filteredRows = filterServiceItemRows(rows, filters);
+  const {
+    page,
+    pageSize,
+    totalCount: pagedTotalCount,
+    pagedItems,
+    setPage,
+    setPageSize,
+  } = usePagination(filteredRows, searchParams.toString());
 
   const handleFilterChange = (key: keyof ServiceItemListFilters, value: string): void => {
     const next = new URLSearchParams(searchParams);
@@ -83,7 +91,7 @@ export const ServiceItemList = (): ReactElement => {
             />
           ) : (
             <ServiceItemTable
-              rows={filteredRows}
+              rows={pagedItems}
               onRecord={(row) => {
                 setModal({ kind: MODAL_KIND.SERVICE_RECORD, row });
               }}
@@ -93,6 +101,15 @@ export const ServiceItemList = (): ReactElement => {
               onEdit={(row) => {
                 setModal({ kind: MODAL_KIND.EDIT, row });
               }}
+            />
+          )}
+          {filteredRows.length > 0 && (
+            <Pagination
+              page={page}
+              pageSize={pageSize}
+              totalCount={pagedTotalCount}
+              onPageChange={setPage}
+              onPageSizeChange={setPageSize}
             />
           )}
         </>

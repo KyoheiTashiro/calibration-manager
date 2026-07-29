@@ -5,6 +5,13 @@ export { ConfirmModal } from "@/components/ui/ConfirmModal";
 export { DateField } from "@/components/ui/DateField";
 export { EmptyState } from "@/components/ui/EmptyState";
 export { Modal } from "@/components/ui/Modal";
+export {
+  Pagination,
+  PAGE_SIZE_OPTIONS,
+  DEFAULT_PAGE_SIZE,
+  usePagination,
+  type PageSizeOption,
+} from "@/components/ui/Pagination";
 export { RadioGroup } from "@/components/ui/RadioGroup";
 export { Select } from "@/components/ui/Select";
 export { Table, TableBody, TableHead, Th, Td, activatableRowProps } from "@/components/ui/Table";
