@@ -2,19 +2,19 @@
  * フィルタの真実源はURLクエリ(D-022)であり、値の保持・更新は親(index.tsx)の責務。
  */
 
-import { Button, Select } from "@/components/ui";
-import { SERVICE_ITEM_STATUS } from "@/domain/serviceItemStatus";
-import { statusBadgeLabel } from "@/domain/statusBadge";
-import { EXECUTION_OPTIONS, SERVICE_ITEM_TYPE_OPTIONS } from "@/features/serviceItems/constants";
-import { FILTER_ALL, type ServiceItemListFilters } from "@/features/serviceItems/list/hooks";
-import { personLabelOf } from "@/store/selectors";
-import type { Person } from "@/store/types";
-import type { ReactElement } from "react";
+import { Button, Select } from '@/components/ui';
+import { SERVICE_ITEM_STATUS } from '@/domain/serviceItemStatus';
+import { statusBadgeLabel } from '@/domain/statusBadge';
+import { EXECUTION_OPTIONS, SERVICE_ITEM_TYPE_OPTIONS } from '@/features/serviceItems/constants';
+import { FILTER_ALL, type ServiceItemListFilters } from '@/features/serviceItems/list/hooks';
+import { personLabelOf } from '@/store/selectors';
+import type { Person } from '@/store/types';
+import type { ReactElement } from 'react';
 
 type SelectOption = { value: string; label: string };
 
 const withAllOption = (options: readonly SelectOption[]): SelectOption[] => [
-  { value: FILTER_ALL, label: "全て" },
+  { value: FILTER_ALL, label: '全て' },
   ...options,
 ];
 
@@ -44,48 +44,48 @@ export const FilterBar = ({ filters, persons, onFilterChange, onClear }: Props):
   );
 
   return (
-    <div className="flex flex-wrap items-end gap-4">
-      <div className="w-40">
+    <div className='flex flex-wrap items-end gap-4'>
+      <div className='w-40'>
         <Select
-          label="状態"
+          label='状態'
           options={STATUS_OPTIONS}
           value={filters.status}
           onChange={(value) => {
-            onFilterChange("status", value);
+            onFilterChange('status', value);
           }}
         />
       </div>
-      <div className="w-32">
+      <div className='w-32'>
         <Select
-          label="種別"
+          label='種別'
           options={TYPE_OPTIONS}
           value={filters.type}
           onChange={(value) => {
-            onFilterChange("type", value);
+            onFilterChange('type', value);
           }}
         />
       </div>
-      <div className="w-32">
+      <div className='w-32'>
         <Select
-          label="内外"
+          label='内外'
           options={EXECUTION_FILTER_OPTIONS}
           value={filters.execution}
           onChange={(value) => {
-            onFilterChange("execution", value);
+            onFilterChange('execution', value);
           }}
         />
       </div>
-      <div className="w-40">
+      <div className='w-40'>
         <Select
-          label="担当"
+          label='担当'
           options={personOptions}
           value={filters.personId}
           onChange={(value) => {
-            onFilterChange("personId", value);
+            onFilterChange('personId', value);
           }}
         />
       </div>
-      <Button variant="secondary" onClick={onClear}>
+      <Button variant='secondary' onClick={onClear}>
         クリア
       </Button>
     </div>

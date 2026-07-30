@@ -1,4 +1,4 @@
-import { PersonModal } from "@/components/domain/PersonModal";
+import { PersonModal } from '@/components/domain/PersonModal';
 import {
   Badge,
   Button,
@@ -12,16 +12,16 @@ import {
   TextField,
   Th,
   usePagination,
-} from "@/components/ui";
-import { UNSET_LABEL } from "@/constants/labels";
-import { STATUS_FILTER_OPTIONS, isStatusFilter, usePersonList } from "@/features/persons/hooks";
-import type { Person } from "@/store/types";
-import { useEntityModal } from "@/utils/modal";
-import type { ReactElement } from "react";
+} from '@/components/ui';
+import { UNSET_LABEL } from '@/constants/labels';
+import { STATUS_FILTER_OPTIONS, isStatusFilter, usePersonList } from '@/features/persons/hooks';
+import type { Person } from '@/store/types';
+import { useEntityModal } from '@/utils/modal';
+import type { ReactElement } from 'react';
 
 /** 状態バッジの色classNameマッピング（StatusBadgeと同じ配色パターン） */
-const ACTIVE_BADGE_CLASS_NAME = "bg-green-100 text-green-800";
-const INACTIVE_BADGE_CLASS_NAME = "bg-slate-100 text-slate-600";
+const ACTIVE_BADGE_CLASS_NAME = 'bg-green-100 text-green-800';
+const INACTIVE_BADGE_CLASS_NAME = 'bg-slate-100 text-slate-600';
 
 /** 物理削除は行わず、モーダル内の「有効」チェックボックストグルで無効化する。 */
 export const PersonList = (): ReactElement => {
@@ -45,28 +45,28 @@ export const PersonList = (): ReactElement => {
     useEntityModal<Person>();
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className='flex flex-col gap-4'>
       {totalCount === 0 ? (
         <EmptyState
-          message="担当者が未登録です"
+          message='担当者が未登録です'
           action={<Button onClick={handleAddClick}>+ 追加</Button>}
         />
       ) : (
         <>
-          <div className="flex flex-wrap items-end gap-4">
-            <div className="w-1/2 min-w-64">
+          <div className='flex flex-wrap items-end gap-4'>
+            <div className='w-1/2 min-w-64'>
               <TextField
-                label="検索"
-                placeholder="氏名, 部署, メールで検索"
+                label='検索'
+                placeholder='氏名, 部署, メールで検索'
                 value={searchText}
                 onChange={(event) => {
                   setSearchText(event.target.value);
                 }}
               />
             </div>
-            <div className="w-40">
+            <div className='w-40'>
               <Select
-                label="状態"
+                label='状態'
                 options={STATUS_FILTER_OPTIONS}
                 value={statusFilter}
                 onChange={(value) => {
@@ -74,13 +74,13 @@ export const PersonList = (): ReactElement => {
                 }}
               />
             </div>
-            <div className="ml-auto">
+            <div className='ml-auto'>
               <Button onClick={handleAddClick}>+ 追加</Button>
             </div>
           </div>
 
           {filteredPersonList.length === 0 ? (
-            <EmptyState message="条件に一致する担当者はありません" />
+            <EmptyState message='条件に一致する担当者はありません' />
           ) : (
             <Table>
               <TableHead>
@@ -104,7 +104,7 @@ export const PersonList = (): ReactElement => {
                           person.isActive ? ACTIVE_BADGE_CLASS_NAME : INACTIVE_BADGE_CLASS_NAME
                         }
                       >
-                        {person.isActive ? "有効" : "無効"}
+                        {person.isActive ? '有効' : '無効'}
                       </Badge>
                     </Td>
                     {/* なぜ truncate 無効か: Td の truncate は子を div でラップするが、
@@ -112,8 +112,8 @@ export const PersonList = (): ReactElement => {
                         ボタン内テキストを検出できなくなるため td 直下に置く。 */}
                     <Td truncate={false}>
                       <Button
-                        size="sm"
-                        variant="secondary"
+                        size='sm'
+                        variant='secondary'
                         onClick={() => {
                           handleEditClick(person);
                         }}

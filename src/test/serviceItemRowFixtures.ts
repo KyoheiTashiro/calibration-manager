@@ -4,7 +4,7 @@
  * today は引数注入なので固定日付で決定的にする(flakiness 回避)。
  */
 
-import type { ServiceItemRow } from "@/store/selectors";
+import type { ServiceItemRow } from '@/store/selectors';
 import {
   EQUIPMENT_STATUS,
   EXECUTION,
@@ -15,42 +15,42 @@ import {
   type ServiceItem,
   type Person,
   type Vendor,
-} from "@/store/types";
+} from '@/store/types';
 
-export const TODAY = "2026-07-03";
+export const TODAY = '2026-07-03';
 
 export const activePerson: Person = {
-  id: "p-active",
-  name: "田中",
-  email: "a@x.jp",
+  id: 'p-active',
+  name: '田中',
+  email: 'a@x.jp',
   isActive: true,
 };
-export const inactivePerson: Person = { id: "p-inactive", name: "鈴木", email: "b@x.jp", isActive: false }; // prettier-ignore
+export const inactivePerson: Person = { id: 'p-inactive', name: '鈴木', email: 'b@x.jp', isActive: false }; // prettier-ignore
 
-export const eqActive: Equipment = { id: "eq-active", managementNo: "EQ-1", name: "ノギス", status: EQUIPMENT_STATUS.ACTIVE }; // prettier-ignore
-export const eqSuspended: Equipment = { id: "eq-susp", managementNo: "EQ-2", name: "はかり", status: EQUIPMENT_STATUS.SUSPENDED }; // prettier-ignore
-export const eqRetired: Equipment = { id: "eq-ret", managementNo: "EQ-3", name: "圧力計", status: EQUIPMENT_STATUS.RETIRED }; // prettier-ignore
+export const eqActive: Equipment = { id: 'eq-active', managementNo: 'EQ-1', name: 'ノギス', status: EQUIPMENT_STATUS.ACTIVE }; // prettier-ignore
+export const eqSuspended: Equipment = { id: 'eq-susp', managementNo: 'EQ-2', name: 'はかり', status: EQUIPMENT_STATUS.SUSPENDED }; // prettier-ignore
+export const eqRetired: Equipment = { id: 'eq-ret', managementNo: 'EQ-3', name: '圧力計', status: EQUIPMENT_STATUS.RETIRED }; // prettier-ignore
 
 export const calibrator: Vendor = {
-  id: "v-cal",
-  name: "校正センター",
+  id: 'v-cal',
+  name: '校正センター',
   isManufacturer: false,
   isCalibrator: true,
   standardLeadTimeDays: 20,
 };
 
 export const makeServiceItem = (
-  over: Partial<ServiceItem> & Pick<ServiceItem, "id">,
+  over: Partial<ServiceItem> & Pick<ServiceItem, 'id'>,
 ): ServiceItem => ({
   equipmentId: eqActive.id,
   type: SERVICE_ITEM_TYPE.INSPECTION,
-  name: "点検",
-  cycle: "1Y",
+  name: '点検',
+  cycle: '1Y',
   execution: EXECUTION.INTERNAL,
   bufferDays: 14,
   personId: activePerson.id,
   noticeDaysBefore: 30,
-  nextDueDate: "2099-01-01",
+  nextDueDate: '2099-01-01',
   isActive: true,
   ...over,
 });
@@ -63,7 +63,7 @@ export const toRecord = <Entry extends { id: string }>(
 export const makeState = (
   serviceItems: readonly ServiceItem[],
   serviceOrders: readonly ServiceOrder[] = [],
-): Pick<AppState, "serviceItems" | "equipment" | "serviceOrders" | "vendors" | "persons"> => ({
+): Pick<AppState, 'serviceItems' | 'equipment' | 'serviceOrders' | 'vendors' | 'persons'> => ({
   serviceItems: toRecord(serviceItems),
   equipment: toRecord([eqActive, eqSuspended, eqRetired]),
   serviceOrders: toRecord(serviceOrders),

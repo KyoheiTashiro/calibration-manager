@@ -4,14 +4,14 @@
  * 割り当てられている場合は確認ダイアログで警告する。
  */
 
-import { Schema, defaultValues, type FormType } from "@/components/domain/PersonModal/schema";
-import { Button, Checkbox, ConfirmModal, Modal, TextField } from "@/components/ui";
-import type { Person } from "@/store/types";
-import { useAppStore } from "@/store/useAppStore";
-import { createSaveHandler, emptyToUndefined } from "@/utils/form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useState, type ReactElement } from "react";
-import { useForm } from "react-hook-form";
+import { Schema, defaultValues, type FormType } from '@/components/domain/PersonModal/schema';
+import { Button, Checkbox, ConfirmModal, Modal, TextField } from '@/components/ui';
+import type { Person } from '@/store/types';
+import { useAppStore } from '@/store/useAppStore';
+import { createSaveHandler, emptyToUndefined } from '@/utils/form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useState, type ReactElement } from 'react';
+import { useForm } from 'react-hook-form';
 
 type PersonModalProps = {
   open: boolean;
@@ -24,7 +24,7 @@ const toFormValues = (person?: Person): FormType =>
     ? {
         name: person.name,
         email: person.email,
-        department: person.department ?? "",
+        department: person.department ?? '',
         isActive: person.isActive,
       }
     : defaultValues;
@@ -99,30 +99,30 @@ export const PersonModal = ({ open, person, onClose }: PersonModalProps): ReactE
   const confirmMessage =
     pendingDeactivation && pendingDeactivation.assignedServiceItemCount > 0
       ? `この担当者は現役の点検校正項目 ${pendingDeactivation.assignedServiceItemCount} 件に割り当てられています。通知が届かなくなる可能性があります。無効化しますか?`
-      : "この担当者を無効化しますか?";
+      : 'この担当者を無効化しますか?';
 
   return (
     <>
       <Modal
         open={open}
-        title={person ? "担当者を編集" : "担当者を追加"}
+        title={person ? '担当者を編集' : '担当者を追加'}
         onClose={handleClose}
         isDirty={isDirty}
         footer={<Button onClick={handleSave}>保存</Button>}
       >
-        <div className="flex flex-col gap-4">
-          <TextField label="氏名" required error={errors.name?.message} {...register("name")} />
-          <TextField label="メール" required error={errors.email?.message} {...register("email")} />
-          <TextField label="部署" error={errors.department?.message} {...register("department")} />
-          <Checkbox label="有効" error={errors.isActive?.message} {...register("isActive")} />
+        <div className='flex flex-col gap-4'>
+          <TextField label='氏名' required error={errors.name?.message} {...register('name')} />
+          <TextField label='メール' required error={errors.email?.message} {...register('email')} />
+          <TextField label='部署' error={errors.department?.message} {...register('department')} />
+          <Checkbox label='有効' error={errors.isActive?.message} {...register('isActive')} />
         </div>
       </Modal>
       {pendingDeactivation ? (
         <ConfirmModal
           open
-          title="担当者の無効化"
+          title='担当者の無効化'
           message={confirmMessage}
-          confirmLabel="無効化"
+          confirmLabel='無効化'
           onConfirm={handleConfirmDeactivation}
           onCancel={handleCancelDeactivation}
         />

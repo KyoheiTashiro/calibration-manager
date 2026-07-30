@@ -8,7 +8,7 @@
  * 表示件数の定数もこのファイルに置く（Pagination.tsx はコンポーネント本体のみを
  * exportする方針のため。react/only-export-components 対策）。
  */
-export const ELLIPSIS = "ellipsis" as const;
+export const ELLIPSIS = 'ellipsis' as const;
 export type PageItem = number | typeof ELLIPSIS;
 
 export const PAGE_SIZE_OPTIONS = [10, 20, 50] as const;

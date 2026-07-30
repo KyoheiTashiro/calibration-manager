@@ -1,12 +1,12 @@
-import type { Meta, StoryObj } from "@storybook/react-vite";
-import { useState, type ComponentProps, type ReactElement } from "react";
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import { useState, type ComponentProps, type ReactElement } from 'react';
 
-import { Select } from "./Select";
+import { Select } from './Select';
 
 const SAMPLE_OPTIONS = [
-  { value: "yearly", label: "年次" },
-  { value: "quarterly", label: "四半期" },
-  { value: "monthly", label: "月次" },
+  { value: 'yearly', label: '年次' },
+  { value: 'quarterly', label: '四半期' },
+  { value: 'monthly', label: '月次' },
 ] as const;
 
 // なぜ: Select は value/onChange 必須の制御コンポーネントのため、Storybook 上でも
@@ -23,7 +23,7 @@ const noop = (): void => {
 };
 
 const meta = {
-  title: "UI/Select",
+  title: 'UI/Select',
   component: Select,
   render: ControlledSelect,
 } satisfies Meta<typeof Select>;
@@ -32,28 +32,28 @@ export default meta;
 
 export const Normal: StoryObj<typeof meta> = {
   args: {
-    label: "周期",
+    label: '周期',
     options: SAMPLE_OPTIONS,
-    value: "monthly",
+    value: 'monthly',
     onChange: noop,
   },
 };
 
 export const WithError: StoryObj<typeof meta> = {
   args: {
-    label: "周期",
+    label: '周期',
     options: SAMPLE_OPTIONS,
-    value: "",
+    value: '',
     onChange: noop,
-    error: "周期を選択してください",
+    error: '周期を選択してください',
   },
 };
 
 export const Required: StoryObj<typeof meta> = {
   args: {
-    label: "周期",
+    label: '周期',
     options: SAMPLE_OPTIONS,
-    value: "",
+    value: '',
     onChange: noop,
     required: true,
   },
@@ -61,19 +61,19 @@ export const Required: StoryObj<typeof meta> = {
 
 export const WithPlaceholder: StoryObj<typeof meta> = {
   args: {
-    label: "周期",
+    label: '周期',
     options: SAMPLE_OPTIONS,
-    value: "",
+    value: '',
     onChange: noop,
-    placeholder: "選択してください",
+    placeholder: '選択してください',
   },
 };
 
 export const Disabled: StoryObj<typeof meta> = {
   args: {
-    label: "周期",
+    label: '周期',
     options: SAMPLE_OPTIONS,
-    value: "monthly",
+    value: 'monthly',
     onChange: noop,
     disabled: true,
   },
@@ -81,10 +81,10 @@ export const Disabled: StoryObj<typeof meta> = {
 
 export const HiddenLabel: StoryObj<typeof meta> = {
   args: {
-    label: "周期",
+    label: '周期',
     labelHidden: true,
     options: SAMPLE_OPTIONS,
-    value: "monthly",
+    value: 'monthly',
     onChange: noop,
   },
 };

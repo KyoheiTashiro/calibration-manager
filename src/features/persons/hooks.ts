@@ -1,22 +1,22 @@
-import type { Person } from "@/store/types";
-import { useAppStore } from "@/store/useAppStore";
-import { useMemo, useState } from "react";
+import type { Person } from '@/store/types';
+import { useAppStore } from '@/store/useAppStore';
+import { useMemo, useState } from 'react';
 
 /**
  * 「全て」という複合値を持つ表示用フィルタのため、ドメイン定数には追加せず
  * このファイルに閉じたモジュールレベル定数とする(機器一覧の StatusFilter と同パターン)。
  */
 const STATUS_FILTER = {
-  ALL: "all",
-  ACTIVE: "active",
-  INACTIVE: "inactive",
+  ALL: 'all',
+  ACTIVE: 'active',
+  INACTIVE: 'inactive',
 } as const;
 export type StatusFilter = (typeof STATUS_FILTER)[keyof typeof STATUS_FILTER];
 
 export const STATUS_FILTER_OPTIONS: { value: StatusFilter; label: string }[] = [
-  { value: STATUS_FILTER.ALL, label: "全て" },
-  { value: STATUS_FILTER.ACTIVE, label: "有効" },
-  { value: STATUS_FILTER.INACTIVE, label: "無効" },
+  { value: STATUS_FILTER.ALL, label: '全て' },
+  { value: STATUS_FILTER.ACTIVE, label: '有効' },
+  { value: STATUS_FILTER.INACTIVE, label: '無効' },
 ];
 
 /**
@@ -32,8 +32,8 @@ const matchesStatusFilter = (person: Person, filter: StatusFilter): boolean => {
 };
 
 const matchesSearch = (person: Person, normalizedSearch: string): boolean => {
-  if (normalizedSearch === "") return true;
-  const haystack = [person.name, person.department ?? "", person.email].join("\n").toLowerCase();
+  if (normalizedSearch === '') return true;
+  const haystack = [person.name, person.department ?? '', person.email].join('\n').toLowerCase();
   return haystack.includes(normalizedSearch);
 };
 
@@ -48,7 +48,7 @@ type UsePersonListResult = {
 
 export const usePersonList = (): UsePersonListResult => {
   const persons = useAppStore((state) => state.persons);
-  const [searchText, setSearchText] = useState("");
+  const [searchText, setSearchText] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>(STATUS_FILTER.ALL);
 
   const totalCount = Object.keys(persons).length;
@@ -58,7 +58,7 @@ export const usePersonList = (): UsePersonListResult => {
     return Object.values(persons)
       .filter((entry) => matchesStatusFilter(entry, statusFilter))
       .filter((entry) => matchesSearch(entry, normalizedSearch))
-      .toSorted((left, right) => left.name.localeCompare(right.name, "ja"));
+      .toSorted((left, right) => left.name.localeCompare(right.name, 'ja'));
   }, [persons, searchText, statusFilter]);
 
   return {

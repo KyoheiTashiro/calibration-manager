@@ -3,13 +3,13 @@
  * 対象の絞り込み・重複抑止・id/日付付与のみを担う。
  */
 
-import { computeExpectedNotifications, type NotificationSeed } from "@/domain/notificationRules";
-import type { AppSliceCreator } from "@/store/storeState";
-import { EQUIPMENT_STATUS, type IsoDateString, type Notification } from "@/store/types";
-import { createId } from "@/utils/id";
-import { recordValue } from "@/utils/record";
+import { computeExpectedNotifications, type NotificationSeed } from '@/domain/notificationRules';
+import type { AppSliceCreator } from '@/store/storeState';
+import { EQUIPMENT_STATUS, type IsoDateString, type Notification } from '@/store/types';
+import { createId } from '@/utils/id';
+import { recordValue } from '@/utils/record';
 
-const duplicationKey = (seed: Pick<NotificationSeed, "targetType" | "targetId" | "type">): string =>
+const duplicationKey = (seed: Pick<NotificationSeed, 'targetType' | 'targetId' | 'type'>): string =>
   `${seed.targetType}:${seed.targetId}:${seed.type}`;
 
 export type NotificationSlice = {

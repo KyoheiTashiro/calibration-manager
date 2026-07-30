@@ -1,23 +1,23 @@
-import { ServiceItemModal, ServiceOrderModal, ServiceRecordModal } from "@/components/domain";
-import { Button, EmptyState, Pagination, usePagination } from "@/components/ui";
-import { FilterBar } from "@/features/serviceItems/list/components/FilterBar";
-import { ServiceItemTable } from "@/features/serviceItems/list/components/ServiceItemTable";
+import { ServiceItemModal, ServiceOrderModal, ServiceRecordModal } from '@/components/domain';
+import { Button, EmptyState, Pagination, usePagination } from '@/components/ui';
+import { FilterBar } from '@/features/serviceItems/list/components/FilterBar';
+import { ServiceItemTable } from '@/features/serviceItems/list/components/ServiceItemTable';
 import {
   FILTER_ALL,
   filterServiceItemRows,
   parseServiceItemListFilters,
   type ServiceItemListFilters,
-} from "@/features/serviceItems/list/hooks";
-import { serviceItemRowsOf, type ServiceItemRow } from "@/store/selectors";
-import { useAppStore } from "@/store/useAppStore";
-import { todayIsoDate } from "@/utils/time";
-import { useMemo, useState, type ReactElement } from "react";
-import { useSearchParams } from "react-router-dom";
+} from '@/features/serviceItems/list/hooks';
+import { serviceItemRowsOf, type ServiceItemRow } from '@/store/selectors';
+import { useAppStore } from '@/store/useAppStore';
+import { todayIsoDate } from '@/utils/time';
+import { useMemo, useState, type ReactElement } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
 const MODAL_KIND = {
-  SERVICE_RECORD: "serviceRecord",
-  ORDER: "order",
-  EDIT: "edit",
+  SERVICE_RECORD: 'serviceRecord',
+  ORDER: 'order',
+  EDIT: 'edit',
 } as const;
 type ModalKind = (typeof MODAL_KIND)[keyof typeof MODAL_KIND];
 type ModalState = { kind: ModalKind; row: ServiceItemRow };
@@ -71,9 +71,9 @@ export const ServiceItemList = (): ReactElement => {
   };
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className='flex flex-col gap-4'>
       {rows.length === 0 ? (
-        <EmptyState message="点検校正項目が未登録です" />
+        <EmptyState message='点検校正項目が未登録です' />
       ) : (
         <>
           <FilterBar
@@ -84,7 +84,7 @@ export const ServiceItemList = (): ReactElement => {
           />
           {filteredRows.length === 0 ? (
             <EmptyState
-              message="条件に一致する項目はありません"
+              message='条件に一致する項目はありません'
               action={<Button onClick={handleClear}>クリア</Button>}
             />
           ) : (

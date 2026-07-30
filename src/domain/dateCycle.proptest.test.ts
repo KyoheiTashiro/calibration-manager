@@ -1,9 +1,9 @@
-import { addCycle } from "@/domain/dateCycle";
-import { CYCLE, type Cycle } from "@/store/types";
-import { cycleArb, isoDateArb } from "@/test/arbitraries";
-import { daysInMonth, isIsoDateString, parseIsoDate } from "@/utils/time";
-import * as fc from "fast-check";
-import { describe, expect, it } from "vitest";
+import { addCycle } from '@/domain/dateCycle';
+import { CYCLE, type Cycle } from '@/store/types';
+import { cycleArb, isoDateArb } from '@/test/arbitraries';
+import { daysInMonth, isIsoDateString, parseIsoDate } from '@/utils/time';
+import * as fc from 'fast-check';
+import { describe, expect, it } from 'vitest';
 
 /** 周期→月数（テスト側の独立実装。実装側の対応表の写し間違いを検出するため別途定義する） */
 const EXPECTED_MONTHS: Record<Cycle, number> = {
@@ -29,18 +29,18 @@ const CYCLES_ASCENDING: Cycle[] = [
   CYCLE.Y10,
 ];
 
-describe("addCycle（property）", () => {
-  it("結果は常に暦上妥当な YYYY-MM-DD である", () => {
+describe('addCycle（property）', () => {
+  it('結果は常に暦上妥当な YYYY-MM-DD である', () => {
     fc.assert(
       fc.property(isoDateArb, cycleArb, (isoDate, cycle) => {
         const result = addCycle(isoDate, cycle);
         expect(result).not.toBeNull();
-        expect(isIsoDateString(result ?? "")).toBe(true);
+        expect(isIsoDateString(result ?? '')).toBe(true);
       }),
     );
   });
 
-  it("nextDueDate は常に lastDoneDate より後である（周期は正のため）", () => {
+  it('nextDueDate は常に lastDoneDate より後である（周期は正のため）', () => {
     fc.assert(
       fc.property(isoDateArb, cycleArb, (isoDate, cycle) => {
         const result = addCycle(isoDate, cycle);
@@ -50,11 +50,11 @@ describe("addCycle（property）", () => {
     );
   });
 
-  it("年月は正確に周期分進む（月末補正は日にのみ作用し年月にはみ出さない）", () => {
+  it('年月は正確に周期分進む（月末補正は日にのみ作用し年月にはみ出さない）', () => {
     fc.assert(
       fc.property(isoDateArb, cycleArb, (isoDate, cycle) => {
         const source = parseIsoDate(isoDate);
-        const result = parseIsoDate(addCycle(isoDate, cycle) ?? "");
+        const result = parseIsoDate(addCycle(isoDate, cycle) ?? '');
         expect(source).not.toBeNull();
         expect(result).not.toBeNull();
         if (!source || !result) return;
@@ -65,18 +65,18 @@ describe("addCycle（property）", () => {
     );
   });
 
-  it("日は「元の日」と「加算先の月末」の小さい方になる（月末補正の仕様そのもの）", () => {
+  it('日は「元の日」と「加算先の月末」の小さい方になる（月末補正の仕様そのもの）', () => {
     fc.assert(
       fc.property(isoDateArb, cycleArb, (isoDate, cycle) => {
         const source = parseIsoDate(isoDate);
-        const result = parseIsoDate(addCycle(isoDate, cycle) ?? "");
+        const result = parseIsoDate(addCycle(isoDate, cycle) ?? '');
         if (!source || !result) return;
         expect(result.day).toBe(Math.min(source.day, daysInMonth(result.year, result.month)));
       }),
     );
   });
 
-  it("28日以前の日は補正されず常に維持される", () => {
+  it('28日以前の日は補正されず常に維持される', () => {
     const dayAtMost28Arb = isoDateArb.filter((isoDate) => {
       const parsed = parseIsoDate(isoDate);
       return parsed !== null && parsed.day <= 28;
@@ -84,16 +84,16 @@ describe("addCycle（property）", () => {
     fc.assert(
       fc.property(dayAtMost28Arb, cycleArb, (isoDate, cycle) => {
         const source = parseIsoDate(isoDate);
-        const result = parseIsoDate(addCycle(isoDate, cycle) ?? "");
+        const result = parseIsoDate(addCycle(isoDate, cycle) ?? '');
         expect(result?.day).toBe(source?.day);
       }),
     );
   });
 
-  it("周期が長いほど期限は同じか後になる（単調性）", () => {
+  it('周期が長いほど期限は同じか後になる（単調性）', () => {
     fc.assert(
       fc.property(isoDateArb, (isoDate) => {
-        const dueDates = CYCLES_ASCENDING.map((cycle) => addCycle(isoDate, cycle) ?? "");
+        const dueDates = CYCLES_ASCENDING.map((cycle) => addCycle(isoDate, cycle) ?? '');
         const sorted = dueDates.toSorted();
         expect(dueDates).toEqual(sorted);
       }),

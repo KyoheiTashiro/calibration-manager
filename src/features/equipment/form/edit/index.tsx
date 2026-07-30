@@ -1,10 +1,10 @@
-import { Button, ConfirmModal } from "@/components/ui";
-import { ROUTES } from "@/constants/routes";
-import { useEditEquipmentForm } from "@/features/equipment/form/edit/hooks";
-import { EquipmentFormFields } from "@/features/equipment/form/shared/FormFields";
-import { createFormSubmitHandler } from "@/utils/form";
-import type { ReactElement } from "react";
-import { Navigate } from "react-router-dom";
+import { Button, ConfirmModal } from '@/components/ui';
+import { ROUTES } from '@/constants/routes';
+import { useEditEquipmentForm } from '@/features/equipment/form/edit/hooks';
+import { EquipmentFormFields } from '@/features/equipment/form/shared/FormFields';
+import { createFormSubmitHandler } from '@/utils/form';
+import type { ReactElement } from 'react';
+import { Navigate } from 'react-router-dom';
 
 export const EquipmentEditForm = (): ReactElement => {
   const {
@@ -25,8 +25,8 @@ export const EquipmentEditForm = (): ReactElement => {
   }
 
   return (
-    <div className="flex flex-col gap-4">
-      <h1 className="text-xl font-bold">機器を編集</h1>
+    <div className='flex flex-col gap-4'>
+      <h1 className='text-xl font-bold'>機器を編集</h1>
 
       {/* なぜ noValidate か: 必須項目は TextField の required 属性経由でネイティブHTML5検証も
           有効になるが、本画面の検証はRHF+zodに一本化し「送信試行でエラー表示」する方針のため、
@@ -34,7 +34,7 @@ export const EquipmentEditForm = (): ReactElement => {
       <form
         onSubmit={createFormSubmitHandler(onFormSubmit)}
         noValidate
-        className="flex max-w-xl flex-col gap-4"
+        className='flex max-w-xl flex-col gap-4'
       >
         <EquipmentFormFields
           register={register}
@@ -43,19 +43,19 @@ export const EquipmentEditForm = (): ReactElement => {
           manufacturerOptions={manufacturerOptions}
         />
 
-        <div className="flex justify-end gap-2 pt-2">
-          <Button type="button" variant="secondary" onClick={handleCancel}>
+        <div className='flex justify-end gap-2 pt-2'>
+          <Button type='button' variant='secondary' onClick={handleCancel}>
             キャンセル
           </Button>
-          <Button type="submit">保存</Button>
+          <Button type='submit'>保存</Button>
         </div>
       </form>
 
       <ConfirmModal
         open={retireConfirmOpen}
-        title="機器の廃棄"
-        message="この機器を廃棄にして保存しますか?"
-        confirmLabel="廃棄"
+        title='機器の廃棄'
+        message='この機器を廃棄にして保存しますか?'
+        confirmLabel='廃棄'
         onConfirm={handleRetireConfirm}
         onCancel={closeRetireConfirm}
       />

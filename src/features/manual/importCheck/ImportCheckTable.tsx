@@ -1,8 +1,8 @@
-import { Table, TableBody, TableHead, Td, Th } from "@/components/ui/Table";
-import type { CsvEntityKind } from "@/features/settings/components/csv/entityCsv";
-import type { ReactElement } from "react";
+import { Table, TableBody, TableHead, Td, Th } from '@/components/ui/Table';
+import type { CsvEntityKind } from '@/features/settings/components/csv/entityCsv';
+import type { ReactElement } from 'react';
 
-import { COLUMN_REQUIREMENT_LABELS, IMPORT_CHECK_COLUMNS } from "./columns";
+import { COLUMN_REQUIREMENT_LABELS, IMPORT_CHECK_COLUMNS } from './columns';
 
 type Props = { kind: CsvEntityKind };
 
@@ -21,7 +21,7 @@ export const ImportCheckTable = ({ kind }: Props): ReactElement => (
       {IMPORT_CHECK_COLUMNS[kind].map((column) => (
         <tr key={column.key}>
           <Td>
-            <code className="rounded bg-slate-100 px-1 py-0.5">{column.key}</code>
+            <code className='rounded bg-slate-100 px-1 py-0.5'>{column.key}</code>
           </Td>
           <Td>{column.label}</Td>
           <Td>{COLUMN_REQUIREMENT_LABELS[column.requirement]}</Td>

@@ -4,17 +4,17 @@
  * - ステータスは保存値ではなく導出値(serviceItemRowsOf 内 deriveServiceItemStatus)。
  */
 
-import { SERVICE_ITEM_STATUS, type ServiceItemStatus } from "@/domain/serviceItemStatus";
-import type { ServiceItemRow } from "@/store/selectors";
+import { SERVICE_ITEM_STATUS, type ServiceItemStatus } from '@/domain/serviceItemStatus';
+import type { ServiceItemRow } from '@/store/selectors';
 import {
   EXECUTION,
   SERVICE_ITEM_TYPE,
   type Execution,
   type ServiceItemType,
   type Person,
-} from "@/store/types";
+} from '@/store/types';
 
-export const FILTER_ALL = "all" as const;
+export const FILTER_ALL = 'all' as const;
 
 export type ServiceItemListFilters = {
   status: ServiceItemStatus | typeof FILTER_ALL;
@@ -39,11 +39,11 @@ export const parseServiceItemListFilters = (
   params: URLSearchParams,
   persons: Record<string, Person>,
 ): ServiceItemListFilters => {
-  const personId = params.get("personId");
+  const personId = params.get('personId');
   return {
-    status: readEnumParam<ServiceItemStatus>(params.get("status"), SERVICE_ITEM_STATUS_VALUES),
-    type: readEnumParam<ServiceItemType>(params.get("type"), SERVICE_ITEM_TYPE_VALUES),
-    execution: readEnumParam<Execution>(params.get("execution"), EXECUTION_VALUES),
+    status: readEnumParam<ServiceItemStatus>(params.get('status'), SERVICE_ITEM_STATUS_VALUES),
+    type: readEnumParam<ServiceItemType>(params.get('type'), SERVICE_ITEM_TYPE_VALUES),
+    execution: readEnumParam<Execution>(params.get('execution'), EXECUTION_VALUES),
     personId: personId !== null && personId in persons ? personId : FILTER_ALL,
   };
 };

@@ -1,24 +1,24 @@
-import { ServiceItemModal, ServiceRecordModal } from "@/components/domain";
-import { Button } from "@/components/ui";
-import { ROUTES, equipmentEditPath } from "@/constants/routes";
-import { EquipmentInfoCard } from "@/features/equipment/detail/components/EquipmentInfoCard";
-import { ServiceItemSection } from "@/features/equipment/detail/components/ServiceItemSection";
-import { ServiceRecordSection } from "@/features/equipment/detail/components/ServiceRecordSection";
+import { ServiceItemModal, ServiceRecordModal } from '@/components/domain';
+import { Button } from '@/components/ui';
+import { ROUTES, equipmentEditPath } from '@/constants/routes';
+import { EquipmentInfoCard } from '@/features/equipment/detail/components/EquipmentInfoCard';
+import { ServiceItemSection } from '@/features/equipment/detail/components/ServiceItemSection';
+import { ServiceRecordSection } from '@/features/equipment/detail/components/ServiceRecordSection';
 import {
   historyRowsOf,
   sortedServiceItemsOf,
   todayIsoDate,
   useSafeNavigate,
   type ServiceItem,
-} from "@/features/equipment/detail/hooks";
-import { useAppStore } from "@/store/useAppStore";
-import { useState, type ReactElement } from "react";
-import { Navigate, useParams } from "react-router-dom";
+} from '@/features/equipment/detail/hooks';
+import { useAppStore } from '@/store/useAppStore';
+import { useState, type ReactElement } from 'react';
+import { Navigate, useParams } from 'react-router-dom';
 
 const MODAL_KIND = {
-  ADD: "add",
-  EDIT: "edit",
-  SERVICE_RECORD: "serviceRecord",
+  ADD: 'add',
+  EDIT: 'edit',
+  SERVICE_RECORD: 'serviceRecord',
 } as const;
 type ModalState =
   | { kind: typeof MODAL_KIND.ADD }
@@ -59,9 +59,9 @@ export const EquipmentDetail = (): ReactElement => {
   const today = todayIsoDate();
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold">
+    <div className='flex flex-col gap-6'>
+      <div className='flex items-center justify-between'>
+        <h1 className='text-xl font-bold'>
           {currentEquipment.managementNo} {currentEquipment.name}
         </h1>
         <Button
@@ -75,9 +75,9 @@ export const EquipmentDetail = (): ReactElement => {
 
       <EquipmentInfoCard equipment={currentEquipment} vendors={vendors} />
 
-      <div className="flex flex-col gap-2">
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold">点検校正項目</h2>
+      <div className='flex flex-col gap-2'>
+        <div className='flex items-center justify-between'>
+          <h2 className='text-lg font-semibold'>点検校正項目</h2>
           <Button onClick={handleAddServiceItemClick}>+ 項目を追加</Button>
         </div>
 
@@ -96,8 +96,8 @@ export const EquipmentDetail = (): ReactElement => {
         />
       </div>
 
-      <div className="flex flex-col gap-2">
-        <h2 className="text-lg font-semibold">実施記録</h2>
+      <div className='flex flex-col gap-2'>
+        <h2 className='text-lg font-semibold'>実施記録</h2>
 
         <ServiceRecordSection serviceRecordRows={serviceRecordRows} />
       </div>

@@ -44,7 +44,7 @@ export type MatchOffset = { start: number; end: number };
  */
 export const findMatchOffsets = (text: string, query: string): MatchOffset[] => {
   const normalizedQuery = normalizeForSearch(query);
-  if (normalizedQuery.trim() === "") {
+  if (normalizedQuery.trim() === '') {
     return [];
   }
 

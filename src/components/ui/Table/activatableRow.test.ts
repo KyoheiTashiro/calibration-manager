@@ -1,6 +1,6 @@
-import { activatableRowProps } from "@/components/ui/Table";
-import type { KeyboardEvent } from "react";
-import { describe, expect, it, vi } from "vitest";
+import { activatableRowProps } from '@/components/ui/Table';
+import type { KeyboardEvent } from 'react';
+import { describe, expect, it, vi } from 'vitest';
 
 const makeKeyboardEvent = (
   key: string,
@@ -13,15 +13,15 @@ const makeKeyboardEvent = (
   };
 };
 
-describe("activatableRowProps", () => {
-  it("tabIndex=0 と cursor-pointer hover:bg-slate-50 の className を返す", () => {
+describe('activatableRowProps', () => {
+  it('tabIndex=0 と cursor-pointer hover:bg-slate-50 の className を返す', () => {
     const props = activatableRowProps(vi.fn<() => void>());
 
     expect(props.tabIndex).toBe(0);
-    expect(props.className).toBe("cursor-pointer hover:bg-slate-50");
+    expect(props.className).toBe('cursor-pointer hover:bg-slate-50');
   });
 
-  it("onClick でアクティベート関数が呼ばれる", () => {
+  it('onClick でアクティベート関数が呼ばれる', () => {
     const onActivate = vi.fn<() => void>();
     const props = activatableRowProps(onActivate);
 
@@ -30,10 +30,10 @@ describe("activatableRowProps", () => {
     expect(onActivate).toHaveBeenCalledTimes(1);
   });
 
-  it("Enter キーで preventDefault し、アクティベート関数が呼ばれる", () => {
+  it('Enter キーで preventDefault し、アクティベート関数が呼ばれる', () => {
     const onActivate = vi.fn<() => void>();
     const props = activatableRowProps(onActivate);
-    const { event, preventDefault } = makeKeyboardEvent("Enter");
+    const { event, preventDefault } = makeKeyboardEvent('Enter');
 
     props.onKeyDown(event);
 
@@ -41,10 +41,10 @@ describe("activatableRowProps", () => {
     expect(onActivate).toHaveBeenCalledTimes(1);
   });
 
-  it("Space キーで preventDefault し、アクティベート関数が呼ばれる", () => {
+  it('Space キーで preventDefault し、アクティベート関数が呼ばれる', () => {
     const onActivate = vi.fn<() => void>();
     const props = activatableRowProps(onActivate);
-    const { event, preventDefault } = makeKeyboardEvent(" ");
+    const { event, preventDefault } = makeKeyboardEvent(' ');
 
     props.onKeyDown(event);
 
@@ -52,10 +52,10 @@ describe("activatableRowProps", () => {
     expect(onActivate).toHaveBeenCalledTimes(1);
   });
 
-  it("Enter/Space 以外のキーは無視する", () => {
+  it('Enter/Space 以外のキーは無視する', () => {
     const onActivate = vi.fn<() => void>();
     const props = activatableRowProps(onActivate);
-    const { event, preventDefault } = makeKeyboardEvent("Tab");
+    const { event, preventDefault } = makeKeyboardEvent('Tab');
 
     props.onKeyDown(event);
 

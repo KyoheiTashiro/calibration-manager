@@ -1,9 +1,9 @@
-import type { Meta, StoryObj } from "@storybook/react-vite";
+import type { Meta, StoryObj } from '@storybook/react-vite';
 
-import { Badge } from "./Badge";
+import { Badge } from './Badge';
 
 const meta = {
-  title: "UI/Badge",
+  title: 'UI/Badge',
   component: Badge,
 } satisfies Meta<typeof Badge>;
 
@@ -11,7 +11,7 @@ export default meta;
 
 export const Default: StoryObj<typeof meta> = {
   args: {
-    children: "バッジ",
+    children: 'バッジ',
   },
 };
 
@@ -19,7 +19,7 @@ export const Default: StoryObj<typeof meta> = {
 // （Badge.tsx参照）ため、className経由で任意の色を注入できることを示すストーリー。
 export const ColorInjection: StoryObj<typeof meta> = {
   args: {
-    className: "bg-green-100 text-green-800",
-    children: "承認済み",
+    className: 'bg-green-100 text-green-800',
+    children: '承認済み',
   },
 };

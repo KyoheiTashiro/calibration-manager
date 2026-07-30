@@ -1,26 +1,26 @@
-import { UNSET_LABEL } from "@/constants/labels";
-import { serviceItemsOf } from "@/store/selectors";
-import { EQUIPMENT_STATUS, type Equipment, type EquipmentStatus } from "@/store/types";
-import { useAppStore } from "@/store/useAppStore";
-import { useMemo, useState } from "react";
+import { UNSET_LABEL } from '@/constants/labels';
+import { serviceItemsOf } from '@/store/selectors';
+import { EQUIPMENT_STATUS, type Equipment, type EquipmentStatus } from '@/store/types';
+import { useAppStore } from '@/store/useAppStore';
+import { useMemo, useState } from 'react';
 
 /**
  * ドメインの EquipmentStatus とは別軸（「全て」という複合値を持つ）のため
  * features/equipment/constants.ts には追加せずこのファイルに閉じたモジュールレベル定数とする。
  */
 const STATUS_FILTER = {
-  ALL: "all",
-  ACTIVE: "active",
-  SUSPENDED: "suspended",
-  RETIRED: "retired",
+  ALL: 'all',
+  ACTIVE: 'active',
+  SUSPENDED: 'suspended',
+  RETIRED: 'retired',
 } as const;
 export type StatusFilter = (typeof STATUS_FILTER)[keyof typeof STATUS_FILTER];
 
 export const STATUS_FILTER_OPTIONS: { value: StatusFilter; label: string }[] = [
-  { value: STATUS_FILTER.ALL, label: "全て" },
-  { value: STATUS_FILTER.ACTIVE, label: "稼働" },
-  { value: STATUS_FILTER.SUSPENDED, label: "休止" },
-  { value: STATUS_FILTER.RETIRED, label: "廃棄" },
+  { value: STATUS_FILTER.ALL, label: '全て' },
+  { value: STATUS_FILTER.ACTIVE, label: '稼働' },
+  { value: STATUS_FILTER.SUSPENDED, label: '休止' },
+  { value: STATUS_FILTER.RETIRED, label: '廃棄' },
 ];
 
 /**
@@ -47,9 +47,9 @@ const matchesStatusFilter = (status: EquipmentStatus, filter: StatusFilter): boo
   MATCHES_STATUS_FILTER_RULES[filter](status);
 
 const matchesSearch = (equipment: Equipment, normalizedSearch: string): boolean => {
-  if (normalizedSearch === "") return true;
-  const haystack = [equipment.managementNo, equipment.name, equipment.model ?? ""]
-    .join("\n")
+  if (normalizedSearch === '') return true;
+  const haystack = [equipment.managementNo, equipment.name, equipment.model ?? '']
+    .join('\n')
     .toLowerCase();
   return haystack.includes(normalizedSearch);
 };
@@ -71,7 +71,7 @@ export const useEquipmentList = (): UseEquipmentListResult => {
   const vendors = useAppStore((state) => state.vendors);
   const serviceItems = useAppStore((state) => state.serviceItems);
 
-  const [searchText, setSearchText] = useState("");
+  const [searchText, setSearchText] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>(STATUS_FILTER.ALL);
 
   const totalCount = Object.keys(equipment).length;

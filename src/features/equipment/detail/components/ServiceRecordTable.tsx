@@ -1,8 +1,8 @@
-import { EmptyState, Table, TableBody, TableHead, Td, Th } from "@/components/ui";
-import { UNSET_LABEL } from "@/constants/labels";
-import type { ServiceRecordRow } from "@/features/equipment/detail/hooks";
-import { SERVICE_RECORD_RESULT_LABELS } from "@/features/serviceItems/constants";
-import type { ReactElement } from "react";
+import { EmptyState, Table, TableBody, TableHead, Td, Th } from '@/components/ui';
+import { UNSET_LABEL } from '@/constants/labels';
+import type { ServiceRecordRow } from '@/features/equipment/detail/hooks';
+import { SERVICE_RECORD_RESULT_LABELS } from '@/features/serviceItems/constants';
+import type { ReactElement } from 'react';
 
 type Props = {
   serviceRecordRows: readonly ServiceRecordRow[];
@@ -10,7 +10,7 @@ type Props = {
 
 export const ServiceRecordTable = ({ serviceRecordRows }: Props): ReactElement =>
   serviceRecordRows.length === 0 ? (
-    <EmptyState message="実施記録が未登録です" />
+    <EmptyState message='実施記録が未登録です' />
   ) : (
     <Table>
       <TableHead>

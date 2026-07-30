@@ -1,8 +1,8 @@
-import { Pagination, usePagination } from "@/components/ui";
-import { ServiceItemTable } from "@/features/equipment/detail/components/ServiceItemTable";
-import type { ServiceItem } from "@/features/equipment/detail/hooks";
-import type { EquipmentStatus, IsoDateString, Person, ServiceOrder, Vendor } from "@/store/types";
-import type { ReactElement } from "react";
+import { Pagination, usePagination } from '@/components/ui';
+import { ServiceItemTable } from '@/features/equipment/detail/components/ServiceItemTable';
+import type { ServiceItem } from '@/features/equipment/detail/hooks';
+import type { EquipmentStatus, IsoDateString, Person, ServiceOrder, Vendor } from '@/store/types';
+import type { ReactElement } from 'react';
 
 type Props = {
   serviceItems: readonly ServiceItem[];

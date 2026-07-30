@@ -1,11 +1,11 @@
-import type { Meta, StoryObj } from "@storybook/react-vite";
-import { useState, type ReactElement } from "react";
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import { useState, type ReactElement } from 'react';
 
-import { DEFAULT_PAGE_SIZE } from "./pageItems";
-import { Pagination } from "./Pagination";
+import { DEFAULT_PAGE_SIZE } from './pageItems';
+import { Pagination } from './Pagination';
 
 const meta = {
-  title: "UI/Pagination",
+  title: 'UI/Pagination',
   component: Pagination,
 } satisfies Meta<typeof Pagination>;
 

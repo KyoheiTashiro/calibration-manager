@@ -13,27 +13,27 @@ import {
   type Execution,
   type ServiceItemType,
   type ServiceRecordResult,
-} from "@/store/types";
+} from '@/store/types';
 
 export const SERVICE_ITEM_TYPE_LABELS = {
-  [SERVICE_ITEM_TYPE.INSPECTION]: "点検",
-  [SERVICE_ITEM_TYPE.CALIBRATION]: "校正",
+  [SERVICE_ITEM_TYPE.INSPECTION]: '点検',
+  [SERVICE_ITEM_TYPE.CALIBRATION]: '校正',
 } as const satisfies Record<ServiceItemType, string>;
 
 export const EXECUTION_LABELS = {
-  [EXECUTION.INTERNAL]: "内部",
-  [EXECUTION.EXTERNAL]: "外部",
+  [EXECUTION.INTERNAL]: '内部',
+  [EXECUTION.EXTERNAL]: '外部',
 } as const satisfies Record<Execution, string>;
 
 export const CYCLE_LABELS = {
-  [CYCLE.M1]: "1ヶ月",
-  [CYCLE.M3]: "3ヶ月",
-  [CYCLE.M6]: "6ヶ月",
-  [CYCLE.Y1]: "1年",
-  [CYCLE.Y2]: "2年",
-  [CYCLE.Y3]: "3年",
-  [CYCLE.Y5]: "5年",
-  [CYCLE.Y10]: "10年",
+  [CYCLE.M1]: '1ヶ月',
+  [CYCLE.M3]: '3ヶ月',
+  [CYCLE.M6]: '6ヶ月',
+  [CYCLE.Y1]: '1年',
+  [CYCLE.Y2]: '2年',
+  [CYCLE.Y3]: '3年',
+  [CYCLE.Y5]: '5年',
+  [CYCLE.Y10]: '10年',
 } as const satisfies Record<Cycle, string>;
 
 export const CYCLE_OPTIONS: readonly { value: Cycle; label: string }[] = Object.values(CYCLE).map(
@@ -51,9 +51,9 @@ export const EXECUTION_OPTIONS: readonly { value: Execution; label: string }[] =
 ).map((execution) => ({ value: execution, label: EXECUTION_LABELS[execution] }));
 
 export const SERVICE_RECORD_RESULT_LABELS = {
-  [SERVICE_RECORD_RESULT.PASS]: "合格",
-  [SERVICE_RECORD_RESULT.FAIL]: "不合格",
-  [SERVICE_RECORD_RESULT.ADJUSTED]: "調整合格",
+  [SERVICE_RECORD_RESULT.PASS]: '合格',
+  [SERVICE_RECORD_RESULT.FAIL]: '不合格',
+  [SERVICE_RECORD_RESULT.ADJUSTED]: '調整合格',
 } as const satisfies Record<ServiceRecordResult, string>;
 
 export const SERVICE_RECORD_RESULT_OPTIONS: readonly {

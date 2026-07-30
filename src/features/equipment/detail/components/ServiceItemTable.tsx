@@ -1,12 +1,12 @@
-import { StatusBadge } from "@/components/domain";
-import { Button, EmptyState, Table, TableBody, TableHead, Td, Th } from "@/components/ui";
-import { UNSET_LABEL } from "@/constants/labels";
-import { displayedServiceItemStatus, personLabelOf } from "@/features/equipment/detail/hooks";
+import { StatusBadge } from '@/components/domain';
+import { Button, EmptyState, Table, TableBody, TableHead, Td, Th } from '@/components/ui';
+import { UNSET_LABEL } from '@/constants/labels';
+import { displayedServiceItemStatus, personLabelOf } from '@/features/equipment/detail/hooks';
 import {
   CYCLE_LABELS,
   EXECUTION_LABELS,
   SERVICE_ITEM_TYPE_LABELS,
-} from "@/features/serviceItems/constants";
+} from '@/features/serviceItems/constants';
 import type {
   EquipmentStatus,
   IsoDateString,
@@ -14,8 +14,8 @@ import type {
   ServiceItem,
   ServiceOrder,
   Vendor,
-} from "@/store/types";
-import type { ReactElement } from "react";
+} from '@/store/types';
+import type { ReactElement } from 'react';
 
 type Props = {
   serviceItems: readonly ServiceItem[];
@@ -42,7 +42,7 @@ export const ServiceItemTable = ({
 }: Props): ReactElement =>
   serviceItems.length === 0 ? (
     <EmptyState
-      message="点検校正項目が未登録です"
+      message='点検校正項目が未登録です'
       action={<Button onClick={onAddClick}>+ 項目を追加</Button>}
     />
   ) : (
@@ -71,7 +71,7 @@ export const ServiceItemTable = ({
           return (
             <tr
               key={serviceItem.id}
-              className={serviceItem.isActive ? undefined : "text-slate-400"}
+              className={serviceItem.isActive ? undefined : 'text-slate-400'}
             >
               <Td>{status === null ? UNSET_LABEL : <StatusBadge status={status} />}</Td>
               <Td>{serviceItem.name}</Td>
@@ -82,10 +82,10 @@ export const ServiceItemTable = ({
               <Td>{serviceItem.nextDueDate}</Td>
               {/* なぜ td 直下に Button を並べるか: equipment/list や VendorList と同様、
                   div でラップするとjsx-a11yのボタンラベル探索深度を超えるためtdをflex化する */}
-              <Td className="flex gap-2" truncate={false}>
+              <Td className='flex gap-2' truncate={false}>
                 <Button
-                  variant="secondary"
-                  size="sm"
+                  variant='secondary'
+                  size='sm'
                   onClick={() => {
                     onRecordClick(serviceItem.id);
                   }}
@@ -93,8 +93,8 @@ export const ServiceItemTable = ({
                   記録
                 </Button>
                 <Button
-                  variant="secondary"
-                  size="sm"
+                  variant='secondary'
+                  size='sm'
                   onClick={() => {
                     onEditClick(serviceItem);
                   }}

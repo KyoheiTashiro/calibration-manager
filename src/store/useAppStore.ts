@@ -2,20 +2,20 @@
  * 読込パイプライン: LocalStorage → migrate → merge（3段サルベージ）→ ストア。
  */
 
-import { STORAGE_KEY, STORAGE_VERSION } from "@/constants/storage";
-import { emptyAppState, migratePersistedState, salvagePersistedState } from "@/store/persistence";
-import { createEquipmentSlice } from "@/store/slices/equipmentSlice";
-import { createNotificationSlice } from "@/store/slices/notificationSlice";
-import { createPersonSlice } from "@/store/slices/personSlice";
-import { createServiceItemSlice } from "@/store/slices/serviceItemSlice";
-import { createServiceOrderSlice } from "@/store/slices/serviceOrderSlice";
-import { createServiceRecordSlice } from "@/store/slices/serviceRecordSlice";
-import { createVendorSlice } from "@/store/slices/vendorSlice";
-import type { StoreState } from "@/store/storeState";
-import type { AppState } from "@/store/types";
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
-import { immer } from "zustand/middleware/immer";
+import { STORAGE_KEY, STORAGE_VERSION } from '@/constants/storage';
+import { emptyAppState, migratePersistedState, salvagePersistedState } from '@/store/persistence';
+import { createEquipmentSlice } from '@/store/slices/equipmentSlice';
+import { createNotificationSlice } from '@/store/slices/notificationSlice';
+import { createPersonSlice } from '@/store/slices/personSlice';
+import { createServiceItemSlice } from '@/store/slices/serviceItemSlice';
+import { createServiceOrderSlice } from '@/store/slices/serviceOrderSlice';
+import { createServiceRecordSlice } from '@/store/slices/serviceRecordSlice';
+import { createVendorSlice } from '@/store/slices/vendorSlice';
+import type { StoreState } from '@/store/storeState';
+import type { AppState } from '@/store/types';
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+import { immer } from 'zustand/middleware/immer';
 
 /** 永続化対象は7エンティティの Record のみ */
 const partializeAppState = (state: StoreState): AppState => ({

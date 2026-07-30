@@ -1,13 +1,13 @@
-import { equipmentDetailPath } from "@/constants/routes";
-import { toEquipmentPayload, type SelectOption } from "@/features/equipment/form/shared/mapping";
-import { defaultValues, type FormType } from "@/features/equipment/form/shared/schema";
-import { useEquipmentFormCore } from "@/features/equipment/form/shared/useFormCore";
-import { EQUIPMENT_STATUS, type Equipment } from "@/store/types";
-import { useAppStore } from "@/store/useAppStore";
-import { useSafeNavigate } from "@/utils/navigation";
-import { useState } from "react";
-import type { Control, FieldErrors, UseFormHandleSubmit, UseFormRegister } from "react-hook-form";
-import { useParams } from "react-router-dom";
+import { equipmentDetailPath } from '@/constants/routes';
+import { toEquipmentPayload, type SelectOption } from '@/features/equipment/form/shared/mapping';
+import { defaultValues, type FormType } from '@/features/equipment/form/shared/schema';
+import { useEquipmentFormCore } from '@/features/equipment/form/shared/useFormCore';
+import { EQUIPMENT_STATUS, type Equipment } from '@/store/types';
+import { useAppStore } from '@/store/useAppStore';
+import { useSafeNavigate } from '@/utils/navigation';
+import { useState } from 'react';
+import type { Control, FieldErrors, UseFormHandleSubmit, UseFormRegister } from 'react-hook-form';
+import { useParams } from 'react-router-dom';
 
 // なぜ undefined を許容するか: Rules of Hooks により対象不在（dangling id・URL直打ち等）でも
 // フックは無条件に実行されるため、currentEquipment が undefined の場合のフォールバック
@@ -17,12 +17,12 @@ const toFormValues = (equipment: Equipment | undefined): FormType =>
     ? {
         managementNo: equipment.managementNo,
         name: equipment.name,
-        model: equipment.model ?? "",
-        serialNo: equipment.serialNo ?? "",
-        manufacturerId: equipment.manufacturerId ?? "",
-        location: equipment.location ?? "",
+        model: equipment.model ?? '',
+        serialNo: equipment.serialNo ?? '',
+        manufacturerId: equipment.manufacturerId ?? '',
+        location: equipment.location ?? '',
         status: equipment.status,
-        note: equipment.note ?? "",
+        note: equipment.note ?? '',
       }
     : defaultValues;
 

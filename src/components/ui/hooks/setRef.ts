@@ -1,4 +1,4 @@
-import type { Ref } from "react";
+import type { Ref } from 'react';
 
 /**
  * callback ref / object ref の両形式に同じノードを伝播させる plain 関数。
@@ -7,6 +7,6 @@ import type { Ref } from "react";
  * コンポーネント本体の callback ref 内から呼ぶ plain 関数とする。
  */
 export const setRef = <Node>(ref: Ref<Node> | undefined, node: Node | null): void => {
-  if (typeof ref === "function") ref(node);
+  if (typeof ref === 'function') ref(node);
   else if (ref !== null && ref !== undefined) ref.current = node;
 };

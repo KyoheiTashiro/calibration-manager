@@ -1,12 +1,12 @@
-import type { FieldValues, SubmitHandler, UseFormHandleSubmit } from "react-hook-form";
-import { z } from "zod";
+import type { FieldValues, SubmitHandler, UseFormHandleSubmit } from 'react-hook-form';
+import { z } from 'zod';
 
 /**
  * HTML input は未入力でも空文字を返すが、ストアの optional フィールドは
  * undefined で「未設定」を表すため、送信時にこの変換が各所で必要になる。
  */
 export const emptyToUndefined = (value: string | undefined): string | undefined =>
-  value === undefined || value === "" ? undefined : value;
+  value === undefined || value === '' ? undefined : value;
 
 /**
  * RHF の handleSubmit をラップし、そのまま onClick に渡せる保存ハンドラを作る。
@@ -52,7 +52,7 @@ export const optionalNonNegativeIntegerString = (invalidMessage: string) =>
     .refine(
       (value) =>
         value === undefined ||
-        value === "" ||
+        value === '' ||
         (Number.isInteger(Number(value)) && Number(value) >= 0),
       {
         message: invalidMessage,

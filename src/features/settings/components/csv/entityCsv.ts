@@ -1,4 +1,4 @@
-import { PHONE_PATTERN, TEXT_LIMIT } from "@/constants/textLimits";
+import { PHONE_PATTERN, TEXT_LIMIT } from '@/constants/textLimits';
 import {
   equipmentSchema,
   notificationSchema,
@@ -7,10 +7,10 @@ import {
   serviceOrderSchema,
   serviceRecordSchema,
   vendorSchema,
-} from "@/store/schema";
-import { type AppState, NOTIFICATION_TARGET_TYPE } from "@/store/types";
-import { serializeCsv } from "@/utils/csv";
-import type { z } from "zod";
+} from '@/store/schema';
+import { type AppState, NOTIFICATION_TARGET_TYPE } from '@/store/types';
+import { serializeCsv } from '@/utils/csv';
+import type { z } from 'zod';
 
 export type CsvEntityKind = keyof AppState;
 
@@ -19,13 +19,13 @@ export type CsvEntityKind = keyof AppState;
  * エクスポートボタン・インポートの「データの種類」セレクト・マニュアルの列仕様タブが共有する(D-060)。
  */
 export const CSV_ENTITY_KINDS = [
-  "vendors",
-  "persons",
-  "equipment",
-  "serviceItems",
-  "serviceOrders",
-  "serviceRecords",
-  "notifications",
+  'vendors',
+  'persons',
+  'equipment',
+  'serviceItems',
+  'serviceOrders',
+  'serviceRecords',
+  'notifications',
 ] as const satisfies readonly CsvEntityKind[];
 
 export type EntityOf<Kind extends CsvEntityKind> = AppState[Kind][string];
@@ -105,15 +105,15 @@ const defineSpec = <Entity>(
 
 const PHONE_RULE: CsvFieldRule = {
   maxLength: TEXT_LIMIT.code,
-  pattern: { regex: PHONE_PATTERN, message: "半角数字またはハイフンで指定してください" },
+  pattern: { regex: PHONE_PATTERN, message: '半角数字またはハイフンで指定してください' },
 };
 
 export const ENTITY_CSV_SPECS: { [Kind in CsvEntityKind]: EntityCsvSpec<EntityOf<Kind>> } = {
   equipment: defineSpec(
-    "機器",
+    '機器',
     equipmentSchema,
-    ["managementNo"],
-    [{ key: "manufacturerId", target: "vendors" }],
+    ['managementNo'],
+    [{ key: 'manufacturerId', target: 'vendors' }],
     {
       managementNo: { maxLength: TEXT_LIMIT.code },
       name: { maxLength: TEXT_LIMIT.name },
@@ -124,23 +124,23 @@ export const ENTITY_CSV_SPECS: { [Kind in CsvEntityKind]: EntityCsvSpec<EntityOf
     },
   ),
   serviceItems: defineSpec(
-    "点検校正項目",
+    '点検校正項目',
     serviceItemSchema,
     [],
     [
-      { key: "equipmentId", target: "equipment" },
-      { key: "vendorId", target: "vendors" },
-      { key: "personId", target: "persons" },
+      { key: 'equipmentId', target: 'equipment' },
+      { key: 'vendorId', target: 'vendors' },
+      { key: 'personId', target: 'persons' },
     ],
     { name: { maxLength: TEXT_LIMIT.name } },
   ),
   serviceRecords: defineSpec(
-    "実施記録",
+    '実施記録',
     serviceRecordSchema,
     [],
     [
-      { key: "serviceItemId", target: "serviceItems" },
-      { key: "serviceOrderId", target: "serviceOrders" },
+      { key: 'serviceItemId', target: 'serviceItems' },
+      { key: 'serviceOrderId', target: 'serviceOrders' },
     ],
     {
       doneBy: { maxLength: TEXT_LIMIT.name },
@@ -148,40 +148,40 @@ export const ENTITY_CSV_SPECS: { [Kind in CsvEntityKind]: EntityCsvSpec<EntityOf
     },
   ),
   serviceOrders: defineSpec(
-    "点検校正外部案件",
+    '点検校正外部案件',
     serviceOrderSchema,
     [],
     [
-      { key: "serviceItemId", target: "serviceItems" },
-      { key: "vendorId", target: "vendors" },
+      { key: 'serviceItemId', target: 'serviceItems' },
+      { key: 'vendorId', target: 'vendors' },
     ],
     { note: { maxLength: TEXT_LIMIT.note } },
   ),
-  vendors: defineSpec("メーカー/取引先", vendorSchema, [], [], {
+  vendors: defineSpec('メーカー/取引先', vendorSchema, [], [], {
     name: { maxLength: TEXT_LIMIT.name },
     contactPerson: { maxLength: TEXT_LIMIT.name },
     email: { maxLength: TEXT_LIMIT.email },
     phone: PHONE_RULE,
     note: { maxLength: TEXT_LIMIT.note },
   }),
-  persons: defineSpec("担当者", personSchema, [], [], {
+  persons: defineSpec('担当者', personSchema, [], [], {
     name: { maxLength: TEXT_LIMIT.name },
     department: { maxLength: TEXT_LIMIT.name },
     email: { maxLength: TEXT_LIMIT.email },
   }),
   notifications: defineSpec(
-    "通知",
+    '通知',
     notificationSchema,
     [],
     [
       {
-        key: "targetId",
+        key: 'targetId',
         target: (entity) =>
           entity.targetType === NOTIFICATION_TARGET_TYPE.SERVICE_ITEM
-            ? "serviceItems"
-            : "serviceOrders",
+            ? 'serviceItems'
+            : 'serviceOrders',
       },
-      { key: "personId", target: "persons" },
+      { key: 'personId', target: 'persons' },
     ],
     {},
   ),
@@ -193,9 +193,9 @@ export const entityCsvFileName = (kind: CsvEntityKind, isoDate: string): string 
 
 /** shape の型定義上 value は下記3種 + undefined のみで、想定外値は空セルとして扱う */
 const cellOfValue = (value: unknown): string => {
-  if (typeof value === "string") return value;
-  if (typeof value === "number" || typeof value === "boolean") return String(value);
-  return "";
+  if (typeof value === 'string') return value;
+  if (typeof value === 'number' || typeof value === 'boolean') return String(value);
+  return '';
 };
 
 /** BOM は付与しない(ダウンロード時に UI 側で先頭に付ける) */

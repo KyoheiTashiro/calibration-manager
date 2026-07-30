@@ -1,14 +1,14 @@
-import App from "@/App";
-import { ErrorBoundary } from "@/components/system";
-import { setupPwaInstallCapture } from "@/features/settings/components/pwa/usePwaInstall";
-import { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
-import { HashRouter } from "react-router-dom";
-import { registerSW } from "virtual:pwa-register";
+import App from '@/App';
+import { ErrorBoundary } from '@/components/system';
+import { setupPwaInstallCapture } from '@/features/settings/components/pwa/usePwaInstall';
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import { HashRouter } from 'react-router-dom';
+import { registerSW } from 'virtual:pwa-register';
 
 // なぜ副作用importとして許可するか: Tailwindのグローバルスタイル・トークン定義（@theme）を
 // アプリ全体に適用するためエントリポイントで一度だけ読み込む必要がある。
-import "@/styles/index.css";
+import '@/styles/index.css';
 
 // なぜ: GitHub Pagesは任意パスへのフォールバックができず、`BrowserRouter` では
 // 深いパスへの直接アクセス・リロードが404になるため `HashRouter` を採用する。
@@ -25,14 +25,14 @@ setupPwaInstallCapture();
 // なぜ動的import + DEVガードか: シードデータを本番バンドルへ含めないため。
 // import.meta.env.DEV が false のときは Rollup がデッドコード除去しチャンク自体を生成しない。
 if (import.meta.env.DEV) {
-  const { seedIfEmpty } = await import("@/dev/seed");
+  const { seedIfEmpty } = await import('@/dev/seed');
   seedIfEmpty();
 }
 
-const rootElement = document.querySelector("#root");
+const rootElement = document.querySelector('#root');
 
 if (!rootElement) {
-  throw new Error("root要素が見つかりません");
+  throw new Error('root要素が見つかりません');
 }
 
 createRoot(rootElement).render(

@@ -2,7 +2,7 @@
  * 点検校正項目（ServiceItem）の追加・編集モーダル。RHF + zodResolver。
  */
 
-import { Schema, toFormValues, type FormType } from "@/components/domain/ServiceItemModal/schema";
+import { Schema, toFormValues, type FormType } from '@/components/domain/ServiceItemModal/schema';
 import {
   Button,
   Checkbox,
@@ -11,21 +11,21 @@ import {
   Modal,
   RadioGroup,
   TextField,
-} from "@/components/ui";
-import { ROUTES } from "@/constants/routes";
+} from '@/components/ui';
+import { ROUTES } from '@/constants/routes';
 import {
   CYCLE_OPTIONS,
   EXECUTION_OPTIONS,
   SERVICE_ITEM_TYPE_OPTIONS,
-} from "@/features/serviceItems/constants";
-import { EXECUTION, type ServiceItem } from "@/store/types";
-import { useAppStore } from "@/store/useAppStore";
-import { createSaveHandler, emptyToUndefined } from "@/utils/form";
-import { recordValue } from "@/utils/record";
-import { zodResolver } from "@hookform/resolvers/zod";
-import type { ChangeEvent, ReactElement } from "react";
-import { useForm, useWatch } from "react-hook-form";
-import { Link } from "react-router-dom";
+} from '@/features/serviceItems/constants';
+import { EXECUTION, type ServiceItem } from '@/store/types';
+import { useAppStore } from '@/store/useAppStore';
+import { createSaveHandler, emptyToUndefined } from '@/utils/form';
+import { recordValue } from '@/utils/record';
+import { zodResolver } from '@hookform/resolvers/zod';
+import type { ChangeEvent, ReactElement } from 'react';
+import { useForm, useWatch } from 'react-hook-form';
+import { Link } from 'react-router-dom';
 
 type Props = {
   open: boolean;
@@ -70,7 +70,7 @@ export const ServiceItemModal = ({
   };
 
   // なぜ watch() ではなく useWatch か: react-compiler lint対策のため。
-  const execution = useWatch({ control, name: "execution" });
+  const execution = useWatch({ control, name: 'execution' });
 
   const calibratorVendors = Object.values(vendors).filter((vendor) => vendor.isCalibrator);
   const vendorOptions = calibratorVendors.map((vendor) => ({
@@ -90,7 +90,7 @@ export const ServiceItemModal = ({
 
   const equipmentLabel = equipment
     ? `${equipment.managementNo} ${equipment.name}`
-    : "(機器情報が見つかりません)";
+    : '(機器情報が見つかりません)';
 
   const onSubmit = (values: FormType): void => {
     const isExternal = values.execution === EXECUTION.EXTERNAL;
@@ -130,58 +130,58 @@ export const ServiceItemModal = ({
   return (
     <Modal
       open={open}
-      title={serviceItem ? "点検校正項目を編集" : "点検校正項目を追加"}
+      title={serviceItem ? '点検校正項目を編集' : '点検校正項目を追加'}
       onClose={handleClose}
       isDirty={isDirty}
       footer={<Button onClick={handleSave}>保存</Button>}
     >
-      <div className="flex flex-col gap-4">
+      <div className='flex flex-col gap-4'>
         <div>
-          <span className="block text-sm text-slate-700">対象機器</span>
-          <p className="text-sm text-slate-800">{equipmentLabel}</p>
+          <span className='block text-sm text-slate-700'>対象機器</span>
+          <p className='text-sm text-slate-800'>{equipmentLabel}</p>
         </div>
-        <TextField label="項目名" required error={errors.name?.message} {...register("name")} />
+        <TextField label='項目名' required error={errors.name?.message} {...register('name')} />
         <RadioGroup
-          label="種別"
+          label='種別'
           required
           options={SERVICE_ITEM_TYPE_OPTIONS}
           error={errors.type?.message}
-          {...register("type")}
+          {...register('type')}
         />
         <ControlledSelect
           control={control}
-          name="cycle"
-          label="周期"
+          name='cycle'
+          label='周期'
           required
           options={CYCLE_OPTIONS}
           error={errors.cycle?.message}
         />
         <RadioGroup
-          label="実施区分"
+          label='実施区分'
           required
           options={EXECUTION_OPTIONS}
           error={errors.execution?.message}
           // なぜ onChange か: state 変化に反応する effect ではなくユーザー操作イベントで直接クリアする。
           // bufferDays は必須属性のためクリアしない。
-          {...register("execution", {
+          {...register('execution', {
             onChange: (event: ChangeEvent<HTMLInputElement>) => {
               if (event.target.value === EXECUTION.INTERNAL) {
-                setValue("vendorId", "", { shouldDirty: false });
-                setValue("leadTimeDays", "", { shouldDirty: false });
+                setValue('vendorId', '', { shouldDirty: false });
+                setValue('leadTimeDays', '', { shouldDirty: false });
               }
             },
           })}
         />
         {execution === EXECUTION.EXTERNAL ? (
-          <div className="border-line flex flex-col gap-4 border-t pt-4">
+          <div className='border-line flex flex-col gap-4 border-t pt-4'>
             {calibratorVendors.length === 0 ? (
               <div>
-                <span className="block text-sm text-slate-700">
-                  校正依頼先<span className="text-red-600">*</span>
+                <span className='block text-sm text-slate-700'>
+                  校正依頼先<span className='text-red-600'>*</span>
                 </span>
-                <p className="text-sm text-slate-600">
+                <p className='text-sm text-slate-600'>
                   校正業者が未登録です
-                  <Link to={ROUTES.VENDOR_LIST} className="text-primary ml-1 underline">
+                  <Link to={ROUTES.VENDOR_LIST} className='text-primary ml-1 underline'>
                     メーカー/取引先マスタへ
                   </Link>
                 </p>
@@ -189,40 +189,40 @@ export const ServiceItemModal = ({
             ) : (
               <ControlledSelect
                 control={control}
-                name="vendorId"
-                label="校正依頼先"
+                name='vendorId'
+                label='校正依頼先'
                 required
-                placeholder="選択してください"
+                placeholder='選択してください'
                 options={vendorOptions}
                 error={errors.vendorId?.message}
               />
             )}
             <TextField
-              label="納期(日)"
-              type="number"
+              label='納期(日)'
+              type='number'
               error={errors.leadTimeDays?.message}
-              {...register("leadTimeDays")}
+              {...register('leadTimeDays')}
             />
-            <p className="text-xs text-slate-500">
+            <p className='text-xs text-slate-500'>
               空欄の場合は校正依頼先の標準納期(日)を使用します
             </p>
             <TextField
-              label="発注余裕日"
-              type="number"
+              label='発注余裕日'
+              type='number'
               required
               error={errors.bufferDays?.message}
-              {...register("bufferDays")}
+              {...register('bufferDays')}
             />
           </div>
         ) : null}
         {personOptions.length === 0 ? (
           <div>
-            <span className="block text-sm text-slate-700">
-              担当者<span className="text-red-600">*</span>
+            <span className='block text-sm text-slate-700'>
+              担当者<span className='text-red-600'>*</span>
             </span>
-            <p className="text-sm text-slate-600">
+            <p className='text-sm text-slate-600'>
               有効な担当者がいません
-              <Link to={ROUTES.PERSON_LIST} className="text-primary ml-1 underline">
+              <Link to={ROUTES.PERSON_LIST} className='text-primary ml-1 underline'>
                 担当者マスタへ
               </Link>
             </p>
@@ -230,35 +230,35 @@ export const ServiceItemModal = ({
         ) : (
           <ControlledSelect
             control={control}
-            name="personId"
-            label="担当者"
+            name='personId'
+            label='担当者'
             required
-            placeholder="選択してください"
+            placeholder='選択してください'
             options={personOptions}
             error={errors.personId?.message}
           />
         )}
         <TextField
-          label="通知開始日数"
-          type="number"
+          label='通知開始日数'
+          type='number'
           required
           error={errors.noticeDaysBefore?.message}
-          {...register("noticeDaysBefore")}
+          {...register('noticeDaysBefore')}
         />
         <div>
           <DateField
-            label="次回期限"
+            label='次回期限'
             required
             error={errors.nextDueDate?.message}
-            {...register("nextDueDate")}
+            {...register('nextDueDate')}
           />
-          <p className="text-xs text-slate-500">
+          <p className='text-xs text-slate-500'>
             ※新規のみ手入力。以降は実施記録から自動計算されます
           </p>
         </div>
         <div>
-          <Checkbox label="期限管理の対象にする" {...register("isActive")} />
-          <p className="text-xs text-slate-500">
+          <Checkbox label='期限管理の対象にする' {...register('isActive')} />
+          <p className='text-xs text-slate-500'>
             オフにすると点検校正項目一覧・期限管理・通知の対象外になります(機器詳細では確認できます)
           </p>
         </div>

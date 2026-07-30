@@ -1,20 +1,20 @@
-import { AppLayout } from "@/components/system";
-import { ROUTES } from "@/constants/routes";
-import { Dashboard } from "@/features/dashboard";
-import { EquipmentDetail } from "@/features/equipment/detail";
-import { EquipmentCreateForm } from "@/features/equipment/form/create";
-import { EquipmentEditForm } from "@/features/equipment/form/edit";
-import { EquipmentList } from "@/features/equipment/list";
-import { Manual } from "@/features/manual";
-import { NotificationCenter } from "@/features/notifications";
-import { useNotificationScan } from "@/features/notifications/scan/useNotificationScan";
-import { PersonList } from "@/features/persons";
-import { ServiceItemList } from "@/features/serviceItems/list";
-import { ServiceOrderList } from "@/features/serviceOrder";
-import { Settings } from "@/features/settings";
-import { VendorList } from "@/features/vendors";
-import type { ReactElement } from "react";
-import { Route, Routes } from "react-router-dom";
+import { AppLayout } from '@/components/system';
+import { ROUTES } from '@/constants/routes';
+import { Dashboard } from '@/features/dashboard';
+import { EquipmentDetail } from '@/features/equipment/detail';
+import { EquipmentCreateForm } from '@/features/equipment/form/create';
+import { EquipmentEditForm } from '@/features/equipment/form/edit';
+import { EquipmentList } from '@/features/equipment/list';
+import { Manual } from '@/features/manual';
+import { NotificationCenter } from '@/features/notifications';
+import { useNotificationScan } from '@/features/notifications/scan/useNotificationScan';
+import { PersonList } from '@/features/persons';
+import { ServiceItemList } from '@/features/serviceItems/list';
+import { ServiceOrderList } from '@/features/serviceOrder';
+import { Settings } from '@/features/settings';
+import { VendorList } from '@/features/vendors';
+import type { ReactElement } from 'react';
+import { Route, Routes } from 'react-router-dom';
 
 function App(): ReactElement {
   useNotificationScan();
@@ -35,7 +35,7 @@ function App(): ReactElement {
         <Route path={ROUTES.NOTIFICATION_LIST} element={<NotificationCenter />} />
         <Route path={ROUTES.SETTINGS} element={<Settings />} />
         <Route path={ROUTES.MANUAL} element={<Manual />} />
-        <Route path="*" element={<div>ページが見つかりません</div>} />
+        <Route path='*' element={<div>ページが見つかりません</div>} />
       </Route>
     </Routes>
   );

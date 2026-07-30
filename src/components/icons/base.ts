@@ -1,4 +1,4 @@
-import type { SVGProps } from "react";
+import type { SVGProps } from 'react';
 
 /**
  * アイコン共通props。サイズは呼び出し側の className（例: "h-5 w-5"）で制御し、
@@ -6,7 +6,7 @@ import type { SVGProps } from "react";
  */
 export type IconProps = { className?: string };
 
-const ICON_VIEW_BOX = "0 0 24 24";
+const ICON_VIEW_BOX = '0 0 24 24';
 
 /**
  * 線画（stroke）系アイコン共通のSVG属性を返すヘルパ。
@@ -15,12 +15,12 @@ const ICON_VIEW_BOX = "0 0 24 24";
  */
 export const strokeIconProps = (className?: string): SVGProps<SVGSVGElement> => ({
   viewBox: ICON_VIEW_BOX,
-  fill: "none",
-  stroke: "currentColor",
+  fill: 'none',
+  stroke: 'currentColor',
   strokeWidth: 2,
-  strokeLinecap: "round",
-  strokeLinejoin: "round",
-  "aria-hidden": "true",
+  strokeLinecap: 'round',
+  strokeLinejoin: 'round',
+  'aria-hidden': 'true',
   className,
 });
 
@@ -31,7 +31,7 @@ export const strokeIconProps = (className?: string): SVGProps<SVGSVGElement> => 
  */
 export const fillIconProps = (className?: string): SVGProps<SVGSVGElement> => ({
   viewBox: ICON_VIEW_BOX,
-  fill: "currentColor",
-  "aria-hidden": "true",
+  fill: 'currentColor',
+  'aria-hidden': 'true',
   className,
 });

@@ -2,11 +2,11 @@
  * 各テストファイルは `beforeEach(setupStoreIsolation)` でストア・LocalStorage を隔離する。
  */
 
-import type { AppState } from "@/store/types";
-import { useAppStore } from "@/store/useAppStore";
-import { render, type RenderResult } from "@testing-library/react";
-import type { ReactElement } from "react";
-import { MemoryRouter, Route, Routes } from "react-router-dom";
+import type { AppState } from '@/store/types';
+import { useAppStore } from '@/store/useAppStore';
+import { render, type RenderResult } from '@testing-library/react';
+import type { ReactElement } from 'react';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
 
 type RenderWithStoreOptions = {
   initialEntries?: string[];
@@ -16,7 +16,7 @@ type RenderWithStoreOptions = {
 
 export const renderWithStore = (
   ui: ReactElement,
-  { initialEntries = ["/"], routePath }: RenderWithStoreOptions = {},
+  { initialEntries = ['/'], routePath }: RenderWithStoreOptions = {},
 ): RenderResult =>
   render(
     <MemoryRouter initialEntries={initialEntries}>

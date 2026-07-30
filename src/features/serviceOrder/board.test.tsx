@@ -3,11 +3,11 @@
  * 中止フロー・トグルON表示・カード表示解決・dangling参照・空状態2種・発注ダイアログの整合警告・列内ソート。
  */
 
-import { ServiceOrderList } from "@/features/serviceOrder";
+import { ServiceOrderList } from '@/features/serviceOrder';
 import {
   BOARD_ACTIVE_COLUMNS,
   SERVICE_ORDER_STATUS_LABELS,
-} from "@/features/serviceOrder/constants";
+} from '@/features/serviceOrder/constants';
 import {
   CYCLE,
   EQUIPMENT_STATUS,
@@ -18,45 +18,45 @@ import {
   type Equipment,
   type ServiceItem,
   type Vendor,
-} from "@/store/types";
-import { useAppStore } from "@/store/useAppStore";
-import { renderWithStore, seedStore, setupStoreIsolation } from "@/test/renderWithStore";
-import { screen, within } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import "@testing-library/jest-dom/vitest";
-import { beforeEach, describe, expect, it } from "vitest";
+} from '@/store/types';
+import { useAppStore } from '@/store/useAppStore';
+import { renderWithStore, seedStore, setupStoreIsolation } from '@/test/renderWithStore';
+import { screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import '@testing-library/jest-dom/vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 const vendor: Vendor = {
-  id: "vendor-1",
-  name: "ミツトヨ校正センター",
+  id: 'vendor-1',
+  name: 'ミツトヨ校正センター',
   isManufacturer: false,
   isCalibrator: true,
 };
 const equipment: Equipment = {
-  id: "equipment-1",
-  managementNo: "EQ-001",
-  name: "ノギス",
+  id: 'equipment-1',
+  managementNo: 'EQ-001',
+  name: 'ノギス',
   status: EQUIPMENT_STATUS.ACTIVE,
 };
 const serviceItem: ServiceItem = {
-  id: "item-1",
-  equipmentId: "equipment-1",
+  id: 'item-1',
+  equipmentId: 'equipment-1',
   type: SERVICE_ITEM_TYPE.CALIBRATION,
-  name: "年次校正",
+  name: '年次校正',
   cycle: CYCLE.Y1,
   execution: EXECUTION.EXTERNAL,
-  vendorId: "vendor-1",
+  vendorId: 'vendor-1',
   bufferDays: 14,
-  personId: "person-1",
+  personId: 'person-1',
   noticeDaysBefore: 30,
-  nextDueDate: "2026-07-10",
+  nextDueDate: '2026-07-10',
   isActive: true,
 };
 
 const makeEquipment = (id: string, managementNo: string): Equipment => ({
   id,
   managementNo,
-  name: "機器",
+  name: '機器',
   status: EQUIPMENT_STATUS.ACTIVE,
 });
 const makeServiceItem = (id: string, equipmentId: string): ServiceItem => ({
@@ -76,53 +76,53 @@ const baseSeed = (serviceOrders: Record<string, ServiceOrder>): void => {
 
 beforeEach(setupStoreIsolation);
 
-describe("カード表示", () => {
-  it("依頼先名・費用を解決し、未設定属性は「-」で表示する", () => {
+describe('カード表示', () => {
+  it('依頼先名・費用を解決し、未設定属性は「-」で表示する', () => {
     baseSeed({
-      "serviceOrder-1": {
-        id: "serviceOrder-1",
-        serviceItemId: "item-1",
-        vendorId: "vendor-1",
+      'serviceOrder-1': {
+        id: 'serviceOrder-1',
+        serviceItemId: 'item-1',
+        vendorId: 'vendor-1',
         status: SERVICE_ORDER_STATUS.ORDERED,
-        orderedDate: "2026-06-01",
+        orderedDate: '2026-06-01',
         cost: 12_000,
       },
     });
     renderWithStore(<ServiceOrderList />);
 
-    expect(screen.getByText("EQ-001")).toBeInTheDocument();
-    expect(screen.getByText("ノギス")).toBeInTheDocument();
-    expect(screen.getByText("年次校正")).toBeInTheDocument();
-    expect(screen.getByText("ミツトヨ校正センター")).toBeInTheDocument();
-    expect(screen.getByText("12000円")).toBeInTheDocument();
-    expect(screen.getByText("-")).toBeInTheDocument();
+    expect(screen.getByText('EQ-001')).toBeInTheDocument();
+    expect(screen.getByText('ノギス')).toBeInTheDocument();
+    expect(screen.getByText('年次校正')).toBeInTheDocument();
+    expect(screen.getByText('ミツトヨ校正センター')).toBeInTheDocument();
+    expect(screen.getByText('12000円')).toBeInTheDocument();
+    expect(screen.getByText('-')).toBeInTheDocument();
   });
 
-  it("dangling 参照（serviceItem/vendor 不在）でも例外を投げず「(参照先なし)」で表示する", () => {
+  it('dangling 参照（serviceItem/vendor 不在）でも例外を投げず「(参照先なし)」で表示する', () => {
     seedStore({
       serviceOrders: {
-        "serviceOrder-1": {
-          id: "serviceOrder-1",
-          serviceItemId: "missing-item",
-          vendorId: "missing-vendor",
+        'serviceOrder-1': {
+          id: 'serviceOrder-1',
+          serviceItemId: 'missing-item',
+          vendorId: 'missing-vendor',
           status: SERVICE_ORDER_STATUS.PLANNED,
         },
       },
     });
     renderWithStore(<ServiceOrderList />);
 
-    expect(screen.getAllByText("(参照先なし)").length).toBeGreaterThanOrEqual(3);
+    expect(screen.getAllByText('(参照先なし)').length).toBeGreaterThanOrEqual(3);
   });
 });
 
-describe("完了/中止も表示 トグル", () => {
-  it("既定OFFでは記録登録済/中止の列は出ず、ONで右側に追加される", async () => {
+describe('完了/中止も表示 トグル', () => {
+  it('既定OFFでは記録登録済/中止の列は出ず、ONで右側に追加される', async () => {
     const user = userEvent.setup();
     baseSeed({
-      "serviceOrder-c": {
-        id: "serviceOrder-c",
-        serviceItemId: "item-1",
-        vendorId: "vendor-1",
+      'serviceOrder-c': {
+        id: 'serviceOrder-c',
+        serviceItemId: 'item-1',
+        vendorId: 'vendor-1',
         status: SERVICE_ORDER_STATUS.COMPLETED,
       },
     });
@@ -130,160 +130,160 @@ describe("完了/中止も表示 トグル", () => {
 
     // 既定OFF: 完了列は非表示だが、案件自体は存在する（completed 1件）ため空状態にはならず、
     // 進行中4列は描画され各列に「なし」が出る（空状態は全ステータス合計0件のときのみ）。
-    expect(screen.queryByText("記録登録済")).not.toBeInTheDocument();
+    expect(screen.queryByText('記録登録済')).not.toBeInTheDocument();
     // なぜ selector 指定か: ConfirmModal（中止確認ダイアログ）は開閉に関わらず常にDOM上に
     // マウントされており、確定ボタンのラベルも「中止」に統一されたため、
     // 列見出し「中止」の有無だけを厳密に判定するには <header> 要素に候補を絞る必要がある。
-    expect(screen.queryByText("中止", { selector: "header" })).not.toBeInTheDocument();
+    expect(screen.queryByText('中止', { selector: 'header' })).not.toBeInTheDocument();
     expect(
-      screen.queryByText("点検校正外部案件はありません。点検校正項目一覧から案件を追加できます"),
+      screen.queryByText('点検校正外部案件はありません。点検校正項目一覧から案件を追加できます'),
     ).not.toBeInTheDocument();
     for (const status of BOARD_ACTIVE_COLUMNS) {
       expect(screen.getByText(SERVICE_ORDER_STATUS_LABELS[status])).toBeInTheDocument();
     }
-    expect(screen.getAllByText("なし")).toHaveLength(BOARD_ACTIVE_COLUMNS.length);
+    expect(screen.getAllByText('なし')).toHaveLength(BOARD_ACTIVE_COLUMNS.length);
 
-    await user.click(screen.getByLabelText("完了/中止も表示"));
+    await user.click(screen.getByLabelText('完了/中止も表示'));
 
-    expect(screen.getByText("記録登録済")).toBeInTheDocument();
-    expect(screen.getByText("中止", { selector: "header" })).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "記録登録" })).not.toBeInTheDocument();
+    expect(screen.getByText('記録登録済')).toBeInTheDocument();
+    expect(screen.getByText('中止', { selector: 'header' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: '記録登録' })).not.toBeInTheDocument();
   });
 });
 
-describe("中止フロー", () => {
-  it("中止 → 確認 → cancelled になり、トグルOFFでカードが消える", async () => {
+describe('中止フロー', () => {
+  it('中止 → 確認 → cancelled になり、トグルOFFでカードが消える', async () => {
     const user = userEvent.setup();
     baseSeed({
-      "serviceOrder-1": {
-        id: "serviceOrder-1",
-        serviceItemId: "item-1",
-        vendorId: "vendor-1",
+      'serviceOrder-1': {
+        id: 'serviceOrder-1',
+        serviceItemId: 'item-1',
+        vendorId: 'vendor-1',
         status: SERVICE_ORDER_STATUS.PLANNED,
       },
     });
     renderWithStore(<ServiceOrderList />);
 
-    await user.click(screen.getByRole("button", { name: "中止" }));
-    const dialog = screen.getByRole("dialog");
-    await user.click(within(dialog).getByRole("button", { name: "中止" }));
+    await user.click(screen.getByRole('button', { name: '中止' }));
+    const dialog = screen.getByRole('dialog');
+    await user.click(within(dialog).getByRole('button', { name: '中止' }));
 
-    expect(useAppStore.getState().serviceOrders["serviceOrder-1"].status).toBe(
+    expect(useAppStore.getState().serviceOrders['serviceOrder-1'].status).toBe(
       SERVICE_ORDER_STATUS.CANCELLED,
     );
-    expect(screen.queryByText("EQ-001")).not.toBeInTheDocument();
+    expect(screen.queryByText('EQ-001')).not.toBeInTheDocument();
   });
 });
 
-describe("空状態", () => {
-  it("表示対象の全列が0件のときEmptyStateと点検校正項目一覧導線を出す", () => {
+describe('空状態', () => {
+  it('表示対象の全列が0件のときEmptyStateと点検校正項目一覧導線を出す', () => {
     seedStore({ serviceOrders: {} });
     renderWithStore(<ServiceOrderList />);
 
     expect(
-      screen.getByText("点検校正外部案件はありません。点検校正項目一覧から案件を追加できます"),
+      screen.getByText('点検校正外部案件はありません。点検校正項目一覧から案件を追加できます'),
     ).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "点検校正項目一覧へ" })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '点検校正項目一覧へ' })).toBeInTheDocument();
   });
 
-  it("個別列が0件のとき列内に「なし」プレースホルダを出す", () => {
+  it('個別列が0件のとき列内に「なし」プレースホルダを出す', () => {
     baseSeed({
-      "serviceOrder-1": {
-        id: "serviceOrder-1",
-        serviceItemId: "item-1",
-        vendorId: "vendor-1",
+      'serviceOrder-1': {
+        id: 'serviceOrder-1',
+        serviceItemId: 'item-1',
+        vendorId: 'vendor-1',
         status: SERVICE_ORDER_STATUS.PLANNED,
       },
     });
     renderWithStore(<ServiceOrderList />);
 
     // planned 以外の3列（発注済/校正中/返却済）が空 → 「なし」3つ
-    expect(screen.getAllByText("なし")).toHaveLength(3);
+    expect(screen.getAllByText('なし')).toHaveLength(3);
   });
 
-  it("completed のみ1件でトグルOFF（既定）でもEmptyStateにならず進行中4列が「なし」で描画される", () => {
+  it('completed のみ1件でトグルOFF（既定）でもEmptyStateにならず進行中4列が「なし」で描画される', () => {
     baseSeed({
-      "serviceOrder-c": {
-        id: "serviceOrder-c",
-        serviceItemId: "item-1",
-        vendorId: "vendor-1",
+      'serviceOrder-c': {
+        id: 'serviceOrder-c',
+        serviceItemId: 'item-1',
+        vendorId: 'vendor-1',
         status: SERVICE_ORDER_STATUS.COMPLETED,
       },
     });
     renderWithStore(<ServiceOrderList />);
 
     expect(
-      screen.queryByText("点検校正外部案件はありません。点検校正項目一覧から案件を追加できます"),
+      screen.queryByText('点検校正外部案件はありません。点検校正項目一覧から案件を追加できます'),
     ).not.toBeInTheDocument();
     for (const status of BOARD_ACTIVE_COLUMNS) {
       expect(screen.getByText(SERVICE_ORDER_STATUS_LABELS[status])).toBeInTheDocument();
     }
     // 4列とも0件のため「なし」が4つ
-    expect(screen.getAllByText("なし")).toHaveLength(4);
+    expect(screen.getAllByText('なし')).toHaveLength(4);
   });
 });
 
-describe("発注ダイアログの整合警告（D-019）", () => {
-  it("発注日 > 返却予定日 で警告を出すが登録はブロックしない", async () => {
+describe('発注ダイアログの整合警告（D-019）', () => {
+  it('発注日 > 返却予定日 で警告を出すが登録はブロックしない', async () => {
     const user = userEvent.setup();
     baseSeed({
-      "serviceOrder-1": {
-        id: "serviceOrder-1",
-        serviceItemId: "item-1",
-        vendorId: "vendor-1",
+      'serviceOrder-1': {
+        id: 'serviceOrder-1',
+        serviceItemId: 'item-1',
+        vendorId: 'vendor-1',
         status: SERVICE_ORDER_STATUS.PLANNED,
       },
     });
     renderWithStore(<ServiceOrderList />);
 
-    await user.click(screen.getByRole("button", { name: "発注する" }));
-    const dueDateField = screen.getByLabelText("返却予定日", { exact: false });
+    await user.click(screen.getByRole('button', { name: '発注する' }));
+    const dueDateField = screen.getByLabelText('返却予定日', { exact: false });
     await user.clear(dueDateField);
-    await user.type(dueDateField, "2020-01-01");
+    await user.type(dueDateField, '2020-01-01');
 
-    expect(screen.getByText("発注日が返却予定日より後になっています")).toBeInTheDocument();
+    expect(screen.getByText('発注日が返却予定日より後になっています')).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: "確定" }));
-    expect(useAppStore.getState().serviceOrders["serviceOrder-1"].status).toBe(
+    await user.click(screen.getByRole('button', { name: '確定' }));
+    expect(useAppStore.getState().serviceOrders['serviceOrder-1'].status).toBe(
       SERVICE_ORDER_STATUS.ORDERED,
     );
-    expect(useAppStore.getState().serviceOrders["serviceOrder-1"].dueDate).toBe("2020-01-01");
+    expect(useAppStore.getState().serviceOrders['serviceOrder-1'].dueDate).toBe('2020-01-01');
   });
 });
 
-describe("列内ソート", () => {
-  it("dueDate 昇順（未設定は末尾）→ id 昇順で決定的に並ぶ", () => {
+describe('列内ソート', () => {
+  it('dueDate 昇順（未設定は末尾）→ id 昇順で決定的に並ぶ', () => {
     seedStore({
       vendors: { [vendor.id]: vendor },
       equipment: {
-        "eq-a": makeEquipment("eq-a", "EQ-A"),
-        "eq-b": makeEquipment("eq-b", "EQ-B"),
-        "eq-c": makeEquipment("eq-c", "EQ-C"),
+        'eq-a': makeEquipment('eq-a', 'EQ-A'),
+        'eq-b': makeEquipment('eq-b', 'EQ-B'),
+        'eq-c': makeEquipment('eq-c', 'EQ-C'),
       },
       serviceItems: {
-        "item-a": makeServiceItem("item-a", "eq-a"),
-        "item-b": makeServiceItem("item-b", "eq-b"),
-        "item-c": makeServiceItem("item-c", "eq-c"),
+        'item-a': makeServiceItem('item-a', 'eq-a'),
+        'item-b': makeServiceItem('item-b', 'eq-b'),
+        'item-c': makeServiceItem('item-c', 'eq-c'),
       },
       serviceOrders: {
-        "serviceOrder-a": {
-          id: "serviceOrder-a",
-          serviceItemId: "item-a",
-          vendorId: "vendor-1",
+        'serviceOrder-a': {
+          id: 'serviceOrder-a',
+          serviceItemId: 'item-a',
+          vendorId: 'vendor-1',
           status: SERVICE_ORDER_STATUS.PLANNED,
-          dueDate: "2026-08-01",
+          dueDate: '2026-08-01',
         },
-        "serviceOrder-b": {
-          id: "serviceOrder-b",
-          serviceItemId: "item-b",
-          vendorId: "vendor-1",
+        'serviceOrder-b': {
+          id: 'serviceOrder-b',
+          serviceItemId: 'item-b',
+          vendorId: 'vendor-1',
           status: SERVICE_ORDER_STATUS.PLANNED,
-          dueDate: "2026-06-01",
+          dueDate: '2026-06-01',
         },
-        "serviceOrder-c": {
-          id: "serviceOrder-c",
-          serviceItemId: "item-c",
-          vendorId: "vendor-1",
+        'serviceOrder-c': {
+          id: 'serviceOrder-c',
+          serviceItemId: 'item-c',
+          vendorId: 'vendor-1',
           status: SERVICE_ORDER_STATUS.PLANNED,
         },
       },
@@ -292,6 +292,6 @@ describe("列内ソート", () => {
 
     const managementNos = screen.getAllByText(/^EQ-[ABC]$/u).map((element) => element.textContent);
     // dueDate 昇順: B(06-01) → A(08-01) → 未設定末尾 C
-    expect(managementNos).toEqual(["EQ-B", "EQ-A", "EQ-C"]);
+    expect(managementNos).toEqual(['EQ-B', 'EQ-A', 'EQ-C']);
   });
 });

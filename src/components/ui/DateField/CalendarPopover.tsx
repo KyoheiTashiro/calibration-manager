@@ -1,14 +1,14 @@
-import { ChevronDownIcon } from "@/components/icons";
+import { ChevronDownIcon } from '@/components/icons';
 import {
   buildMonthWeeks,
   dayCellClassName,
   isSameYearMonthDay,
   shiftMonth,
-} from "@/components/ui/DateField/calendar";
-import { addDays, daysInMonth, formatIsoDate, parseIsoDate, todayIsoDate } from "@/utils/time";
-import { useCallback, useRef, useState, type KeyboardEvent, type ReactElement } from "react";
+} from '@/components/ui/DateField/calendar';
+import { addDays, daysInMonth, formatIsoDate, parseIsoDate, todayIsoDate } from '@/utils/time';
+import { useCallback, useRef, useState, type KeyboardEvent, type ReactElement } from 'react';
 
-const WEEKDAY_LABELS = ["日", "月", "火", "水", "木", "金", "土"];
+const WEEKDAY_LABELS = ['日', '月', '火', '水', '木', '金', '土'];
 
 /** グリッド上の矢印キーに対応する日数移動量(Partial: 対応外キーは undefined を返す) */
 const DAY_STEP_BY_ARROW_KEY: Partial<Record<string, number>> = {
@@ -25,9 +25,9 @@ const MONTH_STEP_BY_PAGE_KEY: Partial<Record<string, number>> = {
 };
 
 const weekdayLabelClassName = (weekday: number): string => {
-  if (weekday === 0) return "text-red-600";
-  if (weekday === 6) return "text-primary";
-  return "text-slate-500";
+  if (weekday === 0) return 'text-red-600';
+  if (weekday === 6) return 'text-primary';
+  return 'text-slate-500';
 };
 
 /** 入力欄の現在値から、カレンダーを開いた瞬間のカーソル日を決める（不正・空なら今日） */
@@ -92,61 +92,61 @@ export const CalendarPopover = ({ initialValue, onSelect, onClose }: Props): Rea
       moveCursorByMonths(monthStep);
       return;
     }
-    if (event.key === "Enter" || event.key === " ") {
+    if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
       selectDay(cursor.day);
       return;
     }
-    if (event.key === "Escape") {
+    if (event.key === 'Escape') {
       event.preventDefault();
       onClose(true);
       return;
     }
-    if (event.key === "Tab") {
+    if (event.key === 'Tab') {
       onClose(false);
     }
   };
 
   return (
     <>
-      <div className="mb-2 flex items-center justify-between">
+      <div className='mb-2 flex items-center justify-between'>
         <button
-          type="button"
-          aria-label="前の月"
+          type='button'
+          aria-label='前の月'
           onClick={() => {
             moveCursorByMonths(-1);
           }}
-          className="flex h-8 w-8 items-center justify-center rounded hover:bg-slate-100"
+          className='flex h-8 w-8 items-center justify-center rounded hover:bg-slate-100'
         >
-          <ChevronDownIcon className="h-4 w-4 rotate-90 text-slate-500" />
+          <ChevronDownIcon className='h-4 w-4 rotate-90 text-slate-500' />
         </button>
-        <span aria-live="polite" className="text-sm text-slate-700">
+        <span aria-live='polite' className='text-sm text-slate-700'>
           {cursor.year}年{cursor.month}月
         </span>
         <button
-          type="button"
-          aria-label="次の月"
+          type='button'
+          aria-label='次の月'
           onClick={() => {
             moveCursorByMonths(1);
           }}
-          className="flex h-8 w-8 items-center justify-center rounded hover:bg-slate-100"
+          className='flex h-8 w-8 items-center justify-center rounded hover:bg-slate-100'
         >
-          <ChevronDownIcon className="h-4 w-4 -rotate-90 text-slate-500" />
+          <ChevronDownIcon className='h-4 w-4 -rotate-90 text-slate-500' />
         </button>
       </div>
       <div
         ref={setGridRef}
-        role="grid"
+        role='grid'
         tabIndex={-1}
         aria-label={`${cursor.year}年${cursor.month}月`}
         onKeyDown={handleGridKeyDown}
-        className="outline-none"
+        className='outline-none'
       >
-        <table role="presentation" className="w-full table-fixed border-collapse">
+        <table role='presentation' className='w-full table-fixed border-collapse'>
           <thead>
             <tr>
               {WEEKDAY_LABELS.map((label, weekday) => (
-                <th key={label} scope="col" className={`text-xs ${weekdayLabelClassName(weekday)}`}>
+                <th key={label} scope='col' className={`text-xs ${weekdayLabelClassName(weekday)}`}>
                   {label}
                 </th>
               ))}
@@ -174,10 +174,10 @@ export const CalendarPopover = ({ initialValue, onSelect, onClose }: Props): Rea
                   return (
                     <td key={day}>
                       <button
-                        type="button"
+                        type='button'
                         aria-label={`${cursor.year}年${cursor.month}月${day}日`}
                         aria-pressed={isSelectedDay}
-                        aria-current={isTodayDay ? "date" : undefined}
+                        aria-current={isTodayDay ? 'date' : undefined}
                         onClick={() => {
                           selectDay(day);
                         }}
@@ -193,13 +193,13 @@ export const CalendarPopover = ({ initialValue, onSelect, onClose }: Props): Rea
           </tbody>
         </table>
       </div>
-      <div className="mt-2 flex justify-end">
+      <div className='mt-2 flex justify-end'>
         <button
-          type="button"
+          type='button'
           onClick={() => {
             onSelect(todayIsoDate());
           }}
-          className="text-primary text-sm hover:underline"
+          className='text-primary text-sm hover:underline'
         >
           今日
         </button>

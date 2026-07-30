@@ -5,13 +5,13 @@
 import {
   canTransitionServiceOrderStatus,
   isActiveServiceOrderStatus,
-} from "@/domain/serviceOrderStatus";
-import type { AppSliceCreator } from "@/store/storeState";
-import { type ServiceOrder, SERVICE_ORDER_STATUS, type ServiceOrderStatus } from "@/store/types";
-import { createId } from "@/utils/id";
-import { recordValue } from "@/utils/record";
+} from '@/domain/serviceOrderStatus';
+import type { AppSliceCreator } from '@/store/storeState';
+import { type ServiceOrder, SERVICE_ORDER_STATUS, type ServiceOrderStatus } from '@/store/types';
+import { createId } from '@/utils/id';
+import { recordValue } from '@/utils/record';
 
-export type AddServiceOrderInput = Omit<ServiceOrder, "id" | "status">;
+export type AddServiceOrderInput = Omit<ServiceOrder, 'id' | 'status'>;
 
 export type ServiceOrderSlice = {
   serviceOrders: Record<string, ServiceOrder>;
@@ -22,7 +22,7 @@ export type ServiceOrderSlice = {
    */
   addServiceOrder: (input: AddServiceOrderInput) => string | null;
   /** status 以外の属性更新。status は updateServiceOrderStatus / addServiceRecord 経由のみ */
-  updateServiceOrder: (id: string, patch: Partial<Omit<ServiceOrder, "id" | "status">>) => void;
+  updateServiceOrder: (id: string, patch: Partial<Omit<ServiceOrder, 'id' | 'status'>>) => void;
   /**
    * 遷移許可テーブルで検証し、許可されない遷移は no-op。
    * completed への遷移は addServiceRecord のカスケード専用のため本アクションでは常に拒否する。

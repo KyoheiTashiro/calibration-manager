@@ -1,4 +1,4 @@
-import { useEffect, useRef, type RefObject } from "react";
+import { useEffect, useRef, type RefObject } from 'react';
 
 /**
  * 要素の外側クリックを検知してハンドラを呼ぶ。
@@ -27,9 +27,9 @@ export const useOutsideClick = (
       onOutsideClickRef.current();
     };
     // enabled=false時も購読解除だけ返す(未登録へのremoveは無害)。早期returnはconsistent-return違反のため
-    if (enabled) document.addEventListener("pointerdown", handlePointerDown);
+    if (enabled) document.addEventListener('pointerdown', handlePointerDown);
     return (): void => {
-      document.removeEventListener("pointerdown", handlePointerDown);
+      document.removeEventListener('pointerdown', handlePointerDown);
     };
   }, [ref, enabled]);
 };

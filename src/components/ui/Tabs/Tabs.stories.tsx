@@ -1,26 +1,26 @@
-import type { Meta, StoryObj } from "@storybook/react-vite";
-import { useState, type ReactElement, type ReactNode } from "react";
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import { useState, type ReactElement, type ReactNode } from 'react';
 
-import { Tabs } from "./Tabs";
+import { Tabs } from './Tabs';
 
 const meta = {
-  title: "UI/Tabs",
+  title: 'UI/Tabs',
   component: Tabs,
 } satisfies Meta<typeof Tabs>;
 
 export default meta;
 
 const SAMPLE_TABS = [
-  { key: "tab-one", label: "概要" },
-  { key: "tab-two", label: "点検・校正項目" },
-  { key: "tab-three", label: "履歴" },
+  { key: 'tab-one', label: '概要' },
+  { key: 'tab-two', label: '点検・校正項目' },
+  { key: 'tab-three', label: '履歴' },
 ] as const;
 
 // なぜ: Tabsは制御コンポーネント（activeKey/onChangeを親から受け取る）のため、
 // Storybook上で実際にクリック操作を確認できるようuseStateで選択状態を持つ
 // デモ用ラッパーをストーリーファイル内に定義する。
 const TabsDemo = ({ actions }: { actions?: ReactNode }): ReactElement => {
-  const [activeKey, setActiveKey] = useState("tab-one");
+  const [activeKey, setActiveKey] = useState('tab-one');
 
   return (
     <Tabs tabs={SAMPLE_TABS} activeKey={activeKey} onChange={setActiveKey} actions={actions} />
@@ -32,7 +32,7 @@ export const Default: StoryObj<typeof meta> = {
   // StoryObjの型上componentが要求するargsを満たす必要があるため代表値を渡す。
   args: {
     tabs: SAMPLE_TABS,
-    activeKey: "tab-one",
+    activeKey: 'tab-one',
     onChange: (): void => undefined,
   },
   render: (): ReactElement => <TabsDemo />,
@@ -41,13 +41,13 @@ export const Default: StoryObj<typeof meta> = {
 export const WithActions: StoryObj<typeof meta> = {
   args: {
     tabs: SAMPLE_TABS,
-    activeKey: "tab-one",
+    activeKey: 'tab-one',
     onChange: (): void => undefined,
   },
   render: (): ReactElement => (
     <TabsDemo
       actions={
-        <button type="button" className="text-sm text-slate-600">
+        <button type='button' className='text-sm text-slate-600'>
           全て既読
         </button>
       }

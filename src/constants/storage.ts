@@ -3,7 +3,7 @@
  * キー・バージョンは zustand persist の `name` / `version` に渡す。
  */
 
-export const STORAGE_KEY = "calibration-manager:v1";
+export const STORAGE_KEY = 'calibration-manager:v1';
 
 /**
  * スキーマバージョン。初回スキーマ=1、v2=item→inspectionItem リネーム（persistence.ts

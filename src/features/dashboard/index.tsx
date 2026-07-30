@@ -1,12 +1,12 @@
-import { ActionRequiredList } from "@/features/dashboard/components/ActionRequiredList";
-import { NotificationList } from "@/features/dashboard/components/NotificationList";
-import { SummaryCards } from "@/features/dashboard/components/SummaryCards";
-import { actionRequiredRows, countByStatus, latestNotifications } from "@/features/dashboard/hooks";
-import { serviceItemRowsOf } from "@/store/selectors";
-import { useAppStore } from "@/store/useAppStore";
-import { useSafeNavigate } from "@/utils/navigation";
-import { todayIsoDate } from "@/utils/time";
-import { useMemo, type ReactElement } from "react";
+import { ActionRequiredList } from '@/features/dashboard/components/ActionRequiredList';
+import { NotificationList } from '@/features/dashboard/components/NotificationList';
+import { SummaryCards } from '@/features/dashboard/components/SummaryCards';
+import { actionRequiredRows, countByStatus, latestNotifications } from '@/features/dashboard/hooks';
+import { serviceItemRowsOf } from '@/store/selectors';
+import { useAppStore } from '@/store/useAppStore';
+import { useSafeNavigate } from '@/utils/navigation';
+import { todayIsoDate } from '@/utils/time';
+import { useMemo, type ReactElement } from 'react';
 
 export const Dashboard = (): ReactElement => {
   const safeNavigate = useSafeNavigate();
@@ -30,11 +30,11 @@ export const Dashboard = (): ReactElement => {
   const latest = useMemo(() => latestNotifications(notifications), [notifications]);
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className='flex flex-col gap-6'>
       <SummaryCards counts={counts} onNavigate={safeNavigate} />
 
-      <section className="flex flex-col gap-2">
-        <h2 className="text-lg font-semibold">要対応項目</h2>
+      <section className='flex flex-col gap-2'>
+        <h2 className='text-lg font-semibold'>要対応項目</h2>
         <ActionRequiredList rows={actionRows} onNavigate={safeNavigate} />
       </section>
 

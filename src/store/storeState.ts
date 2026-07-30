@@ -3,15 +3,15 @@
  * スライス実装とは型のみの相互参照であり、実行時の循環importは発生しない。
  */
 
-import type { EquipmentSlice } from "@/store/slices/equipmentSlice";
-import type { NotificationSlice } from "@/store/slices/notificationSlice";
-import type { PersonSlice } from "@/store/slices/personSlice";
-import type { ServiceItemSlice } from "@/store/slices/serviceItemSlice";
-import type { ServiceOrderSlice } from "@/store/slices/serviceOrderSlice";
-import type { ServiceRecordSlice } from "@/store/slices/serviceRecordSlice";
-import type { VendorSlice } from "@/store/slices/vendorSlice";
-import type { AppState } from "@/store/types";
-import type { StateCreator } from "zustand";
+import type { EquipmentSlice } from '@/store/slices/equipmentSlice';
+import type { NotificationSlice } from '@/store/slices/notificationSlice';
+import type { PersonSlice } from '@/store/slices/personSlice';
+import type { ServiceItemSlice } from '@/store/slices/serviceItemSlice';
+import type { ServiceOrderSlice } from '@/store/slices/serviceOrderSlice';
+import type { ServiceRecordSlice } from '@/store/slices/serviceRecordSlice';
+import type { VendorSlice } from '@/store/slices/vendorSlice';
+import type { AppState } from '@/store/types';
+import type { StateCreator } from 'zustand';
 
 export type StoreState = VendorSlice &
   PersonSlice &
@@ -32,7 +32,7 @@ export type StoreState = VendorSlice &
  */
 export type AppSliceCreator<Slice> = StateCreator<
   StoreState,
-  [["zustand/persist", unknown], ["zustand/immer", never]],
+  [['zustand/persist', unknown], ['zustand/immer', never]],
   [],
   Slice
 >;

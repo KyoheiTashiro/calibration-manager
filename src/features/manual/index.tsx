@@ -1,58 +1,58 @@
 /* oxlint-disable eslint/max-lines -- 利用マニュアルは静的な文章の集合で、行数上限による機械分割は文章の見通しを損なうため(D-054) */
 /* oxlint-disable react/no-multi-comp -- CsvFileNameTable はJSXネスト深さ抑制のための内部切り出しで、Manual画面専用のため同ファイルに置く */
-import { StatusBadge } from "@/components/domain";
-import { Badge } from "@/components/ui";
-import { Table, TableBody, TableHead, Td, Th } from "@/components/ui/Table";
-import { ROUTES } from "@/constants/routes";
-import { DELIVERY_DUE_SOON_NOTICE_DAYS } from "@/domain/constants";
-import { SERVICE_ITEM_STATUS, type ServiceItemStatus } from "@/domain/serviceItemStatus";
-import { statusBadgeLabel } from "@/domain/statusBadge";
+import { StatusBadge } from '@/components/domain';
+import { Badge } from '@/components/ui';
+import { Table, TableBody, TableHead, Td, Th } from '@/components/ui/Table';
+import { ROUTES } from '@/constants/routes';
+import { DELIVERY_DUE_SOON_NOTICE_DAYS } from '@/domain/constants';
+import { SERVICE_ITEM_STATUS, type ServiceItemStatus } from '@/domain/serviceItemStatus';
+import { statusBadgeLabel } from '@/domain/statusBadge';
 import {
   NOTIFICATION_TYPE_BADGE_CLASSES,
   NOTIFICATION_TYPE_ICONS,
   NOTIFICATION_TYPE_LABELS,
-} from "@/features/notifications/constants";
+} from '@/features/notifications/constants';
 import {
   CSV_ENTITY_KINDS,
   ENTITY_CSV_SPECS,
   entityCsvFileName,
-} from "@/features/settings/components/csv/entityCsv";
-import { NOTIFICATION_TYPE, type NotificationType } from "@/store/types";
-import { useRef, type ReactElement } from "react";
-import { Link } from "react-router-dom";
+} from '@/features/settings/components/csv/entityCsv';
+import { NOTIFICATION_TYPE, type NotificationType } from '@/store/types';
+import { useRef, type ReactElement } from 'react';
+import { Link } from 'react-router-dom';
 
-import { ImportCheckTabs } from "./importCheck/ImportCheckTabs";
-import { ManualSearchBar } from "./search/ManualSearchBar";
-import { TocFab } from "./TocFab";
+import { ImportCheckTabs } from './importCheck/ImportCheckTabs';
+import { ManualSearchBar } from './search/ManualSearchBar';
+import { TocFab } from './TocFab';
 
 /* スクロール先。レイアウトのスクロールコンテナは window ではなく main 要素のため、
    window.scrollTo ではなく目次と同じ scrollIntoView 方式で最上部へ戻す(D-067) */
-const MANUAL_TOP_SECTION = { id: "manual-top", title: "ページ上部へ戻る" } as const;
+const MANUAL_TOP_SECTION = { id: 'manual-top', title: 'ページ上部へ戻る' } as const;
 
 const MANUAL_SECTIONS = {
-  INTRO: { id: "introduction", title: "ご利用にあたって" },
-  FLOW: { id: "basic-flow", title: "基本の流れ" },
-  STATUS: { id: "status-guide", title: "ステータスの見方" },
-  DUE_DATES: { id: "due-date-calculation", title: "期限と発注推奨日の計算" },
-  SCREENS: { id: "screen-guides", title: "各画面の説明" },
-  CSV: { id: "csv-export-import", title: "CSVエクスポートとインポート" },
-  PRIVACY: { id: "privacy", title: "プライバシーとデータの取り扱い" },
-  LICENSE: { id: "license", title: "ライセンスとソースコード" },
+  INTRO: { id: 'introduction', title: 'ご利用にあたって' },
+  FLOW: { id: 'basic-flow', title: '基本の流れ' },
+  STATUS: { id: 'status-guide', title: 'ステータスの見方' },
+  DUE_DATES: { id: 'due-date-calculation', title: '期限と発注推奨日の計算' },
+  SCREENS: { id: 'screen-guides', title: '各画面の説明' },
+  CSV: { id: 'csv-export-import', title: 'CSVエクスポートとインポート' },
+  PRIVACY: { id: 'privacy', title: 'プライバシーとデータの取り扱い' },
+  LICENSE: { id: 'license', title: 'ライセンスとソースコード' },
 } as const;
 
 const STATUS_DESCRIPTIONS = {
-  [SERVICE_ITEM_STATUS.OVERDUE]: "次回期限を過ぎています",
+  [SERVICE_ITEM_STATUS.OVERDUE]: '次回期限を過ぎています',
   [SERVICE_ITEM_STATUS.ORDER_NOW]:
-    "外部点検校正の発注推奨日を過ぎていて、まだ進行中の点検校正外部案件がありません",
-  [SERVICE_ITEM_STATUS.IN_PROGRESS]: "発注済み・校正中の点検校正外部案件があります",
-  [SERVICE_ITEM_STATUS.DUE_SOON]: "次回期限が近づいています(通知開始日数に到達)",
-  [SERVICE_ITEM_STATUS.OK]: "上記のいずれにも当てはまりません",
+    '外部点検校正の発注推奨日を過ぎていて、まだ進行中の点検校正外部案件がありません',
+  [SERVICE_ITEM_STATUS.IN_PROGRESS]: '発注済み・校正中の点検校正外部案件があります',
+  [SERVICE_ITEM_STATUS.DUE_SOON]: '次回期限が近づいています(通知開始日数に到達)',
+  [SERVICE_ITEM_STATUS.OK]: '上記のいずれにも当てはまりません',
 } as const satisfies Record<ServiceItemStatus, string>;
 
 /* 通知種別と項目ステータスの対応関係を本文で明示するためのラベル列。
    文言は通知バッジと同じ定数から導出し、名称変更時の乖離を防ぐ */
 const joinNotificationLabels = (types: readonly NotificationType[]): string =>
-  types.map((type) => `「${NOTIFICATION_TYPE_LABELS[type]}」`).join("");
+  types.map((type) => `「${NOTIFICATION_TYPE_LABELS[type]}」`).join('');
 
 const ITEM_NOTIFICATION_LABELS = joinNotificationLabels([
   NOTIFICATION_TYPE.DUE_SOON,
@@ -66,60 +66,60 @@ const ORDER_NOTIFICATION_LABELS = joinNotificationLabels([
 ]);
 
 const NOTIFICATION_TYPE_DESCRIPTIONS = {
-  [NOTIFICATION_TYPE.DUE_SOON]: "点検校正項目の次回期限が近づいています(通知開始日数に到達)",
-  [NOTIFICATION_TYPE.OVERDUE]: "点検校正項目の次回期限を過ぎています",
+  [NOTIFICATION_TYPE.DUE_SOON]: '点検校正項目の次回期限が近づいています(通知開始日数に到達)',
+  [NOTIFICATION_TYPE.OVERDUE]: '点検校正項目の次回期限を過ぎています',
   [NOTIFICATION_TYPE.ORDER_RECOMMENDED]:
-    "外部点検校正の発注推奨日を過ぎていて、まだ進行中の点検校正外部案件がありません",
+    '外部点検校正の発注推奨日を過ぎていて、まだ進行中の点検校正外部案件がありません',
   [NOTIFICATION_TYPE.DELIVERY_DUE_SOON]: `点検校正外部案件の返却予定日が近づいています(${String(DELIVERY_DUE_SOON_NOTICE_DAYS)}日前から)`,
   [NOTIFICATION_TYPE.DELIVERY_OVERDUE]:
-    "点検校正外部案件の返却予定日を過ぎています(未返却のもののみ)",
+    '点検校正外部案件の返却予定日を過ぎています(未返却のもののみ)',
 } as const satisfies Record<NotificationType, string>;
 
 const SCREEN_GUIDES = [
   {
     route: ROUTES.DASHBOARD,
-    title: "ダッシュボード",
+    title: 'ダッシュボード',
     description:
-      "対応が必要な点検校正項目の全体像をひと目で確認し、そこから対象の点検校正項目へすぐに移動できる画面です。",
+      '対応が必要な点検校正項目の全体像をひと目で確認し、そこから対象の点検校正項目へすぐに移動できる画面です。',
   },
   {
     route: ROUTES.EQUIPMENT_LIST,
-    title: "機器一覧・機器詳細",
+    title: '機器一覧・機器詳細',
     description:
-      "登録した機器の一覧表示と検索ができます。機器詳細では、1台の機器の基本情報・点検校正項目・実施記録をまとめて確認でき、点検校正項目の管理や実施記録の登録もここから行います。",
+      '登録した機器の一覧表示と検索ができます。機器詳細では、1台の機器の基本情報・点検校正項目・実施記録をまとめて確認でき、点検校正項目の管理や実施記録の登録もここから行います。',
   },
   {
     route: ROUTES.SERVICE_ITEM_LIST,
-    title: "点検校正項目一覧",
+    title: '点検校正項目一覧',
     description:
-      "全機器の点検校正項目を期限が近い順に確認できます。絞り込みや各行の操作で日々の点検・校正業務を進める、中心となる画面です。",
+      '全機器の点検校正項目を期限が近い順に確認できます。絞り込みや各行の操作で日々の点検・校正業務を進める、中心となる画面です。',
   },
   {
     route: ROUTES.SERVICE_ORDER_LIST,
-    title: "点検校正外部案件",
+    title: '点検校正外部案件',
     description:
-      "外部点検校正の発注から返却・実施記録の登録までの進み具合を、状態ごとのボードで管理します。",
+      '外部点検校正の発注から返却・実施記録の登録までの進み具合を、状態ごとのボードで管理します。',
   },
   {
     route: ROUTES.VENDOR_LIST,
-    title: "メーカー/取引先",
-    description: "機器のメーカーや、外部点検校正の依頼先となる取引先を追加・編集します。",
+    title: 'メーカー/取引先',
+    description: '機器のメーカーや、外部点検校正の依頼先となる取引先を追加・編集します。',
   },
   {
     route: ROUTES.PERSON_LIST,
-    title: "担当者",
-    description: "担当者を追加・編集します。",
+    title: '担当者',
+    description: '担当者を追加・編集します。',
   },
   {
     route: ROUTES.NOTIFICATION_LIST,
-    title: "通知",
-    description: "アプリ内の通知を確認し、既読にできます。",
+    title: '通知',
+    description: 'アプリ内の通知を確認し、既読にできます。',
   },
   {
     route: ROUTES.SETTINGS,
-    title: "設定",
+    title: '設定',
     description:
-      "アプリのインストール(PWA)、CSVでのデータのエクスポート(バックアップ)とインポート(復元・一括登録)、データの全削除を行います。",
+      'アプリのインストール(PWA)、CSVでのデータのエクスポート(バックアップ)とインポート(復元・一括登録)、データの全削除を行います。',
   },
 ] as const;
 
@@ -139,8 +139,8 @@ const CsvFileNameTable = (): ReactElement => (
         <tr key={kind}>
           <Td>{ENTITY_CSV_SPECS[kind].label}</Td>
           <Td>
-            <code className="rounded bg-slate-100 px-1 py-0.5">
-              {entityCsvFileName(kind, "YYYY-MM-DD")}
+            <code className='rounded bg-slate-100 px-1 py-0.5'>
+              {entityCsvFileName(kind, 'YYYY-MM-DD')}
             </code>
           </Td>
         </tr>
@@ -153,24 +153,24 @@ export const Manual = (): ReactElement => {
   const searchContentRef = useRef<HTMLDivElement>(null);
 
   return (
-    <div className="flex flex-col gap-4">
-      <h1 id={MANUAL_TOP_SECTION.id} className="text-xl font-bold">
+    <div className='flex flex-col gap-4'>
+      <h1 id={MANUAL_TOP_SECTION.id} className='text-xl font-bold'>
         利用マニュアル
       </h1>
 
-      <div className="fixed right-4 bottom-4 z-10">
+      <div className='fixed right-4 bottom-4 z-10'>
         <TocFab sections={Object.values(MANUAL_SECTIONS)} topSection={MANUAL_TOP_SECTION} />
       </div>
 
       <ManualSearchBar contentRef={searchContentRef} />
 
       {/* 検索対象を本文セクションに限定し、検索バー自身や目次FABを対象外にするため */}
-      <div ref={searchContentRef} className="flex flex-col gap-4">
+      <div ref={searchContentRef} className='flex flex-col gap-4'>
         <section
           id={MANUAL_SECTIONS.INTRO.id}
-          className="flex flex-col gap-3 rounded border border-slate-200 p-4"
+          className='flex flex-col gap-3 rounded border border-slate-200 p-4'
         >
-          <h2 className="border-b border-slate-200 pb-2 text-lg font-semibold">
+          <h2 className='border-b border-slate-200 pb-2 text-lg font-semibold'>
             {MANUAL_SECTIONS.INTRO.title}
           </h2>
           <p>このアプリは、機器の点検・校正の期限をまとめて管理するツールです。</p>
@@ -183,46 +183,46 @@ export const Manual = (): ReactElement => {
 
         <section
           id={MANUAL_SECTIONS.FLOW.id}
-          className="flex flex-col gap-3 rounded border border-slate-200 p-4"
+          className='flex flex-col gap-3 rounded border border-slate-200 p-4'
         >
-          <h2 className="border-b border-slate-200 pb-2 text-lg font-semibold">
+          <h2 className='border-b border-slate-200 pb-2 text-lg font-semibold'>
             {MANUAL_SECTIONS.FLOW.title}
           </h2>
-          <ol className="flex list-decimal flex-col gap-2 pl-5">
+          <ol className='flex list-decimal flex-col gap-2 pl-5'>
             <li>
               はじめに、機器の登録で使う基本情報(
-              <Link to={ROUTES.VENDOR_LIST} className="text-primary underline">
+              <Link to={ROUTES.VENDOR_LIST} className='text-primary underline'>
                 メーカー/取引先
               </Link>
               ・
-              <Link to={ROUTES.PERSON_LIST} className="text-primary underline">
+              <Link to={ROUTES.PERSON_LIST} className='text-primary underline'>
                 担当者
               </Link>
               )を追加します。
             </li>
             <li>
-              <Link to={ROUTES.EQUIPMENT_CREATE} className="text-primary underline">
+              <Link to={ROUTES.EQUIPMENT_CREATE} className='text-primary underline'>
                 機器を追加
               </Link>
               します。
             </li>
             <li>
               機器に点検校正項目を追加します。入力画面は、
-              <Link to={ROUTES.EQUIPMENT_LIST} className="text-primary underline">
+              <Link to={ROUTES.EQUIPMENT_LIST} className='text-primary underline'>
                 機器一覧
               </Link>
               から対象機器の詳細を開くと表示できます。
             </li>
             <li>
               点検・校正を実施したら、
-              <Link to={ROUTES.SERVICE_ITEM_LIST} className="text-primary underline">
+              <Link to={ROUTES.SERVICE_ITEM_LIST} className='text-primary underline'>
                 点検校正項目一覧
               </Link>
               から実施記録を登録します。実施記録を登録すると、次回期限が自動で更新されます。
             </li>
             <li>
               外部点検校正が必要な点検校正項目は、
-              <Link to={ROUTES.SERVICE_ITEM_LIST} className="text-primary underline">
+              <Link to={ROUTES.SERVICE_ITEM_LIST} className='text-primary underline'>
                 点検校正項目一覧
               </Link>
               の各行にある「案件」ボタンから点検校正外部案件を作成します(「案件」ボタンは
@@ -230,7 +230,7 @@ export const Manual = (): ReactElement => {
             </li>
             <li>
               作成した点検校正外部案件は
-              <Link to={ROUTES.SERVICE_ORDER_LIST} className="text-primary underline">
+              <Link to={ROUTES.SERVICE_ORDER_LIST} className='text-primary underline'>
                 点検校正外部案件
               </Link>
               画面のボードに表示され、発注から返却・実施記録の登録までの進み具合を管理できます。
@@ -240,28 +240,28 @@ export const Manual = (): ReactElement => {
 
         <section
           id={MANUAL_SECTIONS.STATUS.id}
-          className="flex flex-col gap-3 rounded border border-slate-200 p-4"
+          className='flex flex-col gap-3 rounded border border-slate-200 p-4'
         >
-          <h2 className="border-b border-slate-200 pb-2 text-lg font-semibold">
+          <h2 className='border-b border-slate-200 pb-2 text-lg font-semibold'>
             {MANUAL_SECTIONS.STATUS.title}
           </h2>
-          <h3 className="border-primary border-l-4 pl-2 font-semibold">点検校正項目のステータス</h3>
+          <h3 className='border-primary border-l-4 pl-2 font-semibold'>点検校正項目のステータス</h3>
           <p>
             点検校正項目一覧やダッシュボードなどで表示されるステータスです。複数に当てはまる場合は、
             上にあるものほど優先して表示されます。
           </p>
-          <ul className="flex flex-col gap-2">
+          <ul className='flex flex-col gap-2'>
             {Object.values(SERVICE_ITEM_STATUS).map((status) => (
-              <li key={status} className="flex items-center gap-2">
+              <li key={status} className='flex items-center gap-2'>
                 <StatusBadge status={status} />
                 <span>{STATUS_DESCRIPTIONS[status]}</span>
               </li>
             ))}
           </ul>
-          <h3 className="border-primary border-l-4 pl-2 font-semibold">通知の種類</h3>
+          <h3 className='border-primary border-l-4 pl-2 font-semibold'>通知の種類</h3>
           <p>
             対応が必要になった点検校正項目・点検校正外部案件については、
-            <Link to={ROUTES.NOTIFICATION_LIST} className="text-primary mx-1 underline">
+            <Link to={ROUTES.NOTIFICATION_LIST} className='text-primary mx-1 underline'>
               通知一覧
             </Link>
             に次の5種類の通知が自動で作られます。
@@ -275,13 +275,13 @@ export const Manual = (): ReactElement => {
             {statusBadgeLabel(SERVICE_ITEM_STATUS.OK)}
             」は対応が不要な状態のため、対応する通知はありません。
           </p>
-          <ul className="flex flex-col gap-2">
+          <ul className='flex flex-col gap-2'>
             {Object.values(NOTIFICATION_TYPE).map((type) => {
               const TypeIcon = NOTIFICATION_TYPE_ICONS[type];
               return (
-                <li key={type} className="flex items-center gap-2">
+                <li key={type} className='flex items-center gap-2'>
                   <Badge className={NOTIFICATION_TYPE_BADGE_CLASSES[type]}>
-                    <TypeIcon className="mr-1 h-3.5 w-3.5" />
+                    <TypeIcon className='mr-1 h-3.5 w-3.5' />
                     {NOTIFICATION_TYPE_LABELS[type]}
                   </Badge>
                   <span>{NOTIFICATION_TYPE_DESCRIPTIONS[type]}</span>
@@ -293,12 +293,12 @@ export const Manual = (): ReactElement => {
 
         <section
           id={MANUAL_SECTIONS.DUE_DATES.id}
-          className="flex flex-col gap-3 rounded border border-slate-200 p-4"
+          className='flex flex-col gap-3 rounded border border-slate-200 p-4'
         >
-          <h2 className="border-b border-slate-200 pb-2 text-lg font-semibold">
+          <h2 className='border-b border-slate-200 pb-2 text-lg font-semibold'>
             {MANUAL_SECTIONS.DUE_DATES.title}
           </h2>
-          <h3 className="border-primary border-l-4 pl-2 font-semibold">次回期限</h3>
+          <h3 className='border-primary border-l-4 pl-2 font-semibold'>次回期限</h3>
           <p>
             次回期限は「前回実施日 +
             周期」で自動計算されます。点検校正項目を登録した直後はまだ実施記録が
@@ -314,7 +314,7 @@ export const Manual = (): ReactElement => {
             その月の末日になります(例: 1/31 の1か月後は 2/28、うるう年なら 2/29)。
           </p>
 
-          <h3 className="border-primary border-l-4 pl-2 font-semibold">
+          <h3 className='border-primary border-l-4 pl-2 font-semibold'>
             発注推奨日(外部点検校正のみ)
           </h3>
           <p>
@@ -339,15 +339,15 @@ export const Manual = (): ReactElement => {
 
         <section
           id={MANUAL_SECTIONS.SCREENS.id}
-          className="flex flex-col gap-3 rounded border border-slate-200 p-4"
+          className='flex flex-col gap-3 rounded border border-slate-200 p-4'
         >
-          <h2 className="border-b border-slate-200 pb-2 text-lg font-semibold">
+          <h2 className='border-b border-slate-200 pb-2 text-lg font-semibold'>
             {MANUAL_SECTIONS.SCREENS.title}
           </h2>
           {SCREEN_GUIDES.map((guide) => (
             <div key={guide.route}>
-              <h3 className="font-semibold">
-                <Link to={guide.route} className="text-primary underline">
+              <h3 className='font-semibold'>
+                <Link to={guide.route} className='text-primary underline'>
                   {guide.title}
                 </Link>
               </h3>
@@ -358,13 +358,13 @@ export const Manual = (): ReactElement => {
 
         <section
           id={MANUAL_SECTIONS.CSV.id}
-          className="flex flex-col gap-3 rounded border border-slate-200 p-4"
+          className='flex flex-col gap-3 rounded border border-slate-200 p-4'
         >
-          <h2 className="border-b border-slate-200 pb-2 text-lg font-semibold">
+          <h2 className='border-b border-slate-200 pb-2 text-lg font-semibold'>
             {MANUAL_SECTIONS.CSV.title}
           </h2>
           <p>
-            <Link to={ROUTES.SETTINGS} className="text-primary underline">
+            <Link to={ROUTES.SETTINGS} className='text-primary underline'>
               設定画面
             </Link>
             から、CSVファイルでデータのエクスポート(書き出し)とインポート(取り込み)ができます。
@@ -373,7 +373,7 @@ export const Manual = (): ReactElement => {
             定期的にエクスポートしておくことを推奨します。
           </p>
 
-          <h3 className="border-primary border-l-4 pl-2 font-semibold">CSVエクスポート</h3>
+          <h3 className='border-primary border-l-4 pl-2 font-semibold'>CSVエクスポート</h3>
           <p>
             データの種類ごとに、1つのCSVファイルをダウンロードできます。ファイルはUTF-8(BOM付き)で、
             Excelでもそのまま開けます。データが1件もない場合でも、1行目の英語の項目名だけのCSVを出力できます。
@@ -388,10 +388,10 @@ export const Manual = (): ReactElement => {
             インポート時にどの種類のCSVかを判定するために使われます。編集せず、そのまま残してください。
           </p>
 
-          <h3 className="border-primary border-l-4 pl-2 font-semibold">CSVインポート</h3>
-          <ol className="flex list-decimal flex-col gap-2 pl-5">
+          <h3 className='border-primary border-l-4 pl-2 font-semibold'>CSVインポート</h3>
+          <ol className='flex list-decimal flex-col gap-2 pl-5'>
             <li>
-              <Link to={ROUTES.SETTINGS} className="text-primary underline">
+              <Link to={ROUTES.SETTINGS} className='text-primary underline'>
                 設定画面
               </Link>
               の「CSVインポート」で、対象となるデータの種類を選択します。
@@ -420,10 +420,10 @@ export const Manual = (): ReactElement => {
             そのファイルに行を追記してからインポートしてください。
           </p>
 
-          <h3 className="border-primary border-l-4 pl-2 font-semibold">
+          <h3 className='border-primary border-l-4 pl-2 font-semibold'>
             インポート時にチェックされる内容
           </h3>
-          <ul className="flex list-disc flex-col gap-2 pl-5">
+          <ul className='flex list-disc flex-col gap-2 pl-5'>
             <li>
               1行目の英語の項目名が、選択した種類のものと一致しているか(別の種類のCSVの取り違え防止)
             </li>
@@ -446,7 +446,7 @@ export const Manual = (): ReactElement => {
             確認してください。
           </p>
 
-          <h3 className="border-primary border-l-4 pl-2 font-semibold">
+          <h3 className='border-primary border-l-4 pl-2 font-semibold'>
             複数の種類をインポートする順番
           </h3>
           <p>
@@ -455,7 +455,7 @@ export const Manual = (): ReactElement => {
           </p>
           <p>メーカー/取引先 → 担当者 → 機器 → 点検校正項目 → 点検校正外部案件 → 実施記録 → 通知</p>
 
-          <h3 className="border-primary border-l-4 pl-2 font-semibold">セキュリティ上の注意</h3>
+          <h3 className='border-primary border-l-4 pl-2 font-semibold'>セキュリティ上の注意</h3>
           <p>
             インポートするCSVファイルは、ご自身でエクスポートしたものや、入手元が信頼できるもの
             だけにしてください。また、エクスポートしたCSVをExcel等の表計算ソフトで開いたときに、
@@ -466,9 +466,9 @@ export const Manual = (): ReactElement => {
 
         <section
           id={MANUAL_SECTIONS.PRIVACY.id}
-          className="flex flex-col gap-3 rounded border border-slate-200 p-4"
+          className='flex flex-col gap-3 rounded border border-slate-200 p-4'
         >
-          <h2 className="border-b border-slate-200 pb-2 text-lg font-semibold">
+          <h2 className='border-b border-slate-200 pb-2 text-lg font-semibold'>
             {MANUAL_SECTIONS.PRIVACY.title}
           </h2>
           <p>
@@ -482,15 +482,15 @@ export const Manual = (): ReactElement => {
           </p>
           <p>
             保存したデータは、
-            <Link to={ROUTES.SETTINGS} className="text-primary underline">
+            <Link to={ROUTES.SETTINGS} className='text-primary underline'>
               設定画面
             </Link>
             のデータ全削除でいつでも削除できます。詳しくは
             <a
-              href="https://github.com/KyoheiTashiro/calibration-manager/blob/main/PRIVACY.md"
-              target="_blank"
-              rel="noreferrer"
-              className="text-primary mx-1 underline"
+              href='https://github.com/KyoheiTashiro/calibration-manager/blob/main/PRIVACY.md'
+              target='_blank'
+              rel='noreferrer'
+              className='text-primary mx-1 underline'
             >
               プライバシーポリシー
             </a>
@@ -500,18 +500,18 @@ export const Manual = (): ReactElement => {
 
         <section
           id={MANUAL_SECTIONS.LICENSE.id}
-          className="flex flex-col gap-3 rounded border border-slate-200 p-4"
+          className='flex flex-col gap-3 rounded border border-slate-200 p-4'
         >
-          <h2 className="border-b border-slate-200 pb-2 text-lg font-semibold">
+          <h2 className='border-b border-slate-200 pb-2 text-lg font-semibold'>
             {MANUAL_SECTIONS.LICENSE.title}
           </h2>
           <p>
             このアプリはオープンソースソフトウェアです。ソースコードはMITライセンスのもと、
             <a
-              href="https://github.com/KyoheiTashiro/calibration-manager"
-              target="_blank"
-              rel="noreferrer"
-              className="text-primary mx-1 underline"
+              href='https://github.com/KyoheiTashiro/calibration-manager'
+              target='_blank'
+              rel='noreferrer'
+              className='text-primary mx-1 underline'
             >
               GitHubリポジトリ
             </a>
@@ -520,10 +520,10 @@ export const Manual = (): ReactElement => {
           <p>
             業務に合わせて機能を追加したい場合は、
             <a
-              href="https://github.com/KyoheiTashiro/calibration-manager/blob/main/LICENSE.ja.md"
-              target="_blank"
-              rel="noreferrer"
-              className="text-primary mx-1 underline"
+              href='https://github.com/KyoheiTashiro/calibration-manager/blob/main/LICENSE.ja.md'
+              target='_blank'
+              rel='noreferrer'
+              className='text-primary mx-1 underline'
             >
               ライセンスの条件
             </a>

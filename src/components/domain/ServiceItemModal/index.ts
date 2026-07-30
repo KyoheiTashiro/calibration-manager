@@ -1,1 +1,1 @@
-export { ServiceItemModal } from "@/components/domain/ServiceItemModal/ServiceItemModal";
+export { ServiceItemModal } from '@/components/domain/ServiceItemModal/ServiceItemModal';

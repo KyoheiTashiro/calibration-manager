@@ -1,6 +1,6 @@
-import { ROUTES } from "@/constants/routes";
-import type { ReactElement } from "react";
-import { NavLink } from "react-router-dom";
+import { ROUTES } from '@/constants/routes';
+import type { ReactElement } from 'react';
+import { NavLink } from 'react-router-dom';
 
 type Props = {
   /** モバイルオーバーレイでリンククリック時にオーバーレイを閉じるための任意コールバック */
@@ -15,15 +15,15 @@ type NavItem = {
 };
 
 const NAV_ITEMS: NavItem[] = [
-  { path: ROUTES.DASHBOARD, label: "ダッシュボード", end: true },
-  { path: ROUTES.EQUIPMENT_LIST, label: "機器" },
-  { path: ROUTES.SERVICE_ITEM_LIST, label: "点検校正項目" },
-  { path: ROUTES.SERVICE_ORDER_LIST, label: "点検校正外部案件" },
-  { path: ROUTES.VENDOR_LIST, label: "メーカー/取引先" },
-  { path: ROUTES.PERSON_LIST, label: "担当者" },
-  { path: ROUTES.NOTIFICATION_LIST, label: "通知" },
-  { path: ROUTES.SETTINGS, label: "設定" },
-  { path: ROUTES.MANUAL, label: "利用マニュアル" },
+  { path: ROUTES.DASHBOARD, label: 'ダッシュボード', end: true },
+  { path: ROUTES.EQUIPMENT_LIST, label: '機器' },
+  { path: ROUTES.SERVICE_ITEM_LIST, label: '点検校正項目' },
+  { path: ROUTES.SERVICE_ORDER_LIST, label: '点検校正外部案件' },
+  { path: ROUTES.VENDOR_LIST, label: 'メーカー/取引先' },
+  { path: ROUTES.PERSON_LIST, label: '担当者' },
+  { path: ROUTES.NOTIFICATION_LIST, label: '通知' },
+  { path: ROUTES.SETTINGS, label: '設定' },
+  { path: ROUTES.MANUAL, label: '利用マニュアル' },
 ];
 
 export const Sidebar = ({ onNavigate }: Props): ReactElement => {
@@ -32,8 +32,8 @@ export const Sidebar = ({ onNavigate }: Props): ReactElement => {
   };
 
   return (
-    <nav aria-label="メインナビゲーション" className="bg-subBg h-full w-60">
-      <ul className="flex flex-col gap-1 p-2">
+    <nav aria-label='メインナビゲーション' className='bg-subBg h-full w-60'>
+      <ul className='flex flex-col gap-1 p-2'>
         {NAV_ITEMS.map((navItem) => (
           <li key={navItem.path}>
             <NavLink
@@ -42,7 +42,7 @@ export const Sidebar = ({ onNavigate }: Props): ReactElement => {
               onClick={handleNavigate}
               className={({ isActive }): string =>
                 `block rounded px-3 py-2 text-sm ${
-                  isActive ? "bg-blue-50 text-blue-700" : "text-slate-600 hover:bg-slate-100"
+                  isActive ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-100'
                 }`
               }
             >

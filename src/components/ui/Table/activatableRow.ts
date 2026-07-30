@@ -1,4 +1,4 @@
-import type { KeyboardEvent } from "react";
+import type { KeyboardEvent } from 'react';
 
 type ActivatableRowProps = {
   tabIndex: 0;
@@ -11,9 +11,9 @@ export const activatableRowProps = (onActivate: () => void): ActivatableRowProps
   tabIndex: 0,
   onClick: onActivate,
   onKeyDown: (event): void => {
-    if (event.key !== "Enter" && event.key !== " ") return;
+    if (event.key !== 'Enter' && event.key !== ' ') return;
     event.preventDefault();
     onActivate();
   },
-  className: "cursor-pointer hover:bg-slate-50",
+  className: 'cursor-pointer hover:bg-slate-50',
 });

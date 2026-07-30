@@ -1,4 +1,4 @@
-import { useDialog } from "@/components/ui/hooks/useDialog";
+import { useDialog } from '@/components/ui/hooks/useDialog';
 import {
   useId,
   useState,
@@ -6,7 +6,7 @@ import {
   type ReactElement,
   type ReactNode,
   type SyntheticEvent,
-} from "react";
+} from 'react';
 
 type ModalProps = {
   open: boolean;
@@ -77,44 +77,44 @@ export const Modal = ({
       onCancel={handleCancel}
       onClick={handleClick}
       onClose={handleDialogClose}
-      className="border-line m-auto w-full max-w-lg rounded-lg border p-0 backdrop:bg-slate-900/50"
+      className='border-line m-auto w-full max-w-lg rounded-lg border p-0 backdrop:bg-slate-900/50'
     >
-      <div className="relative flex max-h-[85vh] flex-col">
-        <div className="border-line flex items-center justify-between border-b px-4 py-3">
-          <h2 id={titleId} className="text-lg font-semibold">
+      <div className='relative flex max-h-[85vh] flex-col'>
+        <div className='border-line flex items-center justify-between border-b px-4 py-3'>
+          <h2 id={titleId} className='text-lg font-semibold'>
             {title}
           </h2>
           <button
-            type="button"
-            aria-label="閉じる"
+            type='button'
+            aria-label='閉じる'
             onClick={attemptClose}
-            className="text-slate-500 hover:text-slate-800"
+            className='text-slate-500 hover:text-slate-800'
           >
             ×
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-4 py-4">{children}</div>
+        <div className='flex-1 overflow-y-auto px-4 py-4'>{children}</div>
 
         {footer !== undefined && footer !== null && (
-          <div className="border-line flex justify-end gap-2 border-t px-4 py-3">{footer}</div>
+          <div className='border-line flex justify-end gap-2 border-t px-4 py-3'>{footer}</div>
         )}
 
         {confirmDiscardOpen ? (
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-white/95 px-4 text-center">
-            <p className="text-sm font-medium">編集内容を破棄しますか?</p>
-            <div className="flex gap-2">
+          <div className='absolute inset-0 flex flex-col items-center justify-center gap-4 bg-white/95 px-4 text-center'>
+            <p className='text-sm font-medium'>編集内容を破棄しますか?</p>
+            <div className='flex gap-2'>
               <button
-                type="button"
+                type='button'
                 onClick={handleCancelDiscard}
-                className="h-9 rounded border border-slate-300 px-4 text-sm text-slate-700"
+                className='h-9 rounded border border-slate-300 px-4 text-sm text-slate-700'
               >
                 キャンセル
               </button>
               <button
-                type="button"
+                type='button'
                 onClick={handleConfirmDiscard}
-                className="bg-danger h-9 rounded px-4 text-sm text-white"
+                className='bg-danger h-9 rounded px-4 text-sm text-white'
               >
                 破棄
               </button>

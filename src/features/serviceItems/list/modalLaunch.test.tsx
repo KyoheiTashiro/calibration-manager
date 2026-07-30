@@ -1,25 +1,25 @@
-import { ServiceItemList } from "@/features/serviceItems/list";
-import { renderWithStore, setupStoreIsolation } from "@/test/renderWithStore";
-import { serviceItemExternalOverdue, seedServiceItemList } from "@/test/serviceItemListFixtures";
-import { screen, within } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import "@testing-library/jest-dom/vitest";
-import { beforeEach, describe, expect, it } from "vitest";
+import { ServiceItemList } from '@/features/serviceItems/list';
+import { renderWithStore, setupStoreIsolation } from '@/test/renderWithStore';
+import { serviceItemExternalOverdue, seedServiceItemList } from '@/test/serviceItemListFixtures';
+import { screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import '@testing-library/jest-dom/vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 const renderList = (): ReturnType<typeof renderWithStore> =>
-  renderWithStore(<ServiceItemList />, { initialEntries: ["/service-items"] });
+  renderWithStore(<ServiceItemList />, { initialEntries: ['/service-items'] });
 
 const getOpenDialog = (title: string): HTMLElement => {
-  const dialogElement = screen.getByText(title).closest("dialog");
-  if (!dialogElement) throw new Error("dialog要素が見つかりません");
-  expect(dialogElement).toHaveAttribute("open");
+  const dialogElement = screen.getByText(title).closest('dialog');
+  if (!dialogElement) throw new Error('dialog要素が見つかりません');
+  expect(dialogElement).toHaveAttribute('open');
   return dialogElement;
 };
 
 const clickRowAction = async (buttonName: string): Promise<void> => {
   const user = userEvent.setup();
-  const row = screen.getByRole("row", { name: /年次校正/u });
-  await user.click(within(row).getByRole("button", { name: buttonName }));
+  const row = screen.getByRole('row', { name: /年次校正/u });
+  await user.click(within(row).getByRole('button', { name: buttonName }));
 };
 
 beforeEach(() => {
@@ -27,42 +27,42 @@ beforeEach(() => {
   seedServiceItemList();
 });
 
-describe("ServiceItemList: モーダル起動", () => {
-  it("[記録]で対象項目の ServiceRecordModal が開く", async () => {
+describe('ServiceItemList: モーダル起動', () => {
+  it('[記録]で対象項目の ServiceRecordModal が開く', async () => {
     renderList();
-    await clickRowAction("記録");
+    await clickRowAction('記録');
 
-    const dialogElement = getOpenDialog("実施記録を登録");
+    const dialogElement = getOpenDialog('実施記録を登録');
     expect(within(dialogElement).getByText(/年次校正/u)).toBeInTheDocument();
   });
 
-  it("[案件]で対象項目の ServiceOrderModal が開く", async () => {
+  it('[案件]で対象項目の ServiceOrderModal が開く', async () => {
     renderList();
-    await clickRowAction("案件");
+    await clickRowAction('案件');
 
-    const dialogElement = getOpenDialog("点検校正外部案件を追加");
+    const dialogElement = getOpenDialog('点検校正外部案件を追加');
     expect(within(dialogElement).getByText(/年次校正/u)).toBeInTheDocument();
   });
 
-  it("[編集]で対象項目がプリフィルされた ServiceItemModal が開く", async () => {
+  it('[編集]で対象項目がプリフィルされた ServiceItemModal が開く', async () => {
     renderList();
-    await clickRowAction("編集");
+    await clickRowAction('編集');
 
-    const dialogElement = getOpenDialog("点検校正項目を編集");
-    expect(within(dialogElement).getByLabelText("項目名", { exact: false })).toHaveValue(
+    const dialogElement = getOpenDialog('点検校正項目を編集');
+    expect(within(dialogElement).getByLabelText('項目名', { exact: false })).toHaveValue(
       serviceItemExternalOverdue.name,
     );
   });
 
-  it("モーダルを閉じると起動 state がリセットされ再度開き直せる", async () => {
+  it('モーダルを閉じると起動 state がリセットされ再度開き直せる', async () => {
     const user = userEvent.setup();
     renderList();
 
-    await clickRowAction("編集");
-    await user.click(screen.getByRole("button", { name: "閉じる" }));
-    expect(screen.queryByText("点検校正項目を編集")).not.toBeInTheDocument();
+    await clickRowAction('編集');
+    await user.click(screen.getByRole('button', { name: '閉じる' }));
+    expect(screen.queryByText('点検校正項目を編集')).not.toBeInTheDocument();
 
-    await clickRowAction("記録");
-    expect(getOpenDialog("実施記録を登録")).toBeInTheDocument();
+    await clickRowAction('記録');
+    expect(getOpenDialog('実施記録を登録')).toBeInTheDocument();
   });
 });

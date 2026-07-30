@@ -1,6 +1,6 @@
-import { ArrowUpIcon, CloseIcon, MenuIcon } from "@/components/icons";
-import { useOutsideClick } from "@/components/ui/hooks/useOutsideClick";
-import { useEffect, useRef, useState, type ReactElement } from "react";
+import { ArrowUpIcon, CloseIcon, MenuIcon } from '@/components/icons';
+import { useOutsideClick } from '@/components/ui/hooks/useOutsideClick';
+import { useEffect, useRef, useState, type ReactElement } from 'react';
 
 type TocSection = { id: string; title: string };
 
@@ -26,45 +26,45 @@ export const TocFab = ({ sections, topSection }: TocFabProps): ReactElement => {
   // 閉じる必要があるため。開いている間だけ購読し、閉じたら必ず解除する。
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent): void => {
-      if (event.key === "Escape") {
+      if (event.key === 'Escape') {
         setIsOpen(false);
       }
     };
     if (isOpen) {
-      document.addEventListener("keydown", handleKeyDown);
+      document.addEventListener('keydown', handleKeyDown);
     }
     return (): void => {
-      document.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener('keydown', handleKeyDown);
     };
   }, [isOpen]);
 
   const handleSectionClick = (id: string): void => {
-    document.querySelector(`#${id}`)?.scrollIntoView({ behavior: "smooth" });
+    document.querySelector(`#${id}`)?.scrollIntoView({ behavior: 'smooth' });
     setIsOpen(false);
   };
 
   return (
-    <div ref={containerRef} className="relative">
+    <div ref={containerRef} className='relative'>
       {isOpen ? (
-        <div className="absolute right-0 bottom-full mb-2 w-max rounded border border-slate-200 bg-white p-2 shadow-lg">
-          <ul className="flex flex-col gap-1">
-            <li className="border-b border-slate-200 pb-1">
+        <div className='absolute right-0 bottom-full mb-2 w-max rounded border border-slate-200 bg-white p-2 shadow-lg'>
+          <ul className='flex flex-col gap-1'>
+            <li className='border-b border-slate-200 pb-1'>
               <button
-                type="button"
-                className="text-primary flex w-full items-center gap-2 rounded px-3 py-1.5 text-left"
+                type='button'
+                className='text-primary flex w-full items-center gap-2 rounded px-3 py-1.5 text-left'
                 onClick={() => {
                   handleSectionClick(topSection.id);
                 }}
               >
-                <ArrowUpIcon className="h-4 w-4" />
+                <ArrowUpIcon className='h-4 w-4' />
                 {topSection.title}
               </button>
             </li>
             {sections.map((section) => (
               <li key={section.id}>
                 <button
-                  type="button"
-                  className="text-primary block w-full rounded px-3 py-1.5 text-left"
+                  type='button'
+                  className='text-primary block w-full rounded px-3 py-1.5 text-left'
                   onClick={() => {
                     handleSectionClick(section.id);
                   }}
@@ -78,15 +78,15 @@ export const TocFab = ({ sections, topSection }: TocFabProps): ReactElement => {
       ) : null}
 
       <button
-        type="button"
-        aria-label="目次"
+        type='button'
+        aria-label='目次'
         aria-expanded={isOpen}
-        className="border-primary text-primary rounded-full border bg-white p-3 shadow-md"
+        className='border-primary text-primary rounded-full border bg-white p-3 shadow-md'
         onClick={() => {
           setIsOpen((prev) => !prev);
         }}
       >
-        {isOpen ? <CloseIcon className="h-5 w-5" /> : <MenuIcon className="h-5 w-5" />}
+        {isOpen ? <CloseIcon className='h-5 w-5' /> : <MenuIcon className='h-5 w-5' />}
       </button>
     </div>
   );

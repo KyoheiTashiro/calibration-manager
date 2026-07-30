@@ -9,57 +9,57 @@
  * preprocess/transform による resolver の入出力型ズレを避ける。
  */
 
-import { PHONE_PATTERN, TEXT_LIMIT } from "@/constants/textLimits";
-import { maxLengthMessage } from "@/utils/form";
-import { z } from "zod";
+import { PHONE_PATTERN, TEXT_LIMIT } from '@/constants/textLimits';
+import { maxLengthMessage } from '@/utils/form';
+import { z } from 'zod';
 
 export const Schema = z.object({
   name: z
     .string()
-    .min(1, "名称は必須です")
-    .max(TEXT_LIMIT.name, maxLengthMessage("名称", TEXT_LIMIT.name)),
+    .min(1, '名称は必須です')
+    .max(TEXT_LIMIT.name, maxLengthMessage('名称', TEXT_LIMIT.name)),
   isManufacturer: z.boolean(),
   isCalibrator: z.boolean(),
   contactPerson: z
     .string()
-    .max(TEXT_LIMIT.name, maxLengthMessage("窓口担当者", TEXT_LIMIT.name))
+    .max(TEXT_LIMIT.name, maxLengthMessage('窓口担当者', TEXT_LIMIT.name))
     .optional(),
   email: z
     .string()
-    .max(TEXT_LIMIT.email, maxLengthMessage("メールアドレス", TEXT_LIMIT.email))
+    .max(TEXT_LIMIT.email, maxLengthMessage('メールアドレス', TEXT_LIMIT.email))
     .optional()
-    .refine((value) => value === undefined || value === "" || z.email().safeParse(value).success, {
-      message: "メールアドレスの形式が不正です",
+    .refine((value) => value === undefined || value === '' || z.email().safeParse(value).success, {
+      message: 'メールアドレスの形式が不正です',
     }),
   phone: z
     .string()
-    .max(TEXT_LIMIT.code, maxLengthMessage("電話番号", TEXT_LIMIT.code))
+    .max(TEXT_LIMIT.code, maxLengthMessage('電話番号', TEXT_LIMIT.code))
     .optional()
-    .refine((value) => value === undefined || value === "" || PHONE_PATTERN.test(value), {
-      message: "電話番号は半角数字またはハイフンで入力してください",
+    .refine((value) => value === undefined || value === '' || PHONE_PATTERN.test(value), {
+      message: '電話番号は半角数字またはハイフンで入力してください',
     }),
   standardLeadTimeDays: z
     .string()
     .optional()
     .refine(
       (value) =>
-        value === undefined || value === "" || (!Number.isNaN(Number(value)) && Number(value) >= 0),
+        value === undefined || value === '' || (!Number.isNaN(Number(value)) && Number(value) >= 0),
       {
-        message: "0以上の数値を入力してください",
+        message: '0以上の数値を入力してください',
       },
     ),
-  note: z.string().max(TEXT_LIMIT.note, maxLengthMessage("備考", TEXT_LIMIT.note)).optional(),
+  note: z.string().max(TEXT_LIMIT.note, maxLengthMessage('備考', TEXT_LIMIT.note)).optional(),
 });
 
 export type FormType = z.infer<typeof Schema>;
 
 export const defaultValues: FormType = {
-  name: "",
+  name: '',
   isManufacturer: false,
   isCalibrator: false,
-  contactPerson: "",
-  email: "",
-  phone: "",
-  standardLeadTimeDays: "",
-  note: "",
+  contactPerson: '',
+  email: '',
+  phone: '',
+  standardLeadTimeDays: '',
+  note: '',
 };

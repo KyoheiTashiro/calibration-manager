@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 /* なぜ: ui-guidelines.md §3・§12 の色トークンをTailwind 4の @theme でユーティリティクラス化する
    （bg-primary / text-primary / hover:bg-primaryHover 等が生成される）。 */
@@ -17,7 +17,7 @@
   /* なぜ: ui-guidelines.md §2 の書体指定。明朝体を使わず、OS標準のゴシック体を
      既定書体にする。フォントは配布しない（バンドル削減、D-052）。
      Noto Sans JP はOSにインストール済みの場合のみ使われる。 */
-  --font-sans: "Noto Sans JP", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-sans: 'Noto Sans JP', system-ui, -apple-system, 'Segoe UI', sans-serif;
 }
 
 /* なぜ: ui-guidelines.md §12「ベースCSS」参考コードのTailwind4版。
@@ -32,22 +32,22 @@ body {
    押下で作用するUI(ボタン・リンク・選択系フォーム)すべてでホバー時にポインターを示す。
    無効状態は操作不能を伝えるため not-allowed を優先する。 */
 button,
-[role="button"],
+[role='button'],
 a[href],
 select,
 summary,
-input[type="checkbox"],
-input[type="radio"],
-input[type="file"],
-label:has(> input[type="checkbox"]),
-label:has(> input[type="radio"]) {
+input[type='checkbox'],
+input[type='radio'],
+input[type='file'],
+label:has(> input[type='checkbox']),
+label:has(> input[type='radio']) {
   cursor: pointer;
 }
 
 button:disabled,
 select:disabled,
 input:disabled,
-[aria-disabled="true"] {
+[aria-disabled='true'] {
   cursor: not-allowed;
 }
 

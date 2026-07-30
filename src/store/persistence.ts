@@ -3,7 +3,7 @@
  * zustand persist の設定から呼ばれる純関数群で、ストアに依存しない。
  */
 
-import { STORAGE_VERSION } from "@/constants/storage";
+import { STORAGE_VERSION } from '@/constants/storage';
 import {
   appStateSchema,
   serviceOrderSchema,
@@ -13,10 +13,10 @@ import {
   notificationSchema,
   personSchema,
   vendorSchema,
-} from "@/store/schema";
-import { type AppState, NOTIFICATION_TARGET_TYPE } from "@/store/types";
-import { isRecord, recordValue } from "@/utils/record";
-import type { z } from "zod";
+} from '@/store/schema';
+import { type AppState, NOTIFICATION_TARGET_TYPE } from '@/store/types';
+import { isRecord, recordValue } from '@/utils/record';
+import type { z } from 'zod';
 
 export const emptyAppState = (): AppState => ({
   vendors: {},
@@ -68,9 +68,9 @@ export const migrateV1ToV2: MigrationStep = (persisted) => {
   return {
     ...rest,
     inspectionItems: items,
-    records: renameFieldInRecord(records, "itemId", "inspectionItemId"),
-    orders: renameFieldInRecord(orders, "itemId", "inspectionItemId"),
-    notifications: renameNotificationTargetType(notifications, "item", "inspectionItem"),
+    records: renameFieldInRecord(records, 'itemId', 'inspectionItemId'),
+    orders: renameFieldInRecord(orders, 'itemId', 'inspectionItemId'),
+    notifications: renameNotificationTargetType(notifications, 'item', 'inspectionItem'),
   };
 };
 
@@ -85,11 +85,11 @@ export const migrateV2ToV3: MigrationStep = (persisted) => {
   return {
     ...rest,
     serviceItems: inspectionItems,
-    records: renameFieldInRecord(records, "inspectionItemId", "serviceItemId"),
-    orders: renameFieldInRecord(orders, "inspectionItemId", "serviceItemId"),
+    records: renameFieldInRecord(records, 'inspectionItemId', 'serviceItemId'),
+    orders: renameFieldInRecord(orders, 'inspectionItemId', 'serviceItemId'),
     notifications: renameNotificationTargetType(
       notifications,
-      "inspectionItem",
+      'inspectionItem',
       NOTIFICATION_TARGET_TYPE.SERVICE_ITEM,
     ),
   };
@@ -106,10 +106,10 @@ export const migrateV3ToV4: MigrationStep = (persisted) => {
   return {
     ...rest,
     serviceOrders: orders,
-    records: renameFieldInRecord(records, "orderId", "serviceOrderId"),
+    records: renameFieldInRecord(records, 'orderId', 'serviceOrderId'),
     notifications: renameNotificationTargetType(
       notifications,
-      "order",
+      'order',
       NOTIFICATION_TARGET_TYPE.SERVICE_ORDER,
     ),
   };
@@ -164,7 +164,7 @@ const salvageRecords = <Entity>(
   value: unknown,
   schema: z.ZodType<Entity>,
 ): Record<string, Entity> => {
-  if (typeof value !== "object" || value === null) return {};
+  if (typeof value !== 'object' || value === null) return {};
   const salvaged: Record<string, Entity> = {};
   for (const [key, entry] of Object.entries(value)) {
     const parsed = schema.safeParse(entry);

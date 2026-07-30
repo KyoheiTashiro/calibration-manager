@@ -3,94 +3,94 @@ import {
   serviceOrderSchema,
   serviceItemSchema,
   vendorSchema,
-} from "@/store/schema";
-import { describe, expect, it } from "vitest";
+} from '@/store/schema';
+import { describe, expect, it } from 'vitest';
 
 const validServiceItem = {
-  id: "item-1",
-  equipmentId: "equipment-1",
-  type: "calibration",
-  name: "年次校正",
-  cycle: "1Y",
-  execution: "external",
-  vendorId: "vendor-1",
+  id: 'item-1',
+  equipmentId: 'equipment-1',
+  type: 'calibration',
+  name: '年次校正',
+  cycle: '1Y',
+  execution: 'external',
+  vendorId: 'vendor-1',
   bufferDays: 14,
-  personId: "person-1",
+  personId: 'person-1',
   noticeDaysBefore: 30,
-  nextDueDate: "2026-07-31",
+  nextDueDate: '2026-07-31',
   isActive: true,
 };
 
-describe("serviceItemSchema", () => {
-  it("妥当な項目を受理する", () => {
+describe('serviceItemSchema', () => {
+  it('妥当な項目を受理する', () => {
     expect(serviceItemSchema.safeParse(validServiceItem).success).toBe(true);
   });
 
-  it("external なのに vendorId が無い項目を拒否する（相関制約）", () => {
+  it('external なのに vendorId が無い項目を拒否する（相関制約）', () => {
     const { vendorId: _dropped, ...withoutVendor } = validServiceItem;
     expect(serviceItemSchema.safeParse(withoutVendor).success).toBe(false);
   });
 
-  it("internal なら vendorId 無しでも受理する", () => {
+  it('internal なら vendorId 無しでも受理する', () => {
     const { vendorId: _dropped, ...withoutVendor } = validServiceItem;
-    expect(serviceItemSchema.safeParse({ ...withoutVendor, execution: "internal" }).success).toBe(
+    expect(serviceItemSchema.safeParse({ ...withoutVendor, execution: 'internal' }).success).toBe(
       true,
     );
   });
 
-  it("暦上あり得ない日付（2026-02-30）を拒否する", () => {
+  it('暦上あり得ない日付（2026-02-30）を拒否する', () => {
     expect(
-      serviceItemSchema.safeParse({ ...validServiceItem, nextDueDate: "2026-02-30" }).success,
+      serviceItemSchema.safeParse({ ...validServiceItem, nextDueDate: '2026-02-30' }).success,
     ).toBe(false);
   });
 
-  it("未知の cycle 値を拒否する", () => {
-    expect(serviceItemSchema.safeParse({ ...validServiceItem, cycle: "4M" }).success).toBe(false);
+  it('未知の cycle 値を拒否する', () => {
+    expect(serviceItemSchema.safeParse({ ...validServiceItem, cycle: '4M' }).success).toBe(false);
   });
 
-  it("負の日数（bufferDays）を拒否する", () => {
+  it('負の日数（bufferDays）を拒否する', () => {
     expect(serviceItemSchema.safeParse({ ...validServiceItem, bufferDays: -1 }).success).toBe(
       false,
     );
   });
 });
 
-describe("vendorSchema", () => {
-  it("必須属性のみでも受理する（任意属性は省略可）", () => {
+describe('vendorSchema', () => {
+  it('必須属性のみでも受理する（任意属性は省略可）', () => {
     const minimal = {
-      id: "vendor-1",
-      name: "テスト校正",
+      id: 'vendor-1',
+      name: 'テスト校正',
       isManufacturer: false,
       isCalibrator: true,
     };
     expect(vendorSchema.safeParse(minimal).success).toBe(true);
   });
 
-  it("name が空文字のレコードを拒否する", () => {
-    const noName = { id: "vendor-1", name: "", isManufacturer: false, isCalibrator: true };
+  it('name が空文字のレコードを拒否する', () => {
+    const noName = { id: 'vendor-1', name: '', isManufacturer: false, isCalibrator: true };
     expect(vendorSchema.safeParse(noName).success).toBe(false);
   });
 });
 
-describe("serviceOrderSchema", () => {
-  it("負の費用を拒否する", () => {
+describe('serviceOrderSchema', () => {
+  it('負の費用を拒否する', () => {
     const serviceOrder = {
-      id: "o-1",
-      serviceItemId: "i-1",
-      vendorId: "v-1",
-      status: "planned",
+      id: 'o-1',
+      serviceItemId: 'i-1',
+      vendorId: 'v-1',
+      status: 'planned',
       cost: -100,
     };
     expect(serviceOrderSchema.safeParse(serviceOrder).success).toBe(false);
   });
 
-  it("未知の status を拒否する", () => {
-    const serviceOrder = { id: "o-1", serviceItemId: "i-1", vendorId: "v-1", status: "shipping" };
+  it('未知の status を拒否する', () => {
+    const serviceOrder = { id: 'o-1', serviceItemId: 'i-1', vendorId: 'v-1', status: 'shipping' };
     expect(serviceOrderSchema.safeParse(serviceOrder).success).toBe(false);
   });
 });
 
-describe("appStateSchema", () => {
+describe('appStateSchema', () => {
   const emptyState = {
     vendors: {},
     persons: {},
@@ -101,19 +101,19 @@ describe("appStateSchema", () => {
     notifications: {},
   };
 
-  it("全テーブル空の初期状態を受理する", () => {
+  it('全テーブル空の初期状態を受理する', () => {
     expect(appStateSchema.safeParse(emptyState).success).toBe(true);
   });
 
-  it("1レコードでも不正があれば全体パースは失敗する（merge のレコード単位サルベージが必要な根拠）", () => {
+  it('1レコードでも不正があれば全体パースは失敗する（merge のレコード単位サルベージが必要な根拠）', () => {
     const broken = {
       ...emptyState,
-      serviceItems: { "item-1": { ...validServiceItem, nextDueDate: "破損データ" } },
+      serviceItems: { 'item-1': { ...validServiceItem, nextDueDate: '破損データ' } },
     };
     expect(appStateSchema.safeParse(broken).success).toBe(false);
   });
 
-  it("テーブル自体が欠けている場合は失敗する", () => {
+  it('テーブル自体が欠けている場合は失敗する', () => {
     const { notifications: _dropped, ...withoutNotifications } = emptyState;
     expect(appStateSchema.safeParse(withoutNotifications).success).toBe(false);
   });

@@ -1,9 +1,9 @@
-import type { ReactElement, ReactNode } from "react";
+import type { ReactElement, ReactNode } from 'react';
 
 type Props = {
-  variant?: "primary" | "secondary" | "danger";
-  size?: "md" | "sm";
-  type?: "button" | "submit";
+  variant?: 'primary' | 'secondary' | 'danger';
+  size?: 'md' | 'sm';
+  type?: 'button' | 'submit';
   disabled?: boolean;
   onClick?: () => void;
   className?: string;
@@ -11,27 +11,27 @@ type Props = {
 };
 
 const SIZE_CLASS_NAME = {
-  md: "h-9 px-4 text-sm",
-  sm: "h-8 px-3 text-sm",
+  md: 'h-9 px-4 text-sm',
+  sm: 'h-8 px-3 text-sm',
 } as const;
 
 const VARIANT_CLASS_NAME = {
-  primary: "bg-primary text-white hover:bg-primaryHover",
-  secondary: "border border-slate-300 text-slate-700 hover:bg-slate-50",
-  danger: "bg-danger text-white hover:bg-red-700",
+  primary: 'bg-primary text-white hover:bg-primaryHover',
+  secondary: 'border border-slate-300 text-slate-700 hover:bg-slate-50',
+  danger: 'bg-danger text-white hover:bg-red-700',
 } as const;
 
 export const Button = ({
-  variant = "primary",
-  size = "md",
-  type = "button",
+  variant = 'primary',
+  size = 'md',
+  type = 'button',
   disabled,
   onClick,
   className,
   children,
 }: Props): ReactElement => {
   const baseClassName =
-    "inline-flex cursor-pointer items-center justify-center rounded font-medium transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-50";
+    'inline-flex cursor-pointer items-center justify-center rounded font-medium transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-50';
   const mergedClassName = [
     baseClassName,
     SIZE_CLASS_NAME[size],
@@ -39,7 +39,7 @@ export const Button = ({
     className,
   ]
     .filter(Boolean)
-    .join(" ");
+    .join(' ');
 
   return (
     // oxlint-disable-next-line react/button-has-type -- typeはPropsで"button"|"submit"に制約済み

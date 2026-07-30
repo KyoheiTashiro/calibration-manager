@@ -2,16 +2,16 @@
  * 「案件」は row.canCreateServiceOrder=true(外部かつ有効案件なし)の行のみ表示する(§5)。
  */
 
-import { StatusBadge } from "@/components/domain";
-import { Button, Table, TableBody, TableHead, Td, Th } from "@/components/ui";
-import { UNSET_LABEL } from "@/constants/labels";
+import { StatusBadge } from '@/components/domain';
+import { Button, Table, TableBody, TableHead, Td, Th } from '@/components/ui';
+import { UNSET_LABEL } from '@/constants/labels';
 import {
   CYCLE_LABELS,
   EXECUTION_LABELS,
   SERVICE_ITEM_TYPE_LABELS,
-} from "@/features/serviceItems/constants";
-import type { ServiceItemRow } from "@/store/selectors";
-import type { ReactElement } from "react";
+} from '@/features/serviceItems/constants';
+import type { ServiceItemRow } from '@/store/selectors';
+import type { ReactElement } from 'react';
 
 type Props = {
   rows: readonly ServiceItemRow[];
@@ -56,10 +56,10 @@ export const ServiceItemTable = ({ rows, onRecord, onOrder, onEdit }: Props): Re
           <Td>{row.recommendedOrderDate ?? UNSET_LABEL}</Td>
           {/* なぜ td を flex 化して直下に Button を並べるか: equipment/detail と同様、
               div ラップだと jsx-a11y のボタンラベル探索深度を超えるため。 */}
-          <Td className="flex gap-2" truncate={false}>
+          <Td className='flex gap-2' truncate={false}>
             <Button
-              variant="secondary"
-              size="sm"
+              variant='secondary'
+              size='sm'
               onClick={() => {
                 onRecord(row);
               }}
@@ -68,8 +68,8 @@ export const ServiceItemTable = ({ rows, onRecord, onOrder, onEdit }: Props): Re
             </Button>
             {row.canCreateServiceOrder ? (
               <Button
-                variant="secondary"
-                size="sm"
+                variant='secondary'
+                size='sm'
                 onClick={() => {
                   onOrder(row);
                 }}
@@ -78,8 +78,8 @@ export const ServiceItemTable = ({ rows, onRecord, onOrder, onEdit }: Props): Re
               </Button>
             ) : null}
             <Button
-              variant="secondary"
-              size="sm"
+              variant='secondary'
+              size='sm'
               onClick={() => {
                 onEdit(row);
               }}

@@ -9,12 +9,12 @@
  * preprocess/transform による resolver の入出力型ズレを避ける。
  */
 
-import { TEXT_LIMIT } from "@/constants/textLimits";
-import { DEFAULT_BUFFER_DAYS, DEFAULT_NOTICE_DAYS_BEFORE } from "@/domain/constants";
-import { CYCLE, EXECUTION, SERVICE_ITEM_TYPE, type ServiceItem } from "@/store/types";
-import { maxLengthMessage, optionalNonNegativeIntegerString } from "@/utils/form";
-import { isIsoDateString } from "@/utils/time";
-import { z } from "zod";
+import { TEXT_LIMIT } from '@/constants/textLimits';
+import { DEFAULT_BUFFER_DAYS, DEFAULT_NOTICE_DAYS_BEFORE } from '@/domain/constants';
+import { CYCLE, EXECUTION, SERVICE_ITEM_TYPE, type ServiceItem } from '@/store/types';
+import { maxLengthMessage, optionalNonNegativeIntegerString } from '@/utils/form';
+import { isIsoDateString } from '@/utils/time';
+import { z } from 'zod';
 
 /** 空欄不可・0以上の整数文字列（発注余裕日・通知開始日数向け） */
 // なぜ戻り値の型注釈を付けないか: equipment/form/shared/schema.ts の createSchema と同じ理由で、
@@ -32,36 +32,36 @@ export const Schema = z
   .object({
     name: z
       .string()
-      .min(1, "項目名は必須です")
-      .max(TEXT_LIMIT.name, maxLengthMessage("項目名", TEXT_LIMIT.name)),
+      .min(1, '項目名は必須です')
+      .max(TEXT_LIMIT.name, maxLengthMessage('項目名', TEXT_LIMIT.name)),
     type: z.enum(SERVICE_ITEM_TYPE),
     cycle: z.enum(CYCLE),
     execution: z.enum(EXECUTION),
     vendorId: z.string().optional(),
-    leadTimeDays: optionalNonNegativeIntegerString("納期(日)は0以上の整数で入力してください"),
+    leadTimeDays: optionalNonNegativeIntegerString('納期(日)は0以上の整数で入力してください'),
     bufferDays: requiredNonNegativeIntegerString(
-      "発注余裕日は必須です",
-      "発注余裕日は0以上の整数で入力してください",
+      '発注余裕日は必須です',
+      '発注余裕日は0以上の整数で入力してください',
     ),
-    personId: z.string().min(1, "担当者を選択してください"),
+    personId: z.string().min(1, '担当者を選択してください'),
     noticeDaysBefore: requiredNonNegativeIntegerString(
-      "通知開始日数は必須です",
-      "通知開始日数は0以上の整数で入力してください",
+      '通知開始日数は必須です',
+      '通知開始日数は0以上の整数で入力してください',
     ),
     nextDueDate: z
       .string()
-      .min(1, "次回期限は必須です")
-      .refine(isIsoDateString, { message: "次回期限の形式が不正です" }),
+      .min(1, '次回期限は必須です')
+      .refine(isIsoDateString, { message: '次回期限の形式が不正です' }),
     isActive: z.boolean(),
   })
   // なぜ superRefine か: 「external の場合 vendorId 必須」は
   // 型では表現していない相関制約のため、スキーマ側で強制する。
   .superRefine((values, context) => {
-    if (values.execution === EXECUTION.EXTERNAL && (values.vendorId ?? "") === "") {
+    if (values.execution === EXECUTION.EXTERNAL && (values.vendorId ?? '') === '') {
       context.addIssue({
-        code: "custom",
-        path: ["vendorId"],
-        message: "校正依頼先を選択してください",
+        code: 'custom',
+        path: ['vendorId'],
+        message: '校正依頼先を選択してください',
       });
     }
   });
@@ -70,16 +70,16 @@ export type FormType = z.infer<typeof Schema>;
 
 /** 新規追加時の既定フォーム値 */
 export const defaultValues: FormType = {
-  name: "",
+  name: '',
   type: SERVICE_ITEM_TYPE.INSPECTION,
   cycle: CYCLE.Y1,
   execution: EXECUTION.INTERNAL,
-  vendorId: "",
-  leadTimeDays: "",
+  vendorId: '',
+  leadTimeDays: '',
   bufferDays: String(DEFAULT_BUFFER_DAYS),
-  personId: "",
+  personId: '',
   noticeDaysBefore: String(DEFAULT_NOTICE_DAYS_BEFORE),
-  nextDueDate: "",
+  nextDueDate: '',
   isActive: true,
 };
 
@@ -91,8 +91,8 @@ export const toFormValues = (serviceItem: ServiceItem | undefined): FormType =>
         type: serviceItem.type,
         cycle: serviceItem.cycle,
         execution: serviceItem.execution,
-        vendorId: serviceItem.vendorId ?? "",
-        leadTimeDays: serviceItem.leadTimeDays?.toString() ?? "",
+        vendorId: serviceItem.vendorId ?? '',
+        leadTimeDays: serviceItem.leadTimeDays?.toString() ?? '',
         bufferDays: serviceItem.bufferDays.toString(),
         personId: serviceItem.personId,
         noticeDaysBefore: serviceItem.noticeDaysBefore.toString(),

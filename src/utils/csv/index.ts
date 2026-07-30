@@ -6,7 +6,7 @@
  */
 
 /** UTF-8 BOM。エクスポート時にファイル先頭へ付与する(Excel 互換) */
-export const CSV_BOM = "\u{FEFF}";
+export const CSV_BOM = '\u{FEFF}';
 
 /** 引用が必要な文字(カンマ・引用符・改行)を含むかの判定用 */
 const NEEDS_QUOTING_PATTERN = /[",\r\n]/u;
@@ -17,7 +17,7 @@ const serializeCsvField = (value: string): string =>
 
 /** セル二次元配列を CSV 文字列へ直列化する(各行 CRLF 終端。BOM は付与しない) */
 export const serializeCsv = (rows: readonly (readonly string[])[]): string =>
-  rows.map((row) => `${row.map((cell) => serializeCsvField(cell)).join(",")}\r\n`).join("");
+  rows.map((row) => `${row.map((cell) => serializeCsvField(cell)).join(',')}\r\n`).join('');
 
 /**
  * 1フィールド + 直後の区切りにマッチする sticky 正規表現。
@@ -38,7 +38,7 @@ const FIELD_PATTERN = /(?<raw>"(?:[^"]|"")*"|[^",\r\n][^,\r\n]*|)(?<delimiter>,|
  */
 export const parseCsv = (text: string): string[][] | null => {
   const content = text.startsWith(CSV_BOM) ? text.slice(CSV_BOM.length) : text;
-  if (content === "") return [];
+  if (content === '') return [];
 
   const rows: string[][] = [];
   let row: string[] = [];
@@ -51,10 +51,10 @@ export const parseCsv = (text: string): string[][] | null => {
     FIELD_PATTERN.lastIndex = index;
     const match = FIELD_PATTERN.exec(content);
     if (match === null) return null;
-    const { raw = "", delimiter = "" } = match.groups ?? {};
+    const { raw = '', delimiter = '' } = match.groups ?? {};
     row.push(raw.startsWith('"') ? raw.slice(1, -1).replaceAll('""', '"') : raw);
     index += match[0].length;
-    if (delimiter === ",") {
+    if (delimiter === ',') {
       pending = true;
       continue;
     }

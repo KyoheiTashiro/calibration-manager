@@ -1,1 +1,1 @@
-export { ServiceRecordModal } from "@/components/domain/ServiceRecordModal/ServiceRecordModal";
+export { ServiceRecordModal } from '@/components/domain/ServiceRecordModal/ServiceRecordModal';

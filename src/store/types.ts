@@ -6,44 +6,44 @@
 
 /** 点検・校正の周期（domain-model.md §1・§3.4） */
 export const CYCLE = {
-  M1: "1M",
-  M3: "3M",
-  M6: "6M",
-  Y1: "1Y",
-  Y2: "2Y",
-  Y3: "3Y",
-  Y5: "5Y",
-  Y10: "10Y",
+  M1: '1M',
+  M3: '3M',
+  M6: '6M',
+  Y1: '1Y',
+  Y2: '2Y',
+  Y3: '3Y',
+  Y5: '5Y',
+  Y10: '10Y',
 } as const;
 export type Cycle = (typeof CYCLE)[keyof typeof CYCLE];
 
 /** 機器の状態（domain-model.md §3.3）。suspended/retired は期限計算・通知の対象外 */
 export const EQUIPMENT_STATUS = {
-  ACTIVE: "active",
-  SUSPENDED: "suspended",
-  RETIRED: "retired",
+  ACTIVE: 'active',
+  SUSPENDED: 'suspended',
+  RETIRED: 'retired',
 } as const;
 export type EquipmentStatus = (typeof EQUIPMENT_STATUS)[keyof typeof EQUIPMENT_STATUS];
 
 /** 点検校正項目の種別（domain-model.md §3.4） */
 export const SERVICE_ITEM_TYPE = {
-  INSPECTION: "inspection",
-  CALIBRATION: "calibration",
+  INSPECTION: 'inspection',
+  CALIBRATION: 'calibration',
 } as const;
 export type ServiceItemType = (typeof SERVICE_ITEM_TYPE)[keyof typeof SERVICE_ITEM_TYPE];
 
 /** 実施区分（domain-model.md §3.4）。external の場合のみ vendorId が必須 */
 export const EXECUTION = {
-  INTERNAL: "internal",
-  EXTERNAL: "external",
+  INTERNAL: 'internal',
+  EXTERNAL: 'external',
 } as const;
 export type Execution = (typeof EXECUTION)[keyof typeof EXECUTION];
 
 /** 実施記録の結果（domain-model.md §3.5）。fail は次回期限を更新しない */
 export const SERVICE_RECORD_RESULT = {
-  PASS: "pass",
-  FAIL: "fail",
-  ADJUSTED: "adjusted",
+  PASS: 'pass',
+  FAIL: 'fail',
+  ADJUSTED: 'adjusted',
 } as const;
 export type ServiceRecordResult =
   (typeof SERVICE_RECORD_RESULT)[keyof typeof SERVICE_RECORD_RESULT];
@@ -53,29 +53,29 @@ export type ServiceRecordResult =
  * 遷移の許可判定は {@link ../domain/serviceOrderStatus.ts} の遷移テーブルが正。
  */
 export const SERVICE_ORDER_STATUS = {
-  PLANNED: "planned",
-  ORDERED: "ordered",
-  IN_CALIBRATION: "inCalibration",
-  RETURNED: "returned",
-  COMPLETED: "completed",
-  CANCELLED: "cancelled",
+  PLANNED: 'planned',
+  ORDERED: 'ordered',
+  IN_CALIBRATION: 'inCalibration',
+  RETURNED: 'returned',
+  COMPLETED: 'completed',
+  CANCELLED: 'cancelled',
 } as const;
 export type ServiceOrderStatus = (typeof SERVICE_ORDER_STATUS)[keyof typeof SERVICE_ORDER_STATUS];
 
 /** 通知種別（domain-model.md §3.7）。発生条件は domain/notificationRules.ts が正 */
 export const NOTIFICATION_TYPE = {
-  DUE_SOON: "dueSoon",
-  OVERDUE: "overdue",
-  ORDER_RECOMMENDED: "orderRecommended",
-  DELIVERY_DUE_SOON: "deliveryDueSoon",
-  DELIVERY_OVERDUE: "deliveryOverdue",
+  DUE_SOON: 'dueSoon',
+  OVERDUE: 'overdue',
+  ORDER_RECOMMENDED: 'orderRecommended',
+  DELIVERY_DUE_SOON: 'deliveryDueSoon',
+  DELIVERY_OVERDUE: 'deliveryOverdue',
 } as const;
 export type NotificationType = (typeof NOTIFICATION_TYPE)[keyof typeof NOTIFICATION_TYPE];
 
 /** 通知の対象種別（domain-model.md §3.7） */
 export const NOTIFICATION_TARGET_TYPE = {
-  SERVICE_ITEM: "serviceItem",
-  SERVICE_ORDER: "serviceOrder",
+  SERVICE_ITEM: 'serviceItem',
+  SERVICE_ORDER: 'serviceOrder',
 } as const;
 export type NotificationTargetType =
   (typeof NOTIFICATION_TARGET_TYPE)[keyof typeof NOTIFICATION_TARGET_TYPE];

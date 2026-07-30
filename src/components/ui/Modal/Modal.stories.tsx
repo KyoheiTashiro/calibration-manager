@@ -1,10 +1,10 @@
-import { Button } from "@/components/ui/Button/Button";
-import type { Meta, StoryObj } from "@storybook/react-vite";
+import { Button } from '@/components/ui/Button/Button';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 
-import { Modal } from "./Modal";
+import { Modal } from './Modal';
 
 const meta = {
-  title: "UI/Modal",
+  title: 'UI/Modal',
   component: Modal,
 } satisfies Meta<typeof Modal>;
 
@@ -13,14 +13,14 @@ export default meta;
 export const WithFooter: StoryObj<typeof meta> = {
   args: {
     open: true,
-    title: "機器情報の編集",
+    title: '機器情報の編集',
     // なぜ: 手動確認用ストーリーのためonCloseは何もしないダミー関数でよい。
     onClose: (): void => undefined,
-    children: <p className="text-sm text-slate-700">モーダル本文のサンプルです。</p>,
+    children: <p className='text-sm text-slate-700'>モーダル本文のサンプルです。</p>,
     footer: (
       <>
-        <Button variant="secondary">キャンセル</Button>
-        <Button variant="primary">保存</Button>
+        <Button variant='secondary'>キャンセル</Button>
+        <Button variant='primary'>保存</Button>
       </>
     ),
   },
@@ -32,9 +32,9 @@ export const WithFooter: StoryObj<typeof meta> = {
 export const DirtyWithDiscardConfirm: StoryObj<typeof meta> = {
   args: {
     open: true,
-    title: "機器情報の編集",
+    title: '機器情報の編集',
     isDirty: true,
     onClose: (): void => undefined,
-    children: <p className="text-sm text-slate-700">編集中の内容があります。</p>,
+    children: <p className='text-sm text-slate-700'>編集中の内容があります。</p>,
   },
 };

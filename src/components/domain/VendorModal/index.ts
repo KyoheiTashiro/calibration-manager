@@ -1,1 +1,1 @@
-export { VendorModal } from "./VendorModal";
+export { VendorModal } from './VendorModal';

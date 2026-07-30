@@ -1,5 +1,5 @@
-import { ROUTES } from "@/constants/routes";
-import { EquipmentList } from "@/features/equipment/list";
+import { ROUTES } from '@/constants/routes';
+import { EquipmentList } from '@/features/equipment/list';
 import {
   EQUIPMENT_STATUS,
   SERVICE_ITEM_TYPE,
@@ -8,14 +8,14 @@ import {
   type Equipment,
   type ServiceItem,
   type Vendor,
-} from "@/store/types";
-import { renderWithStore, seedStore, setupStoreIsolation } from "@/test/renderWithStore";
-import { screen, within } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import "@testing-library/jest-dom/vitest";
-import type { ReactElement } from "react";
-import { Route, Routes, useParams } from "react-router-dom";
-import { beforeEach, describe, expect, it } from "vitest";
+} from '@/store/types';
+import { renderWithStore, seedStore, setupStoreIsolation } from '@/test/renderWithStore';
+import { screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import '@testing-library/jest-dom/vitest';
+import type { ReactElement } from 'react';
+import { Route, Routes, useParams } from 'react-router-dom';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 const DummyEquipmentDetail = (): ReactElement => {
   const { id } = useParams();
@@ -24,61 +24,61 @@ const DummyEquipmentDetail = (): ReactElement => {
 
 /** 行内の最終列(次回期限セル)を取得する(型式/メーカー/設置場所にも「-」が出るため列位置で特定する) */
 const dueDateCellOf = (row: HTMLElement): HTMLElement => {
-  const cells = within(row).getAllByRole("cell");
+  const cells = within(row).getAllByRole('cell');
   const lastCell = cells.at(-1);
-  if (!lastCell) throw new Error("次回期限セルが見つかりません");
+  if (!lastCell) throw new Error('次回期限セルが見つかりません');
   return lastCell;
 };
 
 const mitutoyo: Vendor = {
-  id: "vendor-1",
-  name: "ミツトヨ",
+  id: 'vendor-1',
+  name: 'ミツトヨ',
   isManufacturer: true,
   isCalibrator: false,
 };
 
 const activeEquipmentWithDue: Equipment = {
-  id: "equipment-1",
-  managementNo: "EQ-001",
-  name: "ノギス",
-  model: "CD-15",
+  id: 'equipment-1',
+  managementNo: 'EQ-001',
+  name: 'ノギス',
+  model: 'CD-15',
   manufacturerId: mitutoyo.id,
-  location: "検査室",
+  location: '検査室',
   status: EQUIPMENT_STATUS.ACTIVE,
 };
 
 const activeEquipmentNoVendor: Equipment = {
-  id: "equipment-2",
-  managementNo: "EQ-002",
-  name: "マイクロメータ",
+  id: 'equipment-2',
+  managementNo: 'EQ-002',
+  name: 'マイクロメータ',
   status: EQUIPMENT_STATUS.ACTIVE,
 };
 
 const suspendedEquipment: Equipment = {
-  id: "equipment-3",
-  managementNo: "EQ-003",
-  name: "電子はかり",
+  id: 'equipment-3',
+  managementNo: 'EQ-003',
+  name: '電子はかり',
   status: EQUIPMENT_STATUS.SUSPENDED,
 };
 
 const retiredEquipment: Equipment = {
-  id: "equipment-4",
-  managementNo: "EQ-004",
-  name: "廃棄済み機器",
+  id: 'equipment-4',
+  managementNo: 'EQ-004',
+  name: '廃棄済み機器',
   status: EQUIPMENT_STATUS.RETIRED,
 };
 
 const makeServiceItem = (
-  overrides: Partial<ServiceItem> & Pick<ServiceItem, "id" | "equipmentId">,
+  overrides: Partial<ServiceItem> & Pick<ServiceItem, 'id' | 'equipmentId'>,
 ): ServiceItem => ({
   type: SERVICE_ITEM_TYPE.INSPECTION,
-  name: "定期点検",
+  name: '定期点検',
   cycle: CYCLE.Y1,
   execution: EXECUTION.INTERNAL,
   bufferDays: 14,
-  personId: "person-1",
+  personId: 'person-1',
   noticeDaysBefore: 30,
-  nextDueDate: "2026-08-20",
+  nextDueDate: '2026-08-20',
   isActive: true,
   ...overrides,
 });
@@ -93,8 +93,8 @@ const renderEquipmentListWithRoutes = (): ReactElement => (
 
 beforeEach(setupStoreIsolation);
 
-describe("EquipmentList: 一覧表示", () => {
-  it("メーカー名解決・項目数・最寄り期限(active機器・active項目あり)を表示する", () => {
+describe('EquipmentList: 一覧表示', () => {
+  it('メーカー名解決・項目数・最寄り期限(active機器・active項目あり)を表示する', () => {
     seedStore({
       vendors: { [mitutoyo.id]: mitutoyo },
       equipment: {
@@ -102,96 +102,96 @@ describe("EquipmentList: 一覧表示", () => {
         [activeEquipmentNoVendor.id]: activeEquipmentNoVendor,
       },
       serviceItems: {
-        "item-1": makeServiceItem({
-          id: "item-1",
+        'item-1': makeServiceItem({
+          id: 'item-1',
           equipmentId: activeEquipmentWithDue.id,
-          nextDueDate: "2026-09-01",
+          nextDueDate: '2026-09-01',
         }),
-        "item-2": makeServiceItem({
-          id: "item-2",
+        'item-2': makeServiceItem({
+          id: 'item-2',
           equipmentId: activeEquipmentWithDue.id,
-          nextDueDate: "2026-08-15",
+          nextDueDate: '2026-08-15',
         }),
       },
     });
     renderWithStore(<EquipmentList />);
 
-    const noginsuRow = screen.getByRole("row", { name: /EQ-001/u });
-    expect(within(noginsuRow).getByText("ノギス")).toBeInTheDocument();
-    expect(within(noginsuRow).getByText("CD-15")).toBeInTheDocument();
-    expect(within(noginsuRow).getByText("ミツトヨ")).toBeInTheDocument();
-    expect(within(noginsuRow).getByText("検査室")).toBeInTheDocument();
-    expect(within(noginsuRow).getByText("稼働")).toBeInTheDocument();
-    expect(within(noginsuRow).getByText("2")).toBeInTheDocument();
-    expect(within(noginsuRow).getByText("2026-08-15")).toBeInTheDocument();
+    const noginsuRow = screen.getByRole('row', { name: /EQ-001/u });
+    expect(within(noginsuRow).getByText('ノギス')).toBeInTheDocument();
+    expect(within(noginsuRow).getByText('CD-15')).toBeInTheDocument();
+    expect(within(noginsuRow).getByText('ミツトヨ')).toBeInTheDocument();
+    expect(within(noginsuRow).getByText('検査室')).toBeInTheDocument();
+    expect(within(noginsuRow).getByText('稼働')).toBeInTheDocument();
+    expect(within(noginsuRow).getByText('2')).toBeInTheDocument();
+    expect(within(noginsuRow).getByText('2026-08-15')).toBeInTheDocument();
 
-    const microRow = screen.getByRole("row", { name: /EQ-002/u });
-    expect(within(microRow).getByText("0")).toBeInTheDocument();
-    expect(within(microRow).getAllByText("-")).toHaveLength(4);
+    const microRow = screen.getByRole('row', { name: /EQ-002/u });
+    expect(within(microRow).getByText('0')).toBeInTheDocument();
+    expect(within(microRow).getAllByText('-')).toHaveLength(4);
   });
 });
 
-describe("EquipmentList: 非稼働機器の期限", () => {
-  it("suspended機器は有効項目があっても期限が-になる", () => {
+describe('EquipmentList: 非稼働機器の期限', () => {
+  it('suspended機器は有効項目があっても期限が-になる', () => {
     seedStore({
       equipment: { [suspendedEquipment.id]: suspendedEquipment },
       serviceItems: {
-        "item-1": makeServiceItem({
-          id: "item-1",
+        'item-1': makeServiceItem({
+          id: 'item-1',
           equipmentId: suspendedEquipment.id,
-          nextDueDate: "2026-08-15",
+          nextDueDate: '2026-08-15',
           isActive: true,
         }),
       },
     });
     renderWithStore(<EquipmentList />);
 
-    const row = screen.getByRole("row", { name: /EQ-003/u });
-    expect(dueDateCellOf(row)).toHaveTextContent("-");
+    const row = screen.getByRole('row', { name: /EQ-003/u });
+    expect(dueDateCellOf(row)).toHaveTextContent('-');
   });
 
-  it("retired機器は有効項目があっても期限が-になる", () => {
+  it('retired機器は有効項目があっても期限が-になる', () => {
     seedStore({
       equipment: { [retiredEquipment.id]: retiredEquipment },
       serviceItems: {
-        "item-1": makeServiceItem({
-          id: "item-1",
+        'item-1': makeServiceItem({
+          id: 'item-1',
           equipmentId: retiredEquipment.id,
-          nextDueDate: "2026-08-15",
+          nextDueDate: '2026-08-15',
           isActive: true,
         }),
       },
     });
     renderWithStore(<EquipmentList />);
 
-    const row = screen.getByRole("row", { name: /EQ-004/u });
-    expect(dueDateCellOf(row)).toHaveTextContent("-");
+    const row = screen.getByRole('row', { name: /EQ-004/u });
+    expect(dueDateCellOf(row)).toHaveTextContent('-');
   });
 });
 
-describe("EquipmentList: active機器でisActive項目のみ", () => {
-  it("isActive=falseの項目しかなければ期限は-になる", () => {
+describe('EquipmentList: active機器でisActive項目のみ', () => {
+  it('isActive=falseの項目しかなければ期限は-になる', () => {
     seedStore({
       equipment: { [activeEquipmentNoVendor.id]: activeEquipmentNoVendor },
       serviceItems: {
-        "item-1": makeServiceItem({
-          id: "item-1",
+        'item-1': makeServiceItem({
+          id: 'item-1',
           equipmentId: activeEquipmentNoVendor.id,
-          nextDueDate: "2026-08-15",
+          nextDueDate: '2026-08-15',
           isActive: false,
         }),
       },
     });
     renderWithStore(<EquipmentList />);
 
-    const row = screen.getByRole("row", { name: /EQ-002/u });
-    expect(within(row).getByText("1")).toBeInTheDocument();
-    expect(dueDateCellOf(row)).toHaveTextContent("-");
+    const row = screen.getByRole('row', { name: /EQ-002/u });
+    expect(within(row).getByText('1')).toBeInTheDocument();
+    expect(dueDateCellOf(row)).toHaveTextContent('-');
   });
 });
 
-describe("EquipmentList: 状態フィルタ", () => {
-  it("デフォルト(全て)は全状態を表示し、稼働に切り替えるとretiredが隠れる", async () => {
+describe('EquipmentList: 状態フィルタ', () => {
+  it('デフォルト(全て)は全状態を表示し、稼働に切り替えるとretiredが隠れる', async () => {
     const user = userEvent.setup();
     seedStore({
       equipment: {
@@ -201,19 +201,19 @@ describe("EquipmentList: 状態フィルタ", () => {
     });
     renderWithStore(<EquipmentList />);
 
-    expect(screen.getByText("EQ-001")).toBeInTheDocument();
-    expect(screen.getByText("EQ-004")).toBeInTheDocument();
+    expect(screen.getByText('EQ-001')).toBeInTheDocument();
+    expect(screen.getByText('EQ-004')).toBeInTheDocument();
 
-    await user.click(screen.getByRole("combobox", { name: "状態" }));
-    await user.click(screen.getByRole("option", { name: "稼働" }));
+    await user.click(screen.getByRole('combobox', { name: '状態' }));
+    await user.click(screen.getByRole('option', { name: '稼働' }));
 
-    expect(screen.getByText("EQ-001")).toBeInTheDocument();
-    expect(screen.queryByText("EQ-004")).not.toBeInTheDocument();
+    expect(screen.getByText('EQ-001')).toBeInTheDocument();
+    expect(screen.queryByText('EQ-004')).not.toBeInTheDocument();
   });
 });
 
-describe("EquipmentList: 検索", () => {
-  it("managementNo/name/modelの部分一致(大文字小文字無視)で絞り込む", async () => {
+describe('EquipmentList: 検索', () => {
+  it('managementNo/name/modelの部分一致(大文字小文字無視)で絞り込む', async () => {
     const user = userEvent.setup();
     seedStore({
       equipment: {
@@ -223,55 +223,55 @@ describe("EquipmentList: 検索", () => {
     });
     renderWithStore(<EquipmentList />);
 
-    await user.type(screen.getByLabelText("検索"), "cd-15");
+    await user.type(screen.getByLabelText('検索'), 'cd-15');
 
-    expect(screen.getByText("EQ-001")).toBeInTheDocument();
-    expect(screen.queryByText("EQ-002")).not.toBeInTheDocument();
+    expect(screen.getByText('EQ-001')).toBeInTheDocument();
+    expect(screen.queryByText('EQ-002')).not.toBeInTheDocument();
   });
 });
 
-describe("EquipmentList: 行クリック・追加ボタン遷移", () => {
+describe('EquipmentList: 行クリック・追加ボタン遷移', () => {
   const renderWithRoutes = (): void => {
     seedStore({ equipment: { [activeEquipmentWithDue.id]: activeEquipmentWithDue } });
     renderWithStore(renderEquipmentListWithRoutes(), { initialEntries: [ROUTES.EQUIPMENT_LIST] });
   };
 
-  it("行クリックで機器詳細へ遷移する", async () => {
+  it('行クリックで機器詳細へ遷移する', async () => {
     const user = userEvent.setup();
     renderWithRoutes();
-    await user.click(screen.getByRole("row", { name: /EQ-001/u }));
+    await user.click(screen.getByRole('row', { name: /EQ-001/u }));
     expect(screen.getByText(`機器詳細:${activeEquipmentWithDue.id}`)).toBeInTheDocument();
   });
 
-  it("「+ 機器を追加」で機器登録画面へ遷移する", async () => {
+  it('「+ 機器を追加」で機器登録画面へ遷移する', async () => {
     const user = userEvent.setup();
     renderWithRoutes();
-    await user.click(screen.getByRole("button", { name: "+ 機器を追加" }));
-    expect(screen.getByText("機器登録画面")).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: '+ 機器を追加' }));
+    expect(screen.getByText('機器登録画面')).toBeInTheDocument();
   });
 });
 
-describe("EquipmentList: 空状態", () => {
-  it("0件時は検索・フィルタを隠しCTA付きEmptyStateを表示する", () => {
+describe('EquipmentList: 空状態', () => {
+  it('0件時は検索・フィルタを隠しCTA付きEmptyStateを表示する', () => {
     renderWithStore(<EquipmentList />);
 
-    expect(screen.getByText("機器が未登録です")).toBeInTheDocument();
+    expect(screen.getByText('機器が未登録です')).toBeInTheDocument();
     // 追加ボタンは検索・フィルタ行に統合されたため、0件時はEmptyState内のCTAのみ
-    expect(screen.getByRole("button", { name: "+ 機器を追加" })).toBeInTheDocument();
-    expect(screen.queryByLabelText("検索")).not.toBeInTheDocument();
-    expect(screen.queryByLabelText("状態")).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '+ 機器を追加' })).toBeInTheDocument();
+    expect(screen.queryByLabelText('検索')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('状態')).not.toBeInTheDocument();
   });
 
-  it("検索結果0件時は検索・フィルタを表示したままCTAなしのEmptyStateを表示する", async () => {
+  it('検索結果0件時は検索・フィルタを表示したままCTAなしのEmptyStateを表示する', async () => {
     const user = userEvent.setup();
     seedStore({ equipment: { [activeEquipmentWithDue.id]: activeEquipmentWithDue } });
     renderWithStore(<EquipmentList />);
 
-    await user.type(screen.getByLabelText("検索"), "該当なし検索語");
+    await user.type(screen.getByLabelText('検索'), '該当なし検索語');
 
-    expect(screen.getByText("条件に一致する機器はありません")).toBeInTheDocument();
-    expect(screen.getByLabelText("検索")).toBeInTheDocument();
-    expect(screen.getByLabelText("状態")).toBeInTheDocument();
-    expect(screen.getAllByRole("button", { name: "+ 機器を追加" })).toHaveLength(1);
+    expect(screen.getByText('条件に一致する機器はありません')).toBeInTheDocument();
+    expect(screen.getByLabelText('検索')).toBeInTheDocument();
+    expect(screen.getByLabelText('状態')).toBeInTheDocument();
+    expect(screen.getAllByRole('button', { name: '+ 機器を追加' })).toHaveLength(1);
   });
 });

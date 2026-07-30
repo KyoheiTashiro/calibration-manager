@@ -1,15 +1,15 @@
-import type { SelectOption } from "@/features/equipment/form/shared/mapping";
-import { createSchema, type FormType } from "@/features/equipment/form/shared/schema";
-import { useAppStore } from "@/store/useAppStore";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useMemo } from "react";
+import type { SelectOption } from '@/features/equipment/form/shared/mapping';
+import { createSchema, type FormType } from '@/features/equipment/form/shared/schema';
+import { useAppStore } from '@/store/useAppStore';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useMemo } from 'react';
 import {
   useForm,
   type Control,
   type FieldErrors,
   type UseFormHandleSubmit,
   type UseFormRegister,
-} from "react-hook-form";
+} from 'react-hook-form';
 
 type UseEquipmentFormCoreParams = {
   defaultValues: FormType;
@@ -69,7 +69,7 @@ export const useEquipmentFormCore = ({
 
   const manufacturerOptions = Object.values(vendors)
     .filter((vendor) => vendor.isManufacturer)
-    .toSorted((left, right) => left.name.localeCompare(right.name, "ja"))
+    .toSorted((left, right) => left.name.localeCompare(right.name, 'ja'))
     .map((vendor) => ({ value: vendor.id, label: vendor.name }));
 
   return { register, errors, control, handleSubmit, manufacturerOptions };

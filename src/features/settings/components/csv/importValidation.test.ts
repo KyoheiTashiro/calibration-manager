@@ -1,5 +1,5 @@
-import { validateEntityCsv } from "@/features/settings/components/csv/importValidation";
-import { emptyAppState } from "@/store/persistence";
+import { validateEntityCsv } from '@/features/settings/components/csv/importValidation';
+import { emptyAppState } from '@/store/persistence';
 import {
   CYCLE,
   EQUIPMENT_STATUS,
@@ -12,40 +12,40 @@ import {
   type ServiceItem,
   type Person,
   type Vendor,
-} from "@/store/types";
-import { describe, expect, it } from "vitest";
+} from '@/store/types';
+import { describe, expect, it } from 'vitest';
 
-const vendor: Vendor = { id: "vendor-1", name: "校正社", isManufacturer: true, isCalibrator: true };
+const vendor: Vendor = { id: 'vendor-1', name: '校正社', isManufacturer: true, isCalibrator: true };
 const person: Person = {
-  id: "person-1",
-  name: "田中",
-  email: "tanaka@example.com",
+  id: 'person-1',
+  name: '田中',
+  email: 'tanaka@example.com',
   isActive: true,
 };
 const equipment: Equipment = {
-  id: "equipment-1",
-  managementNo: "EQ-001",
-  name: "ノギス",
+  id: 'equipment-1',
+  managementNo: 'EQ-001',
+  name: 'ノギス',
   status: EQUIPMENT_STATUS.ACTIVE,
 };
 const serviceItem: ServiceItem = {
-  id: "item-1",
-  equipmentId: "equipment-1",
+  id: 'item-1',
+  equipmentId: 'equipment-1',
   type: SERVICE_ITEM_TYPE.CALIBRATION,
-  name: "年次校正",
+  name: '年次校正',
   cycle: CYCLE.Y1,
   execution: EXECUTION.EXTERNAL,
-  vendorId: "vendor-1",
+  vendorId: 'vendor-1',
   bufferDays: 14,
-  personId: "person-1",
+  personId: 'person-1',
   noticeDaysBefore: 30,
-  nextDueDate: "2026-07-15",
+  nextDueDate: '2026-07-15',
   isActive: true,
 };
 const serviceOrder: ServiceOrder = {
-  id: "serviceOrder-1",
-  serviceItemId: "item-1",
-  vendorId: "vendor-1",
+  id: 'serviceOrder-1',
+  serviceItemId: 'item-1',
+  vendorId: 'vendor-1',
   status: SERVICE_ORDER_STATUS.ORDERED,
 };
 
@@ -58,358 +58,358 @@ const stateWithReferences = (): AppState => ({
   serviceOrders: { [serviceOrder.id]: serviceOrder },
 });
 
-const EQUIPMENT_HEADER = "id,managementNo,name,model,serialNo,manufacturerId,location,status,note";
+const EQUIPMENT_HEADER = 'id,managementNo,name,model,serialNo,manufacturerId,location,status,note';
 const ITEMS_HEADER =
-  "id,equipmentId,type,name,cycle,execution,vendorId,leadTimeDays,bufferDays,personId,noticeDaysBefore,lastDoneDate,nextDueDate,isActive";
-const NOTIFICATIONS_HEADER = "id,type,targetType,targetId,personId,message,createdDate,isRead";
+  'id,equipmentId,type,name,cycle,execution,vendorId,leadTimeDays,bufferDays,personId,noticeDaysBefore,lastDoneDate,nextDueDate,isActive';
+const NOTIFICATIONS_HEADER = 'id,type,targetType,targetId,personId,message,createdDate,isRead';
 
-const joinCsv = (...lines: string[]): string => `${lines.join("\r\n")}\r\n`;
+const joinCsv = (...lines: string[]): string => `${lines.join('\r\n')}\r\n`;
 
-describe("validateEntityCsv: 取り込み成功", () => {
-  it("全行有効なら entities を返し、optional 空セルは undefined になる", () => {
+describe('validateEntityCsv: 取り込み成功', () => {
+  it('全行有効なら entities を返し、optional 空セルは undefined になる', () => {
     const csv = joinCsv(
       EQUIPMENT_HEADER,
-      "eq-1,EQ-101,ノギスA,,,vendor-1,,active,",
-      "eq-2,EQ-102,マイクロメータ,M-2,S-2,,検査室,suspended,予備",
+      'eq-1,EQ-101,ノギスA,,,vendor-1,,active,',
+      'eq-2,EQ-102,マイクロメータ,M-2,S-2,,検査室,suspended,予備',
     );
-    const result = validateEntityCsv("equipment", csv, stateWithReferences());
+    const result = validateEntityCsv('equipment', csv, stateWithReferences());
     expect(result.errors).toEqual([]);
     expect(result.validCount).toBe(2);
     expect(result.entities).toEqual({
-      "eq-1": {
-        id: "eq-1",
-        managementNo: "EQ-101",
-        name: "ノギスA",
-        manufacturerId: "vendor-1",
+      'eq-1': {
+        id: 'eq-1',
+        managementNo: 'EQ-101',
+        name: 'ノギスA',
+        manufacturerId: 'vendor-1',
         status: EQUIPMENT_STATUS.ACTIVE,
       },
-      "eq-2": {
-        id: "eq-2",
-        managementNo: "EQ-102",
-        name: "マイクロメータ",
-        model: "M-2",
-        serialNo: "S-2",
-        location: "検査室",
+      'eq-2': {
+        id: 'eq-2',
+        managementNo: 'EQ-102',
+        name: 'マイクロメータ',
+        model: 'M-2',
+        serialNo: 'S-2',
+        location: '検査室',
         status: EQUIPMENT_STATUS.SUSPENDED,
-        note: "予備",
+        note: '予備',
       },
     });
   });
 
-  it("ヘッダのみ(データ0行)は取り込み可の空 Record を返す", () => {
-    const result = validateEntityCsv("equipment", joinCsv(EQUIPMENT_HEADER), emptyAppState());
+  it('ヘッダのみ(データ0行)は取り込み可の空 Record を返す', () => {
+    const result = validateEntityCsv('equipment', joinCsv(EQUIPMENT_HEADER), emptyAppState());
     expect(result).toEqual({ validCount: 0, errors: [], entities: {}, warnings: [] });
   });
 
-  it("数値・boolean のセルをフィールド値へ変換する(serviceItems)", () => {
+  it('数値・boolean のセルをフィールド値へ変換する(serviceItems)', () => {
     const csv = joinCsv(
       ITEMS_HEADER,
-      "it-1,equipment-1,inspection,月次点検,1M,internal,,,14,person-1,30,2026-06-01,2026-07-01,true",
+      'it-1,equipment-1,inspection,月次点検,1M,internal,,,14,person-1,30,2026-06-01,2026-07-01,true',
     );
-    const result = validateEntityCsv("serviceItems", csv, stateWithReferences());
+    const result = validateEntityCsv('serviceItems', csv, stateWithReferences());
     expect(result.errors).toEqual([]);
-    expect(result.entities?.["it-1"]).toEqual({
-      id: "it-1",
-      equipmentId: "equipment-1",
+    expect(result.entities?.['it-1']).toEqual({
+      id: 'it-1',
+      equipmentId: 'equipment-1',
       type: SERVICE_ITEM_TYPE.INSPECTION,
-      name: "月次点検",
+      name: '月次点検',
       cycle: CYCLE.M1,
       execution: EXECUTION.INTERNAL,
       bufferDays: 14,
-      personId: "person-1",
+      personId: 'person-1',
       noticeDaysBefore: 30,
-      lastDoneDate: "2026-06-01",
-      nextDueDate: "2026-07-01",
+      lastDoneDate: '2026-06-01',
+      nextDueDate: '2026-07-01',
       isActive: true,
     });
   });
 });
 
-describe("validateEntityCsv: ファイル全体エラー(行1)", () => {
-  it("引用符の対応が取れない CSV を拒否する", () => {
-    const result = validateEntityCsv("equipment", '"broken', emptyAppState());
+describe('validateEntityCsv: ファイル全体エラー(行1)', () => {
+  it('引用符の対応が取れない CSV を拒否する', () => {
+    const result = validateEntityCsv('equipment', '"broken', emptyAppState());
     expect(result.entities).toBeNull();
     expect(result.errors).toEqual([
-      { line: 1, message: "CSVとして解釈できません(引用符の対応を確認してください)" },
+      { line: 1, message: 'CSVとして解釈できません(引用符の対応を確認してください)' },
     ]);
   });
 
-  it("ヘッダが列定義と一致しないファイルを拒否する", () => {
-    const csv = joinCsv("id,name", "eq-1,ノギス");
-    const result = validateEntityCsv("equipment", csv, emptyAppState());
+  it('ヘッダが列定義と一致しないファイルを拒否する', () => {
+    const csv = joinCsv('id,name', 'eq-1,ノギス');
+    const result = validateEntityCsv('equipment', csv, emptyAppState());
     expect(result.entities).toBeNull();
     expect(result.errors).toEqual([
-      { line: 1, message: "ヘッダが不正です(機器のCSVではありません)" },
+      { line: 1, message: 'ヘッダが不正です(機器のCSVではありません)' },
     ]);
   });
 });
 
-describe("validateEntityCsv: 行単位エラー", () => {
-  it("列数不一致の行を報告する", () => {
-    const csv = joinCsv(EQUIPMENT_HEADER, "eq-1,EQ-101,ノギスA");
-    const result = validateEntityCsv("equipment", csv, emptyAppState());
-    expect(result.errors).toEqual([{ line: 2, message: "列数が不正です(期待9・実際3)" }]);
+describe('validateEntityCsv: 行単位エラー', () => {
+  it('列数不一致の行を報告する', () => {
+    const csv = joinCsv(EQUIPMENT_HEADER, 'eq-1,EQ-101,ノギスA');
+    const result = validateEntityCsv('equipment', csv, emptyAppState());
+    expect(result.errors).toEqual([{ line: 2, message: '列数が不正です(期待9・実際3)' }]);
   });
 
-  it("列挙の不正値は入力値付きで報告する(§11 のプレビュー例)", () => {
-    const csv = joinCsv(EQUIPMENT_HEADER, "eq-1,EQ-101,ノギスA,,,,,broken,");
-    const result = validateEntityCsv("equipment", csv, emptyAppState());
+  it('列挙の不正値は入力値付きで報告する(§11 のプレビュー例)', () => {
+    const csv = joinCsv(EQUIPMENT_HEADER, 'eq-1,EQ-101,ノギスA,,,,,broken,');
+    const result = validateEntityCsv('equipment', csv, emptyAppState());
     expect(result.errors).toEqual([{ line: 2, message: "status: 不正値 'broken'" }]);
   });
 
-  it("必須文字列の空セルを報告する", () => {
-    const csv = joinCsv(EQUIPMENT_HEADER, "eq-1,EQ-101,,,,,,active,");
-    const result = validateEntityCsv("equipment", csv, emptyAppState());
-    expect(result.errors).toEqual([{ line: 2, message: "name: 必須です" }]);
+  it('必須文字列の空セルを報告する', () => {
+    const csv = joinCsv(EQUIPMENT_HEADER, 'eq-1,EQ-101,,,,,,active,');
+    const result = validateEntityCsv('equipment', csv, emptyAppState());
+    expect(result.errors).toEqual([{ line: 2, message: 'name: 必須です' }]);
   });
 
-  it("日付形式の不正を報告する", () => {
+  it('日付形式の不正を報告する', () => {
     const csv = joinCsv(
       ITEMS_HEADER,
-      "it-1,equipment-1,inspection,月次点検,1M,internal,,,14,person-1,30,,2026/07/01,true",
+      'it-1,equipment-1,inspection,月次点検,1M,internal,,,14,person-1,30,,2026/07/01,true',
     );
-    const result = validateEntityCsv("serviceItems", csv, stateWithReferences());
+    const result = validateEntityCsv('serviceItems', csv, stateWithReferences());
     expect(result.errors).toEqual([
-      { line: 2, message: "nextDueDate: YYYY-MM-DD形式の日付ではありません" },
+      { line: 2, message: 'nextDueDate: YYYY-MM-DD形式の日付ではありません' },
     ]);
   });
 
-  it("数値セルに解釈できない値を報告する", () => {
+  it('数値セルに解釈できない値を報告する', () => {
     const csv = joinCsv(
       ITEMS_HEADER,
-      "it-1,equipment-1,inspection,月次点検,1M,internal,,,abc,person-1,30,,2026-07-01,true",
+      'it-1,equipment-1,inspection,月次点検,1M,internal,,,abc,person-1,30,,2026-07-01,true',
     );
-    const result = validateEntityCsv("serviceItems", csv, stateWithReferences());
-    expect(result.errors).toEqual([{ line: 2, message: "bufferDays: 数値を指定してください" }]);
+    const result = validateEntityCsv('serviceItems', csv, stateWithReferences());
+    expect(result.errors).toEqual([{ line: 2, message: 'bufferDays: 数値を指定してください' }]);
   });
 
-  it("boolean セルに true/false 以外の値を報告する", () => {
+  it('boolean セルに true/false 以外の値を報告する', () => {
     const csv = joinCsv(
       ITEMS_HEADER,
-      "it-1,equipment-1,inspection,月次点検,1M,internal,,,14,person-1,30,,2026-07-01,yes",
+      'it-1,equipment-1,inspection,月次点検,1M,internal,,,14,person-1,30,,2026-07-01,yes',
     );
-    const result = validateEntityCsv("serviceItems", csv, stateWithReferences());
+    const result = validateEntityCsv('serviceItems', csv, stateWithReferences());
     expect(result.errors).toEqual([
-      { line: 2, message: "isActive: true/false のいずれかを指定してください" },
+      { line: 2, message: 'isActive: true/false のいずれかを指定してください' },
     ]);
   });
 
-  it("external なのに vendorId が空の行を報告する(schema.ts の相関制約)", () => {
+  it('external なのに vendorId が空の行を報告する(schema.ts の相関制約)', () => {
     const csv = joinCsv(
       ITEMS_HEADER,
-      "it-1,equipment-1,calibration,年次校正,1Y,external,,,14,person-1,30,,2026-07-01,true",
+      'it-1,equipment-1,calibration,年次校正,1Y,external,,,14,person-1,30,,2026-07-01,true',
     );
-    const result = validateEntityCsv("serviceItems", csv, stateWithReferences());
+    const result = validateEntityCsv('serviceItems', csv, stateWithReferences());
     expect(result.errors).toEqual([
-      { line: 2, message: "vendorId: 外部実施の項目には校正依頼先が必要です" },
-    ]);
-  });
-});
-
-describe("validateEntityCsv: ファイル内ユニーク制約", () => {
-  it("id の重複を初出行番号付きで報告する", () => {
-    const csv = joinCsv(
-      EQUIPMENT_HEADER,
-      "eq-1,EQ-101,ノギスA,,,,,active,",
-      "eq-1,EQ-102,ノギスB,,,,,active,",
-    );
-    const result = validateEntityCsv("equipment", csv, emptyAppState());
-    expect(result.errors).toEqual([{ line: 3, message: "id: 重複しています(行2と同じ値)" }]);
-  });
-
-  it("equipment は managementNo の重複も報告する(§11 のプレビュー例)", () => {
-    const csv = joinCsv(
-      EQUIPMENT_HEADER,
-      "eq-1,EQ-101,ノギスA,,,,,active,",
-      "eq-2,EQ-101,ノギスB,,,,,active,",
-    );
-    const result = validateEntityCsv("equipment", csv, emptyAppState());
-    expect(result.errors).toEqual([
-      { line: 3, message: "managementNo: 重複しています(行2と同じ値)" },
+      { line: 2, message: 'vendorId: 外部実施の項目には校正依頼先が必要です' },
     ]);
   });
 });
 
-describe("validateEntityCsv: 参照整合(D-029: 現在ストアと突合)", () => {
-  it("equipment.manufacturerId の参照先不存在を報告する", () => {
-    const csv = joinCsv(EQUIPMENT_HEADER, "eq-1,EQ-101,ノギスA,,,vendor-9,,active,");
-    const result = validateEntityCsv("equipment", csv, emptyAppState());
+describe('validateEntityCsv: ファイル内ユニーク制約', () => {
+  it('id の重複を初出行番号付きで報告する', () => {
+    const csv = joinCsv(
+      EQUIPMENT_HEADER,
+      'eq-1,EQ-101,ノギスA,,,,,active,',
+      'eq-1,EQ-102,ノギスB,,,,,active,',
+    );
+    const result = validateEntityCsv('equipment', csv, emptyAppState());
+    expect(result.errors).toEqual([{ line: 3, message: 'id: 重複しています(行2と同じ値)' }]);
+  });
+
+  it('equipment は managementNo の重複も報告する(§11 のプレビュー例)', () => {
+    const csv = joinCsv(
+      EQUIPMENT_HEADER,
+      'eq-1,EQ-101,ノギスA,,,,,active,',
+      'eq-2,EQ-101,ノギスB,,,,,active,',
+    );
+    const result = validateEntityCsv('equipment', csv, emptyAppState());
+    expect(result.errors).toEqual([
+      { line: 3, message: 'managementNo: 重複しています(行2と同じ値)' },
+    ]);
+  });
+});
+
+describe('validateEntityCsv: 参照整合(D-029: 現在ストアと突合)', () => {
+  it('equipment.manufacturerId の参照先不存在を報告する', () => {
+    const csv = joinCsv(EQUIPMENT_HEADER, 'eq-1,EQ-101,ノギスA,,,vendor-9,,active,');
+    const result = validateEntityCsv('equipment', csv, emptyAppState());
     expect(result.errors).toEqual([
       { line: 2, message: "manufacturerId: 参照先が存在しません 'vendor-9'" },
     ]);
   });
 
-  it("serviceItems の equipmentId / personId の参照先不存在を1行で複数報告する", () => {
+  it('serviceItems の equipmentId / personId の参照先不存在を1行で複数報告する', () => {
     const csv = joinCsv(
       ITEMS_HEADER,
-      "it-1,equipment-9,inspection,月次点検,1M,internal,,,14,person-9,30,,2026-07-01,true",
+      'it-1,equipment-9,inspection,月次点検,1M,internal,,,14,person-9,30,,2026-07-01,true',
     );
-    const result = validateEntityCsv("serviceItems", csv, stateWithReferences());
+    const result = validateEntityCsv('serviceItems', csv, stateWithReferences());
     expect(result.errors).toEqual([
       { line: 2, message: "equipmentId: 参照先が存在しません 'equipment-9'" },
       { line: 2, message: "personId: 参照先が存在しません 'person-9'" },
     ]);
   });
 
-  it("notifications は targetType に応じて serviceItems / serviceOrders と突合する", () => {
+  it('notifications は targetType に応じて serviceItems / serviceOrders と突合する', () => {
     // targetType=serviceOrder だが targetId は serviceItem の id → serviceOrders に存在しないためエラー
     const csv = joinCsv(
       NOTIFICATIONS_HEADER,
-      "nt-1,dueSoon,serviceOrder,item-1,person-1,期限接近,2026-07-01,false",
-      "nt-2,dueSoon,serviceItem,item-1,person-1,期限接近,2026-07-01,true",
+      'nt-1,dueSoon,serviceOrder,item-1,person-1,期限接近,2026-07-01,false',
+      'nt-2,dueSoon,serviceItem,item-1,person-1,期限接近,2026-07-01,true',
     );
-    const result = validateEntityCsv("notifications", csv, stateWithReferences());
+    const result = validateEntityCsv('notifications', csv, stateWithReferences());
     expect(result.errors).toEqual([
       { line: 2, message: "targetId: 参照先が存在しません 'item-1'" },
     ]);
     expect(result.validCount).toBe(1);
   });
 
-  it("serviceRecords の serviceOrderId は指定時のみ突合する", () => {
+  it('serviceRecords の serviceOrderId は指定時のみ突合する', () => {
     const csv = joinCsv(
-      "id,serviceItemId,doneDate,doneBy,result,serviceOrderId,note",
-      "rc-1,item-1,2026-07-01,田中,pass,,",
-      "rc-2,item-1,2026-07-01,校正社,pass,serviceOrder-9,",
+      'id,serviceItemId,doneDate,doneBy,result,serviceOrderId,note',
+      'rc-1,item-1,2026-07-01,田中,pass,,',
+      'rc-2,item-1,2026-07-01,校正社,pass,serviceOrder-9,',
     );
-    const result = validateEntityCsv("serviceRecords", csv, stateWithReferences());
+    const result = validateEntityCsv('serviceRecords', csv, stateWithReferences());
     expect(result.errors).toEqual([
       { line: 3, message: "serviceOrderId: 参照先が存在しません 'serviceOrder-9'" },
     ]);
   });
 });
 
-describe("validateEntityCsv: 件数集計と取り込み可否(D-030)", () => {
-  it("エラーが1件でもあれば entities は null、有効行数は維持する", () => {
+describe('validateEntityCsv: 件数集計と取り込み可否(D-030)', () => {
+  it('エラーが1件でもあれば entities は null、有効行数は維持する', () => {
     const csv = joinCsv(
       EQUIPMENT_HEADER,
-      "eq-1,EQ-101,ノギスA,,,,,active,",
-      "eq-2,EQ-102,ノギスB,,,,,broken,",
-      "eq-3,EQ-103,ノギスC,,,,,active,",
+      'eq-1,EQ-101,ノギスA,,,,,active,',
+      'eq-2,EQ-102,ノギスB,,,,,broken,',
+      'eq-3,EQ-103,ノギスC,,,,,active,',
     );
-    const result = validateEntityCsv("equipment", csv, emptyAppState());
+    const result = validateEntityCsv('equipment', csv, emptyAppState());
     expect(result.validCount).toBe(2);
     expect(result.errors).toHaveLength(1);
     expect(result.entities).toBeNull();
   });
 });
 
-describe("validateEntityCsv: フィールド別ルール(文字数上限・形式)", () => {
+describe('validateEntityCsv: フィールド別ルール(文字数上限・形式)', () => {
   const VENDORS_HEADER =
-    "id,name,isManufacturer,isCalibrator,contactPerson,email,phone,standardLeadTimeDays,note";
+    'id,name,isManufacturer,isCalibrator,contactPerson,email,phone,standardLeadTimeDays,note';
 
-  it("文字数上限を超えた note の行をエラーにする(entities は null)", () => {
-    const csv = joinCsv(VENDORS_HEADER, `vendor-1,校正社,true,true,,,,,${"あ".repeat(501)}`);
-    const result = validateEntityCsv("vendors", csv, emptyAppState());
+  it('文字数上限を超えた note の行をエラーにする(entities は null)', () => {
+    const csv = joinCsv(VENDORS_HEADER, `vendor-1,校正社,true,true,,,,,${'あ'.repeat(501)}`);
+    const result = validateEntityCsv('vendors', csv, emptyAppState());
     expect(result.errors).toEqual([
-      { line: 2, message: "note: 500文字以内で指定してください(実際501文字)" },
+      { line: 2, message: 'note: 500文字以内で指定してください(実際501文字)' },
     ]);
     expect(result.validCount).toBe(0);
     expect(result.entities).toBeNull();
   });
 
-  it("文字数上限ちょうどの name はエラーにしない", () => {
-    const csv = joinCsv(VENDORS_HEADER, `vendor-1,${"あ".repeat(50)},true,true,,,,,`);
-    const result = validateEntityCsv("vendors", csv, emptyAppState());
+  it('文字数上限ちょうどの name はエラーにしない', () => {
+    const csv = joinCsv(VENDORS_HEADER, `vendor-1,${'あ'.repeat(50)},true,true,,,,,`);
+    const result = validateEntityCsv('vendors', csv, emptyAppState());
     expect(result.errors).toEqual([]);
     expect(result.entities).not.toBeNull();
   });
 
-  it("phone が形式(半角数字・ハイフン)に一致しない行をエラーにする", () => {
-    const csv = joinCsv(VENDORS_HEADER, "vendor-1,校正社,true,true,,,03(1234)5678,,");
-    const result = validateEntityCsv("vendors", csv, emptyAppState());
+  it('phone が形式(半角数字・ハイフン)に一致しない行をエラーにする', () => {
+    const csv = joinCsv(VENDORS_HEADER, 'vendor-1,校正社,true,true,,,03(1234)5678,,');
+    const result = validateEntityCsv('vendors', csv, emptyAppState());
     expect(result.errors).toEqual([
-      { line: 2, message: "phone: 半角数字またはハイフンで指定してください" },
+      { line: 2, message: 'phone: 半角数字またはハイフンで指定してください' },
     ]);
   });
 
-  it("phone が半角数字・ハイフンのみならエラーにしない", () => {
-    const csv = joinCsv(VENDORS_HEADER, "vendor-1,校正社,true,true,,,03-1234-5678,,");
-    const result = validateEntityCsv("vendors", csv, emptyAppState());
+  it('phone が半角数字・ハイフンのみならエラーにしない', () => {
+    const csv = joinCsv(VENDORS_HEADER, 'vendor-1,校正社,true,true,,,03-1234-5678,,');
+    const result = validateEntityCsv('vendors', csv, emptyAppState());
     expect(result.errors).toEqual([]);
   });
 
-  it("phone が空セルならエラーにしない", () => {
-    const csv = joinCsv(VENDORS_HEADER, "vendor-1,校正社,true,true,,,,,");
-    const result = validateEntityCsv("vendors", csv, emptyAppState());
+  it('phone が空セルならエラーにしない', () => {
+    const csv = joinCsv(VENDORS_HEADER, 'vendor-1,校正社,true,true,,,,,');
+    const result = validateEntityCsv('vendors', csv, emptyAppState());
     expect(result.errors).toEqual([]);
   });
 
-  it("1行で zod エラーとルールエラーが同時に発生する場合、両方を報告する", () => {
-    const csv = joinCsv(VENDORS_HEADER, "vendor-1,校正社,broken,true,,,03(1234)5678,,");
-    const result = validateEntityCsv("vendors", csv, emptyAppState());
+  it('1行で zod エラーとルールエラーが同時に発生する場合、両方を報告する', () => {
+    const csv = joinCsv(VENDORS_HEADER, 'vendor-1,校正社,broken,true,,,03(1234)5678,,');
+    const result = validateEntityCsv('vendors', csv, emptyAppState());
     expect(result.errors).toEqual([
-      { line: 2, message: "phone: 半角数字またはハイフンで指定してください" },
-      { line: 2, message: "isManufacturer: true/false のいずれかを指定してください" },
+      { line: 2, message: 'phone: 半角数字またはハイフンで指定してください' },
+      { line: 2, message: 'isManufacturer: true/false のいずれかを指定してください' },
     ]);
     expect(result.entities).toBeNull();
   });
 });
 
-describe("validateEntityCsv: 数式インジェクション警告(D-053)", () => {
-  it("`=`始まりの文字列セルを行番号・列名付きで警告する(取り込みは妨げない)", () => {
-    const csv = joinCsv(EQUIPMENT_HEADER, "eq-1,EQ-101,ノギスA,,,,,active,=HYPERLINK(evil)");
-    const result = validateEntityCsv("equipment", csv, emptyAppState());
+describe('validateEntityCsv: 数式インジェクション警告(D-053)', () => {
+  it('`=`始まりの文字列セルを行番号・列名付きで警告する(取り込みは妨げない)', () => {
+    const csv = joinCsv(EQUIPMENT_HEADER, 'eq-1,EQ-101,ノギスA,,,,,active,=HYPERLINK(evil)');
+    const result = validateEntityCsv('equipment', csv, emptyAppState());
     expect(result.errors).toEqual([]);
     expect(result.warnings).toEqual([
-      { line: 2, message: "note: 数式として解釈され得る値です(Excel等で開く際は注意)" },
+      { line: 2, message: 'note: 数式として解釈され得る値です(Excel等で開く際は注意)' },
     ]);
     expect(result.entities).not.toBeNull();
   });
 
-  it("`-20`のような数値解釈可能なセルは警告対象外", () => {
-    const csv = joinCsv(EQUIPMENT_HEADER, "eq-1,EQ-101,ノギスA,,,,,active,-20");
-    const result = validateEntityCsv("equipment", csv, emptyAppState());
+  it('`-20`のような数値解釈可能なセルは警告対象外', () => {
+    const csv = joinCsv(EQUIPMENT_HEADER, 'eq-1,EQ-101,ノギスA,,,,,active,-20');
+    const result = validateEntityCsv('equipment', csv, emptyAppState());
     expect(result.warnings).toEqual([]);
-    expect(result.entities?.["eq-1"]).toMatchObject({ note: "-20" });
+    expect(result.entities?.['eq-1']).toMatchObject({ note: '-20' });
   });
 
-  it("`-`始まりでも数値として解釈できない文字列は警告対象", () => {
-    const csv = joinCsv(EQUIPMENT_HEADER, "eq-1,EQ-101,ノギスA,,,,,active,-20℃で保管");
-    const result = validateEntityCsv("equipment", csv, emptyAppState());
+  it('`-`始まりでも数値として解釈できない文字列は警告対象', () => {
+    const csv = joinCsv(EQUIPMENT_HEADER, 'eq-1,EQ-101,ノギスA,,,,,active,-20℃で保管');
+    const result = validateEntityCsv('equipment', csv, emptyAppState());
     expect(result.warnings).toEqual([
-      { line: 2, message: "note: 数式として解釈され得る値です(Excel等で開く際は注意)" },
+      { line: 2, message: 'note: 数式として解釈され得る値です(Excel等で開く際は注意)' },
     ]);
   });
 
-  it("`@`始まりのセルも警告対象", () => {
-    const csv = joinCsv(EQUIPMENT_HEADER, "eq-1,EQ-101,ノギスA,,,,,active,@SUM(1+1)");
-    const result = validateEntityCsv("equipment", csv, emptyAppState());
+  it('`@`始まりのセルも警告対象', () => {
+    const csv = joinCsv(EQUIPMENT_HEADER, 'eq-1,EQ-101,ノギスA,,,,,active,@SUM(1+1)');
+    const result = validateEntityCsv('equipment', csv, emptyAppState());
     expect(result.warnings).toEqual([
-      { line: 2, message: "note: 数式として解釈され得る値です(Excel等で開く際は注意)" },
+      { line: 2, message: 'note: 数式として解釈され得る値です(Excel等で開く際は注意)' },
     ]);
   });
 
-  it("警告のみの場合は validCount / entities とも従来どおり取り込み可能", () => {
-    const csv = joinCsv(EQUIPMENT_HEADER, "eq-1,EQ-101,ノギスA,,,,,active,=B1");
-    const result = validateEntityCsv("equipment", csv, emptyAppState());
+  it('警告のみの場合は validCount / entities とも従来どおり取り込み可能', () => {
+    const csv = joinCsv(EQUIPMENT_HEADER, 'eq-1,EQ-101,ノギスA,,,,,active,=B1');
+    const result = validateEntityCsv('equipment', csv, emptyAppState());
     expect(result.errors).toEqual([]);
     expect(result.validCount).toBe(1);
     expect(result.entities).not.toBeNull();
   });
 
-  it("エラー行と警告行が混在しても両方を報告し、entities は null のまま", () => {
-    const csv = joinCsv(EQUIPMENT_HEADER, "eq-1,EQ-101,ノギスA,,,,,broken,=B1");
-    const result = validateEntityCsv("equipment", csv, emptyAppState());
+  it('エラー行と警告行が混在しても両方を報告し、entities は null のまま', () => {
+    const csv = joinCsv(EQUIPMENT_HEADER, 'eq-1,EQ-101,ノギスA,,,,,broken,=B1');
+    const result = validateEntityCsv('equipment', csv, emptyAppState());
     expect(result.errors).toEqual([{ line: 2, message: "status: 不正値 'broken'" }]);
     expect(result.warnings).toEqual([
-      { line: 2, message: "note: 数式として解釈され得る値です(Excel等で開く際は注意)" },
+      { line: 2, message: 'note: 数式として解釈され得る値です(Excel等で開く際は注意)' },
     ]);
     expect(result.entities).toBeNull();
   });
 
-  it("列数不正の行は警告判定の対象外", () => {
-    const csv = joinCsv(EQUIPMENT_HEADER, "eq-1,EQ-101,=A1");
-    const result = validateEntityCsv("equipment", csv, emptyAppState());
-    expect(result.errors).toEqual([{ line: 2, message: "列数が不正です(期待9・実際3)" }]);
+  it('列数不正の行は警告判定の対象外', () => {
+    const csv = joinCsv(EQUIPMENT_HEADER, 'eq-1,EQ-101,=A1');
+    const result = validateEntityCsv('equipment', csv, emptyAppState());
+    expect(result.errors).toEqual([{ line: 2, message: '列数が不正です(期待9・実際3)' }]);
     expect(result.warnings).toEqual([]);
   });
 
-  it("同一行の複数セルが対象なら列ごとに警告する", () => {
-    const csv = joinCsv(EQUIPMENT_HEADER, "eq-1,EQ-101,ノギスA,,,,=A1,active,=B1");
-    const result = validateEntityCsv("equipment", csv, emptyAppState());
+  it('同一行の複数セルが対象なら列ごとに警告する', () => {
+    const csv = joinCsv(EQUIPMENT_HEADER, 'eq-1,EQ-101,ノギスA,,,,=A1,active,=B1');
+    const result = validateEntityCsv('equipment', csv, emptyAppState());
     expect(result.warnings).toEqual([
-      { line: 2, message: "location: 数式として解釈され得る値です(Excel等で開く際は注意)" },
-      { line: 2, message: "note: 数式として解釈され得る値です(Excel等で開く際は注意)" },
+      { line: 2, message: 'location: 数式として解釈され得る値です(Excel等で開く際は注意)' },
+      { line: 2, message: 'note: 数式として解釈され得る値です(Excel等で開く際は注意)' },
     ]);
   });
 });

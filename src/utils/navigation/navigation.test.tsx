@@ -1,21 +1,21 @@
-import { useSafeNavigate } from "@/utils/navigation";
-import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import "@testing-library/jest-dom/vitest";
-import type { ReactElement } from "react";
-import { MemoryRouter, Route, Routes, useLocation } from "react-router-dom";
-import { describe, expect, it } from "vitest";
+import { useSafeNavigate } from '@/utils/navigation';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import '@testing-library/jest-dom/vitest';
+import type { ReactElement } from 'react';
+import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
+import { describe, expect, it } from 'vitest';
 
 const Screen = (): ReactElement => {
   const safeNavigate = useSafeNavigate();
   const location = useLocation();
 
-  if (location.pathname === "/next") {
+  if (location.pathname === '/next') {
     return (
       <div>
-        <p>次画面:{location.search === "?from=object" ? "object" : "direct"}</p>
+        <p>次画面:{location.search === '?from=object' ? 'object' : 'direct'}</p>
         <button
-          type="button"
+          type='button'
           onClick={() => {
             safeNavigate(-1);
           }}
@@ -30,17 +30,17 @@ const Screen = (): ReactElement => {
     <div>
       <p>開始画面</p>
       <button
-        type="button"
+        type='button'
         onClick={() => {
-          safeNavigate("/next");
+          safeNavigate('/next');
         }}
       >
         文字列パスへ
       </button>
       <button
-        type="button"
+        type='button'
         onClick={() => {
-          safeNavigate({ pathname: "/next", search: "?from=object" });
+          safeNavigate({ pathname: '/next', search: '?from=object' });
         }}
       >
         オブジェクトパスへ
@@ -53,42 +53,42 @@ const renderWithRoutes = (initialEntries: string[]): void => {
   render(
     <MemoryRouter initialEntries={initialEntries}>
       <Routes>
-        <Route path="/" element={<Screen />} />
-        <Route path="/next" element={<Screen />} />
+        <Route path='/' element={<Screen />} />
+        <Route path='/next' element={<Screen />} />
       </Routes>
     </MemoryRouter>,
   );
 };
 
-describe("useSafeNavigate", () => {
-  it("文字列パスへ遷移する", async () => {
+describe('useSafeNavigate', () => {
+  it('文字列パスへ遷移する', async () => {
     const user = userEvent.setup();
-    renderWithRoutes(["/"]);
+    renderWithRoutes(['/']);
 
-    expect(screen.getByText("開始画面")).toBeInTheDocument();
-    await user.click(screen.getByRole("button", { name: "文字列パスへ" }));
+    expect(screen.getByText('開始画面')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: '文字列パスへ' }));
 
-    expect(await screen.findByText("次画面:direct")).toBeInTheDocument();
+    expect(await screen.findByText('次画面:direct')).toBeInTheDocument();
   });
 
-  it("オブジェクトパス(検索クエリ付き)へ遷移する", async () => {
+  it('オブジェクトパス(検索クエリ付き)へ遷移する', async () => {
     const user = userEvent.setup();
-    renderWithRoutes(["/"]);
+    renderWithRoutes(['/']);
 
-    await user.click(screen.getByRole("button", { name: "オブジェクトパスへ" }));
+    await user.click(screen.getByRole('button', { name: 'オブジェクトパスへ' }));
 
-    expect(await screen.findByText("次画面:object")).toBeInTheDocument();
+    expect(await screen.findByText('次画面:object')).toBeInTheDocument();
   });
 
-  it("数値(履歴デルタ)で1つ前の画面へ戻る", async () => {
+  it('数値(履歴デルタ)で1つ前の画面へ戻る', async () => {
     const user = userEvent.setup();
-    renderWithRoutes(["/"]);
+    renderWithRoutes(['/']);
 
-    await user.click(screen.getByRole("button", { name: "文字列パスへ" }));
-    expect(await screen.findByText("次画面:direct")).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: '文字列パスへ' }));
+    expect(await screen.findByText('次画面:direct')).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: "戻る" }));
+    await user.click(screen.getByRole('button', { name: '戻る' }));
 
-    expect(await screen.findByText("開始画面")).toBeInTheDocument();
+    expect(await screen.findByText('開始画面')).toBeInTheDocument();
   });
 });

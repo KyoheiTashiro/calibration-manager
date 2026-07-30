@@ -7,29 +7,29 @@
  * 変換するのは検証成功後（呼び出し側の submit ハンドラ）に限る。
  */
 
-import { TEXT_LIMIT } from "@/constants/textLimits";
-import { maxLengthMessage, optionalNonNegativeIntegerString } from "@/utils/form";
-import { isIsoDateString } from "@/utils/time";
-import { z } from "zod";
+import { TEXT_LIMIT } from '@/constants/textLimits';
+import { maxLengthMessage, optionalNonNegativeIntegerString } from '@/utils/form';
+import { isIsoDateString } from '@/utils/time';
+import { z } from 'zod';
 
 export const Schema = z.object({
-  vendorId: z.string().min(1, "校正依頼先を選択してください"),
+  vendorId: z.string().min(1, '校正依頼先を選択してください'),
   dueDate: z
     .string()
     .optional()
-    .refine((value) => value === undefined || value === "" || isIsoDateString(value), {
-      message: "返却予定日の形式が不正です",
+    .refine((value) => value === undefined || value === '' || isIsoDateString(value), {
+      message: '返却予定日の形式が不正です',
     }),
-  cost: optionalNonNegativeIntegerString("費用は0以上の数値で入力してください"),
-  note: z.string().max(TEXT_LIMIT.note, maxLengthMessage("備考", TEXT_LIMIT.note)).optional(),
+  cost: optionalNonNegativeIntegerString('費用は0以上の数値で入力してください'),
+  note: z.string().max(TEXT_LIMIT.note, maxLengthMessage('備考', TEXT_LIMIT.note)).optional(),
 });
 
 export type FormType = z.infer<typeof Schema>;
 
 /** 新規作成時の既定フォーム値。vendorId は呼び出し側で serviceItem.vendorId から解決して上書きする */
 export const defaultValues: FormType = {
-  vendorId: "",
-  dueDate: "",
-  cost: "",
-  note: "",
+  vendorId: '',
+  dueDate: '',
+  cost: '',
+  note: '',
 };

@@ -1,10 +1,10 @@
-import { equipmentDetailPath, ROUTES } from "@/constants/routes";
-import { NOTIFICATION_TARGET_TYPE, type ServiceItem, type Notification } from "@/store/types";
-import { recordValue } from "@/utils/record";
+import { equipmentDetailPath, ROUTES } from '@/constants/routes';
+import { NOTIFICATION_TARGET_TYPE, type ServiceItem, type Notification } from '@/store/types';
+import { recordValue } from '@/utils/record';
 
 export const NOTIFICATION_TAB = {
-  UNREAD: "unread",
-  READ: "read",
+  UNREAD: 'unread',
+  READ: 'read',
 } as const;
 export type NotificationTab = (typeof NOTIFICATION_TAB)[keyof typeof NOTIFICATION_TAB];
 

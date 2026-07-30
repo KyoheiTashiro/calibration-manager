@@ -1,19 +1,19 @@
-import { ServiceItemList } from "@/features/serviceItems/list";
-import { renderWithStore, setupStoreIsolation } from "@/test/renderWithStore";
-import { personSuzuki, seedServiceItemList } from "@/test/serviceItemListFixtures";
-import { screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import "@testing-library/jest-dom/vitest";
-import type { ReactElement } from "react";
-import { useLocation } from "react-router-dom";
-import { beforeEach, describe, expect, it } from "vitest";
+import { ServiceItemList } from '@/features/serviceItems/list';
+import { renderWithStore, setupStoreIsolation } from '@/test/renderWithStore';
+import { personSuzuki, seedServiceItemList } from '@/test/serviceItemListFixtures';
+import { screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import '@testing-library/jest-dom/vitest';
+import type { ReactElement } from 'react';
+import { useLocation } from 'react-router-dom';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 const LocationProbe = (): ReactElement => {
   const location = useLocation();
-  return <span data-testid="search">{location.search}</span>;
+  return <span data-testid='search'>{location.search}</span>;
 };
 
-const renderList = (search = ""): ReturnType<typeof renderWithStore> =>
+const renderList = (search = ''): ReturnType<typeof renderWithStore> =>
   renderWithStore(
     <>
       <ServiceItemList />
@@ -22,76 +22,76 @@ const renderList = (search = ""): ReturnType<typeof renderWithStore> =>
     { initialEntries: [`/service-items${search}`] },
   );
 
-const searchValue = (): string => screen.getByTestId("search").textContent;
-const dataRowCount = (): number => screen.getAllByRole("row").length - 1;
+const searchValue = (): string => screen.getByTestId('search').textContent;
+const dataRowCount = (): number => screen.getAllByRole('row').length - 1;
 
 beforeEach(() => {
   setupStoreIsolation();
   seedServiceItemList();
 });
 
-describe("ServiceItemList: フィルタ", () => {
-  it("?status=overdue で初期化すると overdue の行だけを表示する", () => {
-    renderList("?status=overdue");
+describe('ServiceItemList: フィルタ', () => {
+  it('?status=overdue で初期化すると overdue の行だけを表示する', () => {
+    renderList('?status=overdue');
 
-    expect(screen.getByRole("row", { name: /年次校正/u })).toBeInTheDocument();
-    expect(screen.queryByText("半期校正")).not.toBeInTheDocument();
-    expect(screen.queryByText("月次点検")).not.toBeInTheDocument();
+    expect(screen.getByRole('row', { name: /年次校正/u })).toBeInTheDocument();
+    expect(screen.queryByText('半期校正')).not.toBeInTheDocument();
+    expect(screen.queryByText('月次点検')).not.toBeInTheDocument();
   });
 
-  it("担当セレクトは name 昇順で無効者に「(無効)」注記を付ける", async () => {
+  it('担当セレクトは name 昇順で無効者に「(無効)」注記を付ける', async () => {
     const user = userEvent.setup();
     renderList();
 
-    await user.click(screen.getByRole("combobox", { name: "担当" }));
-    expect(screen.getByRole("option", { name: `${personSuzuki.name}(無効)` })).toBeInTheDocument();
+    await user.click(screen.getByRole('combobox', { name: '担当' }));
+    expect(screen.getByRole('option', { name: `${personSuzuki.name}(無効)` })).toBeInTheDocument();
   });
 
-  it("種別セレクトを変更すると行が絞られ URL に type が反映される", async () => {
+  it('種別セレクトを変更すると行が絞られ URL に type が反映される', async () => {
     const user = userEvent.setup();
     renderList();
     expect(dataRowCount()).toBe(3);
 
-    await user.click(screen.getByRole("combobox", { name: "種別" }));
-    await user.click(screen.getByRole("option", { name: "点検" }));
+    await user.click(screen.getByRole('combobox', { name: '種別' }));
+    await user.click(screen.getByRole('option', { name: '点検' }));
 
     expect(dataRowCount()).toBe(1);
-    expect(screen.getByRole("row", { name: /月次点検/u })).toBeInTheDocument();
-    expect(searchValue()).toContain("type=inspection");
+    expect(screen.getByRole('row', { name: /月次点検/u })).toBeInTheDocument();
+    expect(searchValue()).toContain('type=inspection');
   });
 
-  it("「全て」を選び直すと該当クエリが URL から除去される", async () => {
+  it('「全て」を選び直すと該当クエリが URL から除去される', async () => {
     const user = userEvent.setup();
-    renderList("?type=inspection");
+    renderList('?type=inspection');
     expect(dataRowCount()).toBe(1);
 
-    await user.click(screen.getByRole("combobox", { name: "種別" }));
-    await user.click(screen.getByRole("option", { name: "全て" }));
+    await user.click(screen.getByRole('combobox', { name: '種別' }));
+    await user.click(screen.getByRole('option', { name: '全て' }));
 
     expect(dataRowCount()).toBe(3);
-    expect(searchValue()).not.toContain("type=");
+    expect(searchValue()).not.toContain('type=');
   });
 
-  it("クリアで全フィルタが外れ全行が復帰し URL クエリが空になる", async () => {
+  it('クリアで全フィルタが外れ全行が復帰し URL クエリが空になる', async () => {
     const user = userEvent.setup();
-    renderList("?status=overdue");
+    renderList('?status=overdue');
     expect(dataRowCount()).toBe(1);
 
-    await user.click(screen.getByRole("button", { name: "クリア" }));
+    await user.click(screen.getByRole('button', { name: 'クリア' }));
 
     expect(dataRowCount()).toBe(3);
-    expect(searchValue()).toBe("");
+    expect(searchValue()).toBe('');
   });
 
-  it("クリアはフィルタ以外の未知クエリも含めて全除去する(D-022)", async () => {
+  it('クリアはフィルタ以外の未知クエリも含めて全除去する(D-022)', async () => {
     const user = userEvent.setup();
     // 未知パラメータ(page)をフィルタと併存させ、クリアが全クエリを消すことを確認する
-    renderList("?status=overdue&page=2");
+    renderList('?status=overdue&page=2');
     expect(dataRowCount()).toBe(1);
 
-    await user.click(screen.getByRole("button", { name: "クリア" }));
+    await user.click(screen.getByRole('button', { name: 'クリア' }));
 
     expect(dataRowCount()).toBe(3);
-    expect(searchValue()).toBe("");
+    expect(searchValue()).toBe('');
   });
 });

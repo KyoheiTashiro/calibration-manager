@@ -1,4 +1,4 @@
-import { StatusBadge } from "@/components/domain";
+import { StatusBadge } from '@/components/domain';
 import {
   EmptyState,
   Table,
@@ -7,11 +7,11 @@ import {
   Td,
   Th,
   activatableRowProps,
-} from "@/components/ui";
-import { equipmentDetailPath } from "@/constants/routes";
-import { SERVICE_ITEM_TYPE_LABELS } from "@/features/serviceItems/constants";
-import type { ServiceItemRow } from "@/store/selectors";
-import type { ReactElement } from "react";
+} from '@/components/ui';
+import { equipmentDetailPath } from '@/constants/routes';
+import { SERVICE_ITEM_TYPE_LABELS } from '@/features/serviceItems/constants';
+import type { ServiceItemRow } from '@/store/selectors';
+import type { ReactElement } from 'react';
 
 type Props = {
   rows: readonly ServiceItemRow[];
@@ -20,7 +20,7 @@ type Props = {
 };
 
 export const ActionRequiredList = ({ rows, onNavigate }: Props): ReactElement => {
-  if (rows.length === 0) return <EmptyState message="対応が必要な項目はありません" />;
+  if (rows.length === 0) return <EmptyState message='対応が必要な項目はありません' />;
 
   const activate = (equipmentId: string): void => {
     onNavigate(equipmentDetailPath(equipmentId));

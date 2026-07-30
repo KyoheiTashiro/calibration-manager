@@ -10,7 +10,7 @@
  * コンポーネントは保持済みの状態を購読するだけの薄いビューにする。
  */
 
-import { useSyncExternalStore } from "react";
+import { useSyncExternalStore } from 'react';
 
 type PwaInstallState = {
   readonly deferredPrompt: BeforeInstallPromptEvent | null;
@@ -22,8 +22,8 @@ type PwaInstallState = {
 const createInitialState = (): PwaInstallState => ({
   deferredPrompt: null,
   isInstalled:
-    typeof globalThis.matchMedia === "function" &&
-    globalThis.matchMedia("(display-mode: standalone)").matches,
+    typeof globalThis.matchMedia === 'function' &&
+    globalThis.matchMedia('(display-mode: standalone)').matches,
 });
 
 let state: PwaInstallState = createInitialState();
@@ -44,13 +44,13 @@ export const setupPwaInstallCapture = (): void => {
   }
   isSetup = true;
 
-  globalThis.addEventListener("beforeinstallprompt", (event: BeforeInstallPromptEvent): void => {
+  globalThis.addEventListener('beforeinstallprompt', (event: BeforeInstallPromptEvent): void => {
     // なぜ: Chrome のミニ情報バー自動表示を抑止し、設定画面のボタンから任意タイミングで出すため。
     event.preventDefault();
     setState({ ...state, deferredPrompt: event });
   });
 
-  globalThis.addEventListener("appinstalled", (): void => {
+  globalThis.addEventListener('appinstalled', (): void => {
     setState({ deferredPrompt: null, isInstalled: true });
   });
 };

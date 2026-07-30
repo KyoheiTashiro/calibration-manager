@@ -1,21 +1,21 @@
-import { PwaInstallSection } from "@/features/settings/components/pwa/PwaInstallSection";
+import { PwaInstallSection } from '@/features/settings/components/pwa/PwaInstallSection';
 import {
   resetPwaInstallStateForTest,
   setupPwaInstallCapture,
-} from "@/features/settings/components/pwa/usePwaInstall";
-import "@testing-library/jest-dom/vitest";
-import { act, render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+} from '@/features/settings/components/pwa/usePwaInstall';
+import '@testing-library/jest-dom/vitest';
+import { act, render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const createMockEvent = (): BeforeInstallPromptEvent & { prompt: ReturnType<typeof vi.fn> } =>
-  Object.assign(new Event("beforeinstallprompt"), {
+  Object.assign(new Event('beforeinstallprompt'), {
     platforms: [],
-    userChoice: Promise.resolve({ outcome: "accepted" as const, platform: "web" }),
+    userChoice: Promise.resolve({ outcome: 'accepted' as const, platform: 'web' }),
     prompt: vi.fn().mockResolvedValue(undefined),
   });
 
-describe("PwaInstallSection", () => {
+describe('PwaInstallSection', () => {
   beforeEach(() => {
     // なぜ: ストアはモジュールスコープで状態を保持するため、テスト間の汚染を防ぐためリセットしてから
     // 捕捉を再登録する(setupPwaInstallCapture は isSetup ガードで冪等なため毎回呼んでよい)。
@@ -23,18 +23,18 @@ describe("PwaInstallSection", () => {
     setupPwaInstallCapture();
   });
 
-  it("初期状態では非対応案内文を表示し、インストールボタンは存在しない", () => {
+  it('初期状態では非対応案内文を表示し、インストールボタンは存在しない', () => {
     render(<PwaInstallSection />);
 
     expect(
       screen.getByText(/このブラウザーでは自動インストールに対応していません/u),
     ).toBeInTheDocument();
     expect(
-      screen.queryByRole("button", { name: "アプリとしてインストール" }),
+      screen.queryByRole('button', { name: 'アプリとしてインストール' }),
     ).not.toBeInTheDocument();
   });
 
-  it("beforeinstallprompt 発火後はインストールボタンを表示し、クリックで prompt が呼ばれ非対応案内文に戻る", async () => {
+  it('beforeinstallprompt 発火後はインストールボタンを表示し、クリックで prompt が呼ばれ非対応案内文に戻る', async () => {
     render(<PwaInstallSection />);
     const mockEvent = createMockEvent();
 
@@ -42,8 +42,8 @@ describe("PwaInstallSection", () => {
       globalThis.dispatchEvent(mockEvent);
     });
 
-    const installButton = await screen.findByRole("button", {
-      name: "アプリとしてインストール",
+    const installButton = await screen.findByRole('button', {
+      name: 'アプリとしてインストール',
     });
 
     await userEvent.click(installButton);
@@ -53,27 +53,27 @@ describe("PwaInstallSection", () => {
       await screen.findByText(/このブラウザーでは自動インストールに対応していません/u),
     ).toBeInTheDocument();
     expect(
-      screen.queryByRole("button", { name: "アプリとしてインストール" }),
+      screen.queryByRole('button', { name: 'アプリとしてインストール' }),
     ).not.toBeInTheDocument();
   });
 
-  it("appinstalled 発火後はインストール済み文言を表示し、ボタンは表示されない", () => {
+  it('appinstalled 発火後はインストール済み文言を表示し、ボタンは表示されない', () => {
     render(<PwaInstallSection />);
 
     act(() => {
-      globalThis.dispatchEvent(new Event("appinstalled"));
+      globalThis.dispatchEvent(new Event('appinstalled'));
     });
 
     expect(screen.getByText(/インストール済みです/u)).toBeInTheDocument();
     expect(
-      screen.queryByRole("button", { name: "アプリとしてインストール" }),
+      screen.queryByRole('button', { name: 'アプリとしてインストール' }),
     ).not.toBeInTheDocument();
   });
 
-  it("beforeinstallprompt 発火時に event.preventDefault が呼ばれる", () => {
+  it('beforeinstallprompt 発火時に event.preventDefault が呼ばれる', () => {
     render(<PwaInstallSection />);
     const mockEvent = createMockEvent();
-    const preventDefaultSpy = vi.spyOn(mockEvent, "preventDefault");
+    const preventDefaultSpy = vi.spyOn(mockEvent, 'preventDefault');
 
     act(() => {
       globalThis.dispatchEvent(mockEvent);
@@ -82,7 +82,7 @@ describe("PwaInstallSection", () => {
     expect(preventDefaultSpy).toHaveBeenCalled();
   });
 
-  it("コンポーネントマウント前に beforeinstallprompt が発火してもインストールボタンを表示する（回帰）", () => {
+  it('コンポーネントマウント前に beforeinstallprompt が発火してもインストールボタンを表示する（回帰）', () => {
     const mockEvent = createMockEvent();
 
     // なぜ render の前に発火させるか: setupPwaInstallCapture はモジュールスコープで捕捉するため、
@@ -94,6 +94,6 @@ describe("PwaInstallSection", () => {
 
     render(<PwaInstallSection />);
 
-    expect(screen.getByRole("button", { name: "アプリとしてインストール" })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'アプリとしてインストール' })).toBeInTheDocument();
   });
 });

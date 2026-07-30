@@ -3,16 +3,16 @@
  * 対象外だが、その除外は派生側（serviceItemStatus / generateNotifications）の責務。
  */
 
-import type { AppSliceCreator } from "@/store/storeState";
-import type { Equipment, EquipmentStatus } from "@/store/types";
-import { createId } from "@/utils/id";
-import { recordValue } from "@/utils/record";
+import type { AppSliceCreator } from '@/store/storeState';
+import type { Equipment, EquipmentStatus } from '@/store/types';
+import { createId } from '@/utils/id';
+import { recordValue } from '@/utils/record';
 
 export type EquipmentSlice = {
   equipment: Record<string, Equipment>;
   /** @returns 生成したEquipmentのid */
-  addEquipment: (input: Omit<Equipment, "id">) => string;
-  updateEquipment: (id: string, patch: Partial<Omit<Equipment, "id">>) => void;
+  addEquipment: (input: Omit<Equipment, 'id'>) => string;
+  updateEquipment: (id: string, patch: Partial<Omit<Equipment, 'id'>>) => void;
   setEquipmentStatus: (id: string, status: EquipmentStatus) => void;
 };
 

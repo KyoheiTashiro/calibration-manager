@@ -1,6 +1,6 @@
-import { SERVICE_ITEM_STATUS, type ServiceItemStatus } from "@/domain/serviceItemStatus";
-import type { ServiceItemRow } from "@/store/selectors";
-import type { Notification } from "@/store/types";
+import { SERVICE_ITEM_STATUS, type ServiceItemStatus } from '@/domain/serviceItemStatus';
+import type { ServiceItemRow } from '@/store/selectors';
+import type { Notification } from '@/store/types';
 
 export const SUMMARY_CARD_STATUSES: readonly ServiceItemStatus[] = [
   SERVICE_ITEM_STATUS.OVERDUE,

@@ -1,4 +1,4 @@
-import { useOutsideClick } from "@/components/ui/hooks/useOutsideClick";
+import { useOutsideClick } from '@/components/ui/hooks/useOutsideClick';
 import {
   useCallback,
   useRef,
@@ -7,7 +7,7 @@ import {
   type KeyboardEvent,
   type RefObject,
   type SetStateAction,
-} from "react";
+} from 'react';
 
 export type SelectOption = {
   value: string;
@@ -97,10 +97,10 @@ export const useSelectBehavior = ({
 
   const handleTriggerKeyDown = (event: KeyboardEvent<HTMLButtonElement>): void => {
     if (
-      event.key !== "Enter" &&
-      event.key !== " " &&
-      event.key !== "ArrowDown" &&
-      event.key !== "ArrowUp"
+      event.key !== 'Enter' &&
+      event.key !== ' ' &&
+      event.key !== 'ArrowDown' &&
+      event.key !== 'ArrowUp'
     ) {
       return;
     }
@@ -124,7 +124,7 @@ export const useSelectBehavior = ({
     Enter: () => {
       selectByIndex(focusedIndex);
     },
-    " ": () => {
+    ' ': () => {
       selectByIndex(focusedIndex);
     },
     Escape: () => {
@@ -133,7 +133,7 @@ export const useSelectBehavior = ({
   };
 
   const handleListKeyDown = (event: KeyboardEvent<HTMLDivElement>): void => {
-    if (event.key === "Tab") {
+    if (event.key === 'Tab') {
       close(false, true);
       return;
     }

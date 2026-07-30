@@ -6,6 +6,10 @@
   "sortImports": {
     "internalPattern": ["^@/.*"]
   },
+  // なぜ: クォートは原則シングルに統一し、文字列中に ' を含むなど必要な場合のみダブルを許す
+  // 方針のため（coding-standards.md §10、D-092）。JSX属性も同方針で jsxSingleQuote を有効化。
+  "singleQuote": true,
+  "jsxSingleQuote": true,
   // なぜ: Tailwind CSS 4採用のため、className内のユーティリティクラスの並び順を
   // prettier-plugin-tailwindcss互換のアルゴリズムで自動整列し、レビュー時の差分ノイズを減らす。
   "sortTailwindcss": true

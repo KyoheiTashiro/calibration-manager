@@ -1,6 +1,6 @@
 /** 起動元（項目一覧）との結線は modalLaunch.test.tsx 側の責務 */
 
-import { ServiceOrderModal } from "@/components/domain/ServiceOrderModal";
+import { ServiceOrderModal } from '@/components/domain/ServiceOrderModal';
 import {
   CYCLE,
   EQUIPMENT_STATUS,
@@ -10,49 +10,49 @@ import {
   type Equipment,
   type ServiceItem,
   type Vendor,
-} from "@/store/types";
-import { useAppStore } from "@/store/useAppStore";
-import { renderWithStore, seedStore, setupStoreIsolation } from "@/test/renderWithStore";
-import { screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import "@testing-library/jest-dom/vitest";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+} from '@/store/types';
+import { useAppStore } from '@/store/useAppStore';
+import { renderWithStore, seedStore, setupStoreIsolation } from '@/test/renderWithStore';
+import { screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import '@testing-library/jest-dom/vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 beforeEach(setupStoreIsolation);
 
 const equipment: Equipment = {
-  id: "equipment-1",
-  managementNo: "EQ-001",
-  name: "ノギス",
+  id: 'equipment-1',
+  managementNo: 'EQ-001',
+  name: 'ノギス',
   status: EQUIPMENT_STATUS.ACTIVE,
 };
 
 const calibratorVendor: Vendor = {
-  id: "vendor-1",
-  name: "ミツトヨ校正センター",
+  id: 'vendor-1',
+  name: 'ミツトヨ校正センター',
   isManufacturer: false,
   isCalibrator: true,
 };
 
 const manufacturerOnlyVendor: Vendor = {
-  id: "vendor-2",
-  name: "メーカーのみ商事",
+  id: 'vendor-2',
+  name: 'メーカーのみ商事',
   isManufacturer: true,
   isCalibrator: false,
 };
 
 const externalServiceItem: ServiceItem = {
-  id: "item-1",
+  id: 'item-1',
   equipmentId: equipment.id,
   type: SERVICE_ITEM_TYPE.CALIBRATION,
-  name: "年次校正",
+  name: '年次校正',
   cycle: CYCLE.Y1,
   execution: EXECUTION.EXTERNAL,
   vendorId: calibratorVendor.id,
   bufferDays: 14,
-  personId: "person-1",
+  personId: 'person-1',
   noticeDaysBefore: 30,
-  nextDueDate: "2026-08-01",
+  nextDueDate: '2026-08-01',
   isActive: true,
 };
 
@@ -67,8 +67,8 @@ const seedBaseMasters = (): void => {
   });
 };
 
-describe("ServiceOrderModal", () => {
-  it("対象が「対象:EQ-001 ノギス / 年次校正」の形式で固定表示される", () => {
+describe('ServiceOrderModal', () => {
+  it('対象が「対象:EQ-001 ノギス / 年次校正」の形式で固定表示される', () => {
     seedBaseMasters();
     renderWithStore(
       <ServiceOrderModal
@@ -78,10 +78,10 @@ describe("ServiceOrderModal", () => {
       />,
     );
 
-    expect(screen.getByText("対象:EQ-001 ノギス / 年次校正")).toBeInTheDocument();
+    expect(screen.getByText('対象:EQ-001 ノギス / 年次校正')).toBeInTheDocument();
   });
 
-  it("依頼先の既定値がserviceItem.vendorId(isCalibratorの選択肢に存在する場合)になる", () => {
+  it('依頼先の既定値がserviceItem.vendorId(isCalibratorの選択肢に存在する場合)になる', () => {
     seedBaseMasters();
     renderWithStore(
       <ServiceOrderModal
@@ -91,12 +91,12 @@ describe("ServiceOrderModal", () => {
       />,
     );
 
-    expect(screen.getByRole("combobox", { name: /校正依頼先/u })).toHaveTextContent(
+    expect(screen.getByRole('combobox', { name: /校正依頼先/u })).toHaveTextContent(
       calibratorVendor.name,
     );
   });
 
-  it("依頼先の選択肢がisCalibrator=trueのVendorのみ", async () => {
+  it('依頼先の選択肢がisCalibrator=trueのVendorのみ', async () => {
     seedBaseMasters();
     const user = userEvent.setup();
     renderWithStore(
@@ -107,14 +107,14 @@ describe("ServiceOrderModal", () => {
       />,
     );
 
-    await user.click(screen.getByRole("combobox", { name: /校正依頼先/u }));
-    expect(screen.getByRole("option", { name: calibratorVendor.name })).toBeInTheDocument();
+    await user.click(screen.getByRole('combobox', { name: /校正依頼先/u }));
+    expect(screen.getByRole('option', { name: calibratorVendor.name })).toBeInTheDocument();
     expect(
-      screen.queryByRole("option", { name: manufacturerOnlyVendor.name }),
+      screen.queryByRole('option', { name: manufacturerOnlyVendor.name }),
     ).not.toBeInTheDocument();
   });
 
-  it("有効な入力で「保存」を押すとaddServiceOrderが呼ばれstatus=plannedの案件が追加されonCloseが呼ばれる", async () => {
+  it('有効な入力で「保存」を押すとaddServiceOrderが呼ばれstatus=plannedの案件が追加されonCloseが呼ばれる', async () => {
     seedBaseMasters();
     const user = userEvent.setup();
     const onClose = vi.fn<() => void>();
@@ -122,10 +122,10 @@ describe("ServiceOrderModal", () => {
       <ServiceOrderModal open serviceItemId={externalServiceItem.id} onClose={onClose} />,
     );
 
-    await user.type(screen.getByLabelText("返却予定日", { exact: false }), "2026-08-10");
-    await user.type(screen.getByLabelText("費用", { exact: false }), "5000");
-    await user.type(screen.getByLabelText("備考", { exact: false }), "定期校正");
-    await user.click(screen.getByRole("button", { name: "保存" }));
+    await user.type(screen.getByLabelText('返却予定日', { exact: false }), '2026-08-10');
+    await user.type(screen.getByLabelText('費用', { exact: false }), '5000');
+    await user.type(screen.getByLabelText('備考', { exact: false }), '定期校正');
+    await user.click(screen.getByRole('button', { name: '保存' }));
 
     const createdServiceOrders = Object.values(useAppStore.getState().serviceOrders);
     expect(createdServiceOrders).toHaveLength(1);
@@ -133,19 +133,19 @@ describe("ServiceOrderModal", () => {
       serviceItemId: externalServiceItem.id,
       vendorId: calibratorVendor.id,
       status: SERVICE_ORDER_STATUS.PLANNED,
-      dueDate: "2026-08-10",
+      dueDate: '2026-08-10',
       cost: 5000,
-      note: "定期校正",
+      note: '定期校正',
     });
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
-  it("既に進行中の案件がある項目で作成するとaddServiceOrderがnullを返しエラー表示・onClose不呼び出し・ストア件数不変", async () => {
+  it('既に進行中の案件がある項目で作成するとaddServiceOrderがnullを返しエラー表示・onClose不呼び出し・ストア件数不変', async () => {
     seedBaseMasters();
     seedStore({
       serviceOrders: {
-        "serviceOrder-existing": {
-          id: "serviceOrder-existing",
+        'serviceOrder-existing': {
+          id: 'serviceOrder-existing',
           serviceItemId: externalServiceItem.id,
           vendorId: calibratorVendor.id,
           status: SERVICE_ORDER_STATUS.ORDERED,
@@ -158,14 +158,14 @@ describe("ServiceOrderModal", () => {
       <ServiceOrderModal open serviceItemId={externalServiceItem.id} onClose={onClose} />,
     );
 
-    await user.click(screen.getByRole("button", { name: "保存" }));
+    await user.click(screen.getByRole('button', { name: '保存' }));
 
-    expect(await screen.findByText("この項目には進行中の案件が既に存在します")).toBeInTheDocument();
+    expect(await screen.findByText('この項目には進行中の案件が既に存在します')).toBeInTheDocument();
     expect(onClose).not.toHaveBeenCalled();
     expect(Object.values(useAppStore.getState().serviceOrders)).toHaveLength(1);
   });
 
-  it("校正業者が0件のとき空状態が表示され校正依頼先Selectが表示されない", () => {
+  it('校正業者が0件のとき空状態が表示され校正依頼先Selectが表示されない', () => {
     seedStore({
       equipment: { [equipment.id]: equipment },
       vendors: { [manufacturerOnlyVendor.id]: manufacturerOnlyVendor },
@@ -179,15 +179,15 @@ describe("ServiceOrderModal", () => {
       />,
     );
 
-    expect(screen.getByText("校正業者が未登録です")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "メーカー/取引先マスタへ" })).toHaveAttribute(
-      "href",
-      "/vendors",
+    expect(screen.getByText('校正業者が未登録です')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'メーカー/取引先マスタへ' })).toHaveAttribute(
+      'href',
+      '/vendors',
     );
-    expect(screen.queryByRole("combobox", { name: /校正依頼先/u })).not.toBeInTheDocument();
+    expect(screen.queryByRole('combobox', { name: /校正依頼先/u })).not.toBeInTheDocument();
   });
 
-  it("校正依頼先未選択のまま「保存」を押すとエラー表示されストアが変化しない", async () => {
+  it('校正依頼先未選択のまま「保存」を押すとエラー表示されストアが変化しない', async () => {
     seedStore({
       equipment: { [equipment.id]: equipment },
       vendors: {
@@ -207,13 +207,13 @@ describe("ServiceOrderModal", () => {
       />,
     );
 
-    await user.click(screen.getByRole("button", { name: "保存" }));
+    await user.click(screen.getByRole('button', { name: '保存' }));
 
-    expect(await screen.findByText("校正依頼先を選択してください")).toBeInTheDocument();
+    expect(await screen.findByText('校正依頼先を選択してください')).toBeInTheDocument();
     expect(Object.values(useAppStore.getState().serviceOrders)).toHaveLength(0);
   });
 
-  it("費用に負数を入力すると検証エラーが出る", async () => {
+  it('費用に負数を入力すると検証エラーが出る', async () => {
     seedBaseMasters();
     const user = userEvent.setup();
     renderWithStore(
@@ -224,10 +224,10 @@ describe("ServiceOrderModal", () => {
       />,
     );
 
-    await user.type(screen.getByLabelText("費用", { exact: false }), "-100");
-    await user.click(screen.getByRole("button", { name: "保存" }));
+    await user.type(screen.getByLabelText('費用', { exact: false }), '-100');
+    await user.click(screen.getByRole('button', { name: '保存' }));
 
-    expect(await screen.findByText("費用は0以上の数値で入力してください")).toBeInTheDocument();
+    expect(await screen.findByText('費用は0以上の数値で入力してください')).toBeInTheDocument();
     expect(Object.values(useAppStore.getState().serviceOrders)).toHaveLength(0);
   });
 });

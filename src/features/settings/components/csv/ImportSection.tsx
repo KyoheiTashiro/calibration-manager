@@ -1,17 +1,17 @@
-import { Button, ConfirmModal, Select } from "@/components/ui";
+import { Button, ConfirmModal, Select } from '@/components/ui';
 import {
   CSV_ENTITY_KINDS,
   type CsvEntityKind,
   ENTITY_CSV_SPECS,
-} from "@/features/settings/components/csv/entityCsv";
+} from '@/features/settings/components/csv/entityCsv';
 import {
   type ImportRowError,
   type ImportValidationResult,
   validateEntityCsv,
-} from "@/features/settings/components/csv/importValidation";
-import type { AppState } from "@/store/types";
-import { useAppStore } from "@/store/useAppStore";
-import { type ChangeEvent, type ReactElement, type ReactNode, useRef, useState } from "react";
+} from '@/features/settings/components/csv/importValidation';
+import type { AppState } from '@/store/types';
+import { useAppStore } from '@/store/useAppStore';
+import { type ChangeEvent, type ReactElement, type ReactNode, useRef, useState } from 'react';
 
 const ENTITY_OPTIONS = CSV_ENTITY_KINDS.map((kind) => ({
   value: kind,
@@ -21,7 +21,7 @@ const ENTITY_OPTIONS = CSV_ENTITY_KINDS.map((kind) => ({
 const isCsvEntityKind = (value: string): value is CsvEntityKind =>
   CSV_ENTITY_KINDS.some((kind) => kind === value);
 
-const IMPORT_STEP = { IDLE: "idle", PREVIEW: "preview", DONE: "done" } as const;
+const IMPORT_STEP = { IDLE: 'idle', PREVIEW: 'preview', DONE: 'done' } as const;
 
 type ViewState =
   | { step: typeof IMPORT_STEP.IDLE }
@@ -41,7 +41,7 @@ const issueBlock = (
 ): ReactElement => (
   <div className={`flex flex-col gap-1 ${colorClassName}`}>
     <p>{`${mark} ${new Set(items.map((item) => item.line)).size}行 ${label}`}</p>
-    <ul className="flex flex-col gap-0.5">
+    <ul className='flex flex-col gap-0.5'>
       {items.map((item) => (
         <li key={`${item.line}-${item.message}`}>
           行{item.line}: {item.message}
@@ -73,7 +73,7 @@ export const ImportSection = ({ state }: Props): ReactElement => {
   const clearSelection = (): void => {
     validationSeq.current += 1;
     setViewState({ step: IMPORT_STEP.IDLE });
-    if (fileInputRef.current) fileInputRef.current.value = "";
+    if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   const handleKindChange = (value: string): void => {
@@ -112,67 +112,67 @@ export const ImportSection = ({ state }: Props): ReactElement => {
     replaceEntities(kind, entities);
     const message = `${label}を ${validCount} 件取り込みました`;
     validationSeq.current += 1;
-    if (fileInputRef.current) fileInputRef.current.value = "";
+    if (fileInputRef.current) fileInputRef.current.value = '';
     setViewState({ step: IMPORT_STEP.DONE, message });
   };
 
   const renderPreview = (): ReactNode => {
     if (viewState.step === IMPORT_STEP.DONE) {
-      return <output className="text-green-700">{viewState.message}</output>;
+      return <output className='text-green-700'>{viewState.message}</output>;
     }
     if (viewState.step === IMPORT_STEP.IDLE) {
       return (
-        <p className="text-slate-500">CSVファイルを選択すると、ここに検証結果が表示されます</p>
+        <p className='text-slate-500'>CSVファイルを選択すると、ここに検証結果が表示されます</p>
       );
     }
     const { result } = viewState;
     return (
-      <div className="flex flex-col gap-1">
-        <p className="text-green-700">✓ {result.validCount}行 取り込み可</p>
-        {result.errors.length > 0 && issueBlock("✗", "エラー", result.errors, "text-danger")}
-        {result.warnings.length > 0 && issueBlock("⚠", "警告", result.warnings, "text-amber-600")}
+      <div className='flex flex-col gap-1'>
+        <p className='text-green-700'>✓ {result.validCount}行 取り込み可</p>
+        {result.errors.length > 0 && issueBlock('✗', 'エラー', result.errors, 'text-danger')}
+        {result.warnings.length > 0 && issueBlock('⚠', '警告', result.warnings, 'text-amber-600')}
       </div>
     );
   };
 
   return (
-    <section className="flex flex-col gap-3 rounded border border-slate-200 p-4">
-      <h2 className="border-b border-slate-200 pb-2 text-lg font-semibold">CSVインポート</h2>
-      <div className="flex flex-wrap items-end gap-3">
-        <div className="w-40">
+    <section className='flex flex-col gap-3 rounded border border-slate-200 p-4'>
+      <h2 className='border-b border-slate-200 pb-2 text-lg font-semibold'>CSVインポート</h2>
+      <div className='flex flex-wrap items-end gap-3'>
+        <div className='w-40'>
           <Select
-            label="データの種類"
+            label='データの種類'
             options={ENTITY_OPTIONS}
             value={kind}
             onChange={handleKindChange}
           />
         </div>
-        <div className="flex items-center gap-2">
+        <div className='flex items-center gap-2'>
           {/* なぜ: ネイティブの file input は見た目をボタンに揃えられないため sr-only で隠し、
               共通 Button から click() で起動する。aria-label はテスト・支援技術向けの参照名。 */}
           <input
             ref={fileInputRef}
-            type="file"
-            accept=".csv"
-            aria-label="ファイル"
+            type='file'
+            accept='.csv'
+            aria-label='ファイル'
             onChange={(event) => {
               void handleFileChange(event);
             }}
-            className="sr-only"
+            className='sr-only'
           />
-          <Button variant="secondary" onClick={() => fileInputRef.current?.click()}>
+          <Button variant='secondary' onClick={() => fileInputRef.current?.click()}>
             ファイルを選択
           </Button>
-          <span className="text-sm text-slate-500">
-            {viewState.step === IMPORT_STEP.PREVIEW ? viewState.fileName : "未選択"}
+          <span className='text-sm text-slate-500'>
+            {viewState.step === IMPORT_STEP.PREVIEW ? viewState.fileName : '未選択'}
           </span>
         </div>
       </div>
 
-      <div className="border-line rounded border p-3 text-sm">{renderPreview()}</div>
+      <div className='border-line rounded border p-3 text-sm'>{renderPreview()}</div>
 
-      <div className="flex justify-end gap-2">
-        <Button variant="secondary" onClick={handleCancel}>
+      <div className='flex justify-end gap-2'>
+        <Button variant='secondary' onClick={handleCancel}>
           キャンセル
         </Button>
         <Button
@@ -189,7 +189,7 @@ export const ImportSection = ({ state }: Props): ReactElement => {
         open={confirmOpen}
         title={`${label}の取り込み`}
         message={`既存の${label}データは取り込み内容で置き換えられます。よろしいですか?`}
-        confirmLabel="取り込み"
+        confirmLabel='取り込み'
         onConfirm={handleConfirmImport}
         onCancel={() => {
           setConfirmOpen(false);

@@ -1,13 +1,13 @@
-import { Tabs } from "@/components/ui/Tabs";
-import { SEARCH_REVEAL_EVENT } from "@/features/manual/search/revealEvent";
+import { Tabs } from '@/components/ui/Tabs';
+import { SEARCH_REVEAL_EVENT } from '@/features/manual/search/revealEvent';
 import {
   CSV_ENTITY_KINDS,
   type CsvEntityKind,
   ENTITY_CSV_SPECS,
-} from "@/features/settings/components/csv/entityCsv";
-import { useEffect, useRef, useState, type ReactElement } from "react";
+} from '@/features/settings/components/csv/entityCsv';
+import { useEffect, useRef, useState, type ReactElement } from 'react';
 
-import { ImportCheckTable } from "./ImportCheckTable";
+import { ImportCheckTable } from './ImportCheckTable';
 
 /** タブの並びは CSV_ENTITY_KINDS(推奨インポート順)と共通。マニュアル本文の記載と一致させる(D-058 / D-060) */
 const TABS = CSV_ENTITY_KINDS.map((kind) => ({ key: kind, label: ENTITY_CSV_SPECS[kind].label }));
@@ -46,7 +46,7 @@ export const ImportCheckTabs = (): ReactElement => {
   }, []);
 
   return (
-    <div ref={containerRef} className="flex flex-col gap-3">
+    <div ref={containerRef} className='flex flex-col gap-3'>
       <Tabs
         tabs={TABS}
         activeKey={activeKind}

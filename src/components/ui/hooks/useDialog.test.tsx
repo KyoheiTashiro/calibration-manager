@@ -1,10 +1,10 @@
-import { useDialog } from "@/components/ui/hooks/useDialog";
-import { render } from "@testing-library/react";
+import { useDialog } from '@/components/ui/hooks/useDialog';
+import { render } from '@testing-library/react';
 // なぜ: vitest.setup.ts（tsconfig.node.json側）の副作用importだけではtsconfig.app.json側の
 // 型解決にjest-domのmatcher拡張が伝播しないため、テストファイル側でも明示的にimportする。
-import "@testing-library/jest-dom/vitest";
-import type { ReactElement } from "react";
-import { describe, expect, it, vi } from "vitest";
+import '@testing-library/jest-dom/vitest';
+import type { ReactElement } from 'react';
+import { describe, expect, it, vi } from 'vitest';
 
 type TestDialogProps = { open: boolean };
 
@@ -13,46 +13,46 @@ const TestDialog = ({ open }: TestDialogProps): ReactElement => {
   return <dialog ref={dialogRef}>ダイアログ本文</dialog>;
 };
 
-describe("useDialog", () => {
-  it("open=trueでshowModalが呼ばれdialogにopen属性が付く", () => {
-    const showModalSpy = vi.spyOn(HTMLDialogElement.prototype, "showModal");
+describe('useDialog', () => {
+  it('open=trueでshowModalが呼ばれdialogにopen属性が付く', () => {
+    const showModalSpy = vi.spyOn(HTMLDialogElement.prototype, 'showModal');
     const { container } = render(<TestDialog open />);
 
-    const dialogElement = container.querySelector("dialog");
+    const dialogElement = container.querySelector('dialog');
 
-    expect(dialogElement).toHaveAttribute("open");
+    expect(dialogElement).toHaveAttribute('open');
     expect(showModalSpy).toHaveBeenCalledTimes(1);
 
     showModalSpy.mockRestore();
   });
 
-  it("open=falseではshowModalが呼ばれずopen属性も付かない", () => {
-    const showModalSpy = vi.spyOn(HTMLDialogElement.prototype, "showModal");
+  it('open=falseではshowModalが呼ばれずopen属性も付かない', () => {
+    const showModalSpy = vi.spyOn(HTMLDialogElement.prototype, 'showModal');
     const { container } = render(<TestDialog open={false} />);
 
-    const dialogElement = container.querySelector("dialog");
+    const dialogElement = container.querySelector('dialog');
 
-    expect(dialogElement).not.toHaveAttribute("open");
+    expect(dialogElement).not.toHaveAttribute('open');
     expect(showModalSpy).not.toHaveBeenCalled();
 
     showModalSpy.mockRestore();
   });
 
-  it("open=trueからfalseへrerenderするとcloseが呼ばれopen属性が外れる", () => {
-    const closeSpy = vi.spyOn(HTMLDialogElement.prototype, "close");
+  it('open=trueからfalseへrerenderするとcloseが呼ばれopen属性が外れる', () => {
+    const closeSpy = vi.spyOn(HTMLDialogElement.prototype, 'close');
     const { container, rerender } = render(<TestDialog open />);
 
     rerender(<TestDialog open={false} />);
-    const dialogElement = container.querySelector("dialog");
+    const dialogElement = container.querySelector('dialog');
 
-    expect(dialogElement).not.toHaveAttribute("open");
+    expect(dialogElement).not.toHaveAttribute('open');
     expect(closeSpy).toHaveBeenCalledTimes(1);
 
     closeSpy.mockRestore();
   });
 
-  it("既に開いている状態でopen=trueのままrerenderしてもshowModalは再度呼ばれない", () => {
-    const showModalSpy = vi.spyOn(HTMLDialogElement.prototype, "showModal");
+  it('既に開いている状態でopen=trueのままrerenderしてもshowModalは再度呼ばれない', () => {
+    const showModalSpy = vi.spyOn(HTMLDialogElement.prototype, 'showModal');
     const { rerender } = render(<TestDialog open />);
 
     rerender(<TestDialog open />);
@@ -62,8 +62,8 @@ describe("useDialog", () => {
     showModalSpy.mockRestore();
   });
 
-  it("開いた状態でアンマウントするとcloseが呼ばれる", () => {
-    const closeSpy = vi.spyOn(HTMLDialogElement.prototype, "close");
+  it('開いた状態でアンマウントするとcloseが呼ばれる', () => {
+    const closeSpy = vi.spyOn(HTMLDialogElement.prototype, 'close');
     const { unmount } = render(<TestDialog open />);
 
     unmount();
@@ -73,8 +73,8 @@ describe("useDialog", () => {
     closeSpy.mockRestore();
   });
 
-  it("閉じた状態でアンマウントしてもcloseは呼ばれない", () => {
-    const closeSpy = vi.spyOn(HTMLDialogElement.prototype, "close");
+  it('閉じた状態でアンマウントしてもcloseは呼ばれない', () => {
+    const closeSpy = vi.spyOn(HTMLDialogElement.prototype, 'close');
     const { unmount } = render(<TestDialog open={false} />);
 
     unmount();

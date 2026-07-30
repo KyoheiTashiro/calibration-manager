@@ -4,7 +4,7 @@
  * 各テストファイルで生成器を重複定義しない。
  */
 
-import { PHONE_PATTERN } from "@/constants/textLimits";
+import { PHONE_PATTERN } from '@/constants/textLimits';
 import {
   type ServiceOrder,
   CYCLE,
@@ -23,11 +23,11 @@ import {
   type Person,
   SERVICE_RECORD_RESULT,
   type Vendor,
-} from "@/store/types";
-import { daysInMonth, formatIsoDate } from "@/utils/time";
+} from '@/store/types';
+import { daysInMonth, formatIsoDate } from '@/utils/time';
 // なぜワイルドカード import か: fast-check は `fc.integer()` のようにプレフィックス付きで使うのが
 // 公式慣習であり、named import では `string` / `record` 等の汎用名がスコープを汚染するため。
-import * as fc from "fast-check";
+import * as fc from 'fast-check';
 
 // なぜこの範囲か: 機器台帳で現実に扱う年代をカバーしつつ、閏年（2000年・2024年等）と
 // 非閏の世紀年を含む範囲で暦計算の境界を踏ませるため。

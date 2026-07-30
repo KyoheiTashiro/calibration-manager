@@ -12,20 +12,20 @@ import {
   Th,
   activatableRowProps,
   usePagination,
-} from "@/components/ui";
-import { UNSET_LABEL } from "@/constants/labels";
-import { ROUTES, equipmentDetailPath } from "@/constants/routes";
+} from '@/components/ui';
+import { UNSET_LABEL } from '@/constants/labels';
+import { ROUTES, equipmentDetailPath } from '@/constants/routes';
 import {
   EQUIPMENT_STATUS_BADGE_CLASSES,
   EQUIPMENT_STATUS_LABELS,
-} from "@/features/equipment/constants";
+} from '@/features/equipment/constants';
 import {
   STATUS_FILTER_OPTIONS,
   isStatusFilter,
   useEquipmentList,
-} from "@/features/equipment/list/hooks";
-import { useSafeNavigate } from "@/utils/navigation";
-import type { ReactElement } from "react";
+} from '@/features/equipment/list/hooks';
+import { useSafeNavigate } from '@/utils/navigation';
+import type { ReactElement } from 'react';
 
 export const EquipmentList = (): ReactElement => {
   const safeNavigate = useSafeNavigate();
@@ -58,28 +58,28 @@ export const EquipmentList = (): ReactElement => {
   };
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className='flex flex-col gap-4'>
       {totalCount === 0 ? (
         <EmptyState
-          message="機器が未登録です"
+          message='機器が未登録です'
           action={<Button onClick={handleAddClick}>+ 機器を追加</Button>}
         />
       ) : (
         <>
-          <div className="flex flex-wrap items-end gap-4">
-            <div className="w-1/2 min-w-64">
+          <div className='flex flex-wrap items-end gap-4'>
+            <div className='w-1/2 min-w-64'>
               <TextField
-                label="検索"
-                placeholder="管理番号, 機器名, 型式で検索"
+                label='検索'
+                placeholder='管理番号, 機器名, 型式で検索'
                 value={searchText}
                 onChange={(event) => {
                   setSearchText(event.target.value);
                 }}
               />
             </div>
-            <div className="w-40">
+            <div className='w-40'>
               <Select
-                label="状態"
+                label='状態'
                 options={STATUS_FILTER_OPTIONS}
                 value={statusFilter}
                 onChange={(value) => {
@@ -87,13 +87,13 @@ export const EquipmentList = (): ReactElement => {
                 }}
               />
             </div>
-            <div className="ml-auto">
+            <div className='ml-auto'>
               <Button onClick={handleAddClick}>+ 機器を追加</Button>
             </div>
           </div>
 
           {filteredEquipmentList.length === 0 ? (
-            <EmptyState message="条件に一致する機器はありません" />
+            <EmptyState message='条件に一致する機器はありません' />
           ) : (
             <Table>
               <TableHead>
@@ -104,7 +104,7 @@ export const EquipmentList = (): ReactElement => {
                   <Th>メーカー</Th>
                   <Th>設置場所</Th>
                   <Th>状態</Th>
-                  <Th align="right">点検校正項目数</Th>
+                  <Th align='right'>点検校正項目数</Th>
                   <Th>次回期限</Th>
                 </tr>
               </TableHead>
@@ -126,7 +126,7 @@ export const EquipmentList = (): ReactElement => {
                         {EQUIPMENT_STATUS_LABELS[entry.status]}
                       </Badge>
                     </Td>
-                    <Td className="text-right tabular-nums">{serviceItemCountOf(entry)}</Td>
+                    <Td className='text-right tabular-nums'>{serviceItemCountOf(entry)}</Td>
                     <Td>{nearestDueDateOf(entry)}</Td>
                   </tr>
                 ))}

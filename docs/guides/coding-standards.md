@@ -159,5 +159,5 @@ Lint/Format は **oxlint + oxfmt**（ESLint/Prettier ではない）。多くは
 
 - **tsconfig**: `strict` + `noUnusedLocals` / `noUnusedParameters` / `noFallthroughCasesInSwitch`。`target: ES2022`, `moduleResolution: bundler`, `jsx: react-jsx`。`noUncheckedIndexedAccess` は**意図的に無効**（有効化は未対応点）。
 - **oxlint**: plugins = typescript/unicorn/oxc/react/jsx-a11y/import（test override で vitest）。categories 全 error。ファイル/ルール単位の off は **override + 理由コメント**で行う。
-- **oxfmt**: 明示設定は `sortImports` / `sortTailwindcss` のみ。インデント/quote/semicolon/行幅はデフォルト（実態: 2スペース・ダブルクオート・セミコロンあり・末尾カンマあり）。手で整形せず `npm run format` に任せる。
+- **oxfmt**: 明示設定は `sortImports` / `sortTailwindcss` / `singleQuote` / `jsxSingleQuote`。クォートは**原則シングル**（JSX属性含む）。文字列中に `'` を含む場合のみダブル可（oxfmt が自動判断）(D-092)。インデント/semicolon/行幅はデフォルト（実態: 2スペース・セミコロンあり・末尾カンマあり）。手で整形せず `npm run format` に任せる。`// prettier-ignore` 行は oxfmt 対象外のため手動でシングルに揃える。
 - 終了時に `.claude/hooks/stop-ci-check.sh` が `lint:typed → format:check → test` を回す。**これが通る状態で終える**。

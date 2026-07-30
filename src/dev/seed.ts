@@ -8,16 +8,16 @@
 import {
   buildGeneratedRecords,
   buildGeneratedServiceItems,
-} from "@/dev/seedGeneratedTransactionData";
-import { buildSeedEquipment, buildSeedPersons, buildSeedVendors } from "@/dev/seedMasterData";
+} from '@/dev/seedGeneratedTransactionData';
+import { buildSeedEquipment, buildSeedPersons, buildSeedVendors } from '@/dev/seedMasterData';
 import {
   buildSeedServiceItems,
   buildSeedServiceOrders,
   buildSeedRecords,
-} from "@/dev/seedTransactionData";
-import type { AppState, IsoDateString } from "@/store/types";
-import { useAppStore } from "@/store/useAppStore";
-import { todayIsoDate } from "@/utils/time";
+} from '@/dev/seedTransactionData';
+import type { AppState, IsoDateString } from '@/store/types';
+import { useAppStore } from '@/store/useAppStore';
+import { todayIsoDate } from '@/utils/time';
 
 export const buildSeedState = (today: IsoDateString): AppState => ({
   vendors: buildSeedVendors(),

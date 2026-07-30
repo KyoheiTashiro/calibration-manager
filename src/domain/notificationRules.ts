@@ -5,9 +5,9 @@
  * 場合は生成をスキップする（重複抑止はストア側の責務。store.md「アクション仕様」）。
  */
 
-import { DELIVERY_DUE_SOON_NOTICE_DAYS } from "@/domain/constants";
-import { recommendedOrderDate } from "@/domain/leadTime";
-import { isActiveServiceOrderStatus } from "@/domain/serviceOrderStatus";
+import { DELIVERY_DUE_SOON_NOTICE_DAYS } from '@/domain/constants';
+import { recommendedOrderDate } from '@/domain/leadTime';
+import { isActiveServiceOrderStatus } from '@/domain/serviceOrderStatus';
 import {
   type ServiceOrder,
   type Equipment,
@@ -19,15 +19,15 @@ import {
   type Notification,
   SERVICE_ORDER_STATUS,
   type Vendor,
-} from "@/store/types";
-import { recordValue } from "@/utils/record";
-import { addDays } from "@/utils/time";
+} from '@/store/types';
+import { recordValue } from '@/utils/record';
+import { addDays } from '@/utils/time';
 
 /**
  * 生成すべき通知の判定結果。id・createdDate・isRead はストア側が付与する
  * （純粋関数はID生成・現在時刻という副作用に触れないため）。
  */
-export type NotificationSeed = Omit<Notification, "id" | "createdDate" | "isRead">;
+export type NotificationSeed = Omit<Notification, 'id' | 'createdDate' | 'isRead'>;
 
 /**
  * 通知文の先頭に付ける機器の管理番号プレフィックス（screen-design/10-notifications.md の文例準拠）。
@@ -35,7 +35,7 @@ export type NotificationSeed = Omit<Notification, "id" | "createdDate" | "isRead
  */
 const messagePrefix = (serviceItem: ServiceItem, equipment: Record<string, Equipment>): string => {
   const managementNo = recordValue(equipment, serviceItem.equipmentId)?.managementNo;
-  return managementNo === undefined ? "" : `${managementNo} `;
+  return managementNo === undefined ? '' : `${managementNo} `;
 };
 
 /** 1項目に対する serviceItem 宛先通知（dueSoon / overdue / orderRecommended）を判定する */

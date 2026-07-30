@@ -18,4 +18,4 @@ export const recordValue = <Value>(
  * このヘルパを型ガードとして使うと戻り値が `Record<string, unknown>` に narrowing される。
  */
 export const isRecord = (value: unknown): value is Record<string, unknown> =>
-  typeof value === "object" && value !== null;
+  typeof value === 'object' && value !== null;

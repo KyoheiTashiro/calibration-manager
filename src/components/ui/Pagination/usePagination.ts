@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState } from 'react';
 
-import { DEFAULT_PAGE_SIZE } from "./pageItems";
+import { DEFAULT_PAGE_SIZE } from './pageItems';
 
 type UsePaginationResult<Item> = {
   /** クランプ済みの現在ページ(1始まり)。Pagination の page にそのまま渡す */
@@ -24,7 +24,7 @@ type UsePaginationResult<Item> = {
  */
 export const usePagination = <Item>(
   items: readonly Item[],
-  resetKey = "",
+  resetKey = '',
 ): UsePaginationResult<Item> => {
   const [page, setPage] = useState(1);
   const [pageSizeState, setPageSizeState] = useState<number>(DEFAULT_PAGE_SIZE);

@@ -1,4 +1,4 @@
-import { useId, type InputHTMLAttributes, type ReactElement, type Ref } from "react";
+import { useId, type InputHTMLAttributes, type ReactElement, type Ref } from 'react';
 
 type Props = {
   label: string;
@@ -20,33 +20,33 @@ export const RadioGroup = ({
 }: Props): ReactElement => {
   const groupId = useId();
   const errorId = `${groupId}-error`;
-  const hasError = error !== undefined && error !== "";
+  const hasError = error !== undefined && error !== '';
 
   return (
     <fieldset
       aria-describedby={hasError ? errorId : undefined}
-      aria-invalid={hasError ? "true" : undefined}
+      aria-invalid={hasError ? 'true' : undefined}
     >
-      <legend className="block text-sm text-slate-700">
+      <legend className='block text-sm text-slate-700'>
         {label}
-        {required === true && <span className="text-red-600">*</span>}
+        {required === true && <span className='text-red-600'>*</span>}
       </legend>
-      <div className="flex items-center gap-4">
+      <div className='flex items-center gap-4'>
         {options.map((option) => {
           const inputId = `${groupId}-${option.value}`;
           return (
             <label
               key={option.value}
               htmlFor={inputId}
-              className="flex items-center gap-2 text-sm text-slate-700"
+              className='flex items-center gap-2 text-sm text-slate-700'
             >
               <input
-                type="radio"
+                type='radio'
                 {...rest}
                 ref={ref}
                 id={inputId}
                 value={option.value}
-                className="h-4 w-4 border-slate-300"
+                className='h-4 w-4 border-slate-300'
               />
               {option.label}
             </label>
@@ -54,7 +54,7 @@ export const RadioGroup = ({
         })}
       </div>
       {hasError && (
-        <p id={errorId} className="text-xs text-red-600">
+        <p id={errorId} className='text-xs text-red-600'>
           {error}
         </p>
       )}

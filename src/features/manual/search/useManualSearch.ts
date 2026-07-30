@@ -1,12 +1,12 @@
-import { useEffect, useState, type RefObject } from "react";
+import { useEffect, useState, type RefObject } from 'react';
 
-import { dispatchSearchReveal } from "./revealEvent";
-import { collectMatchRanges } from "./textSearch";
+import { dispatchSearchReveal } from './revealEvent';
+import { collectMatchRanges } from './textSearch';
 
 /* CSS Custom Highlight API の ::highlight() 名。src/styles/index.css の定義と一致させること。 */
 export const MANUAL_SEARCH_HIGHLIGHT = {
-  MATCH: "manual-search-match",
-  CURRENT: "manual-search-current",
+  MATCH: 'manual-search-match',
+  CURRENT: 'manual-search-current',
 } as const;
 
 type ManualSearchState = {
@@ -30,10 +30,10 @@ const scrollToRange = (range: Range): void => {
   }
 
   const scroll = (): void => {
-    parentElement.scrollIntoView({ behavior: "smooth", block: "center" });
+    parentElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
   };
 
-  const hiddenAncestor = parentElement.closest<HTMLElement>("[hidden]");
+  const hiddenAncestor = parentElement.closest<HTMLElement>('[hidden]');
   if (hiddenAncestor === null) {
     scroll();
     return;
@@ -48,7 +48,7 @@ const scrollToRange = (range: Range): void => {
 /* CSS Custom Highlight API に対応しているか判定する。非対応ブラウザではハイライト表示を
    諦め、検索・ジャンプ機能のみ提供する(段階的機能低下)。 */
 const isHighlightApiSupported = (): boolean =>
-  typeof Highlight !== "undefined" && typeof CSS !== "undefined" && "highlights" in CSS;
+  typeof Highlight !== 'undefined' && typeof CSS !== 'undefined' && 'highlights' in CSS;
 
 /* matches・currentIndex の変化に応じてハイライト登録を同期する。
    cleanup は再実行前・アンマウント時に必ず走るため、削除は cleanup に一本化する。 */
@@ -84,7 +84,7 @@ const useHighlightRegistration = (matches: Range[], currentIndex: number): void 
  * (D-073)、タブ切替で Range は失効しない。
  */
 export const useManualSearch = (contentRef: RefObject<HTMLElement | null>): ManualSearchState => {
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState('');
   const [matches, setMatches] = useState<Range[]>([]);
   const [currentIndex, setCurrentIndex] = useState(-1);
 
@@ -122,7 +122,7 @@ export const useManualSearch = (contentRef: RefObject<HTMLElement | null>): Manu
   };
 
   const clearSearch = (): void => {
-    setQuery("");
+    setQuery('');
     setMatches([]);
     setCurrentIndex(-1);
   };

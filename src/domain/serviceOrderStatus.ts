@@ -13,7 +13,7 @@
  *   テーブル自体には遷移として存在する（ボードの「記録登録」ボタン表示判定にも使う）。
  */
 
-import { SERVICE_ORDER_STATUS, type ServiceOrderStatus } from "@/store/types";
+import { SERVICE_ORDER_STATUS, type ServiceOrderStatus } from '@/store/types';
 
 export const SERVICE_ORDER_STATUS_TRANSITIONS = {
   [SERVICE_ORDER_STATUS.PLANNED]: [SERVICE_ORDER_STATUS.ORDERED, SERVICE_ORDER_STATUS.CANCELLED],

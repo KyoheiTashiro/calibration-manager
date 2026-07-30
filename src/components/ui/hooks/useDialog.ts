@@ -1,4 +1,4 @@
-import { useEffect, useRef, type RefObject } from "react";
+import { useEffect, useRef, type RefObject } from 'react';
 
 // なぜ: Modal/ConfirmModal共通でdialog要素のshowModal/close呼び出しを1箇所に集約する。
 // dialog.openの現在値を見てから呼ぶことで、既に開/閉状態のときに再度呼んで

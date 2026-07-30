@@ -4,13 +4,13 @@
  * `発注推奨日 = nextDueDate − leadTime − bufferDays`
  */
 
-import { EXECUTION, type ServiceItem, type IsoDateString, type Vendor } from "@/store/types";
-import { addDays } from "@/utils/time";
+import { EXECUTION, type ServiceItem, type IsoDateString, type Vendor } from '@/store/types';
+import { addDays } from '@/utils/time';
 
 /** vendor が null 許容なのは、依頼先未設定・参照切れの項目でも呼び出せるようにするため */
 export const resolveLeadTime = (
-  serviceItem: Pick<ServiceItem, "leadTimeDays">,
-  vendor: Pick<Vendor, "standardLeadTimeDays"> | null,
+  serviceItem: Pick<ServiceItem, 'leadTimeDays'>,
+  vendor: Pick<Vendor, 'standardLeadTimeDays'> | null,
 ): number | null => serviceItem.leadTimeDays ?? vendor?.standardLeadTimeDays ?? null;
 
 /**
@@ -20,8 +20,8 @@ export const resolveLeadTime = (
  * - nextDueDate が日付として不正
  */
 export const recommendedOrderDate = (
-  serviceItem: Pick<ServiceItem, "execution" | "leadTimeDays" | "bufferDays" | "nextDueDate">,
-  vendor: Pick<Vendor, "standardLeadTimeDays"> | null,
+  serviceItem: Pick<ServiceItem, 'execution' | 'leadTimeDays' | 'bufferDays' | 'nextDueDate'>,
+  vendor: Pick<Vendor, 'standardLeadTimeDays'> | null,
 ): IsoDateString | null => {
   if (serviceItem.execution !== EXECUTION.EXTERNAL) return null;
   const leadTimeDays = resolveLeadTime(serviceItem, vendor);

@@ -3,8 +3,8 @@
  * 保存しない派生値であり、表示のたびにこの関数で導出する。
  */
 
-import { recommendedOrderDate } from "@/domain/leadTime";
-import { isActiveServiceOrderStatus } from "@/domain/serviceOrderStatus";
+import { recommendedOrderDate } from '@/domain/leadTime';
+import { isActiveServiceOrderStatus } from '@/domain/serviceOrderStatus';
 import {
   type ServiceOrder,
   EXECUTION,
@@ -12,19 +12,19 @@ import {
   type IsoDateString,
   SERVICE_ORDER_STATUS,
   type Vendor,
-} from "@/store/types";
-import { addDays } from "@/utils/time";
+} from '@/store/types';
+import { addDays } from '@/utils/time';
 
 /**
  * 項目ステータス（導出値）。エンティティ属性ではないため store/types.ts でなくここに定義する。
  * 表示色・ラベルは domain/statusBadge.ts が対応する。
  */
 export const SERVICE_ITEM_STATUS = {
-  OVERDUE: "overdue",
-  ORDER_NOW: "orderNow",
-  IN_PROGRESS: "inProgress",
-  DUE_SOON: "dueSoon",
-  OK: "ok",
+  OVERDUE: 'overdue',
+  ORDER_NOW: 'orderNow',
+  IN_PROGRESS: 'inProgress',
+  DUE_SOON: 'dueSoon',
+  OK: 'ok',
 } as const;
 export type ServiceItemStatus = (typeof SERVICE_ITEM_STATUS)[keyof typeof SERVICE_ITEM_STATUS];
 
@@ -48,7 +48,7 @@ export type ServiceItemStatus = (typeof SERVICE_ITEM_STATUS)[keyof typeof SERVIC
 export const deriveServiceItemStatus = (
   serviceItem: ServiceItem,
   serviceOrders: readonly ServiceOrder[],
-  vendor: Pick<Vendor, "standardLeadTimeDays"> | null,
+  vendor: Pick<Vendor, 'standardLeadTimeDays'> | null,
   today: IsoDateString,
 ): ServiceItemStatus => {
   if (today > serviceItem.nextDueDate) return SERVICE_ITEM_STATUS.OVERDUE;

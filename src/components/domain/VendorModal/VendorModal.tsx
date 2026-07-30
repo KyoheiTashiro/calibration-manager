@@ -3,14 +3,14 @@
  * RHF + zodResolver。送信ボタンはエラー時も無効化せず、送信試行でエラー表示する。
  */
 
-import { Schema, defaultValues, type FormType } from "@/components/domain/VendorModal/schema";
-import { Button, Checkbox, Modal, TextField } from "@/components/ui";
-import type { Vendor } from "@/store/types";
-import { useAppStore } from "@/store/useAppStore";
-import { createSaveHandler, emptyToUndefined } from "@/utils/form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import type { ChangeEvent, ReactElement } from "react";
-import { useForm, useWatch } from "react-hook-form";
+import { Schema, defaultValues, type FormType } from '@/components/domain/VendorModal/schema';
+import { Button, Checkbox, Modal, TextField } from '@/components/ui';
+import type { Vendor } from '@/store/types';
+import { useAppStore } from '@/store/useAppStore';
+import { createSaveHandler, emptyToUndefined } from '@/utils/form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import type { ChangeEvent, ReactElement } from 'react';
+import { useForm, useWatch } from 'react-hook-form';
 
 type Props = {
   open: boolean;
@@ -25,11 +25,11 @@ const toFormValues = (vendor: Vendor | undefined): FormType =>
         name: vendor.name,
         isManufacturer: vendor.isManufacturer,
         isCalibrator: vendor.isCalibrator,
-        contactPerson: vendor.contactPerson ?? "",
-        email: vendor.email ?? "",
-        phone: vendor.phone ?? "",
-        standardLeadTimeDays: vendor.standardLeadTimeDays?.toString() ?? "",
-        note: vendor.note ?? "",
+        contactPerson: vendor.contactPerson ?? '',
+        email: vendor.email ?? '',
+        phone: vendor.phone ?? '',
+        standardLeadTimeDays: vendor.standardLeadTimeDays?.toString() ?? '',
+        note: vendor.note ?? '',
       }
     : defaultValues;
 
@@ -53,8 +53,8 @@ export const VendorModal = ({ open, vendor, onClose }: Props): ReactElement => {
   // なぜ watch() ではなく useWatch か: watch() が返す購読値は React Compiler が
   // 安全にメモ化できず lint(react-compiler)がエラーになるため、フックとして使える
   // useWatch を用いる。
-  const isManufacturer = useWatch({ control, name: "isManufacturer" });
-  const isCalibrator = useWatch({ control, name: "isCalibrator" });
+  const isManufacturer = useWatch({ control, name: 'isManufacturer' });
+  const isCalibrator = useWatch({ control, name: 'isCalibrator' });
 
   // なぜ close 時に reset() を呼ぶか: values オプションは内容が変わらない限り reset しないため、
   // 同一対象を dirty のまま破棄クローズ→再オープンした場合に入力が残留してしまう。
@@ -92,53 +92,53 @@ export const VendorModal = ({ open, vendor, onClose }: Props): ReactElement => {
   return (
     <Modal
       open={open}
-      title={vendor ? "取引先を編集" : "取引先を追加"}
+      title={vendor ? '取引先を編集' : '取引先を追加'}
       onClose={handleClose}
       isDirty={isDirty}
       footer={<Button onClick={handleSave}>保存</Button>}
     >
-      <div className="flex flex-col gap-4">
-        <TextField label="名称" required error={errors.name?.message} {...register("name")} />
-        <Checkbox label="メーカー" {...register("isManufacturer")} />
+      <div className='flex flex-col gap-4'>
+        <TextField label='名称' required error={errors.name?.message} {...register('name')} />
+        <Checkbox label='メーカー' {...register('isManufacturer')} />
         <Checkbox
-          label="校正業者"
+          label='校正業者'
           // なぜ onChange でクリアするか: isCalibrator オフ時は「標準納期(日)」を非表示にするだけでなく
           // 入力値もクリアし、再度オンにしても古い値が復活しないようにする。
           // state 変化に反応する effect ではなくユーザー操作イベントで直接処理する。
-          {...register("isCalibrator", {
+          {...register('isCalibrator', {
             onChange: (event: ChangeEvent<HTMLInputElement>) => {
               if (!event.target.checked) {
-                setValue("standardLeadTimeDays", "", { shouldDirty: false });
+                setValue('standardLeadTimeDays', '', { shouldDirty: false });
               }
             },
           })}
         />
         {!isManufacturer && !isCalibrator ? (
-          <p role="alert" className="text-xs text-orange-600">
+          <p role='alert' className='text-xs text-orange-600'>
             メーカー・校正業者のどちらにも該当しません
           </p>
         ) : null}
         <TextField
-          label="窓口担当者"
+          label='窓口担当者'
           error={errors.contactPerson?.message}
-          {...register("contactPerson")}
+          {...register('contactPerson')}
         />
         <TextField
-          label="メール"
-          type="email"
+          label='メール'
+          type='email'
           error={errors.email?.message}
-          {...register("email")}
+          {...register('email')}
         />
-        <TextField label="電話" error={errors.phone?.message} {...register("phone")} />
+        <TextField label='電話' error={errors.phone?.message} {...register('phone')} />
         {isCalibrator ? (
           <TextField
-            label="標準納期(日)"
-            type="number"
+            label='標準納期(日)'
+            type='number'
             error={errors.standardLeadTimeDays?.message}
-            {...register("standardLeadTimeDays")}
+            {...register('standardLeadTimeDays')}
           />
         ) : null}
-        <TextField label="備考" error={errors.note?.message} {...register("note")} />
+        <TextField label='備考' error={errors.note?.message} {...register('note')} />
       </div>
     </Modal>
   );

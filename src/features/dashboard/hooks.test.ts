@@ -1,6 +1,6 @@
-import { SERVICE_ITEM_STATUS, type ServiceItemStatus } from "@/domain/serviceItemStatus";
-import { actionRequiredRows, countByStatus, latestNotifications } from "@/features/dashboard/hooks";
-import type { ServiceItemRow } from "@/store/selectors";
+import { SERVICE_ITEM_STATUS, type ServiceItemStatus } from '@/domain/serviceItemStatus';
+import { actionRequiredRows, countByStatus, latestNotifications } from '@/features/dashboard/hooks';
+import type { ServiceItemRow } from '@/store/selectors';
 import {
   CYCLE,
   EQUIPMENT_STATUS,
@@ -11,8 +11,8 @@ import {
   type Equipment,
   type ServiceItem,
   type Notification,
-} from "@/store/types";
-import { describe, expect, it } from "vitest";
+} from '@/store/types';
+import { describe, expect, it } from 'vitest';
 
 const makeEquipment = (id: string): Equipment => ({
   id,
@@ -29,7 +29,7 @@ const makeServiceItem = (id: string, equipmentId: string, nextDueDate: string): 
   cycle: CYCLE.Y1,
   execution: EXECUTION.INTERNAL,
   bufferDays: 14,
-  personId: "person-1",
+  personId: 'person-1',
   noticeDaysBefore: 30,
   nextDueDate,
   isActive: true,
@@ -40,33 +40,33 @@ const makeRow = (id: string, status: ServiceItemStatus, nextDueDate: string): Se
   serviceItem: makeServiceItem(id, `eq-${id}`, nextDueDate),
   equipment: makeEquipment(id),
   status,
-  personLabel: "田中",
+  personLabel: '田中',
   recommendedOrderDate: null,
   canCreateServiceOrder: false,
 });
 
 const makeNotification = (
-  overrides: Partial<Notification> & Pick<Notification, "id">,
+  overrides: Partial<Notification> & Pick<Notification, 'id'>,
 ): Notification => ({
   type: NOTIFICATION_TYPE.OVERDUE,
   targetType: NOTIFICATION_TARGET_TYPE.SERVICE_ITEM,
-  targetId: "item-1",
-  personId: "person-1",
+  targetId: 'item-1',
+  personId: 'person-1',
   message: `通知${overrides.id}`,
-  createdDate: "2026-07-01",
+  createdDate: '2026-07-01',
   isRead: false,
   ...overrides,
 });
 
-describe("countByStatus", () => {
-  it("全ステータスを集計し、該当0のステータスも0で埋める", () => {
+describe('countByStatus', () => {
+  it('全ステータスを集計し、該当0のステータスも0で埋める', () => {
     const rows: ServiceItemRow[] = [
-      makeRow("1", SERVICE_ITEM_STATUS.OVERDUE, "2026-06-01"),
-      makeRow("2", SERVICE_ITEM_STATUS.OVERDUE, "2026-06-02"),
-      makeRow("3", SERVICE_ITEM_STATUS.ORDER_NOW, "2026-07-10"),
-      makeRow("4", SERVICE_ITEM_STATUS.DUE_SOON, "2026-07-20"),
-      makeRow("5", SERVICE_ITEM_STATUS.DUE_SOON, "2026-07-21"),
-      makeRow("6", SERVICE_ITEM_STATUS.OK, "2027-01-01"),
+      makeRow('1', SERVICE_ITEM_STATUS.OVERDUE, '2026-06-01'),
+      makeRow('2', SERVICE_ITEM_STATUS.OVERDUE, '2026-06-02'),
+      makeRow('3', SERVICE_ITEM_STATUS.ORDER_NOW, '2026-07-10'),
+      makeRow('4', SERVICE_ITEM_STATUS.DUE_SOON, '2026-07-20'),
+      makeRow('5', SERVICE_ITEM_STATUS.DUE_SOON, '2026-07-21'),
+      makeRow('6', SERVICE_ITEM_STATUS.OK, '2027-01-01'),
     ];
 
     expect(countByStatus(rows)).toEqual({
@@ -78,7 +78,7 @@ describe("countByStatus", () => {
     });
   });
 
-  it("空配列なら全ステータス0", () => {
+  it('空配列なら全ステータス0', () => {
     expect(countByStatus([])).toEqual({
       [SERVICE_ITEM_STATUS.OVERDUE]: 0,
       [SERVICE_ITEM_STATUS.ORDER_NOW]: 0,
@@ -89,62 +89,62 @@ describe("countByStatus", () => {
   });
 });
 
-describe("actionRequiredRows", () => {
-  it("inProgress/ok を除外し、overdue→orderNow→dueSoon の優先度順に並べる", () => {
+describe('actionRequiredRows', () => {
+  it('inProgress/ok を除外し、overdue→orderNow→dueSoon の優先度順に並べる', () => {
     // 入力は nextDueDate 昇順(serviceItemRowsOf の保証)を模した順序
     const rows: ServiceItemRow[] = [
-      makeRow("due", SERVICE_ITEM_STATUS.DUE_SOON, "2026-07-20"),
-      makeRow("prog", SERVICE_ITEM_STATUS.IN_PROGRESS, "2026-07-22"),
-      makeRow("order", SERVICE_ITEM_STATUS.ORDER_NOW, "2026-07-25"),
-      makeRow("ok", SERVICE_ITEM_STATUS.OK, "2027-01-01"),
-      makeRow("over", SERVICE_ITEM_STATUS.OVERDUE, "2026-06-01"),
+      makeRow('due', SERVICE_ITEM_STATUS.DUE_SOON, '2026-07-20'),
+      makeRow('prog', SERVICE_ITEM_STATUS.IN_PROGRESS, '2026-07-22'),
+      makeRow('order', SERVICE_ITEM_STATUS.ORDER_NOW, '2026-07-25'),
+      makeRow('ok', SERVICE_ITEM_STATUS.OK, '2027-01-01'),
+      makeRow('over', SERVICE_ITEM_STATUS.OVERDUE, '2026-06-01'),
     ];
 
     const result = actionRequiredRows(rows);
 
-    expect(result.map((row) => row.serviceItem.id)).toEqual(["over", "order", "due"]);
+    expect(result.map((row) => row.serviceItem.id)).toEqual(['over', 'order', 'due']);
   });
 
-  it("同一優先度グループ内は入力順(nextDueDate昇順)を安定に保つ", () => {
+  it('同一優先度グループ内は入力順(nextDueDate昇順)を安定に保つ', () => {
     const rows: ServiceItemRow[] = [
-      makeRow("over-a", SERVICE_ITEM_STATUS.OVERDUE, "2026-06-01"),
-      makeRow("over-b", SERVICE_ITEM_STATUS.OVERDUE, "2026-06-05"),
-      makeRow("due-a", SERVICE_ITEM_STATUS.DUE_SOON, "2026-07-10"),
-      makeRow("due-b", SERVICE_ITEM_STATUS.DUE_SOON, "2026-07-15"),
+      makeRow('over-a', SERVICE_ITEM_STATUS.OVERDUE, '2026-06-01'),
+      makeRow('over-b', SERVICE_ITEM_STATUS.OVERDUE, '2026-06-05'),
+      makeRow('due-a', SERVICE_ITEM_STATUS.DUE_SOON, '2026-07-10'),
+      makeRow('due-b', SERVICE_ITEM_STATUS.DUE_SOON, '2026-07-15'),
     ];
 
     const result = actionRequiredRows(rows);
 
-    expect(result.map((row) => row.serviceItem.id)).toEqual(["over-a", "over-b", "due-a", "due-b"]);
+    expect(result.map((row) => row.serviceItem.id)).toEqual(['over-a', 'over-b', 'due-a', 'due-b']);
   });
 
-  it("要対応が0件なら空配列", () => {
+  it('要対応が0件なら空配列', () => {
     const rows: ServiceItemRow[] = [
-      makeRow("ok", SERVICE_ITEM_STATUS.OK, "2027-01-01"),
-      makeRow("prog", SERVICE_ITEM_STATUS.IN_PROGRESS, "2026-07-22"),
+      makeRow('ok', SERVICE_ITEM_STATUS.OK, '2027-01-01'),
+      makeRow('prog', SERVICE_ITEM_STATUS.IN_PROGRESS, '2026-07-22'),
     ];
     expect(actionRequiredRows(rows)).toEqual([]);
   });
 });
 
-describe("latestNotifications", () => {
-  it("未読優先 → createdDate 降順 → id 昇順 で5件返す", () => {
+describe('latestNotifications', () => {
+  it('未読優先 → createdDate 降順 → id 昇順 で5件返す', () => {
     const notifications: Record<string, Notification> = {
-      n1: makeNotification({ id: "n1", createdDate: "2026-07-01", isRead: true }),
-      n2: makeNotification({ id: "n2", createdDate: "2026-07-05", isRead: false }),
-      n3: makeNotification({ id: "n3", createdDate: "2026-07-05", isRead: false }),
-      n4: makeNotification({ id: "n4", createdDate: "2026-07-03", isRead: false }),
-      n5: makeNotification({ id: "n5", createdDate: "2026-07-10", isRead: true }),
-      n6: makeNotification({ id: "n6", createdDate: "2026-07-02", isRead: false }),
+      n1: makeNotification({ id: 'n1', createdDate: '2026-07-01', isRead: true }),
+      n2: makeNotification({ id: 'n2', createdDate: '2026-07-05', isRead: false }),
+      n3: makeNotification({ id: 'n3', createdDate: '2026-07-05', isRead: false }),
+      n4: makeNotification({ id: 'n4', createdDate: '2026-07-03', isRead: false }),
+      n5: makeNotification({ id: 'n5', createdDate: '2026-07-10', isRead: true }),
+      n6: makeNotification({ id: 'n6', createdDate: '2026-07-02', isRead: false }),
     };
 
     const result = latestNotifications(notifications);
 
     // 未読(n2,n3,n4,n6)を createdDate 降順・id 昇順 → n2,n3,n4,n6、続いて既読を降順 → n5
-    expect(result.map((notification) => notification.id)).toEqual(["n2", "n3", "n4", "n6", "n5"]);
+    expect(result.map((notification) => notification.id)).toEqual(['n2', 'n3', 'n4', 'n6', 'n5']);
   });
 
-  it("5件を超えたら先頭5件のみに切り詰める", () => {
+  it('5件を超えたら先頭5件のみに切り詰める', () => {
     const notifications: Record<string, Notification> = {};
     for (let index = 0; index < 8; index += 1) {
       const id = `n${index}`;
@@ -158,7 +158,7 @@ describe("latestNotifications", () => {
     expect(latestNotifications(notifications)).toHaveLength(5);
   });
 
-  it("0件なら空配列", () => {
+  it('0件なら空配列', () => {
     expect(latestNotifications({})).toEqual([]);
   });
 });

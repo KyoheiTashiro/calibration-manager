@@ -1,4 +1,4 @@
-import { defineConfig } from "vite";
+import { defineConfig } from 'vite';
 
 // なぜ: @storybook/builder-vite はviteConfigPathを明示しない場合、
 // プロジェクトルートのvite.config.tsを自動検出してベース設定として読み込んでしまう

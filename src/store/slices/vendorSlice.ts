@@ -2,17 +2,17 @@
  * removeVendor は参照整合カスケードを持つ。
  */
 
-import { isVendorReferenced } from "@/store/selectors";
-import type { AppSliceCreator } from "@/store/storeState";
-import type { Vendor } from "@/store/types";
-import { createId } from "@/utils/id";
-import { recordValue } from "@/utils/record";
+import { isVendorReferenced } from '@/store/selectors';
+import type { AppSliceCreator } from '@/store/storeState';
+import type { Vendor } from '@/store/types';
+import { createId } from '@/utils/id';
+import { recordValue } from '@/utils/record';
 
 export type VendorSlice = {
   vendors: Record<string, Vendor>;
   /** @returns 生成したVendorのid */
-  addVendor: (input: Omit<Vendor, "id">) => string;
-  updateVendor: (id: string, patch: Partial<Omit<Vendor, "id">>) => void;
+  addVendor: (input: Omit<Vendor, 'id'>) => string;
+  updateVendor: (id: string, patch: Partial<Omit<Vendor, 'id'>>) => void;
   /**
    * Equipment.manufacturerId / ServiceItem.vendorId / ServiceOrder.vendorId の
    * いずれかから参照されている場合は削除せず false を返す。

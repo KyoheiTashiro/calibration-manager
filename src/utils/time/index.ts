@@ -5,7 +5,7 @@
  * 比較専用の関数は設けない。
  */
 
-import type { IsoDateString } from "@/store/types";
+import type { IsoDateString } from '@/store/types';
 
 /** `YYYY-MM-DD` の形式チェック用パターン（形式のみ。暦上の妥当性は isIsoDateString で判定） */
 const ISO_DATE_PATTERN = /^(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})$/u;
@@ -45,9 +45,9 @@ export const isIsoDateString = (value: string): boolean => parseIsoDate(value) !
 
 /** 年月日を `YYYY-MM-DD` 文字列へ整形する（ゼロ埋め固定10桁） */
 export const formatIsoDate = ({ year, month, day }: CalendarDate): IsoDateString => {
-  const paddedYear = String(year).padStart(4, "0");
-  const paddedMonth = String(month).padStart(2, "0");
-  const paddedDay = String(day).padStart(2, "0");
+  const paddedYear = String(year).padStart(4, '0');
+  const paddedMonth = String(month).padStart(2, '0');
+  const paddedDay = String(day).padStart(2, '0');
   return `${paddedYear}-${paddedMonth}-${paddedDay}`;
 };
 

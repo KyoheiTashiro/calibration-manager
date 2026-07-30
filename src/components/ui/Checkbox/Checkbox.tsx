@@ -1,4 +1,4 @@
-import { useId, type InputHTMLAttributes, type ReactElement, type Ref } from "react";
+import { useId, type InputHTMLAttributes, type ReactElement, type Ref } from 'react';
 
 type Props = {
   label: string;
@@ -12,24 +12,24 @@ export const Checkbox = ({ label, error, ref, ...rest }: Props): ReactElement =>
   const generatedId = useId();
   const inputId = rest.id ?? generatedId;
   const errorId = `${inputId}-error`;
-  const hasError = error !== undefined && error !== "";
+  const hasError = error !== undefined && error !== '';
 
   return (
     <div>
-      <label htmlFor={inputId} className="flex items-center gap-2 text-sm text-slate-700">
+      <label htmlFor={inputId} className='flex items-center gap-2 text-sm text-slate-700'>
         <input
-          type="checkbox"
+          type='checkbox'
           {...rest}
           ref={ref}
           id={inputId}
-          aria-invalid={hasError ? "true" : undefined}
+          aria-invalid={hasError ? 'true' : undefined}
           aria-describedby={hasError ? errorId : undefined}
-          className="h-4 w-4 rounded border-slate-300"
+          className='h-4 w-4 rounded border-slate-300'
         />
         {label}
       </label>
       {hasError && (
-        <p id={errorId} className="text-xs text-red-600">
+        <p id={errorId} className='text-xs text-red-600'>
           {error}
         </p>
       )}

@@ -1,1 +1,1 @@
-export const UNSET_LABEL = "-";
+export const UNSET_LABEL = '-';

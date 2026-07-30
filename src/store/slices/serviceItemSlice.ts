@@ -2,16 +2,16 @@
  * 項目は物理削除せず isActive で無効化する。
  */
 
-import type { AppSliceCreator } from "@/store/storeState";
-import type { ServiceItem } from "@/store/types";
-import { createId } from "@/utils/id";
-import { recordValue } from "@/utils/record";
+import type { AppSliceCreator } from '@/store/storeState';
+import type { ServiceItem } from '@/store/types';
+import { createId } from '@/utils/id';
+import { recordValue } from '@/utils/record';
 
 export type ServiceItemSlice = {
   serviceItems: Record<string, ServiceItem>;
   /** @returns 生成したServiceItemのid */
-  addServiceItem: (input: Omit<ServiceItem, "id">) => string;
-  updateServiceItem: (id: string, patch: Partial<Omit<ServiceItem, "id">>) => void;
+  addServiceItem: (input: Omit<ServiceItem, 'id'>) => string;
+  updateServiceItem: (id: string, patch: Partial<Omit<ServiceItem, 'id'>>) => void;
   setServiceItemActive: (id: string, isActive: boolean) => void;
 };
 

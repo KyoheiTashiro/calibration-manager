@@ -1,4 +1,4 @@
-import { daysInMonth, weekdayOf } from "@/utils/time";
+import { daysInMonth, weekdayOf } from '@/utils/time';
 
 /** 月グリッドの1マス。月の日数に含まれない空白セルは null */
 export type CalendarCell = number | null;
@@ -56,7 +56,7 @@ export const isSameYearMonthDay = (
 
 /** 日セルの Tailwind クラスを状態から決定する（選択 > 今日 > 通常の優先度） */
 export const dayCellClassName = (isSelected: boolean, isToday: boolean): string => {
-  const base = "flex h-8 w-full items-center justify-center rounded text-sm";
+  const base = 'flex h-8 w-full items-center justify-center rounded text-sm';
   if (isSelected) return `${base} bg-primary text-white`;
   if (isToday) return `${base} border border-primary text-primary`;
   return `${base} hover:bg-slate-100`;

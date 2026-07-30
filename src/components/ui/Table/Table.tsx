@@ -1,4 +1,4 @@
-import type { ReactElement, ReactNode } from "react";
+import type { ReactElement, ReactNode } from 'react';
 
 // oxlint-disable react/no-multi-comp -- Table/TableHead/TableBody/Th/Tdは<table><thead><tbody>と
 // そのセル(<th>/<td>)を一体で扱う複合コンポーネントであり、directory-structure.md の指定通り
@@ -12,10 +12,10 @@ type TableProps = {
 };
 
 export const Table = ({ children, className }: TableProps): ReactElement => {
-  const tableClassName = ["w-full border-collapse text-sm", className].filter(Boolean).join(" ");
+  const tableClassName = ['w-full border-collapse text-sm', className].filter(Boolean).join(' ');
 
   return (
-    <div className="overflow-x-auto">
+    <div className='overflow-x-auto'>
       <table className={tableClassName}>{children}</table>
     </div>
   );
@@ -26,7 +26,7 @@ type TableHeadProps = {
 };
 
 export const TableHead = ({ children }: TableHeadProps): ReactElement => (
-  <thead className="bg-slate-50 text-xs font-medium text-slate-600">{children}</thead>
+  <thead className='bg-slate-50 text-xs font-medium text-slate-600'>{children}</thead>
 );
 
 type TableBodyProps = {
@@ -34,13 +34,13 @@ type TableBodyProps = {
 };
 
 export const TableBody = ({ children }: TableBodyProps): ReactElement => (
-  <tbody className="divide-y divide-slate-200">{children}</tbody>
+  <tbody className='divide-y divide-slate-200'>{children}</tbody>
 );
 
-type ThProps = { children: ReactNode; align?: "left" | "right" };
+type ThProps = { children: ReactNode; align?: 'left' | 'right' };
 
-export const Th = ({ children, align = "left" }: ThProps): ReactElement => (
-  <th scope="col" className={`px-3 py-2 ${align === "right" ? "text-right" : "text-left"}`}>
+export const Th = ({ children, align = 'left' }: ThProps): ReactElement => (
+  <th scope='col' className={`px-3 py-2 ${align === 'right' ? 'text-right' : 'text-left'}`}>
     {children}
   </th>
 );
@@ -51,15 +51,15 @@ type TdProps = { children?: ReactNode; className?: string; truncate?: boolean };
 // セル内ブロック要素に max-width を与えて溢れた分を「…」で省略する(D-087)。
 // 操作ボタン列など省略が不要なセルは truncate={false} で td 直下に子を置く。
 export const Td = ({ children, className, truncate = true }: TdProps): ReactElement => {
-  const tdClassName = ["px-3 py-2", className].filter(Boolean).join(" ");
+  const tdClassName = ['px-3 py-2', className].filter(Boolean).join(' ');
   if (!truncate) {
     return <td className={tdClassName}>{children}</td>;
   }
   return (
     <td className={tdClassName}>
       <div
-        className="max-w-64 truncate"
-        title={typeof children === "string" ? children : undefined}
+        className='max-w-64 truncate'
+        title={typeof children === 'string' ? children : undefined}
       >
         {children}
       </div>

@@ -8,7 +8,7 @@ import {
   BOARD_CLOSED_COLUMNS,
   type CardAction,
   type DialogState,
-} from "@/features/serviceOrder/constants";
+} from '@/features/serviceOrder/constants';
 import {
   SERVICE_ORDER_STATUS,
   type ServiceOrder,
@@ -16,9 +16,9 @@ import {
   type ServiceItem,
   type ServiceOrderStatus,
   type Vendor,
-} from "@/store/types";
-import { useAppStore } from "@/store/useAppStore";
-import { useMemo, useState } from "react";
+} from '@/store/types';
+import { useAppStore } from '@/store/useAppStore';
+import { useMemo, useState } from 'react';
 
 /**
  * ISO日付文字列は辞書順比較がそのまま日付順（utils/time.ts）。

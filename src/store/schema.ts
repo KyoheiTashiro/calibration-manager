@@ -26,14 +26,14 @@ import {
   type Person,
   SERVICE_RECORD_RESULT,
   type Vendor,
-} from "@/store/types";
-import { isIsoDateString } from "@/utils/time";
-import { z } from "zod";
+} from '@/store/types';
+import { isIsoDateString } from '@/utils/time';
+import { z } from 'zod';
 
 /** `YYYY-MM-DD` かつ暦上妥当な日付のみ許可（screen-design/README.md §0.4） */
 const isoDateStringSchema = z
   .string()
-  .refine(isIsoDateString, { message: "YYYY-MM-DD形式の日付ではありません" });
+  .refine(isIsoDateString, { message: 'YYYY-MM-DD形式の日付ではありません' });
 
 const requiredStringSchema = z.string().min(1);
 
@@ -90,11 +90,11 @@ export const serviceItemSchema = z
   })
   // 「external の場合 vendorId 必須」（domain-model.md §3.4）は型で表現していない相関制約のため、スキーマ側で強制する。
   .superRefine((serviceItem, context) => {
-    if (serviceItem.execution === EXECUTION.EXTERNAL && (serviceItem.vendorId ?? "") === "") {
+    if (serviceItem.execution === EXECUTION.EXTERNAL && (serviceItem.vendorId ?? '') === '') {
       context.addIssue({
-        code: "custom",
-        path: ["vendorId"],
-        message: "外部実施の項目には校正依頼先が必要です",
+        code: 'custom',
+        path: ['vendorId'],
+        message: '外部実施の項目には校正依頼先が必要です',
       });
     }
   });

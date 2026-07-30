@@ -1,11 +1,11 @@
-import { SERVICE_ITEM_STATUS } from "@/domain/serviceItemStatus";
-import type { Meta, StoryObj } from "@storybook/react-vite";
-import type { ReactElement } from "react";
+import { SERVICE_ITEM_STATUS } from '@/domain/serviceItemStatus';
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import type { ReactElement } from 'react';
 
-import { StatusBadge } from "./StatusBadge";
+import { StatusBadge } from './StatusBadge';
 
 const meta = {
-  title: "Domain/StatusBadge",
+  title: 'Domain/StatusBadge',
   component: StatusBadge,
 } satisfies Meta<typeof StatusBadge>;
 
@@ -20,7 +20,7 @@ export const AllStatuses: StoryObj<typeof meta> = {
     status: SERVICE_ITEM_STATUS.OK,
   },
   render: (): ReactElement => (
-    <div className="flex flex-wrap gap-2">
+    <div className='flex flex-wrap gap-2'>
       {Object.values(SERVICE_ITEM_STATUS).map((status) => (
         <StatusBadge key={status} status={status} />
       ))}

@@ -1,4 +1,4 @@
-import { useDialog } from "@/components/ui/hooks/useDialog";
+import { useDialog } from '@/components/ui/hooks/useDialog';
 import {
   useEffect,
   useId,
@@ -6,7 +6,7 @@ import {
   type MouseEvent,
   type ReactElement,
   type SyntheticEvent,
-} from "react";
+} from 'react';
 
 type ConfirmModalProps = {
   open: boolean;
@@ -59,26 +59,26 @@ export const ConfirmModal = ({
       aria-labelledby={titleId}
       onCancel={handleCancel}
       onClick={handleClick}
-      className="border-line m-auto w-full max-w-sm rounded-lg border p-0 backdrop:bg-slate-900/50"
+      className='border-line m-auto w-full max-w-sm rounded-lg border p-0 backdrop:bg-slate-900/50'
     >
-      <div className="flex flex-col gap-4 px-4 py-4">
-        <h2 id={titleId} className="text-base font-semibold">
+      <div className='flex flex-col gap-4 px-4 py-4'>
+        <h2 id={titleId} className='text-base font-semibold'>
           {title}
         </h2>
-        <p className="text-sm text-slate-700">{message}</p>
-        <div className="flex justify-end gap-2">
+        <p className='text-sm text-slate-700'>{message}</p>
+        <div className='flex justify-end gap-2'>
           <button
             ref={cancelButtonRef}
-            type="button"
+            type='button'
             onClick={onCancel}
-            className="h-9 rounded border border-slate-300 px-4 text-sm text-slate-700"
+            className='h-9 rounded border border-slate-300 px-4 text-sm text-slate-700'
           >
             キャンセル
           </button>
           <button
-            type="button"
+            type='button'
             onClick={onConfirm}
-            className="bg-danger h-9 rounded px-4 text-sm text-white"
+            className='bg-danger h-9 rounded px-4 text-sm text-white'
           >
             {confirmLabel}
           </button>

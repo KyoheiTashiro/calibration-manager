@@ -1,4 +1,4 @@
-import { VendorModal } from "@/components/domain/VendorModal";
+import { VendorModal } from '@/components/domain/VendorModal';
 import {
   Button,
   ConfirmModal,
@@ -12,13 +12,13 @@ import {
   TextField,
   Th,
   usePagination,
-} from "@/components/ui";
-import { UNSET_LABEL } from "@/constants/labels";
-import { VendorTypeBadges } from "@/features/vendors/components/VendorTypeBadges";
-import { useVendorDelete, useVendorList } from "@/features/vendors/hooks";
-import type { Vendor } from "@/store/types";
-import { useEntityModal } from "@/utils/modal";
-import type { ReactElement } from "react";
+} from '@/components/ui';
+import { UNSET_LABEL } from '@/constants/labels';
+import { VendorTypeBadges } from '@/features/vendors/components/VendorTypeBadges';
+import { useVendorDelete, useVendorList } from '@/features/vendors/hooks';
+import type { Vendor } from '@/store/types';
+import { useEntityModal } from '@/utils/modal';
+import type { ReactElement } from 'react';
 
 export const VendorList = (): ReactElement => {
   const { totalCount, filteredVendorList, searchText, setSearchText } = useVendorList();
@@ -44,39 +44,39 @@ export const VendorList = (): ReactElement => {
   } = useVendorDelete();
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className='flex flex-col gap-4'>
       {totalCount === 0 ? (
         <EmptyState
-          message="取引先が未登録です"
+          message='取引先が未登録です'
           action={<Button onClick={handleAddClick}>+ 追加</Button>}
         />
       ) : (
         <>
-          <div className="flex flex-wrap items-end gap-4">
-            <div className="w-1/2 min-w-64">
+          <div className='flex flex-wrap items-end gap-4'>
+            <div className='w-1/2 min-w-64'>
               <TextField
-                label="検索"
-                placeholder="名称, 窓口担当者, 電話, メールで検索"
+                label='検索'
+                placeholder='名称, 窓口担当者, 電話, メールで検索'
                 value={searchText}
                 onChange={(event) => {
                   setSearchText(event.target.value);
                 }}
               />
             </div>
-            <div className="ml-auto">
+            <div className='ml-auto'>
               <Button onClick={handleAddClick}>+ 追加</Button>
             </div>
           </div>
 
           {filteredVendorList.length === 0 ? (
-            <EmptyState message="条件に一致する取引先はありません" />
+            <EmptyState message='条件に一致する取引先はありません' />
           ) : (
             <Table>
               <TableHead>
                 <tr>
                   <Th>名称</Th>
                   <Th>種別</Th>
-                  <Th align="right">標準納期</Th>
+                  <Th align='right'>標準納期</Th>
                   <Th>窓口担当者</Th>
                   <Th>電話</Th>
                   <Th>メール</Th>
@@ -90,7 +90,7 @@ export const VendorList = (): ReactElement => {
                     <Td>
                       <VendorTypeBadges vendor={vendor} />
                     </Td>
-                    <Td className="text-right tabular-nums">
+                    <Td className='text-right tabular-nums'>
                       {vendor.standardLeadTimeDays === undefined
                         ? UNSET_LABEL
                         : `${vendor.standardLeadTimeDays}日`}
@@ -102,10 +102,10 @@ export const VendorList = (): ReactElement => {
                         jsx-a11y(control-has-associated-label) の既定探索深度(2)を超えて
                         ボタン内テキストを検出できず誤検知するため、td を flex コンテナ化して
                         ラッパーを1段省く。 */}
-                    <Td className="flex gap-2" truncate={false}>
+                    <Td className='flex gap-2' truncate={false}>
                       <Button
-                        variant="secondary"
-                        size="sm"
+                        variant='secondary'
+                        size='sm'
                         onClick={() => {
                           handleEditClick(vendor);
                         }}
@@ -113,8 +113,8 @@ export const VendorList = (): ReactElement => {
                         編集
                       </Button>
                       <Button
-                        variant="danger"
-                        size="sm"
+                        variant='danger'
+                        size='sm'
                         onClick={() => {
                           handleDeleteClick(vendor.id);
                         }}
@@ -144,18 +144,18 @@ export const VendorList = (): ReactElement => {
 
       <ConfirmModal
         open={deleteTargetId !== undefined}
-        title="取引先の削除"
-        message="この取引先を削除しますか?"
-        confirmLabel="削除"
+        title='取引先の削除'
+        message='この取引先を削除しますか?'
+        confirmLabel='削除'
         onConfirm={handleConfirmDelete}
         onCancel={handleCancelDelete}
       />
 
-      <Modal open={referencedErrorOpen} title="削除できません" onClose={closeReferencedError}>
-        <p role="alert" className="text-sm text-slate-700">
+      <Modal open={referencedErrorOpen} title='削除できません' onClose={closeReferencedError}>
+        <p role='alert' className='text-sm text-slate-700'>
           この取引先は参照されているため削除できません
         </p>
-        <div className="flex justify-end pt-4">
+        <div className='flex justify-end pt-4'>
           <Button onClick={closeReferencedError}>OK</Button>
         </div>
       </Modal>

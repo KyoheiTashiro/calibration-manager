@@ -1,1 +1,1 @@
-export { PersonModal } from "./PersonModal";
+export { PersonModal } from './PersonModal';

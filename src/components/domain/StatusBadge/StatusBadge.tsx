@@ -1,8 +1,8 @@
-import { AlertTriangleIcon, CartIcon, CheckIcon, ClockIcon, RefreshIcon } from "@/components/icons";
-import type { IconProps } from "@/components/icons/base";
-import { SERVICE_ITEM_STATUS, type ServiceItemStatus } from "@/domain/serviceItemStatus";
-import { statusBadgeClass, statusBadgeLabel } from "@/domain/statusBadge";
-import type { ComponentType, ReactElement } from "react";
+import { AlertTriangleIcon, CartIcon, CheckIcon, ClockIcon, RefreshIcon } from '@/components/icons';
+import type { IconProps } from '@/components/icons/base';
+import { SERVICE_ITEM_STATUS, type ServiceItemStatus } from '@/domain/serviceItemStatus';
+import { statusBadgeClass, statusBadgeLabel } from '@/domain/statusBadge';
+import type { ComponentType, ReactElement } from 'react';
 
 /**
  * ステータス→アイコンコンポーネント。通知バッジのアイコン(NOTIFICATION_TYPE_ICONS、D-064)と
@@ -24,13 +24,13 @@ const STATUS_BADGE_ICONS = {
  * アイコンは通知アイコン(D-064)と同義同形状で統一し、色は currentColor でバッジ文字色を継承する(D-069)。
  */
 export const StatusBadge = ({ status }: { status: ServiceItemStatus }): ReactElement => {
-  const baseClassName = "inline-flex items-center rounded px-2 py-0.5 text-xs font-medium";
+  const baseClassName = 'inline-flex items-center rounded px-2 py-0.5 text-xs font-medium';
   const className = `${baseClassName} ${statusBadgeClass(status)}`;
   const Icon = STATUS_BADGE_ICONS[status];
 
   return (
     <span className={className}>
-      <Icon className="mr-1 h-3.5 w-3.5" />
+      <Icon className='mr-1 h-3.5 w-3.5' />
       {statusBadgeLabel(status)}
     </span>
   );

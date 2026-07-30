@@ -1,9 +1,9 @@
-import { recommendedOrderDate, resolveLeadTime } from "@/domain/leadTime";
-import { EXECUTION } from "@/store/types";
-import { dayCountArb, isoDateArb } from "@/test/arbitraries";
-import { addDays } from "@/utils/time";
-import * as fc from "fast-check";
-import { describe, expect, it } from "vitest";
+import { recommendedOrderDate, resolveLeadTime } from '@/domain/leadTime';
+import { EXECUTION } from '@/store/types';
+import { dayCountArb, isoDateArb } from '@/test/arbitraries';
+import { addDays } from '@/utils/time';
+import * as fc from 'fast-check';
+import { describe, expect, it } from 'vitest';
 
 /** 外部実施項目（発注推奨日の計算対象）を組み立てる */
 const externalServiceItemArb = fc.record({
@@ -13,8 +13,8 @@ const externalServiceItemArb = fc.record({
   nextDueDate: isoDateArb,
 });
 
-describe("recommendedOrderDate（property）", () => {
-  it("発注推奨日は nextDueDate から (leadTime + bufferDays) 日戻した日に一致する", () => {
+describe('recommendedOrderDate（property）', () => {
+  it('発注推奨日は nextDueDate から (leadTime + bufferDays) 日戻した日に一致する', () => {
     fc.assert(
       fc.property(externalServiceItemArb, (serviceItem) => {
         expect(recommendedOrderDate(serviceItem, null)).toBe(
@@ -24,7 +24,7 @@ describe("recommendedOrderDate（property）", () => {
     );
   });
 
-  it("納期を長くするほど発注推奨日は同じか早まる（単調性）", () => {
+  it('納期を長くするほど発注推奨日は同じか早まる（単調性）', () => {
     fc.assert(
       fc.property(externalServiceItemArb, dayCountArb, (serviceItem, additionalDays) => {
         const base = recommendedOrderDate(serviceItem, null);
@@ -39,7 +39,7 @@ describe("recommendedOrderDate（property）", () => {
     );
   });
 
-  it("serviceItem.leadTimeDays=n と「未設定 + vendor標準納期=n」は同じ結果になる（フォールバック等価性）", () => {
+  it('serviceItem.leadTimeDays=n と「未設定 + vendor標準納期=n」は同じ結果になる（フォールバック等価性）', () => {
     fc.assert(
       fc.property(externalServiceItemArb, (serviceItem) => {
         const viaServiceItem = recommendedOrderDate(serviceItem, null);
@@ -52,7 +52,7 @@ describe("recommendedOrderDate（property）", () => {
     );
   });
 
-  it("resolveLeadTime は serviceItem 優先・vendor フォールバック・両方無しで null の3値のみ", () => {
+  it('resolveLeadTime は serviceItem 優先・vendor フォールバック・両方無しで null の3値のみ', () => {
     fc.assert(
       fc.property(
         fc.option(dayCountArb, { nil: undefined }),

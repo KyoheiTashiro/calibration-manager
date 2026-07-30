@@ -1,54 +1,54 @@
-import { buildSeedState, seedIfEmpty } from "@/dev/seed";
-import { SEED_EQUIPMENT_COUNT } from "@/dev/seedMasterData";
-import { deriveServiceItemStatus, type ServiceItemStatus } from "@/domain/serviceItemStatus";
-import { isActiveServiceOrderStatus } from "@/domain/serviceOrderStatus";
-import { appStateSchema } from "@/store/schema";
-import { CYCLE, EQUIPMENT_STATUS, EXECUTION, SERVICE_ITEM_TYPE } from "@/store/types";
-import { useAppStore } from "@/store/useAppStore";
-import { setupStoreIsolation, seedStore } from "@/test/renderWithStore";
-import { beforeEach, describe, expect, it } from "vitest";
+import { buildSeedState, seedIfEmpty } from '@/dev/seed';
+import { SEED_EQUIPMENT_COUNT } from '@/dev/seedMasterData';
+import { deriveServiceItemStatus, type ServiceItemStatus } from '@/domain/serviceItemStatus';
+import { isActiveServiceOrderStatus } from '@/domain/serviceOrderStatus';
+import { appStateSchema } from '@/store/schema';
+import { CYCLE, EQUIPMENT_STATUS, EXECUTION, SERVICE_ITEM_TYPE } from '@/store/types';
+import { useAppStore } from '@/store/useAppStore';
+import { setupStoreIsolation, seedStore } from '@/test/renderWithStore';
+import { beforeEach, describe, expect, it } from 'vitest';
 
-const TODAY = "2026-07-03";
+const TODAY = '2026-07-03';
 
 beforeEach(setupStoreIsolation);
 
-describe("buildSeedState", () => {
-  it("appStateSchemaの検証を通過する", () => {
+describe('buildSeedState', () => {
+  it('appStateSchemaの検証を通過する', () => {
     const state = buildSeedState(TODAY);
     expect(appStateSchema.safeParse(state).success).toBe(true);
   });
 
-  it("全serviceItemsのequipmentIdがequipmentに存在する", () => {
+  it('全serviceItemsのequipmentIdがequipmentに存在する', () => {
     const state = buildSeedState(TODAY);
     for (const serviceItem of Object.values(state.serviceItems)) {
       expect(state.equipment[serviceItem.equipmentId]).toBeDefined();
     }
   });
 
-  it("全serviceItemsのpersonIdがpersonsに存在する", () => {
+  it('全serviceItemsのpersonIdがpersonsに存在する', () => {
     const state = buildSeedState(TODAY);
     for (const serviceItem of Object.values(state.serviceItems)) {
       expect(state.persons[serviceItem.personId]).toBeDefined();
     }
   });
 
-  it("execution=externalな全serviceItemsのvendorIdがvendorsに存在する", () => {
+  it('execution=externalな全serviceItemsのvendorIdがvendorsに存在する', () => {
     const state = buildSeedState(TODAY);
     for (const serviceItem of Object.values(state.serviceItems)) {
       if (serviceItem.execution !== EXECUTION.EXTERNAL) continue;
       expect(serviceItem.vendorId).toBeDefined();
-      expect(state.vendors[serviceItem.vendorId ?? ""]).toBeDefined();
+      expect(state.vendors[serviceItem.vendorId ?? '']).toBeDefined();
     }
   });
 
-  it("全serviceRecordsのserviceItemIdがserviceItemsに存在する", () => {
+  it('全serviceRecordsのserviceItemIdがserviceItemsに存在する', () => {
     const state = buildSeedState(TODAY);
     for (const record of Object.values(state.serviceRecords)) {
       expect(state.serviceItems[record.serviceItemId]).toBeDefined();
     }
   });
 
-  it("serviceOrderId指定があるserviceRecordsのそのserviceOrderIdがserviceOrdersに存在する", () => {
+  it('serviceOrderId指定があるserviceRecordsのそのserviceOrderIdがserviceOrdersに存在する', () => {
     const state = buildSeedState(TODAY);
     for (const record of Object.values(state.serviceRecords)) {
       if (record.serviceOrderId === undefined) continue;
@@ -56,7 +56,7 @@ describe("buildSeedState", () => {
     }
   });
 
-  it("全serviceOrdersのserviceItemId/vendorIdがserviceItems/vendorsに存在する", () => {
+  it('全serviceOrdersのserviceItemId/vendorIdがserviceItems/vendorsに存在する', () => {
     const state = buildSeedState(TODAY);
     for (const serviceOrder of Object.values(state.serviceOrders)) {
       expect(state.serviceItems[serviceOrder.serviceItemId]).toBeDefined();
@@ -64,7 +64,7 @@ describe("buildSeedState", () => {
     }
   });
 
-  it("有効な機器かつ有効な項目のステータスがoverdue/orderNow/inProgress/dueSoon/okの5種を全て含む", () => {
+  it('有効な機器かつ有効な項目のステータスがoverdue/orderNow/inProgress/dueSoon/okの5種を全て含む', () => {
     const state = buildSeedState(TODAY);
     const serviceOrders = Object.values(state.serviceOrders);
     const statuses = new Set<ServiceItemStatus>();
@@ -79,11 +79,11 @@ describe("buildSeedState", () => {
     }
 
     expect(statuses).toEqual(
-      new Set<ServiceItemStatus>(["overdue", "orderNow", "inProgress", "dueSoon", "ok"]),
+      new Set<ServiceItemStatus>(['overdue', 'orderNow', 'inProgress', 'dueSoon', 'ok']),
     );
   });
 
-  it("有効な機器かつ有効な項目が 種別×実施区分 の4組合せを全て含む", () => {
+  it('有効な機器かつ有効な項目が 種別×実施区分 の4組合せを全て含む', () => {
     const state = buildSeedState(TODAY);
     const combos = new Set<string>();
 
@@ -103,7 +103,7 @@ describe("buildSeedState", () => {
     );
   });
 
-  it("同一serviceItemIdに有効案件(isActiveServiceOrderStatus)が2件以上存在しない", () => {
+  it('同一serviceItemIdに有効案件(isActiveServiceOrderStatus)が2件以上存在しない', () => {
     const state = buildSeedState(TODAY);
     const activeServiceOrderCountByServiceItemId = new Map<string, number>();
     for (const serviceOrder of Object.values(state.serviceOrders)) {
@@ -118,7 +118,7 @@ describe("buildSeedState", () => {
     }
   });
 
-  it("全equipmentに1件以上のserviceItemsが紐付く", () => {
+  it('全equipmentに1件以上のserviceItemsが紐付く', () => {
     const state = buildSeedState(TODAY);
     const linkedEquipmentIds = new Set(
       Object.values(state.serviceItems).map((serviceItem) => serviceItem.equipmentId),
@@ -128,7 +128,7 @@ describe("buildSeedState", () => {
     }
   });
 
-  it("全serviceItemsのlastDoneDateが基準日より過去である", () => {
+  it('全serviceItemsのlastDoneDateが基準日より過去である', () => {
     const state = buildSeedState(TODAY);
     for (const serviceItem of Object.values(state.serviceItems)) {
       if (serviceItem.lastDoneDate === undefined) continue;
@@ -141,7 +141,7 @@ describe("buildSeedState", () => {
     expect(Object.keys(state.equipment).length).toBe(SEED_EQUIPMENT_COUNT);
   });
 
-  it("全equipmentのmanufacturerId指定がvendorsに存在しisManufacturerである", () => {
+  it('全equipmentのmanufacturerId指定がvendorsに存在しisManufacturerである', () => {
     const state = buildSeedState(TODAY);
     for (const equipment of Object.values(state.equipment)) {
       if (equipment.manufacturerId === undefined) continue;
@@ -149,7 +149,7 @@ describe("buildSeedState", () => {
     }
   });
 
-  it("equipment全件のmanagementNoがユニークである", () => {
+  it('equipment全件のmanagementNoがユニークである', () => {
     const state = buildSeedState(TODAY);
     const managementNumbers = Object.values(state.equipment).map(
       (equipment) => equipment.managementNo,
@@ -158,26 +158,26 @@ describe("buildSeedState", () => {
   });
 });
 
-describe("seedIfEmpty", () => {
-  it("空ストアの場合はtrueを返しserviceItemsが非空になる", () => {
+describe('seedIfEmpty', () => {
+  it('空ストアの場合はtrueを返しserviceItemsが非空になる', () => {
     expect(seedIfEmpty()).toBe(true);
     expect(Object.keys(useAppStore.getState().serviceItems).length).toBeGreaterThan(0);
   });
 
-  it("既存データがある場合はfalseを返し既存の内容を上書きしない", () => {
+  it('既存データがある場合はfalseを返し既存の内容を上書きしない', () => {
     seedStore({
       serviceItems: {
-        "existing-item": {
-          id: "existing-item",
-          equipmentId: "existing-equipment",
+        'existing-item': {
+          id: 'existing-item',
+          equipmentId: 'existing-equipment',
           type: SERVICE_ITEM_TYPE.INSPECTION,
-          name: "既存項目",
+          name: '既存項目',
           cycle: CYCLE.Y1,
           execution: EXECUTION.INTERNAL,
           bufferDays: 14,
-          personId: "existing-person",
+          personId: 'existing-person',
           noticeDaysBefore: 30,
-          nextDueDate: "2026-08-01",
+          nextDueDate: '2026-08-01',
           isActive: true,
         },
       },
@@ -186,6 +186,6 @@ describe("seedIfEmpty", () => {
     expect(seedIfEmpty()).toBe(false);
 
     const { serviceItems } = useAppStore.getState();
-    expect(Object.keys(serviceItems)).toEqual(["existing-item"]);
+    expect(Object.keys(serviceItems)).toEqual(['existing-item']);
   });
 });

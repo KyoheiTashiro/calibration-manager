@@ -1,40 +1,40 @@
-import { Badge, EmptyState } from "@/components/ui";
-import { ROUTES } from "@/constants/routes";
+import { Badge, EmptyState } from '@/components/ui';
+import { ROUTES } from '@/constants/routes';
 import {
   NOTIFICATION_TYPE_BADGE_CLASSES,
   NOTIFICATION_TYPE_ICONS,
   NOTIFICATION_TYPE_LABELS,
-} from "@/features/notifications/constants";
-import type { Notification } from "@/store/types";
-import type { ReactElement } from "react";
-import { Link } from "react-router-dom";
+} from '@/features/notifications/constants';
+import type { Notification } from '@/store/types';
+import type { ReactElement } from 'react';
+import { Link } from 'react-router-dom';
 
 type Props = {
   notifications: readonly Notification[];
 };
 
 export const NotificationList = ({ notifications }: Props): ReactElement => (
-  <section className="flex flex-col gap-2">
-    <div className="flex items-center justify-between">
-      <h2 className="text-lg font-semibold">最新の通知</h2>
-      <Link to={ROUTES.NOTIFICATION_LIST} className="text-primary text-sm underline">
+  <section className='flex flex-col gap-2'>
+    <div className='flex items-center justify-between'>
+      <h2 className='text-lg font-semibold'>最新の通知</h2>
+      <Link to={ROUTES.NOTIFICATION_LIST} className='text-primary text-sm underline'>
         通知一覧へ
       </Link>
     </div>
     {notifications.length === 0 ? (
-      <EmptyState message="新しい通知はありません" />
+      <EmptyState message='新しい通知はありません' />
     ) : (
-      <ul className="divide-y divide-slate-200 rounded-lg border border-slate-200">
+      <ul className='divide-y divide-slate-200 rounded-lg border border-slate-200'>
         {notifications.map((notification) => {
           const TypeIcon = NOTIFICATION_TYPE_ICONS[notification.type];
           return (
-            <li key={notification.id} className="flex items-center gap-3 px-3 py-2">
+            <li key={notification.id} className='flex items-center gap-3 px-3 py-2'>
               <Badge className={NOTIFICATION_TYPE_BADGE_CLASSES[notification.type]}>
-                <TypeIcon className="mr-1 h-3.5 w-3.5" />
+                <TypeIcon className='mr-1 h-3.5 w-3.5' />
                 {NOTIFICATION_TYPE_LABELS[notification.type]}
               </Badge>
-              <span className="flex-1 text-sm">{notification.message}</span>
-              <span className="text-xs text-slate-500 tabular-nums">
+              <span className='flex-1 text-sm'>{notification.message}</span>
+              <span className='text-xs text-slate-500 tabular-nums'>
                 {notification.createdDate}
               </span>
             </li>

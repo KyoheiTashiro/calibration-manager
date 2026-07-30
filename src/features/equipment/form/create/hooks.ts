@@ -1,10 +1,10 @@
-import { equipmentDetailPath } from "@/constants/routes";
-import { toEquipmentPayload, type SelectOption } from "@/features/equipment/form/shared/mapping";
-import { defaultValues, type FormType } from "@/features/equipment/form/shared/schema";
-import { useEquipmentFormCore } from "@/features/equipment/form/shared/useFormCore";
-import { useAppStore } from "@/store/useAppStore";
-import { useSafeNavigate } from "@/utils/navigation";
-import type { Control, FieldErrors, UseFormHandleSubmit, UseFormRegister } from "react-hook-form";
+import { equipmentDetailPath } from '@/constants/routes';
+import { toEquipmentPayload, type SelectOption } from '@/features/equipment/form/shared/mapping';
+import { defaultValues, type FormType } from '@/features/equipment/form/shared/schema';
+import { useEquipmentFormCore } from '@/features/equipment/form/shared/useFormCore';
+import { useAppStore } from '@/store/useAppStore';
+import { useSafeNavigate } from '@/utils/navigation';
+import type { Control, FieldErrors, UseFormHandleSubmit, UseFormRegister } from 'react-hook-form';
 
 type UseCreateEquipmentFormResult = {
   register: UseFormRegister<FormType>;

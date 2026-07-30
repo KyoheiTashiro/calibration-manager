@@ -1,7 +1,7 @@
-import { Pagination, usePagination } from "@/components/ui";
-import { ServiceRecordTable } from "@/features/equipment/detail/components/ServiceRecordTable";
-import type { ServiceRecordRow } from "@/features/equipment/detail/hooks";
-import type { ReactElement } from "react";
+import { Pagination, usePagination } from '@/components/ui';
+import { ServiceRecordTable } from '@/features/equipment/detail/components/ServiceRecordTable';
+import type { ServiceRecordRow } from '@/features/equipment/detail/hooks';
+import type { ReactElement } from 'react';
 
 type Props = {
   serviceRecordRows: readonly ServiceRecordRow[];

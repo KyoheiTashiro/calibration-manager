@@ -1,5 +1,5 @@
-import { ROUTES } from "@/constants/routes";
-import { Dashboard } from "@/features/dashboard";
+import { ROUTES } from '@/constants/routes';
+import { Dashboard } from '@/features/dashboard';
 import {
   CYCLE,
   EQUIPMENT_STATUS,
@@ -11,18 +11,18 @@ import {
   type ServiceItem,
   type Notification,
   type Person,
-} from "@/store/types";
-import { renderWithStore, seedStore, setupStoreIsolation } from "@/test/renderWithStore";
-import { screen, within } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import "@testing-library/jest-dom/vitest";
-import type { ReactElement } from "react";
-import { Route, Routes, useParams, useSearchParams } from "react-router-dom";
-import { beforeEach, describe, expect, it } from "vitest";
+} from '@/store/types';
+import { renderWithStore, seedStore, setupStoreIsolation } from '@/test/renderWithStore';
+import { screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import '@testing-library/jest-dom/vitest';
+import type { ReactElement } from 'react';
+import { Route, Routes, useParams, useSearchParams } from 'react-router-dom';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 const DummyServiceItemList = (): ReactElement => {
   const [params] = useSearchParams();
-  return <p>項目一覧:{params.get("status")}</p>;
+  return <p>項目一覧:{params.get('status')}</p>;
 };
 
 const DummyEquipmentDetail = (): ReactElement => {
@@ -43,25 +43,25 @@ const renderDashboardWithRoutes = (): void => {
 };
 
 const tanaka: Person = {
-  id: "person-1",
-  name: "田中",
-  email: "tanaka@example.com",
+  id: 'person-1',
+  name: '田中',
+  email: 'tanaka@example.com',
   isActive: true,
 };
 
 const equipment1: Equipment = {
-  id: "equipment-1",
-  managementNo: "EQ-001",
-  name: "ノギス",
+  id: 'equipment-1',
+  managementNo: 'EQ-001',
+  name: 'ノギス',
   status: EQUIPMENT_STATUS.ACTIVE,
 };
 
 const makeServiceItem = (
-  overrides: Partial<ServiceItem> & Pick<ServiceItem, "id" | "nextDueDate">,
+  overrides: Partial<ServiceItem> & Pick<ServiceItem, 'id' | 'nextDueDate'>,
 ): ServiceItem => ({
   equipmentId: equipment1.id,
   type: SERVICE_ITEM_TYPE.CALIBRATION,
-  name: "年次校正",
+  name: '年次校正',
   cycle: CYCLE.Y1,
   execution: EXECUTION.INTERNAL,
   bufferDays: 14,
@@ -73,20 +73,20 @@ const makeServiceItem = (
 
 // 期限切れ(過去日)・正常(遠未来)で今日に依存せず導出ステータスを確定させる
 const overdueServiceItemA = makeServiceItem({
-  id: "item-a",
-  name: "A校正",
-  nextDueDate: "2000-01-01",
+  id: 'item-a',
+  name: 'A校正',
+  nextDueDate: '2000-01-01',
 });
 const overdueServiceItemB = makeServiceItem({
-  id: "item-b",
-  name: "B点検",
+  id: 'item-b',
+  name: 'B点検',
   type: SERVICE_ITEM_TYPE.INSPECTION,
-  nextDueDate: "2000-06-01",
+  nextDueDate: '2000-06-01',
 });
 const okServiceItem = makeServiceItem({
-  id: "item-ok",
-  name: "OK校正",
-  nextDueDate: "2999-12-31",
+  id: 'item-ok',
+  name: 'OK校正',
+  nextDueDate: '2999-12-31',
 });
 
 const seedActionScenario = (): void => {
@@ -103,133 +103,133 @@ const seedActionScenario = (): void => {
 
 beforeEach(setupStoreIsolation);
 
-describe("Dashboard: サマリーカード", () => {
-  it("導出ステータスごとの件数を表示する(overdue=2, ok は非カード)", () => {
+describe('Dashboard: サマリーカード', () => {
+  it('導出ステータスごとの件数を表示する(overdue=2, ok は非カード)', () => {
     seedActionScenario();
     renderDashboardWithRoutes();
 
-    const overdueCard = screen.getByRole("button", { name: /期限切れ/u });
-    expect(within(overdueCard).getByText("2")).toBeInTheDocument();
+    const overdueCard = screen.getByRole('button', { name: /期限切れ/u });
+    expect(within(overdueCard).getByText('2')).toBeInTheDocument();
 
     expect(
-      within(screen.getByRole("button", { name: /要発注/u })).getByText("0"),
+      within(screen.getByRole('button', { name: /要発注/u })).getByText('0'),
     ).toBeInTheDocument();
     expect(
-      within(screen.getByRole("button", { name: /期限接近/u })).getByText("0"),
+      within(screen.getByRole('button', { name: /期限接近/u })).getByText('0'),
     ).toBeInTheDocument();
     expect(
-      within(screen.getByRole("button", { name: /校正中/u })).getByText("0"),
+      within(screen.getByRole('button', { name: /校正中/u })).getByText('0'),
     ).toBeInTheDocument();
   });
 
-  it("カードクリックで /service-items?status=<値> へ遷移する", async () => {
+  it('カードクリックで /service-items?status=<値> へ遷移する', async () => {
     const user = userEvent.setup();
     seedActionScenario();
     renderDashboardWithRoutes();
 
-    await user.click(screen.getByRole("button", { name: /期限切れ/u }));
+    await user.click(screen.getByRole('button', { name: /期限切れ/u }));
 
-    expect(screen.getByText("項目一覧:overdue")).toBeInTheDocument();
+    expect(screen.getByText('項目一覧:overdue')).toBeInTheDocument();
   });
 });
 
-describe("Dashboard: 要対応項目リスト", () => {
-  it("overdue/orderNow/dueSoon のみ表示し ok は除外する", () => {
+describe('Dashboard: 要対応項目リスト', () => {
+  it('overdue/orderNow/dueSoon のみ表示し ok は除外する', () => {
     seedActionScenario();
     renderDashboardWithRoutes();
 
-    expect(screen.getByText("A校正")).toBeInTheDocument();
-    expect(screen.getByText("B点検")).toBeInTheDocument();
-    expect(screen.queryByText("OK校正")).not.toBeInTheDocument();
+    expect(screen.getByText('A校正')).toBeInTheDocument();
+    expect(screen.getByText('B点検')).toBeInTheDocument();
+    expect(screen.queryByText('OK校正')).not.toBeInTheDocument();
   });
 
-  it("nextDueDate 昇順で並ぶ(同一 overdue グループ内)", () => {
+  it('nextDueDate 昇順で並ぶ(同一 overdue グループ内)', () => {
     seedActionScenario();
     renderDashboardWithRoutes();
 
-    const rows = screen.getAllByRole("row").slice(1);
-    const names = rows.map((row) => within(row).getAllByRole("cell")[3]?.textContent);
-    expect(names).toEqual(["A校正", "B点検"]);
+    const rows = screen.getAllByRole('row').slice(1);
+    const names = rows.map((row) => within(row).getAllByRole('cell')[3]?.textContent);
+    expect(names).toEqual(['A校正', 'B点検']);
   });
 
-  it("行クリックで機器詳細へ遷移する(D-026)", async () => {
+  it('行クリックで機器詳細へ遷移する(D-026)', async () => {
     const user = userEvent.setup();
     seedActionScenario();
     renderDashboardWithRoutes();
 
-    await user.click(screen.getByRole("row", { name: /A校正/u }));
+    await user.click(screen.getByRole('row', { name: /A校正/u }));
 
     expect(screen.getByText(`機器詳細:${equipment1.id}`)).toBeInTheDocument();
   });
 
-  it("行フォーカス + Enter で機器詳細へ遷移する(D-026)", async () => {
+  it('行フォーカス + Enter で機器詳細へ遷移する(D-026)', async () => {
     const user = userEvent.setup();
     seedActionScenario();
     renderDashboardWithRoutes();
 
-    screen.getByRole("row", { name: /A校正/u }).focus();
-    await user.keyboard("{Enter}");
+    screen.getByRole('row', { name: /A校正/u }).focus();
+    await user.keyboard('{Enter}');
 
     expect(screen.getByText(`機器詳細:${equipment1.id}`)).toBeInTheDocument();
   });
 
-  it("行フォーカス + Space で機器詳細へ遷移する(D-026)", async () => {
+  it('行フォーカス + Space で機器詳細へ遷移する(D-026)', async () => {
     const user = userEvent.setup();
     seedActionScenario();
     renderDashboardWithRoutes();
 
-    screen.getByRole("row", { name: /B点検/u }).focus();
-    await user.keyboard(" ");
+    screen.getByRole('row', { name: /B点検/u }).focus();
+    await user.keyboard(' ');
 
     expect(screen.getByText(`機器詳細:${equipment1.id}`)).toBeInTheDocument();
   });
 });
 
-describe("Dashboard: 最新の通知", () => {
+describe('Dashboard: 最新の通知', () => {
   const overdueNotification: Notification = {
-    id: "notif-1",
+    id: 'notif-1',
     type: NOTIFICATION_TYPE.OVERDUE,
     targetType: NOTIFICATION_TARGET_TYPE.SERVICE_ITEM,
     targetId: overdueServiceItemA.id,
     personId: tanaka.id,
-    message: "EQ-001 年次校正が期限を過ぎています",
-    createdDate: "2026-07-01",
+    message: 'EQ-001 年次校正が期限を過ぎています',
+    createdDate: '2026-07-01',
     isRead: false,
   };
 
-  it("種別バッジ・message・createdDate を描画する", () => {
+  it('種別バッジ・message・createdDate を描画する', () => {
     seedStore({ notifications: { [overdueNotification.id]: overdueNotification } });
     renderDashboardWithRoutes();
 
     // ラベル「期限切れ」はKPIカードにも存在するため通知リスト内にスコープする
-    const list = within(screen.getByRole("list"));
-    expect(list.getByText("EQ-001 年次校正が期限を過ぎています")).toBeInTheDocument();
-    expect(list.getByText("2026-07-01")).toBeInTheDocument();
-    expect(list.getByText("期限切れ")).toBeInTheDocument();
+    const list = within(screen.getByRole('list'));
+    expect(list.getByText('EQ-001 年次校正が期限を過ぎています')).toBeInTheDocument();
+    expect(list.getByText('2026-07-01')).toBeInTheDocument();
+    expect(list.getByText('期限切れ')).toBeInTheDocument();
   });
 
-  it("SVGアイコンを aria-hidden 付きで描画し、ラベルはスクリーンリーダーから読める", () => {
+  it('SVGアイコンを aria-hidden 付きで描画し、ラベルはスクリーンリーダーから読める', () => {
     seedStore({ notifications: { [overdueNotification.id]: overdueNotification } });
     renderDashboardWithRoutes();
 
-    const badge = within(screen.getByRole("list")).getByText("期限切れ");
-    expect(badge.querySelector("svg")).toHaveAttribute("aria-hidden", "true");
-    expect(badge).not.toHaveAttribute("aria-hidden");
+    const badge = within(screen.getByRole('list')).getByText('期限切れ');
+    expect(badge.querySelector('svg')).toHaveAttribute('aria-hidden', 'true');
+    expect(badge).not.toHaveAttribute('aria-hidden');
   });
 
-  it("「通知一覧へ」で通知一覧へ遷移する", async () => {
+  it('「通知一覧へ」で通知一覧へ遷移する', async () => {
     const user = userEvent.setup();
     seedStore({ notifications: { [overdueNotification.id]: overdueNotification } });
     renderDashboardWithRoutes();
 
-    await user.click(screen.getByRole("link", { name: "通知一覧へ" }));
+    await user.click(screen.getByRole('link', { name: '通知一覧へ' }));
 
-    expect(screen.getByText("通知一覧画面")).toBeInTheDocument();
+    expect(screen.getByText('通知一覧画面')).toBeInTheDocument();
   });
 });
 
-describe("Dashboard: 空状態", () => {
-  it("要対応0件は 🎉 の空状態を表示する", () => {
+describe('Dashboard: 空状態', () => {
+  it('要対応0件は 🎉 の空状態を表示する', () => {
     seedStore({
       persons: { [tanaka.id]: tanaka },
       equipment: { [equipment1.id]: equipment1 },
@@ -237,12 +237,12 @@ describe("Dashboard: 空状態", () => {
     });
     renderDashboardWithRoutes();
 
-    expect(screen.getByText("対応が必要な項目はありません")).toBeInTheDocument();
+    expect(screen.getByText('対応が必要な項目はありません')).toBeInTheDocument();
   });
 
-  it("通知0件は「新しい通知はありません」を表示する", () => {
+  it('通知0件は「新しい通知はありません」を表示する', () => {
     renderDashboardWithRoutes();
 
-    expect(screen.getByText("新しい通知はありません")).toBeInTheDocument();
+    expect(screen.getByText('新しい通知はありません')).toBeInTheDocument();
   });
 });

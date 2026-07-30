@@ -4,23 +4,23 @@
  * 呼び出し元は閉時アンマウント（条件マウント）必須。
  */
 
-import { Schema, type FormType } from "@/components/domain/ServiceRecordModal/schema";
-import { Button, DateField, Modal, RadioGroup, TextField } from "@/components/ui";
-import { SERVICE_RECORD_RESULT_OPTIONS } from "@/features/serviceItems/constants";
+import { Schema, type FormType } from '@/components/domain/ServiceRecordModal/schema';
+import { Button, DateField, Modal, RadioGroup, TextField } from '@/components/ui';
+import { SERVICE_RECORD_RESULT_OPTIONS } from '@/features/serviceItems/constants';
 import {
   EXECUTION,
   SERVICE_RECORD_RESULT,
   type ServiceOrder,
   type ServiceItem,
   type Vendor,
-} from "@/store/types";
-import { useAppStore } from "@/store/useAppStore";
-import { createSaveHandler } from "@/utils/form";
-import { recordValue } from "@/utils/record";
-import { todayIsoDate } from "@/utils/time";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useState, type ReactElement } from "react";
-import { useForm, useWatch, type DefaultValues } from "react-hook-form";
+} from '@/store/types';
+import { useAppStore } from '@/store/useAppStore';
+import { createSaveHandler } from '@/utils/form';
+import { recordValue } from '@/utils/record';
+import { todayIsoDate } from '@/utils/time';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useState, type ReactElement } from 'react';
+import { useForm, useWatch, type DefaultValues } from 'react-hook-form';
 
 type Props = {
   open: boolean;
@@ -36,14 +36,14 @@ const resolvePrefillDoneBy = (
   serviceOrder: ServiceOrder | undefined,
   vendors: Record<string, Vendor>,
 ): string => {
-  if (serviceOrder) return recordValue(vendors, serviceOrder.vendorId)?.name ?? "";
+  if (serviceOrder) return recordValue(vendors, serviceOrder.vendorId)?.name ?? '';
   if (serviceItem !== undefined && serviceItem.execution === EXECUTION.EXTERNAL) {
     const { vendorId } = serviceItem;
-    if (vendorId !== undefined && vendorId !== "") {
-      return recordValue(vendors, vendorId)?.name ?? "";
+    if (vendorId !== undefined && vendorId !== '') {
+      return recordValue(vendors, vendorId)?.name ?? '';
     }
   }
-  return "";
+  return '';
 };
 
 export const ServiceRecordModal = ({
@@ -57,7 +57,7 @@ export const ServiceRecordModal = ({
     serviceItem ? recordValue(state.equipment, serviceItem.equipmentId) : undefined,
   );
   const vendors = useAppStore((state) => state.vendors);
-  const hasServiceOrderId = serviceOrderId !== undefined && serviceOrderId !== "";
+  const hasServiceOrderId = serviceOrderId !== undefined && serviceOrderId !== '';
   const serviceOrder = useAppStore((state) =>
     hasServiceOrderId ? recordValue(state.serviceOrders, serviceOrderId) : undefined,
   );
@@ -70,7 +70,7 @@ export const ServiceRecordModal = ({
     doneDate: todayIsoDate(),
     doneBy: resolvePrefillDoneBy(serviceItem, serviceOrder, vendors),
     result: undefined,
-    note: "",
+    note: '',
   };
 
   const {
@@ -84,18 +84,18 @@ export const ServiceRecordModal = ({
   });
 
   // なぜ watch() ではなく useWatch か: ServiceItemModal の execution 監視と同じ理由（react-compiler lint対策）。
-  const result = useWatch({ control, name: "result" });
-  const doneDate = useWatch({ control, name: "doneDate" });
+  const result = useWatch({ control, name: 'result' });
+  const doneDate = useWatch({ control, name: 'doneDate' });
 
-  const isFutureDoneDate = typeof doneDate === "string" && doneDate > todayIsoDate();
+  const isFutureDoneDate = typeof doneDate === 'string' && doneDate > todayIsoDate();
   const serviceOrderVendorName = serviceOrder
-    ? (recordValue(vendors, serviceOrder.vendorId)?.name ?? "")
-    : "";
+    ? (recordValue(vendors, serviceOrder.vendorId)?.name ?? '')
+    : '';
 
   const targetLabel =
     serviceItem && equipment
       ? `対象:${equipment.managementNo} ${equipment.name} / ${serviceItem.name}`
-      : "対象:(項目情報が見つかりません)";
+      : '対象:(項目情報が見つかりません)';
 
   // なぜ: submitFailed を閉時にリセットし、同一対象で開き直した際の残留エラー表示を防ぐ
   // （起動元の key remount に依存させない。ボード等どのマウント方法でも安全にする）。
@@ -110,7 +110,7 @@ export const ServiceRecordModal = ({
       doneDate: values.doneDate,
       doneBy: values.doneBy,
       result: values.result,
-      note: values.note === "" ? undefined : values.note,
+      note: values.note === '' ? undefined : values.note,
       serviceOrderId,
     });
     // なぜここで両分岐 setState か: 破棄確認を出さないため submitFailed はイベントハンドラで
@@ -125,44 +125,44 @@ export const ServiceRecordModal = ({
   return (
     <Modal
       open={open}
-      title="実施記録を登録"
+      title='実施記録を登録'
       onClose={handleClose}
       isDirty={isDirty}
       footer={<Button onClick={handleSave}>保存</Button>}
     >
-      <div className="flex flex-col gap-4">
+      <div className='flex flex-col gap-4'>
         <div>
-          <span className="block text-sm text-slate-700">対象</span>
-          <p className="text-sm text-slate-800">{targetLabel}</p>
+          <span className='block text-sm text-slate-700'>対象</span>
+          <p className='text-sm text-slate-800'>{targetLabel}</p>
         </div>
         {hasServiceOrderId ? (
-          <p className="text-primary text-sm">
+          <p className='text-primary text-sm'>
             案件連携:{serviceOrderVendorName} の案件と紐付けて登録します(登録で記録登録済になります)
           </p>
         ) : null}
         <div>
           <DateField
-            label="実施日"
+            label='実施日'
             required
             error={errors.doneDate?.message}
-            {...register("doneDate")}
+            {...register('doneDate')}
           />
-          {isFutureDoneDate ? <p className="text-xs text-amber-600">実施日が未来日です</p> : null}
+          {isFutureDoneDate ? <p className='text-xs text-amber-600'>実施日が未来日です</p> : null}
         </div>
-        <TextField label="実施者" required error={errors.doneBy?.message} {...register("doneBy")} />
+        <TextField label='実施者' required error={errors.doneBy?.message} {...register('doneBy')} />
         <RadioGroup
-          label="結果"
+          label='結果'
           required
           options={SERVICE_RECORD_RESULT_OPTIONS}
           error={errors.result?.message}
-          {...register("result")}
+          {...register('result')}
         />
         {result === SERVICE_RECORD_RESULT.FAIL ? (
-          <p className="text-xs text-slate-600">次回期限は更新されません</p>
+          <p className='text-xs text-slate-600'>次回期限は更新されません</p>
         ) : null}
-        <TextField label="備考" error={errors.note?.message} {...register("note")} />
+        <TextField label='備考' error={errors.note?.message} {...register('note')} />
         {submitFailed ? (
-          <p className="text-sm text-red-600">
+          <p className='text-sm text-red-600'>
             登録できませんでした。データの状態を確認してください
           </p>
         ) : null}

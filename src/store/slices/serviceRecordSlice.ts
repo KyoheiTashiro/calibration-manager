@@ -2,14 +2,14 @@
  * addServiceRecord は期限更新・案件完了のカスケードを持つドメインの心臓部。
  */
 
-import { addCycle } from "@/domain/dateCycle";
-import { canTransitionServiceOrderStatus } from "@/domain/serviceOrderStatus";
-import type { AppSliceCreator } from "@/store/storeState";
-import { type ServiceRecord, SERVICE_ORDER_STATUS, SERVICE_RECORD_RESULT } from "@/store/types";
-import { createId } from "@/utils/id";
-import { recordValue } from "@/utils/record";
+import { addCycle } from '@/domain/dateCycle';
+import { canTransitionServiceOrderStatus } from '@/domain/serviceOrderStatus';
+import type { AppSliceCreator } from '@/store/storeState';
+import { type ServiceRecord, SERVICE_ORDER_STATUS, SERVICE_RECORD_RESULT } from '@/store/types';
+import { createId } from '@/utils/id';
+import { recordValue } from '@/utils/record';
 
-export type AddServiceRecordInput = Omit<ServiceRecord, "id">;
+export type AddServiceRecordInput = Omit<ServiceRecord, 'id'>;
 
 export type ServiceRecordSlice = {
   serviceRecords: Record<string, ServiceRecord>;

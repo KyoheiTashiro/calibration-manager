@@ -1,7 +1,7 @@
-import { CalendarIcon } from "@/components/icons";
-import { CalendarPopover } from "@/components/ui/DateField/CalendarPopover";
-import { setRef } from "@/components/ui/hooks/setRef";
-import { useOutsideClick } from "@/components/ui/hooks/useOutsideClick";
+import { CalendarIcon } from '@/components/icons';
+import { CalendarPopover } from '@/components/ui/DateField/CalendarPopover';
+import { setRef } from '@/components/ui/hooks/setRef';
+import { useOutsideClick } from '@/components/ui/hooks/useOutsideClick';
 import {
   useCallback,
   useId,
@@ -10,7 +10,7 @@ import {
   type InputHTMLAttributes,
   type ReactElement,
   type Ref,
-} from "react";
+} from 'react';
 
 type Props = {
   label: string;
@@ -28,7 +28,7 @@ type Props = {
  */
 const nativeInputValueDescriptor = Object.getOwnPropertyDescriptor(
   HTMLInputElement.prototype,
-  "value",
+  'value',
 );
 
 const setNativeInputValue = (input: HTMLInputElement, value: string): void => {
@@ -39,13 +39,13 @@ export const DateField = ({ label, error, required, ref, ...rest }: Props): Reac
   const generatedId = useId();
   const inputId = rest.id ?? generatedId;
   const errorId = `${inputId}-error`;
-  const hasError = error !== undefined && error !== "";
+  const hasError = error !== undefined && error !== '';
 
   const [isOpen, setIsOpen] = useState(false);
   // なぜ state で保持するか: ポップオーバーを開いた瞬間の入力値をカレンダーの初期カーソルに使う。
   // render 中に ref.current を読むのは React Compiler のルール違反になるため、
   // 開くイベントハンドラの中でのみ ref を読み、その結果を state にスナップショットする。
-  const [initialValueOnOpen, setInitialValueOnOpen] = useState("");
+  const [initialValueOnOpen, setInitialValueOnOpen] = useState('');
   const wrapperRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -77,52 +77,52 @@ export const DateField = ({ label, error, required, ref, ...rest }: Props): Reac
     const inputElement = inputRef.current;
     if (inputElement) {
       setNativeInputValue(inputElement, isoDate);
-      inputElement.dispatchEvent(new Event("input", { bubbles: true }));
+      inputElement.dispatchEvent(new Event('input', { bubbles: true }));
     }
     closeCalendar(true);
   };
 
   return (
     <div>
-      <label htmlFor={inputId} className="block text-sm text-slate-700">
+      <label htmlFor={inputId} className='block text-sm text-slate-700'>
         {label}
-        {required === true && <span className="text-red-600">*</span>}
+        {required === true && <span className='text-red-600'>*</span>}
       </label>
-      <div ref={wrapperRef} className="relative">
+      <div ref={wrapperRef} className='relative'>
         <input
           {...rest}
           ref={setInputRefs}
           id={inputId}
           required={required}
-          aria-invalid={hasError ? "true" : undefined}
+          aria-invalid={hasError ? 'true' : undefined}
           aria-describedby={hasError ? errorId : undefined}
           className={`w-full rounded border px-3 py-2 pr-9 text-sm ${
-            hasError ? "border-red-500" : "border-slate-300"
+            hasError ? 'border-red-500' : 'border-slate-300'
           }`}
-          type="text"
-          inputMode="numeric"
-          placeholder="YYYY-MM-DD"
+          type='text'
+          inputMode='numeric'
+          placeholder='YYYY-MM-DD'
         />
         <button
           ref={buttonRef}
-          type="button"
-          aria-label="カレンダーを開く"
-          aria-haspopup="dialog"
+          type='button'
+          aria-label='カレンダーを開く'
+          aria-haspopup='dialog'
           aria-expanded={isOpen}
           disabled={rest.disabled}
           onClick={() => {
-            setInitialValueOnOpen(inputRef.current?.value ?? "");
+            setInitialValueOnOpen(inputRef.current?.value ?? '');
             setIsOpen((previous) => !previous);
           }}
-          className="absolute top-1/2 right-2 -translate-y-1/2"
+          className='absolute top-1/2 right-2 -translate-y-1/2'
         >
-          <CalendarIcon className="h-4 w-4 text-slate-400" />
+          <CalendarIcon className='h-4 w-4 text-slate-400' />
         </button>
         {isOpen && (
           <dialog
             open
-            aria-label="カレンダー"
-            className="absolute top-full left-0 z-50 mt-1 w-72 rounded border border-slate-200 bg-white p-3 shadow-lg"
+            aria-label='カレンダー'
+            className='absolute top-full left-0 z-50 mt-1 w-72 rounded border border-slate-200 bg-white p-3 shadow-lg'
           >
             <CalendarPopover
               initialValue={initialValueOnOpen}
@@ -133,7 +133,7 @@ export const DateField = ({ label, error, required, ref, ...rest }: Props): Reac
         )}
       </div>
       {hasError && (
-        <p id={errorId} className="text-xs text-red-600">
+        <p id={errorId} className='text-xs text-red-600'>
           {error}
         </p>
       )}

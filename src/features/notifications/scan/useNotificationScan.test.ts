@@ -1,9 +1,9 @@
-import { useNotificationScan } from "@/features/notifications/scan/useNotificationScan";
-import type { IsoDateString } from "@/store/types";
-import { useAppStore } from "@/store/useAppStore";
-import { setupStoreIsolation } from "@/test/renderWithStore";
-import { renderHook } from "@testing-library/react";
-import { afterEach, beforeEach, describe, expect, it, vi, type MockInstance } from "vitest";
+import { useNotificationScan } from '@/features/notifications/scan/useNotificationScan';
+import type { IsoDateString } from '@/store/types';
+import { useAppStore } from '@/store/useAppStore';
+import { setupStoreIsolation } from '@/test/renderWithStore';
+import { renderHook } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi, type MockInstance } from 'vitest';
 
 const SCAN_INTERVAL_MS = 60_000;
 
@@ -13,13 +13,13 @@ const localNoon = (isoDate: string): Date => new Date(`${isoDate}T10:00:00`);
 // generateNotifications を spy する。実処理は空ストアでは早期 return の無害な no-op のため
 // 差し替えずに呼び出し回数・引数のみを検証する。
 const spyGenerate = (): MockInstance<(today: IsoDateString) => void> =>
-  vi.spyOn(useAppStore.getState(), "generateNotifications");
+  vi.spyOn(useAppStore.getState(), 'generateNotifications');
 
-describe("useNotificationScan", () => {
+describe('useNotificationScan', () => {
   beforeEach(() => {
     setupStoreIsolation();
     vi.useFakeTimers();
-    vi.setSystemTime(localNoon("2026-07-03"));
+    vi.setSystemTime(localNoon('2026-07-03'));
   });
 
   afterEach(() => {
@@ -27,17 +27,17 @@ describe("useNotificationScan", () => {
     vi.useRealTimers();
   });
 
-  it("マウント時に今日の日付で1回スキャンする", () => {
+  it('マウント時に今日の日付で1回スキャンする', () => {
     const generateSpy = spyGenerate();
     renderHook(() => {
       useNotificationScan();
     });
 
     expect(generateSpy).toHaveBeenCalledTimes(1);
-    expect(generateSpy).toHaveBeenCalledWith("2026-07-03");
+    expect(generateSpy).toHaveBeenCalledWith('2026-07-03');
   });
 
-  it("同日内はインターバルが発火してもスキャンしない", () => {
+  it('同日内はインターバルが発火してもスキャンしない', () => {
     const generateSpy = spyGenerate();
     renderHook(() => {
       useNotificationScan();
@@ -49,36 +49,36 @@ describe("useNotificationScan", () => {
     expect(generateSpy).not.toHaveBeenCalled();
   });
 
-  it("日付が変わるとインターバルで新しい日付でスキャンする", () => {
+  it('日付が変わるとインターバルで新しい日付でスキャンする', () => {
     const generateSpy = spyGenerate();
     renderHook(() => {
       useNotificationScan();
     });
     generateSpy.mockClear();
 
-    vi.setSystemTime(localNoon("2026-07-04"));
+    vi.setSystemTime(localNoon('2026-07-04'));
     vi.advanceTimersByTime(SCAN_INTERVAL_MS);
 
     expect(generateSpy).toHaveBeenCalledTimes(1);
-    expect(generateSpy).toHaveBeenCalledWith("2026-07-04");
+    expect(generateSpy).toHaveBeenCalledWith('2026-07-04');
   });
 
-  it("visibilitychange の可視復帰+日付変更でスキャンする", () => {
+  it('visibilitychange の可視復帰+日付変更でスキャンする', () => {
     const generateSpy = spyGenerate();
     renderHook(() => {
       useNotificationScan();
     });
     generateSpy.mockClear();
 
-    vi.setSystemTime(localNoon("2026-07-04"));
+    vi.setSystemTime(localNoon('2026-07-04'));
     // jsdom の document.visibilityState は既定で "visible"。
-    document.dispatchEvent(new Event("visibilitychange"));
+    document.dispatchEvent(new Event('visibilitychange'));
 
     expect(generateSpy).toHaveBeenCalledTimes(1);
-    expect(generateSpy).toHaveBeenCalledWith("2026-07-04");
+    expect(generateSpy).toHaveBeenCalledWith('2026-07-04');
   });
 
-  it("アンマウント後はインターバル・visibilitychange いずれでもスキャンしない", () => {
+  it('アンマウント後はインターバル・visibilitychange いずれでもスキャンしない', () => {
     const generateSpy = spyGenerate();
     const { unmount } = renderHook(() => {
       useNotificationScan();
@@ -86,9 +86,9 @@ describe("useNotificationScan", () => {
     generateSpy.mockClear();
     unmount();
 
-    vi.setSystemTime(localNoon("2026-07-05"));
+    vi.setSystemTime(localNoon('2026-07-05'));
     vi.advanceTimersByTime(SCAN_INTERVAL_MS * 2);
-    document.dispatchEvent(new Event("visibilitychange"));
+    document.dispatchEvent(new Event('visibilitychange'));
 
     expect(generateSpy).not.toHaveBeenCalled();
   });
