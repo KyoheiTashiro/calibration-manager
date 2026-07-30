@@ -35,13 +35,13 @@ describe("ServiceItemList: テーブル描画", () => {
     expect(rows[0]).toHaveTextContent("田中");
   });
 
-  it("lastDoneDate 未設定・内部項目の発注推奨日は「—」を表示する(1行に2箇所)", () => {
+  it("lastDoneDate 未設定・内部項目の発注推奨日は「-」を表示する(1行に2箇所)", () => {
     seedServiceItemList();
     renderList();
 
     const okRow = screen.getByRole("row", { name: /月次点検/u });
     expect(okRow).toHaveTextContent(personSato.name);
-    expect(within(okRow).getAllByText("—")).toHaveLength(2);
+    expect(within(okRow).getAllByText("-")).toHaveLength(2);
   });
 
   it("非稼働機器の項目・isActive=false の項目は表示しない", () => {

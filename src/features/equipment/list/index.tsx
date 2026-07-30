@@ -13,6 +13,7 @@ import {
   activatableRowProps,
   usePagination,
 } from "@/components/ui";
+import { UNSET_LABEL } from "@/constants/labels";
 import { ROUTES, equipmentDetailPath } from "@/constants/routes";
 import {
   EQUIPMENT_STATUS_BADGE_CLASSES,
@@ -117,9 +118,9 @@ export const EquipmentList = (): ReactElement => {
                   >
                     <Td>{entry.managementNo}</Td>
                     <Td>{entry.name}</Td>
-                    <Td>{entry.model ?? "—"}</Td>
-                    <Td>{manufacturerNameOf(entry) ?? "—"}</Td>
-                    <Td>{entry.location ?? "—"}</Td>
+                    <Td>{entry.model ?? UNSET_LABEL}</Td>
+                    <Td>{manufacturerNameOf(entry) ?? UNSET_LABEL}</Td>
+                    <Td>{entry.location ?? UNSET_LABEL}</Td>
                     <Td>
                       <Badge className={EQUIPMENT_STATUS_BADGE_CLASSES[entry.status]}>
                         {EQUIPMENT_STATUS_LABELS[entry.status]}

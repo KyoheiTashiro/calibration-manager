@@ -13,6 +13,7 @@ import {
   Th,
   usePagination,
 } from "@/components/ui";
+import { UNSET_LABEL } from "@/constants/labels";
 import { STATUS_FILTER_OPTIONS, isStatusFilter, usePersonList } from "@/features/persons/hooks";
 import type { Person } from "@/store/types";
 import { useEntityModal } from "@/utils/modal";
@@ -95,7 +96,7 @@ export const PersonList = (): ReactElement => {
                 {pagedItems.map((person) => (
                   <tr key={person.id}>
                     <Td>{person.name}</Td>
-                    <Td>{person.department ?? "—"}</Td>
+                    <Td>{person.department ?? UNSET_LABEL}</Td>
                     <Td>{person.email}</Td>
                     <Td>
                       <Badge

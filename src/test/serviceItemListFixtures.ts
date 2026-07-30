@@ -94,7 +94,7 @@ export const serviceItemExternalInProgress: ServiceItem = {
   isActive: true,
 };
 
-/** 内部・点検・far future(ok)。lastDoneDate 未設定・発注推奨日なし → 「—」表示2箇所 */
+/** 内部・点検・far future(ok)。lastDoneDate 未設定・発注推奨日なし → 「-」表示2箇所 */
 export const serviceItemInternalOk: ServiceItem = {
   id: "item-int-ok",
   equipmentId: eqB.id,

@@ -3,6 +3,7 @@
  */
 
 import { Button } from "@/components/ui";
+import { UNSET_LABEL } from "@/constants/labels";
 import { CARD_ACTION, type CardAction } from "@/features/serviceOrder/constants";
 import {
   SERVICE_ORDER_STATUS,
@@ -17,8 +18,6 @@ import type { ReactElement, ReactNode } from "react";
 
 /** 参照先が消えている場合の表示 */
 const NO_REFERENCE_LABEL = "(参照先なし)";
-/** 属性が未設定のときの表示 */
-const UNSET_LABEL = "—";
 
 type CardActionSpec = { label: string; action: CardAction; variant?: "danger" };
 

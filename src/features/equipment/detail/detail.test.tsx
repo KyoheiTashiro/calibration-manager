@@ -62,12 +62,12 @@ describe("EquipmentDetail: 基本情報カード", () => {
     expect(screen.getByText("校正用マスターと同時保管")).toBeInTheDocument();
   });
 
-  it("任意属性が未設定の機器は「—」で表示される", () => {
+  it("任意属性が未設定の機器は「-」で表示される", () => {
     seedStore({ equipment: { [equipmentMinimal.id]: equipmentMinimal } });
     renderDetail(equipmentMinimal.id);
 
     // なぜ5件か: 型式 / S/N / メーカー / 設置場所 / 備考 の5項目すべてが未設定
-    expect(screen.getAllByText("—")).toHaveLength(5);
+    expect(screen.getAllByText("-")).toHaveLength(5);
   });
 
   it("「編集」ボタンで機器編集画面へ遷移する", async () => {
@@ -140,7 +140,7 @@ describe("EquipmentDetail: 実施記録", () => {
     expect(summary).toEqual(["2026-06-25 月次点検", "2026-06-25 年次校正", "2025-06-18 年次校正"]);
   });
 
-  it("実施者・結果の日本語ラベル・備考(空は「—」)が表示される", () => {
+  it("実施者・結果の日本語ラベル・備考(空は「-」)が表示される", () => {
     renderDetail(equipmentFull.id);
 
     const rows = getHistoryRows();
@@ -151,7 +151,7 @@ describe("EquipmentDetail: 実施記録", () => {
 
     expect(within(first).getByText("鈴木")).toBeInTheDocument();
     expect(within(first).getByText("合格")).toBeInTheDocument();
-    expect(within(first).getByText("—")).toBeInTheDocument();
+    expect(within(first).getByText("-")).toBeInTheDocument();
 
     expect(within(second).getByText("田中")).toBeInTheDocument();
     expect(within(second).getByText("不合格")).toBeInTheDocument();
@@ -219,7 +219,7 @@ describe("EquipmentDetail: 項目ステータス(D-014)", () => {
     expect(within(getServiceItemRow(/外観点検/u)).getByText("正常")).toBeInTheDocument();
   });
 
-  it("休止機器では期限切れ相当でもステータス欄が「—」になる", () => {
+  it("休止機器では期限切れ相当でもステータス欄が「-」になる", () => {
     seedStore({
       equipment: { [equipmentSuspended.id]: equipmentSuspended },
       persons: { [activePerson.id]: activePerson },
@@ -231,7 +231,7 @@ describe("EquipmentDetail: 項目ステータス(D-014)", () => {
 
     const row = getServiceItemRow(/定期点検/u);
     const [statusCell] = within(row).getAllByRole("cell");
-    expect(statusCell).toHaveTextContent("—");
+    expect(statusCell).toHaveTextContent("-");
     expect(within(row).queryByText("期限切れ")).not.toBeInTheDocument();
   });
 });

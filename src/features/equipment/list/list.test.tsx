@@ -22,7 +22,7 @@ const DummyEquipmentDetail = (): ReactElement => {
   return <p>機器詳細:{id}</p>;
 };
 
-/** 行内の最終列(次回期限セル)を取得する(型式/メーカー/設置場所にも「—」が出るため列位置で特定する) */
+/** 行内の最終列(次回期限セル)を取得する(型式/メーカー/設置場所にも「-」が出るため列位置で特定する) */
 const dueDateCellOf = (row: HTMLElement): HTMLElement => {
   const cells = within(row).getAllByRole("cell");
   const lastCell = cells.at(-1);
@@ -127,12 +127,12 @@ describe("EquipmentList: 一覧表示", () => {
 
     const microRow = screen.getByRole("row", { name: /EQ-002/u });
     expect(within(microRow).getByText("0")).toBeInTheDocument();
-    expect(within(microRow).getAllByText("—")).toHaveLength(4);
+    expect(within(microRow).getAllByText("-")).toHaveLength(4);
   });
 });
 
 describe("EquipmentList: 非稼働機器の期限", () => {
-  it("suspended機器は有効項目があっても期限が—になる", () => {
+  it("suspended機器は有効項目があっても期限が-になる", () => {
     seedStore({
       equipment: { [suspendedEquipment.id]: suspendedEquipment },
       serviceItems: {
@@ -147,10 +147,10 @@ describe("EquipmentList: 非稼働機器の期限", () => {
     renderWithStore(<EquipmentList />);
 
     const row = screen.getByRole("row", { name: /EQ-003/u });
-    expect(dueDateCellOf(row)).toHaveTextContent("—");
+    expect(dueDateCellOf(row)).toHaveTextContent("-");
   });
 
-  it("retired機器は有効項目があっても期限が—になる", () => {
+  it("retired機器は有効項目があっても期限が-になる", () => {
     seedStore({
       equipment: { [retiredEquipment.id]: retiredEquipment },
       serviceItems: {
@@ -165,12 +165,12 @@ describe("EquipmentList: 非稼働機器の期限", () => {
     renderWithStore(<EquipmentList />);
 
     const row = screen.getByRole("row", { name: /EQ-004/u });
-    expect(dueDateCellOf(row)).toHaveTextContent("—");
+    expect(dueDateCellOf(row)).toHaveTextContent("-");
   });
 });
 
 describe("EquipmentList: active機器でisActive項目のみ", () => {
-  it("isActive=falseの項目しかなければ期限は—になる", () => {
+  it("isActive=falseの項目しかなければ期限は-になる", () => {
     seedStore({
       equipment: { [activeEquipmentNoVendor.id]: activeEquipmentNoVendor },
       serviceItems: {
@@ -186,7 +186,7 @@ describe("EquipmentList: active機器でisActive項目のみ", () => {
 
     const row = screen.getByRole("row", { name: /EQ-002/u });
     expect(within(row).getByText("1")).toBeInTheDocument();
-    expect(dueDateCellOf(row)).toHaveTextContent("—");
+    expect(dueDateCellOf(row)).toHaveTextContent("-");
   });
 });
 

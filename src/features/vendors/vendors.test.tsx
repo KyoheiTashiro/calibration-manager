@@ -58,7 +58,7 @@ describe("VendorList: 一覧表示", () => {
     const nihonSokkiRow = screen.getByRole("row", { name: /日本測器/u });
     expect(within(nihonSokkiRow).getByText("校正業者")).toBeInTheDocument();
     expect(within(nihonSokkiRow).queryByText("メーカー")).not.toBeInTheDocument();
-    expect(within(nihonSokkiRow).getAllByText("—")).toHaveLength(4);
+    expect(within(nihonSokkiRow).getAllByText("-")).toHaveLength(4);
   });
 });
 

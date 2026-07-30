@@ -49,7 +49,7 @@ describe("PersonList", () => {
 
     const satoRow = screen.getByText("佐藤花子").closest("tr");
     if (!satoRow) throw new Error("佐藤花子の行が見つかりません");
-    expect(within(satoRow).getByText("—")).toBeInTheDocument();
+    expect(within(satoRow).getByText("-")).toBeInTheDocument();
     expect(within(satoRow).getByText("sato@example.com")).toBeInTheDocument();
     expect(within(satoRow).getByText("無効")).toBeInTheDocument();
   });

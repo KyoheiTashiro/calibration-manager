@@ -1,4 +1,5 @@
 import { Badge } from "@/components/ui";
+import { UNSET_LABEL } from "@/constants/labels";
 import {
   EQUIPMENT_STATUS_BADGE_CLASSES,
   EQUIPMENT_STATUS_LABELS,
@@ -16,22 +17,22 @@ export const EquipmentInfoCard = ({ equipment, vendors }: Props): ReactElement =
     <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm sm:grid-cols-3">
       <div>
         <dt className="text-slate-500">型式</dt>
-        <dd>{equipment.model ?? "—"}</dd>
+        <dd>{equipment.model ?? UNSET_LABEL}</dd>
       </div>
       <div>
         <dt className="text-slate-500">S/N</dt>
-        <dd>{equipment.serialNo ?? "—"}</dd>
+        <dd>{equipment.serialNo ?? UNSET_LABEL}</dd>
       </div>
       <div>
         <dt className="text-slate-500">メーカー</dt>
         <dd>
           {(equipment.manufacturerId !== undefined && vendors[equipment.manufacturerId]?.name) ||
-            "—"}
+            UNSET_LABEL}
         </dd>
       </div>
       <div>
         <dt className="text-slate-500">設置場所</dt>
-        <dd>{equipment.location ?? "—"}</dd>
+        <dd>{equipment.location ?? UNSET_LABEL}</dd>
       </div>
       <div>
         <dt className="text-slate-500">状態</dt>
@@ -43,7 +44,7 @@ export const EquipmentInfoCard = ({ equipment, vendors }: Props): ReactElement =
       </div>
       <div>
         <dt className="text-slate-500">備考</dt>
-        <dd>{equipment.note ?? "—"}</dd>
+        <dd>{equipment.note ?? UNSET_LABEL}</dd>
       </div>
     </dl>
   </div>

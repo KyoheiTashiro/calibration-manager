@@ -3,6 +3,7 @@
  * コンポーネントは `useAppStore((state) => serviceItemsOf(state, id))` の形で購読する。
  */
 
+import { UNSET_LABEL } from "@/constants/labels";
 import { recommendedOrderDate } from "@/domain/leadTime";
 import { deriveServiceItemStatus, type ServiceItemStatus } from "@/domain/serviceItemStatus";
 import { isActiveServiceOrderStatus } from "@/domain/serviceOrderStatus";
@@ -49,7 +50,7 @@ export const serviceRecordsOf = (
 /** 機器詳細・項目一覧など担当者名を表示する全画面がこれを使う。 */
 export const personLabelOf = (state: Pick<AppState, "persons">, personId: string): string => {
   const person = recordValue(state.persons, personId);
-  if (person === undefined) return "—";
+  if (person === undefined) return UNSET_LABEL;
   return person.isActive ? person.name : `${person.name}(無効)`;
 };
 

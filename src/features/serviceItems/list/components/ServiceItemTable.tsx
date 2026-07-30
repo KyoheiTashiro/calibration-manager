@@ -4,6 +4,7 @@
 
 import { StatusBadge } from "@/components/domain";
 import { Button, Table, TableBody, TableHead, Td, Th } from "@/components/ui";
+import { UNSET_LABEL } from "@/constants/labels";
 import {
   CYCLE_LABELS,
   EXECUTION_LABELS,
@@ -50,9 +51,9 @@ export const ServiceItemTable = ({ rows, onRecord, onOrder, onEdit }: Props): Re
           <Td>{EXECUTION_LABELS[row.serviceItem.execution]}</Td>
           <Td>{CYCLE_LABELS[row.serviceItem.cycle]}</Td>
           <Td>{row.personLabel}</Td>
-          <Td>{row.serviceItem.lastDoneDate ?? "—"}</Td>
+          <Td>{row.serviceItem.lastDoneDate ?? UNSET_LABEL}</Td>
           <Td>{row.serviceItem.nextDueDate}</Td>
-          <Td>{row.recommendedOrderDate ?? "—"}</Td>
+          <Td>{row.recommendedOrderDate ?? UNSET_LABEL}</Td>
           {/* なぜ td を flex 化して直下に Button を並べるか: equipment/detail と同様、
               div ラップだと jsx-a11y のボタンラベル探索深度を超えるため。 */}
           <Td className="flex gap-2" truncate={false}>

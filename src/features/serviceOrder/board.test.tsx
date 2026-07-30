@@ -77,7 +77,7 @@ const baseSeed = (serviceOrders: Record<string, ServiceOrder>): void => {
 beforeEach(setupStoreIsolation);
 
 describe("カード表示", () => {
-  it("依頼先名・費用を解決し、未設定属性は「—」で表示する", () => {
+  it("依頼先名・費用を解決し、未設定属性は「-」で表示する", () => {
     baseSeed({
       "serviceOrder-1": {
         id: "serviceOrder-1",
@@ -95,7 +95,7 @@ describe("カード表示", () => {
     expect(screen.getByText("年次校正")).toBeInTheDocument();
     expect(screen.getByText("ミツトヨ校正センター")).toBeInTheDocument();
     expect(screen.getByText("12000円")).toBeInTheDocument();
-    expect(screen.getByText("—")).toBeInTheDocument();
+    expect(screen.getByText("-")).toBeInTheDocument();
   });
 
   it("dangling 参照（serviceItem/vendor 不在）でも例外を投げず「(参照先なし)」で表示する", () => {

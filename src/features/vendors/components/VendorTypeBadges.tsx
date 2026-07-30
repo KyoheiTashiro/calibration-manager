@@ -1,4 +1,5 @@
 import { Badge } from "@/components/ui";
+import { UNSET_LABEL } from "@/constants/labels";
 import type { Vendor } from "@/store/types";
 import type { ReactElement } from "react";
 
@@ -12,7 +13,7 @@ const CALIBRATOR_BADGE_CLASS_NAME = "bg-emerald-100 text-emerald-800 border bord
  * ここで JSX のネスト深さを1にリセットする。
  */
 export const VendorTypeBadges = ({ vendor }: { vendor: Vendor }): ReactElement => {
-  if (!vendor.isManufacturer && !vendor.isCalibrator) return <>—</>;
+  if (!vendor.isManufacturer && !vendor.isCalibrator) return <span>{UNSET_LABEL}</span>;
   return (
     <span className="inline-flex gap-1">
       {vendor.isManufacturer && <Badge className={MANUFACTURER_BADGE_CLASS_NAME}>メーカー</Badge>}

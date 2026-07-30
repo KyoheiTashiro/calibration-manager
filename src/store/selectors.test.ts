@@ -282,7 +282,7 @@ describe("serviceItemRowsOf: canCreateServiceOrder", () => {
 });
 
 describe("serviceItemRowsOf: personLabel(D-001)", () => {
-  it("dangling(参照先なし)は「—」、無効担当者は「(無効)」注記", () => {
+  it("dangling(参照先なし)は「-」、無効担当者は「(無効)」注記", () => {
     const state = makeState([
       makeServiceItem({ id: "dangling-person", personId: "p-missing" }),
       makeServiceItem({ id: "inactive-person", personId: inactivePerson.id }),
@@ -290,7 +290,7 @@ describe("serviceItemRowsOf: personLabel(D-001)", () => {
     const byId = Object.fromEntries(
       serviceItemRowsOf(state, TODAY).map((row) => [row.serviceItem.id, row]),
     );
-    expect(byId["dangling-person"]?.personLabel).toBe("—");
+    expect(byId["dangling-person"]?.personLabel).toBe("-");
     expect(byId["inactive-person"]?.personLabel).toBe("鈴木(無効)");
   });
 });

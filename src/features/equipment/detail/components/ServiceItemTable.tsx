@@ -1,5 +1,6 @@
 import { StatusBadge } from "@/components/domain";
 import { Button, EmptyState, Table, TableBody, TableHead, Td, Th } from "@/components/ui";
+import { UNSET_LABEL } from "@/constants/labels";
 import { displayedServiceItemStatus, personLabelOf } from "@/features/equipment/detail/hooks";
 import {
   CYCLE_LABELS,
@@ -72,7 +73,7 @@ export const ServiceItemTable = ({
               key={serviceItem.id}
               className={serviceItem.isActive ? undefined : "text-slate-400"}
             >
-              <Td>{status === null ? "—" : <StatusBadge status={status} />}</Td>
+              <Td>{status === null ? UNSET_LABEL : <StatusBadge status={status} />}</Td>
               <Td>{serviceItem.name}</Td>
               <Td>{SERVICE_ITEM_TYPE_LABELS[serviceItem.type]}</Td>
               <Td>{EXECUTION_LABELS[serviceItem.execution]}</Td>

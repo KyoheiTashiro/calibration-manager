@@ -1,3 +1,4 @@
+import { UNSET_LABEL } from "@/constants/labels";
 import { serviceItemsOf } from "@/store/selectors";
 import { EQUIPMENT_STATUS, type Equipment, type EquipmentStatus } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
@@ -90,12 +91,12 @@ export const useEquipmentList = (): UseEquipmentListResult => {
     serviceItemsOf({ serviceItems }, target.id).length;
 
   const nearestDueDateOf = (target: Equipment): string => {
-    if (target.status !== EQUIPMENT_STATUS.ACTIVE) return "—";
+    if (target.status !== EQUIPMENT_STATUS.ACTIVE) return UNSET_LABEL;
     const dueDates = serviceItemsOf({ serviceItems }, target.id)
       .filter((serviceItem) => serviceItem.isActive)
       .map((serviceItem) => serviceItem.nextDueDate);
-    if (dueDates.length === 0) return "—";
-    return dueDates.toSorted((left, right) => left.localeCompare(right))[0] ?? "—";
+    if (dueDates.length === 0) return UNSET_LABEL;
+    return dueDates.toSorted((left, right) => left.localeCompare(right))[0] ?? UNSET_LABEL;
   };
 
   return {

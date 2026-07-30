@@ -30,7 +30,7 @@ export const equipmentFull: Equipment = {
   note: "校正用マスターと同時保管",
 };
 
-/** 任意属性を持たない稼働機器（空の任意項目が「—」表示になることを検証する） */
+/** 任意属性を持たない稼働機器（空の任意項目が「-」表示になることを検証する） */
 export const equipmentMinimal: Equipment = {
   id: "equipment-2",
   managementNo: "EQ-002",
@@ -38,7 +38,7 @@ export const equipmentMinimal: Equipment = {
   status: EQUIPMENT_STATUS.ACTIVE,
 };
 
-/** 休止機器（D-014: ステータスバッジ非表示 = 「—」を検証する） */
+/** 休止機器（D-014: ステータスバッジ非表示 = 「-」を検証する） */
 export const equipmentSuspended: Equipment = {
   id: "equipment-3",
   managementNo: "EQ-003",

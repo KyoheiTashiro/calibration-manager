@@ -15,14 +15,14 @@
 │ │管理番号 機器名   型式    メーカー 設置場所 状態 項目 期限││
 │ │EQ-001  ノギス   CD-15  ミツトヨ 検査室  稼働  2  06-20││
 │ │EQ-007  マイクロ M-25   ミツトヨ 組立    稼働  1  07-25││
-│ │EQ-014  電子はかり GX-2  エー   出荷場  休止  1  —    ││
+│ │EQ-014  電子はかり GX-2  エー   出荷場  休止  1  -    ││
 │ └──────────────────────────────────────────────────────┘│
 └──────────────────────────────────────────────────────────┘
 ```
 
 ## 表示項目
 
-Equipment を主体とし各行に: `管理番号`(managementNo)、`機器名`(name)、`型式`(model)、`メーカー名`(manufacturerId → Vendor.name)、`設置場所`(location)、`状態`(status: active=稼働 / suspended=休止 / retired=廃棄)、`点検校正項目数`(当該機器の ServiceItem 件数)、`最も近い次回期限`(有効項目の nextDueDate 最小値。項目なし・非稼働は `—`)。
+Equipment を主体とし各行に: `管理番号`(managementNo)、`機器名`(name)、`型式`(model)、`メーカー名`(manufacturerId → Vendor.name)、`設置場所`(location)、`状態`(status: active=稼働 / suspended=休止 / retired=廃棄)、`点検校正項目数`(当該機器の ServiceItem 件数)、`最も近い次回期限`(有効項目の nextDueDate 最小値。項目なし・非稼働は `-`)。
 
 ## 操作・アクション
 

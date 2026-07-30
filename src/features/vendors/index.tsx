@@ -13,6 +13,7 @@ import {
   Th,
   usePagination,
 } from "@/components/ui";
+import { UNSET_LABEL } from "@/constants/labels";
 import { VendorTypeBadges } from "@/features/vendors/components/VendorTypeBadges";
 import { useVendorDelete, useVendorList } from "@/features/vendors/hooks";
 import type { Vendor } from "@/store/types";
@@ -91,12 +92,12 @@ export const VendorList = (): ReactElement => {
                     </Td>
                     <Td className="text-right tabular-nums">
                       {vendor.standardLeadTimeDays === undefined
-                        ? "—"
+                        ? UNSET_LABEL
                         : `${vendor.standardLeadTimeDays}日`}
                     </Td>
-                    <Td>{vendor.contactPerson ?? "—"}</Td>
-                    <Td>{vendor.phone ?? "—"}</Td>
-                    <Td>{vendor.email ?? "—"}</Td>
+                    <Td>{vendor.contactPerson ?? UNSET_LABEL}</Td>
+                    <Td>{vendor.phone ?? UNSET_LABEL}</Td>
+                    <Td>{vendor.email ?? UNSET_LABEL}</Td>
                     {/* なぜ td 直下に Button を並べるか: div でラップして1階層深くすると
                         jsx-a11y(control-has-associated-label) の既定探索深度(2)を超えて
                         ボタン内テキストを検出できず誤検知するため、td を flex コンテナ化して
