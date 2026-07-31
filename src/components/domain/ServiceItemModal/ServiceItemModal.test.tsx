@@ -429,7 +429,7 @@ describe('ServiceItemModal: 空状態', () => {
     await user.click(screen.getByLabelText('外部'));
 
     expect(screen.getByText('校正業者が未登録です')).toBeInTheDocument();
-    const vendorLink = screen.getByRole('link', { name: 'メーカー/取引先マスタへ' });
+    const vendorLink = screen.getByRole('link', { name: 'メーカー/取引先一覧へ' });
     expect(vendorLink).toHaveAttribute('href', '/vendors');
   });
 
@@ -444,7 +444,7 @@ describe('ServiceItemModal: 空状態', () => {
     );
 
     expect(screen.getByText('有効な担当者がいません')).toBeInTheDocument();
-    const personLink = screen.getByRole('link', { name: '担当者マスタへ' });
+    const personLink = screen.getByRole('link', { name: '担当者一覧へ' });
     expect(personLink).toHaveAttribute('href', '/persons');
   });
 });

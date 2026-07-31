@@ -182,7 +182,7 @@ export const ServiceItemModal = ({
                 <p className='text-sm text-slate-600'>
                   校正業者が未登録です
                   <Link to={ROUTES.VENDOR_LIST} className='text-primary ml-1 underline'>
-                    メーカー/取引先マスタへ
+                    メーカー/取引先一覧へ
                   </Link>
                 </p>
               </div>
@@ -223,7 +223,7 @@ export const ServiceItemModal = ({
             <p className='text-sm text-slate-600'>
               有効な担当者がいません
               <Link to={ROUTES.PERSON_LIST} className='text-primary ml-1 underline'>
-                担当者マスタへ
+                担当者一覧へ
               </Link>
             </p>
           </div>

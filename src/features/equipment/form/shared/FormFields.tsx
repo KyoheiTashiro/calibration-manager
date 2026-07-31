@@ -33,9 +33,9 @@ export const EquipmentFormFields = ({
       <div>
         <span className='block text-sm text-slate-700'>メーカー</span>
         <p className='text-sm text-slate-600'>
-          メーカーが未登録です。マスタから追加してください
+          メーカーが未登録です。メーカー/取引先一覧から追加してください
           <Link to={ROUTES.VENDOR_LIST} className='text-primary ml-1 underline'>
-            メーカーマスタへ
+            メーカー/取引先一覧へ
           </Link>
         </p>
       </div>

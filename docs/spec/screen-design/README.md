@@ -48,8 +48,8 @@
 | `/equipment/:id/edit` | 機器編集                   | [§3](./03-equipment-form.md)   | フォーム画面                       |
 | `/service-items`              | 点検校正項目一覧(中核)     | [§5](./05-service-item-list.md)        | クエリでステータスフィルタ受け取り |
 | `/service-orders`             | 点検校正外部案件(ボード) | [§8](./08-service-orders.md)           |                                    |
-| `/vendors`            | メーカー/取引先マスタ      | [§9](./09-masters.md)          |                                    |
-| `/persons`            | 担当者マスタ               | [§9](./09-masters.md)          |                                    |
+| `/vendors`            | メーカー/取引先一覧        | [§9](./09-masters.md)          |                                    |
+| `/persons`            | 担当者一覧                 | [§9](./09-masters.md)          |                                    |
 | `/notifications`      | 通知一覧               | [§10](./10-notifications.md)   |                                    |
 | `/settings`           | 設定                       | [§11](./11-settings.md)        |                                    |
 | `/manual`             | 利用マニュアル             | [§12](./12-manual.md)          |                                    |
@@ -64,7 +64,7 @@
 - [6. 点検校正項目モーダル](./06-service-item-modal.md)
 - [7. 実施記録登録モーダル](./07-service-record-modal.md)
 - [8. 点検校正外部案件](./08-service-orders.md)
-- [9. マスタ管理(メーカー/取引先・担当者)](./09-masters.md)
+- [9. メーカー/取引先・担当者一覧](./09-masters.md)
 - [10. 通知一覧](./10-notifications.md)
 - [11. 設定](./11-settings.md)
 - [12. 利用マニュアル](./12-manual.md)
@@ -112,7 +112,7 @@
 
 一覧画面の表示件数増加に備え、共通のページネーションを導入する。単一の共通コンポーネント(例: `src/components/ui/Pagination`)に集約し、全対象画面がこれを利用する。
 
-- **対象画面**: 機器一覧([§2](./02-equipment-list.md))、点検校正項目一覧([§5](./05-service-item-list.md))、メーカー/取引先・担当者マスタ([§9](./09-masters.md))、通知一覧([§10](./10-notifications.md)。未読/既読の各タブ)、機器詳細([§4](./04-equipment-detail.md))内の点検校正項目・実施記録テーブル(各テーブルに個別適用。D-078)。
+- **対象画面**: 機器一覧([§2](./02-equipment-list.md))、点検校正項目一覧([§5](./05-service-item-list.md))、メーカー/取引先・担当者一覧([§9](./09-masters.md))、通知一覧([§10](./10-notifications.md)。未読/既読の各タブ)、機器詳細([§4](./04-equipment-detail.md))内の点検校正項目・実施記録テーブル(各テーブルに個別適用。D-078)。
 - **対象外**: ダッシュボード(サマリー表示)、点検校正外部案件ボード([§8](./08-service-orders.md)。かんばん列単位の表示)。
 - **方式**: クライアントサイドのページ番号方式。検索・フィルタ・タブ・並び順を適用した**後**の結果リストをページ分割する。
 - **1ページ件数**: 既定 20 件。セレクタで 10 / 20 / 50 件から選択可(画面ローカル state、非永続)。

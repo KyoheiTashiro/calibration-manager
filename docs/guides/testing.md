@@ -51,7 +51,7 @@
 - `@testing-library/react` でコンポーネント・feature 単位のテスト
   - 共通 UI（`src/components/ui/<ComponentName>/<ComponentName>.test.tsx`）: Badge / Button / Checkbox / ConfirmModal / DateField / EmptyState / Modal / RadioGroup / Select / Table / Tabs / TextField / Textarea（+ `hooks/useDialog`）
   - ドメイン固有 UI（`src/components/domain/<ComponentName>/<ComponentName>.test.tsx`）: StatusBadge（`deriveServiceItemStatus` の表示）
-  - feature（`src/features/**/*.test.tsx`）: dashboard / equipment（一覧・詳細・登録編集） / serviceItems（点検校正項目一覧・点検校正項目モーダル・実施記録登録モーダル） / serviceOrder（案件一覧） / vendors・persons（メーカー/取引先・担当者マスタ） / notifications（通知一覧） / settings（CSVエクスポート/インポート）
+  - feature（`src/features/**/*.test.tsx`）: dashboard / equipment（一覧・詳細・登録編集） / serviceItems（点検校正項目一覧・点検校正項目モーダル・実施記録登録モーダル） / serviceOrder（案件一覧） / vendors・persons（メーカー/取引先・担当者一覧） / notifications（通知一覧） / settings（CSVエクスポート/インポート）
 - **Storybook** でコンポーネント単位の見た目・状態を確認
   - 起動: `npm run storybook`（dev・ポート6006） / ビルド: `npm run build-storybook`
   - story配置: 各コンポーネント隣に `*.stories.tsx`（`src/**/*.stories.@(tsx|mdx)`）

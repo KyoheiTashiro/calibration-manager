@@ -180,7 +180,7 @@ describe('ServiceOrderModal', () => {
     );
 
     expect(screen.getByText('校正業者が未登録です')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'メーカー/取引先マスタへ' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'メーカー/取引先一覧へ' })).toHaveAttribute(
       'href',
       '/vendors',
     );

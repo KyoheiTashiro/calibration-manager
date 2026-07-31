@@ -138,7 +138,7 @@ describe('EquipmentCreateForm: メーカーセレクト', () => {
     renderCreateForm();
 
     expect(
-      screen.getByText('メーカーが未登録です。マスタから追加してください'),
+      screen.getByText('メーカーが未登録です。メーカー/取引先一覧から追加してください'),
     ).toBeInTheDocument();
     expect(screen.queryByRole('combobox', { name: 'メーカー' })).not.toBeInTheDocument();
     const link = screen.getByRole('link');

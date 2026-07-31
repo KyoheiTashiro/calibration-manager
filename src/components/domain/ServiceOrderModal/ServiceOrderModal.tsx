@@ -106,7 +106,7 @@ export const ServiceOrderModal = ({ open, serviceItemId, onClose }: Props): Reac
             <p className='text-sm text-slate-600'>
               校正業者が未登録です
               <Link to={ROUTES.VENDOR_LIST} className='text-primary ml-1 underline'>
-                メーカー/取引先マスタへ
+                メーカー/取引先一覧へ
               </Link>
             </p>
           </div>
