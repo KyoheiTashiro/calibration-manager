@@ -1,7 +1,6 @@
 /**
  * 担当者の追加/編集モーダル。
- * 削除の代わりに isActive=false への無効化を行い、有効な ServiceItem に
- * 割り当てられている場合は確認ダイアログで警告する。
+ * 削除の代わりに isActive=false への無効化を行い、無効化時は確認ダイアログを表示する。
  */
 
 import { Schema, defaultValues, type FormType } from '@/components/domain/PersonModal/schema';
@@ -29,12 +28,6 @@ const toFormValues = (person?: Person): FormType =>
       }
     : defaultValues;
 
-/** 無効化確認待ちの状態。確定時に使う保存値と、警告文に埋め込む割り当て件数を保持する */
-type PendingDeactivation = {
-  values: FormType;
-  assignedServiceItemCount: number;
-};
-
 export const PersonModal = ({ open, person, onClose }: PersonModalProps): ReactElement => {
   const addPerson = useAppStore((state) => state.addPerson);
   const updatePerson = useAppStore((state) => state.updatePerson);
@@ -49,15 +42,13 @@ export const PersonModal = ({ open, person, onClose }: PersonModalProps): ReactE
     values: toFormValues(person),
   });
 
-  // なぜ close 時に reset() を呼ぶか: values オプションは内容が変わらない限り reset しないため、
-  // 同一対象を dirty のまま破棄クローズ→再オープンした場合に入力が残留してしまう。
-  // close 時に明示的に reset()(引数なし)を呼び、最新の defaultValues(values由来)へ戻す。
   const handleClose = (): void => {
     reset();
     onClose();
   };
 
-  const [pendingDeactivation, setPendingDeactivation] = useState<PendingDeactivation | null>(null);
+  /** 無効化確認待ちの保存値 */
+  const [pendingDeactivation, setPendingDeactivation] = useState<FormType | null>(null);
 
   const savePerson = (values: FormType): void => {
     const normalized: FormType = {
@@ -72,13 +63,9 @@ export const PersonModal = ({ open, person, onClose }: PersonModalProps): ReactE
     handleClose();
   };
 
-  // なぜ getState() で件数を都度取得するか: 送信時点でしか使わない値を毎レンダー購読するのを避けるため。
   const onSubmit = (values: FormType): void => {
     if (person?.isActive === true && !values.isActive) {
-      const assignedServiceItemCount = Object.values(useAppStore.getState().serviceItems).filter(
-        (serviceItem) => serviceItem.personId === person.id && serviceItem.isActive,
-      ).length;
-      setPendingDeactivation({ values, assignedServiceItemCount });
+      setPendingDeactivation(values);
       return;
     }
     savePerson(values);
@@ -86,7 +73,7 @@ export const PersonModal = ({ open, person, onClose }: PersonModalProps): ReactE
 
   const handleConfirmDeactivation = (): void => {
     if (!pendingDeactivation) return;
-    savePerson(pendingDeactivation.values);
+    savePerson(pendingDeactivation);
     setPendingDeactivation(null);
   };
 
@@ -95,11 +82,6 @@ export const PersonModal = ({ open, person, onClose }: PersonModalProps): ReactE
   };
 
   const handleSave = createSaveHandler(handleSubmit, onSubmit);
-
-  const confirmMessage =
-    pendingDeactivation && pendingDeactivation.assignedServiceItemCount > 0
-      ? `この担当者は現役の点検校正項目 ${pendingDeactivation.assignedServiceItemCount} 件に割り当てられています。通知が届かなくなる可能性があります。無効化しますか?`
-      : 'この担当者を無効化しますか?';
 
   return (
     <>
@@ -121,7 +103,7 @@ export const PersonModal = ({ open, person, onClose }: PersonModalProps): ReactE
         <ConfirmModal
           open
           title='担当者の無効化'
-          message={confirmMessage}
+          message='この担当者を無効化しますか?'
           confirmLabel='無効化'
           onConfirm={handleConfirmDeactivation}
           onCancel={handleCancelDeactivation}
