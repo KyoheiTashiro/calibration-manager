@@ -20,3 +20,15 @@ export const Default: StoryObj<typeof meta> = {
     onCancel: (): void => undefined,
   },
 };
+
+export const Primary: StoryObj<typeof meta> = {
+  args: {
+    open: true,
+    title: '全て既読',
+    message: '未読の通知をすべて既読にしますか?',
+    confirmLabel: '既読にする',
+    variant: 'primary',
+    onConfirm: (): void => undefined,
+    onCancel: (): void => undefined,
+  },
+};

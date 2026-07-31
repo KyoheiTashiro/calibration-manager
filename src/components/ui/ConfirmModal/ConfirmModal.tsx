@@ -13,15 +13,23 @@ type ConfirmModalProps = {
   title: string;
   message: string;
   confirmLabel: string;
+  // 破壊的操作(削除・中止)は danger、非破壊の確認は primary。
+  variant?: 'danger' | 'primary';
   onConfirm: () => void;
   onCancel: () => void;
 };
+
+const CONFIRM_BUTTON_CLASSES = {
+  danger: 'bg-danger hover:bg-red-700',
+  primary: 'bg-primary hover:bg-primaryHover',
+} as const;
 
 export const ConfirmModal = ({
   open,
   title,
   message,
   confirmLabel,
+  variant = 'danger',
   onConfirm,
   onCancel,
 }: ConfirmModalProps): ReactElement => {
@@ -78,7 +86,7 @@ export const ConfirmModal = ({
           <button
             type='button'
             onClick={onConfirm}
-            className='bg-danger h-9 rounded px-4 text-sm text-white'
+            className={`${CONFIRM_BUTTON_CLASSES[variant]} h-9 rounded px-4 text-sm text-white`}
           >
             {confirmLabel}
           </button>

@@ -126,7 +126,7 @@ describe('ConfirmModal', () => {
     expect(onCancel).toHaveBeenCalledTimes(1);
   });
 
-  it('実行ボタンにbg-dangerクラスが付与される', () => {
+  it('実行ボタンは既定でbg-dangerクラスが付与される', () => {
     render(
       <ConfirmModal
         open
@@ -139,5 +139,21 @@ describe('ConfirmModal', () => {
     );
 
     expect(screen.getByRole('button', { name: '削除' })).toHaveClass('bg-danger');
+  });
+
+  it('variant=primaryで実行ボタンにbg-primaryクラスが付与される', () => {
+    render(
+      <ConfirmModal
+        open
+        title='全て既読'
+        message='未読の通知をすべて既読にしますか?'
+        confirmLabel='既読にする'
+        variant='primary'
+        onConfirm={vi.fn<() => void>()}
+        onCancel={vi.fn<() => void>()}
+      />,
+    );
+
+    expect(screen.getByRole('button', { name: '既読にする' })).toHaveClass('bg-primary');
   });
 });

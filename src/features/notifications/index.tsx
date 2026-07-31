@@ -115,6 +115,7 @@ export const NotificationCenter = (): ReactElement => {
         title='全て既読'
         message='未読の通知をすべて既読にしますか?'
         confirmLabel='既読にする'
+        variant='primary'
         onConfirm={(): void => {
           markAllAsRead();
           setMarkAllConfirmOpen(false);
