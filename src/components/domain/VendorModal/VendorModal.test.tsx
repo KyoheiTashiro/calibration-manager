@@ -95,6 +95,18 @@ describe('VendorModal: 新規追加', () => {
     expect(screen.getByLabelText('標準納期(日)')).toBeInTheDocument();
   });
 
+  it('全テキスト系入力にautocomplete="off"が付く(D-093)', async () => {
+    const user = userEvent.setup();
+    render(<VendorModal open onClose={vi.fn<() => void>()} />);
+
+    await user.click(screen.getByLabelText('校正業者'));
+
+    for (const label of ['名称', 'メール', '電話', '標準納期(日)', '備考']) {
+      expect(screen.getByLabelText(label, { exact: false })).toHaveAttribute('autocomplete', 'off');
+    }
+    expect(screen.getByLabelText('窓口担当者')).toHaveAttribute('autocomplete', 'off');
+  });
+
   it('校正業者をチェックしてから外すと標準納期(日)の入力値がクリアされ保存値に含まれない', async () => {
     const user = userEvent.setup();
     const onClose = vi.fn<() => void>();

@@ -98,7 +98,13 @@ export const VendorModal = ({ open, vendor, onClose }: Props): ReactElement => {
       footer={<Button onClick={handleSave}>保存</Button>}
     >
       <div className='flex flex-col gap-4'>
-        <TextField label='名称' required error={errors.name?.message} {...register('name')} />
+        <TextField
+          label='名称'
+          required
+          autoComplete='off'
+          error={errors.name?.message}
+          {...register('name')}
+        />
         <Checkbox label='メーカー' {...register('isManufacturer')} />
         <Checkbox
           label='校正業者'
@@ -120,25 +126,38 @@ export const VendorModal = ({ open, vendor, onClose }: Props): ReactElement => {
         ) : null}
         <TextField
           label='窓口担当者'
+          autoComplete='off'
           error={errors.contactPerson?.message}
           {...register('contactPerson')}
         />
         <TextField
           label='メール'
           type='email'
+          autoComplete='off'
           error={errors.email?.message}
           {...register('email')}
         />
-        <TextField label='電話' error={errors.phone?.message} {...register('phone')} />
+        <TextField
+          label='電話'
+          autoComplete='off'
+          error={errors.phone?.message}
+          {...register('phone')}
+        />
         {isCalibrator ? (
           <TextField
             label='標準納期(日)'
             type='number'
+            autoComplete='off'
             error={errors.standardLeadTimeDays?.message}
             {...register('standardLeadTimeDays')}
           />
         ) : null}
-        <TextField label='備考' error={errors.note?.message} {...register('note')} />
+        <TextField
+          label='備考'
+          autoComplete='off'
+          error={errors.note?.message}
+          {...register('note')}
+        />
       </div>
     </Modal>
   );

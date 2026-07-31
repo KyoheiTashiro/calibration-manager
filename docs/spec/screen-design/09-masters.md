@@ -40,6 +40,7 @@
 | 備考         | note                 |      | テキスト                               |
 
 - バリデーション: `name` 必須。`isManufacturer`/`isCalibrator` は真偽値(両方false も許容するが警告表示: どちらの用途にも出てこない)。`email` は入力時に email 形式。`standardLeadTimeDays` は0以上。
+- テキスト系入力は全て `autocomplete="off"`。ブラウザのオートコンプリート候補がマスタ入力の妨げになるため無効化する(D-093)。
 - **削除ガード**: 削除ボタン押下時に UI 側で参照有無(Equipment.manufacturerId / ServiceItem.vendorId / ServiceOrder.vendorId のいずれかから参照)を判定する(D-008)。参照ありは確認ダイアログを出さず即「この取引先は参照されているため削除できません」を表示。未参照時のみ確認ダイアログ後に `removeVendor` を実行し、`removeVendor` が false を返した場合(確認中の競合等)も同メッセージへフォールバックする(D-008)。
 - 空状態: 「取引先が未登録です」+「+ 追加」。
 
