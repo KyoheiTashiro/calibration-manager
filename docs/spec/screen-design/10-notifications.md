@@ -48,7 +48,7 @@
   - `targetType=serviceOrder` → `/service-orders`(カードのハイライトは不実装)。
   - `targetType=serviceItem` → 項目から機器を辿り機器詳細 `/equipment/:id` へ遷移。
   - 対象が dangling(参照先削除済み)の場合は既読化のみで遷移しない。
-- 「全て既読」→ 未読すべてを `isRead=true`。
+- 「全て既読」→ 確認モーダル(ConfirmModal)を表示し、確定(「既読にする」)で未読すべてを `isRead=true`。キャンセルで変化なし(D-096)。
 
 ## 通知生成仕様(ドメインモデル §3.7 に準拠)
 

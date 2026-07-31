@@ -1,4 +1,12 @@
-import { Badge, Button, EmptyState, Pagination, Tabs, usePagination } from '@/components/ui';
+import {
+  Badge,
+  Button,
+  ConfirmModal,
+  EmptyState,
+  Pagination,
+  Tabs,
+  usePagination,
+} from '@/components/ui';
 import {
   NOTIFICATION_TYPE_BADGE_CLASSES,
   NOTIFICATION_TYPE_ICONS,
@@ -26,6 +34,7 @@ export const NotificationCenter = (): ReactElement => {
   const unreadCount = useAppStore((state) => unreadNotificationCount(state));
 
   const [activeTab, setActiveTab] = useState<NotificationTab>(NOTIFICATION_TAB.UNREAD);
+  const [markAllConfirmOpen, setMarkAllConfirmOpen] = useState(false);
 
   const rows = selectTabNotifications(Object.values(notifications), activeTab);
   const { page, pageSize, totalCount, pagedItems, setPage, setPageSize } = usePagination(
@@ -63,7 +72,7 @@ export const NotificationCenter = (): ReactElement => {
             variant='secondary'
             disabled={unreadCount === 0}
             onClick={(): void => {
-              markAllAsRead();
+              setMarkAllConfirmOpen(true);
             }}
           >
             全て既読
@@ -100,6 +109,20 @@ export const NotificationCenter = (): ReactElement => {
           })}
         </ul>
       )}
+
+      <ConfirmModal
+        open={markAllConfirmOpen}
+        title='全て既読'
+        message='未読の通知をすべて既読にしますか?'
+        confirmLabel='既読にする'
+        onConfirm={(): void => {
+          markAllAsRead();
+          setMarkAllConfirmOpen(false);
+        }}
+        onCancel={(): void => {
+          setMarkAllConfirmOpen(false);
+        }}
+      />
 
       {rows.length > 0 && (
         <Pagination

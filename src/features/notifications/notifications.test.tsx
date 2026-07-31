@@ -158,7 +158,7 @@ describe('NotificationCenter: 全て既読', () => {
     expect(screen.getByRole('button', { name: '全て既読' })).toBeDisabled();
   });
 
-  it('全て既読で未読が0になりタブ件数も0になる', async () => {
+  it('全て既読は確認モーダルで確定すると未読が0になりタブ件数も0になる', async () => {
     const user = userEvent.setup();
     seedStore({
       notifications: {
@@ -170,9 +170,29 @@ describe('NotificationCenter: 全て既読', () => {
 
     await user.click(screen.getByRole('button', { name: '全て既読' }));
 
+    expect(screen.getByText('未読の通知をすべて既読にしますか?')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: '既読にする' }));
+
     expect(screen.getByRole('tab', { name: '未読(0)' })).toBeInTheDocument();
     expect(screen.getByText('未読の通知はありません')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: '全て既読' })).toBeDisabled();
+  });
+
+  it('確認モーダルでキャンセルすると未読は変化しない', async () => {
+    const user = userEvent.setup();
+    seedStore({
+      notifications: {
+        u1: makeNotif({ id: 'u1', isRead: false }),
+        u2: makeNotif({ id: 'u2', isRead: false }),
+      },
+    });
+    renderCenter();
+
+    await user.click(screen.getByRole('button', { name: '全て既読' }));
+    await user.click(screen.getByRole('button', { name: 'キャンセル' }));
+
+    expect(screen.getByRole('tab', { name: '未読(2)' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '全て既読' })).toBeEnabled();
   });
 });
 
