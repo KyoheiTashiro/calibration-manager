@@ -20,6 +20,7 @@ export const Settings = (): ReactElement => {
 
   return (
     <div className='flex flex-col gap-4'>
+      <h1 className='text-xl font-bold'>設定</h1>
       <ExportSection state={state} />
       <ImportSection state={state} />
       <PwaInstallSection />

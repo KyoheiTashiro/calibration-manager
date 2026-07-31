@@ -45,6 +45,7 @@ export const VendorList = (): ReactElement => {
 
   return (
     <div className='flex flex-col gap-4'>
+      <h1 className='text-xl font-bold'>メーカー/取引先一覧</h1>
       {totalCount === 0 ? (
         <EmptyState
           message='取引先が未登録です'

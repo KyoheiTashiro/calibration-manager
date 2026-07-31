@@ -51,6 +51,7 @@ export const NotificationCenter = (): ReactElement => {
 
   return (
     <div className='flex flex-col gap-4'>
+      <h1 className='text-xl font-bold'>通知一覧</h1>
       <Tabs
         tabs={tabs}
         activeKey={activeTab}

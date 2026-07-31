@@ -72,6 +72,7 @@ export const ServiceItemList = (): ReactElement => {
 
   return (
     <div className='flex flex-col gap-4'>
+      <h1 className='text-xl font-bold'>点検校正項目一覧</h1>
       {rows.length === 0 ? (
         <EmptyState message='点検校正項目が未登録です' />
       ) : (

@@ -23,25 +23,19 @@ const buildNotification = (overrides: Partial<Notification> = {}): Notification 
 describe('主要ルートのプレースホルダ表示', () => {
   beforeEach(setupStoreIsolation);
 
-  // 各画面は画面タイトル(h1)を表示しない(D-088)ため、画面固有のセクション見出しで表示を判定する
+  // 各画面は画面タイトル(h1)を表示する(D-095)
   it.each([
-    ['/', '要対応項目'],
-    ['/settings', 'CSVエクスポート'],
-  ])('%s はセクション見出し「%s」を表示する', (path, heading) => {
+    ['/', 'ダッシュボード'],
+    ['/equipment', '機器一覧'],
+    ['/service-items', '点検校正項目一覧'],
+    ['/vendors', 'メーカー/取引先一覧'],
+    ['/persons', '担当者一覧'],
+    ['/notifications', '通知一覧'],
+    ['/settings', '設定'],
+  ])('%s は見出し「%s」を表示する', (path, heading) => {
     renderWithStore(<App />, { initialEntries: [path] });
 
-    expect(screen.getByRole('heading', { level: 2, name: heading })).toBeInTheDocument();
-  });
-
-  // 一覧系画面は空状態メッセージで表示を判定する
-  it.each([
-    ['/equipment', '機器が未登録です'],
-    ['/service-items', '点検校正項目が未登録です'],
-    ['/notifications', '未読の通知はありません'],
-  ])('%s は一覧画面を表示する', (path, emptyMessage) => {
-    renderWithStore(<App />, { initialEntries: [path] });
-
-    expect(screen.getByText(emptyMessage)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1, name: heading })).toBeInTheDocument();
   });
 });
 

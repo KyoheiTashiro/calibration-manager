@@ -59,6 +59,7 @@ export const EquipmentList = (): ReactElement => {
 
   return (
     <div className='flex flex-col gap-4'>
+      <h1 className='text-xl font-bold'>機器一覧</h1>
       {totalCount === 0 ? (
         <EmptyState
           message='機器が未登録です'

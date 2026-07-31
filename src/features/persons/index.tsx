@@ -46,6 +46,7 @@ export const PersonList = (): ReactElement => {
 
   return (
     <div className='flex flex-col gap-4'>
+      <h1 className='text-xl font-bold'>担当者一覧</h1>
       {totalCount === 0 ? (
         <EmptyState
           message='担当者が未登録です'

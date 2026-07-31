@@ -31,6 +31,7 @@ export const Dashboard = (): ReactElement => {
 
   return (
     <div className='flex flex-col gap-6'>
+      <h1 className='text-xl font-bold'>ダッシュボード</h1>
       <SummaryCards counts={counts} onNavigate={safeNavigate} />
 
       <section className='flex flex-col gap-2'>
