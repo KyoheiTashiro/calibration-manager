@@ -8,7 +8,7 @@ import {
   type SyntheticEvent,
 } from 'react';
 
-type ConfirmModalProps = {
+type Props = {
   open: boolean;
   title: string;
   message: string;
@@ -32,7 +32,7 @@ export const ConfirmModal = ({
   variant = 'danger',
   onConfirm,
   onCancel,
-}: ConfirmModalProps): ReactElement => {
+}: Props): ReactElement => {
   const dialogRef = useDialog(open);
   const titleId = useId();
   const cancelButtonRef = useRef<HTMLButtonElement>(null);

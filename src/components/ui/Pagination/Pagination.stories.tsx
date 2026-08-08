@@ -11,14 +11,14 @@ const meta = {
 
 export default meta;
 
-type PaginationDemoProps = {
+type Props = {
   totalCount: number;
 };
 
 // なぜ: Paginationは制御コンポーネント（page/pageSizeを親から受け取る）のため、
 // Storybook上で実際にクリック・選択操作を確認できるようuseStateで状態を持つ
 // デモ用ラッパーをストーリーファイル内に定義する。
-const PaginationDemo = ({ totalCount }: PaginationDemoProps): ReactElement => {
+const PaginationDemo = ({ totalCount }: Props): ReactElement => {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState<number>(DEFAULT_PAGE_SIZE);
 

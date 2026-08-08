@@ -12,7 +12,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useState, type ReactElement } from 'react';
 import { useForm } from 'react-hook-form';
 
-type PersonModalProps = {
+type Props = {
   open: boolean;
   person?: Person;
   onClose: () => void;
@@ -28,7 +28,7 @@ const toFormValues = (person?: Person): FormType =>
       }
     : defaultValues;
 
-export const PersonModal = ({ open, person, onClose }: PersonModalProps): ReactElement => {
+export const PersonModal = ({ open, person, onClose }: Props): ReactElement => {
   const addPerson = useAppStore((state) => state.addPerson);
   const updatePerson = useAppStore((state) => state.updatePerson);
 

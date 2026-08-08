@@ -6,9 +6,9 @@ import '@testing-library/jest-dom/vitest';
 import type { ReactElement } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
-type TestDialogProps = { open: boolean };
+type Props = { open: boolean };
 
-const TestDialog = ({ open }: TestDialogProps): ReactElement => {
+const TestDialog = ({ open }: Props): ReactElement => {
   const dialogRef = useDialog(open);
   return <dialog ref={dialogRef}>ダイアログ本文</dialog>;
 };

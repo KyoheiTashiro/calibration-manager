@@ -4,13 +4,13 @@ import { useEffect, useRef, useState, type ReactElement } from 'react';
 
 type TocSection = { id: string; title: string };
 
-type TocFabProps = {
+type Props = {
   sections: readonly TocSection[];
   /* ページ先頭へ戻る行(D-067)。セクション一覧の先頭に区切り付きで表示する */
   topSection: TocSection;
 };
 
-export const TocFab = ({ sections, topSection }: TocFabProps): ReactElement => {
+export const TocFab = ({ sections, topSection }: Props): ReactElement => {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 

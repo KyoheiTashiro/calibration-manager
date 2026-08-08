@@ -8,7 +8,7 @@ import {
   type SyntheticEvent,
 } from 'react';
 
-type ModalProps = {
+type Props = {
   open: boolean;
   title: string;
   onClose: () => void;
@@ -24,7 +24,7 @@ export const Modal = ({
   isDirty = false,
   children,
   footer,
-}: ModalProps): ReactElement => {
+}: Props): ReactElement => {
   const dialogRef = useDialog(open);
   const titleId = useId();
   const [confirmDiscardOpen, setConfirmDiscardOpen] = useState(false);

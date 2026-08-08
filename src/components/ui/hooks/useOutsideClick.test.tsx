@@ -3,12 +3,12 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { useRef, type ReactElement } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
-type HarnessProps = {
+type Props = {
   onOutsideClick: () => void;
   enabled: boolean;
 };
 
-const Harness = ({ onOutsideClick, enabled }: HarnessProps): ReactElement => {
+const Harness = ({ onOutsideClick, enabled }: Props): ReactElement => {
   const ref = useRef<HTMLDivElement>(null);
   useOutsideClick(ref, onOutsideClick, enabled);
   return (
