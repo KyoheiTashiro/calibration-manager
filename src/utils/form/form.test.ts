@@ -4,6 +4,7 @@ import {
   emptyToUndefined,
   maxLengthMessage,
   optionalNonNegativeIntegerString,
+  requiredNonNegativeIntegerString,
 } from '@/utils/form';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -102,6 +103,33 @@ describe('optionalNonNegativeIntegerString', () => {
   it('数値に変換できない文字列は拒否する', () => {
     const result = schema.safeParse('abc');
     expect(result.success).toBe(false);
+  });
+});
+
+describe('requiredNonNegativeIntegerString', () => {
+  const schema = requiredNonNegativeIntegerString('必須です', '0以上の整数で入力してください');
+
+  it('空文字は必須メッセージで拒否する', () => {
+    const result = schema.safeParse('');
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues[0]?.message).toBe('必須です');
+    }
+  });
+
+  it('0以上の整数文字列は許容する', () => {
+    expect(schema.safeParse('0').success).toBe(true);
+    expect(schema.safeParse('10').success).toBe(true);
+  });
+
+  it('負の数・非整数・数値変換不可は不正メッセージで拒否する', () => {
+    for (const value of ['-1', '1.5', 'abc']) {
+      const result = schema.safeParse(value);
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.issues[0]?.message).toBe('0以上の整数で入力してください');
+      }
+    }
   });
 });
 

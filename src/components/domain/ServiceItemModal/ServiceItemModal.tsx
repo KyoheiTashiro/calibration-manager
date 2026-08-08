@@ -2,7 +2,7 @@
  * 点検校正項目（ServiceItem）の追加・編集モーダル。RHF + zodResolver。
  */
 
-import { Schema, toFormValues, type FormType } from '@/components/domain/ServiceItemModal/schema';
+import { Schema, defaultValues, type FormType } from '@/components/domain/ServiceItemModal/schema';
 import {
   Button,
   Checkbox,
@@ -36,6 +36,24 @@ type Props = {
   onClose: () => void;
 };
 
+/** 既存 ServiceItem をフォーム値（すべて string ベース）へ変換する。新規時は既定値 */
+const toFormValues = (serviceItem: ServiceItem | undefined): FormType =>
+  serviceItem
+    ? {
+        name: serviceItem.name,
+        type: serviceItem.type,
+        cycle: serviceItem.cycle,
+        execution: serviceItem.execution,
+        vendorId: serviceItem.vendorId ?? '',
+        leadTimeDays: serviceItem.leadTimeDays?.toString() ?? '',
+        bufferDays: serviceItem.bufferDays.toString(),
+        personId: serviceItem.personId,
+        noticeDaysBefore: serviceItem.noticeDaysBefore.toString(),
+        nextDueDate: serviceItem.nextDueDate,
+        isActive: serviceItem.isActive,
+      }
+    : defaultValues;
+
 export const ServiceItemModal = ({
   open,
   equipmentId,
@@ -57,19 +75,14 @@ export const ServiceItemModal = ({
     formState: { errors, isDirty },
   } = useForm<FormType>({
     resolver: zodResolver(Schema),
-    // なぜ values か: 編集対象（serviceItem）が変わるたびに既存値をプリフィルする。
     values: toFormValues(serviceItem),
   });
 
-  // なぜ close 時に reset() を呼ぶか: values オプションは内容が変わらない限り reset しないため、
-  // 同一対象を dirty のまま破棄クローズ→再オープンした場合に入力が残留してしまう。
-  // close 時に明示的に reset()(引数なし)を呼び、最新の defaultValues(values由来)へ戻す。
   const handleClose = (): void => {
     reset();
     onClose();
   };
 
-  // なぜ watch() ではなく useWatch か: react-compiler lint対策のため。
   const execution = useWatch({ control, name: 'execution' });
 
   const calibratorVendors = Object.values(vendors).filter((vendor) => vendor.isCalibrator);
@@ -161,8 +174,6 @@ export const ServiceItemModal = ({
           required
           options={EXECUTION_OPTIONS}
           error={errors.execution?.message}
-          // なぜ onChange か: state 変化に反応する effect ではなくユーザー操作イベントで直接クリアする。
-          // bufferDays は必須属性のためクリアしない。
           {...register('execution', {
             onChange: (event: ChangeEvent<HTMLInputElement>) => {
               if (event.target.value === EXECUTION.INTERNAL) {

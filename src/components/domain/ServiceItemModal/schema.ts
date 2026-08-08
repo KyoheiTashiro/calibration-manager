@@ -11,22 +11,14 @@
 
 import { TEXT_LIMIT } from '@/constants/textLimits';
 import { DEFAULT_BUFFER_DAYS, DEFAULT_NOTICE_DAYS_BEFORE } from '@/domain/constants';
-import { CYCLE, EXECUTION, SERVICE_ITEM_TYPE, type ServiceItem } from '@/store/types';
-import { maxLengthMessage, optionalNonNegativeIntegerString } from '@/utils/form';
+import { CYCLE, EXECUTION, SERVICE_ITEM_TYPE } from '@/store/types';
+import {
+  maxLengthMessage,
+  optionalNonNegativeIntegerString,
+  requiredNonNegativeIntegerString,
+} from '@/utils/form';
 import { isIsoDateString } from '@/utils/time';
 import { z } from 'zod';
-
-/** 空欄不可・0以上の整数文字列（発注余裕日・通知開始日数向け） */
-// なぜ戻り値の型注釈を付けないか: equipment/form/shared/schema.ts の createSchema と同じ理由で、
-// refine() 済みの具体的なZodスキーマ形状をTypeScriptの推論に委ねる必要があるため。
-// oxlint-disable-next-line typescript/explicit-function-return-type, typescript/explicit-module-boundary-types -- 上記理由によりzodスキーマの戻り値型は推論に委ねる必要がある
-const requiredNonNegativeIntegerString = (requiredMessage: string, invalidMessage: string) =>
-  z
-    .string()
-    .min(1, requiredMessage)
-    .refine((value) => Number.isInteger(Number(value)) && Number(value) >= 0, {
-      message: invalidMessage,
-    });
 
 export const Schema = z
   .object({
@@ -82,21 +74,3 @@ export const defaultValues: FormType = {
   nextDueDate: '',
   isActive: true,
 };
-
-/** 既存 ServiceItem をフォーム値（すべて string ベース）へ変換する。新規時は既定値 */
-export const toFormValues = (serviceItem: ServiceItem | undefined): FormType =>
-  serviceItem
-    ? {
-        name: serviceItem.name,
-        type: serviceItem.type,
-        cycle: serviceItem.cycle,
-        execution: serviceItem.execution,
-        vendorId: serviceItem.vendorId ?? '',
-        leadTimeDays: serviceItem.leadTimeDays?.toString() ?? '',
-        bufferDays: serviceItem.bufferDays.toString(),
-        personId: serviceItem.personId,
-        noticeDaysBefore: serviceItem.noticeDaysBefore.toString(),
-        nextDueDate: serviceItem.nextDueDate,
-        isActive: serviceItem.isActive,
-      }
-    : defaultValues;

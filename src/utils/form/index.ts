@@ -58,3 +58,13 @@ export const optionalNonNegativeIntegerString = (invalidMessage: string) =>
         message: invalidMessage,
       },
     );
+
+/** 空欄不可・0以上の整数文字列（発注余裕日・通知開始日数等、フォーム入力向け zod ヘルパ） */
+// oxlint-disable-next-line typescript/explicit-function-return-type, typescript/explicit-module-boundary-types -- optionalNonNegativeIntegerString と同じ理由によりzodスキーマの戻り値型は推論に委ねる必要がある
+export const requiredNonNegativeIntegerString = (requiredMessage: string, invalidMessage: string) =>
+  z
+    .string()
+    .min(1, requiredMessage)
+    .refine((value) => Number.isInteger(Number(value)) && Number(value) >= 0, {
+      message: invalidMessage,
+    });

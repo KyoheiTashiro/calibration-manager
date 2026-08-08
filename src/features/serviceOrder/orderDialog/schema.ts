@@ -26,10 +26,3 @@ export const Schema = z.object({
     }),
 });
 export type FormType = z.infer<typeof Schema>;
-
-/** 新規作成時の既定フォーム値。orderedDate は呼び出し側で todayIsoDate() を上書きする */
-export const defaultValues: FormType = {
-  orderedDate: '',
-  dueDate: '',
-  cost: '',
-};

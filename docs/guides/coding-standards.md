@@ -49,7 +49,8 @@ Lint/Format は **oxlint + oxfmt**（ESLint/Prettier ではない）。多くは
   export const defaultValues: FormType = {…};
   ```
   - ストア状態依存で動的生成する場合はファクトリ `createSchema` とし、`FormType` は `z.infer<ReturnType<typeof createSchema>>` で導出する（`equipment/form/shared/schema.ts`）。
-  - `defaultValues` は静的既定値を持つフォームのみ export する。今日日付・prefill 等の実行時依存値は呼び出し側で `{ ...defaultValues, orderedDate: todayIsoDate() }` のように上書きし、全フィールドが実行時依存なら export しない（`ServiceRecordModal`、`serviceOrder/returnDialog`）。
+  - `defaultValues` は全フィールドが静的既定値のフォームのみ export する。今日日付・prefill 等の実行時依存値を含むフォームは `useForm` の呼び出し側で `defaultValues` リテラルを直接書く（D-098）。`{ orderedDate: '' }` のような即座に上書きされる死んだ値を定数側に置かない（`ServiceRecordModal`、`serviceOrder/orderDialog`・`serviceOrder/returnDialog`）。
+  - `schema.ts` に置くのは上記 3 つ（動的生成時は `createSchema`）のみ。ドメイン型 → フォーム値の変換（`toFormValues`）や zod ヘルパは置かない（D-098）。変換は消費側コンポーネント内のローカル関数とし（`PersonModal`、`VendorModal`、`ServiceItemModal`）、複数の消費側で共有する場合のみ同ディレクトリの `mapping.ts` に切り出す（`equipment/form/shared/mapping.ts` は create/edit 双方から使うため）。複数フォームで使う zod ヘルパは `src/utils/form/` に置く。
   - 1 つの `schema.ts` には 1 スキーマのみ置く。複数フォームを持つ feature はサブディレクトリに分割する（`serviceOrder/orderDialog/schema.ts`・`serviceOrder/returnDialog/schema.ts`）。
   - 複数の schema.ts を import する側は `import { Schema as orderDialogSchema }` のように別名を付ける。
   - 根拠: フォーム毎に `xxxFormSchema` / `XxxFormValues` / `emptyFormValues` と命名が揺れていたため固定名に統一。schema.ts の中身が予測可能になり、defaultValues とスキーマの型整合（`defaultValues: FormType`）も colocate で保証する。

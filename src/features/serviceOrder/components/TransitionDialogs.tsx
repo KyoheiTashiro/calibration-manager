@@ -11,7 +11,6 @@
 import { Button, DateField, Modal, TextField } from '@/components/ui';
 import {
   Schema as orderDialogSchema,
-  defaultValues as orderDialogDefaultValues,
   type FormType as OrderDialogFormType,
 } from '@/features/serviceOrder/orderDialog/schema';
 import {
@@ -43,7 +42,9 @@ export const ServiceOrderDialog = ({ serviceOrder, onClose }: Props): ReactEleme
     formState: { errors, isDirty },
   } = useForm<OrderDialogFormType>({
     resolver: zodResolver(orderDialogSchema),
-    defaultValues: { ...orderDialogDefaultValues, orderedDate: todayIsoDate() },
+    // 既定値をスキーマ側の定数に置かない理由（D-098）: orderedDate が todayIsoDate() 依存で
+    // モジュール評価時に固定できないため（ReturnDialog / ServiceRecordModal と同方針）。
+    defaultValues: { orderedDate: todayIsoDate(), dueDate: '', cost: '' },
   });
 
   // なぜ useWatch か: ServiceItemModal と同じ理由（react-compiler lint 対策で watch() を使わない）。
