@@ -11,29 +11,25 @@ import { describe, expect, it } from 'vitest';
 const emptyToUndefined = (value: string | undefined): string | undefined =>
   value === '' ? undefined : value;
 
-const normalizedVendorArb: fc.Arbitrary<Vendor> = vendorArb.map(
-  (vendor): Vendor => ({
-    id: vendor.id,
-    name: vendor.name,
-    isManufacturer: vendor.isManufacturer,
-    isCalibrator: vendor.isCalibrator,
-    contactPerson: emptyToUndefined(vendor.contactPerson),
-    email: emptyToUndefined(vendor.email),
-    phone: emptyToUndefined(vendor.phone),
-    standardLeadTimeDays: vendor.standardLeadTimeDays,
-    note: emptyToUndefined(vendor.note),
-  }),
-);
+const normalizedVendorArb: fc.Arbitrary<Vendor> = vendorArb.map((vendor): Vendor => ({
+  id: vendor.id,
+  name: vendor.name,
+  isManufacturer: vendor.isManufacturer,
+  isCalibrator: vendor.isCalibrator,
+  contactPerson: emptyToUndefined(vendor.contactPerson),
+  email: emptyToUndefined(vendor.email),
+  phone: emptyToUndefined(vendor.phone),
+  standardLeadTimeDays: vendor.standardLeadTimeDays,
+  note: emptyToUndefined(vendor.note),
+}));
 
-const normalizedPersonArb: fc.Arbitrary<Person> = personArb.map(
-  (person): Person => ({
-    id: person.id,
-    name: person.name,
-    email: person.email,
-    department: emptyToUndefined(person.department),
-    isActive: person.isActive,
-  }),
-);
+const normalizedPersonArb: fc.Arbitrary<Person> = personArb.map((person): Person => ({
+  id: person.id,
+  name: person.name,
+  email: person.email,
+  department: emptyToUndefined(person.department),
+  isActive: person.isActive,
+}));
 
 const toRecord = <Entity extends { id: string }>(list: Entity[]): Record<string, Entity> =>
   Object.fromEntries(list.map((entity) => [entity.id, entity]));
