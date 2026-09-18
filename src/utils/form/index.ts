@@ -30,7 +30,7 @@ export const createSaveHandler =
  * このヘルパはイベントを素通しするだけで中身に触れないため、呼び出し側の型をそのまま受け渡す。
  */
 export const createFormSubmitHandler =
-  <EventArg>(onFormSubmit: (event: EventArg) => Promise<void>) =>
+  <EventArg>(onFormSubmit: (event: EventArg) => Promise<unknown>) =>
   (event: EventArg): void => {
     onFormSubmit(event).catch(() => {
       // 送信処理内で例外は発生しない想定(バリデーションエラーはRHFが内部で処理する)

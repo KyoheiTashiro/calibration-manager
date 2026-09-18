@@ -159,7 +159,13 @@
     // このルールと真っ向から矛盾する。またReactのクラスコンポーネントのライフサイクル引数
     // （componentDidCatchのerrorInfo等）やDOM APIのコールバック引数にreadonly化を強制するのは
     // 過度に厳格（typescript-eslint本家でも既定オフの意見が強いルール）なため無効化する。
-    "typescript/prefer-readonly-parameter-types": "off"
+    "typescript/prefer-readonly-parameter-types": "off",
+    // なぜ: 複数の const を1文にカンマ結合させるルール（oxlint 1.80 で有効化、既存コード
+    // 1,288 箇所該当）。1宣言1変数の方が差分・可読性ともに優れるため、既存コードの書き方を正とする。
+    "eslint/one-var": "off",
+    // なぜ: React Compiler が未対応の構文（try/finally 等）を検出するルールだが、
+    // 本プロジェクトは React Compiler を導入していない（vite.config.ts 参照）ため対象外。
+    "react/todo": "off"
   },
   "overrides": [
     {
