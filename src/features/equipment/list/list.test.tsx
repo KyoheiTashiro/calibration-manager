@@ -230,12 +230,12 @@ describe('EquipmentList: 検索', () => {
   });
 });
 
-describe('EquipmentList: 行クリック・追加ボタン遷移', () => {
-  const renderWithRoutes = (): void => {
-    seedStore({ equipment: { [activeEquipmentWithDue.id]: activeEquipmentWithDue } });
-    renderWithStore(renderEquipmentListWithRoutes(), { initialEntries: [ROUTES.EQUIPMENT_LIST] });
-  };
+const renderWithRoutes = (): void => {
+  seedStore({ equipment: { [activeEquipmentWithDue.id]: activeEquipmentWithDue } });
+  renderWithStore(renderEquipmentListWithRoutes(), { initialEntries: [ROUTES.EQUIPMENT_LIST] });
+};
 
+describe('EquipmentList: 行クリック・追加ボタン遷移', () => {
   it('行クリックで機器詳細へ遷移する', async () => {
     const user = userEvent.setup();
     renderWithRoutes();

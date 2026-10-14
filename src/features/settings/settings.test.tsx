@@ -53,11 +53,11 @@ beforeEach(() => {
     // 破棄呼び出しは副作用不要(捕捉のみ)
   });
   // なぜ: a要素の click は jsdom でナビゲーション未実装警告を出すため、ダウンロード名だけ捕捉して無効化する。
-  vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(
-    function mockClick(this: HTMLAnchorElement) {
-      capture.name = this.download;
-    },
-  );
+  vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(function mockClick(
+    this: HTMLAnchorElement,
+  ) {
+    capture.name = this.download;
+  });
 });
 
 afterEach(() => {
