@@ -30,6 +30,7 @@ import { TocFab } from './TocFab';
 const MANUAL_TOP_SECTION = { id: 'manual-top', title: 'ページ上部へ戻る' } as const;
 
 const MANUAL_SECTIONS = {
+  VIDEO: { id: 'explainer-video', title: '解説動画' },
   INTRO: { id: 'introduction', title: 'ご利用にあたって' },
   FLOW: { id: 'basic-flow', title: '基本の流れ' },
   STATUS: { id: 'status-guide', title: 'ステータスの見方' },
@@ -39,6 +40,11 @@ const MANUAL_SECTIONS = {
   PRIVACY: { id: 'privacy', title: 'プライバシーとデータの取り扱い' },
   LICENSE: { id: 'license', title: 'ライセンスとソースコード' },
 } as const;
+
+/* public/ 配下の静的ファイルは base(/calibration-manager/)起点で配信されるため BASE_URL を前置する。
+   mp4 は PWA のプリキャッシュ対象外(globPatterns)で、再生はオンライン時のみ(D-100) */
+const EXPLAINER_VIDEO_SRC = `${import.meta.env.BASE_URL}manual/explainer-video.mp4`;
+const EXPLAINER_VIDEO_CAPTIONS_SRC = `${import.meta.env.BASE_URL}manual/explainer-video.vtt`;
 
 const STATUS_DESCRIPTIONS = {
   [SERVICE_ITEM_STATUS.OVERDUE]: '次回期限を過ぎています',
@@ -166,6 +172,29 @@ export const Manual = (): ReactElement => {
 
       {/* 検索対象を本文セクションに限定し、検索バー自身や目次FABを対象外にするため */}
       <div ref={searchContentRef} className='flex flex-col gap-4'>
+        <section
+          id={MANUAL_SECTIONS.VIDEO.id}
+          className='flex flex-col gap-3 rounded border border-slate-200 p-4'
+        >
+          <h2 className='border-b border-slate-200 pb-2 text-lg font-semibold'>
+            {MANUAL_SECTIONS.VIDEO.title}
+          </h2>
+          <p>
+            アプリの考え方と使い始めの手順を、約7分の動画で説明しています(音声・字幕付き)。
+            動画の再生にはインターネット接続が必要です。
+          </p>
+          <video
+            controls
+            preload='metadata'
+            src={EXPLAINER_VIDEO_SRC}
+            aria-label='解説動画'
+            className='aspect-video w-full max-w-3xl rounded bg-black'
+          >
+            {/* 字幕は映像に焼き込み済みのため、二重表示を避けて既定では非表示(default なし) */}
+            <track kind='captions' srcLang='ja' label='日本語' src={EXPLAINER_VIDEO_CAPTIONS_SRC} />
+          </video>
+        </section>
+
         <section
           id={MANUAL_SECTIONS.INTRO.id}
           className='flex flex-col gap-3 rounded border border-slate-200 p-4'

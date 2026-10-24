@@ -239,4 +239,16 @@ describe('Manual', () => {
     expect(link).toHaveAttribute('target', '_blank');
     expect(link).toHaveAttribute('rel', 'noreferrer');
   });
+
+  it('「解説動画」セクションに base 起点の動画と既定非表示の日本語字幕トラックがある(D-100)', () => {
+    renderWithStore(<Manual />);
+
+    expect(screen.getByRole('heading', { level: 2, name: '解説動画' })).toBeInTheDocument();
+    const video = screen.getByLabelText('解説動画');
+    expect(video).toHaveAttribute('src', `${import.meta.env.BASE_URL}manual/explainer-video.mp4`);
+    const track = video.querySelector('track');
+    expect(track).toHaveAttribute('src', `${import.meta.env.BASE_URL}manual/explainer-video.vtt`);
+    expect(track).toHaveAttribute('srclang', 'ja');
+    expect(track).not.toHaveAttribute('default');
+  });
 });
