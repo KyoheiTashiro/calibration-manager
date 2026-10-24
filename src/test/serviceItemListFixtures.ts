@@ -20,6 +20,7 @@ import {
   type Vendor,
 } from '@/store/types';
 import { seedStore } from '@/test/renderWithStore';
+import { toRecord } from '@/test/serviceItemRowFixtures';
 
 export const eqA: Equipment = {
   id: 'eq-a',
@@ -154,20 +155,16 @@ export const serviceOrderInProgress: ServiceOrder = {
  */
 export const seedServiceItemList = (): void => {
   seedStore({
-    equipment: { [eqA.id]: eqA, [eqB.id]: eqB, [eqSuspended.id]: eqSuspended },
-    vendors: { [calibratorVendor.id]: calibratorVendor },
-    persons: {
-      [personTanaka.id]: personTanaka,
-      [personSato.id]: personSato,
-      [personSuzuki.id]: personSuzuki,
-    },
-    serviceItems: {
-      [serviceItemExternalOverdue.id]: serviceItemExternalOverdue,
-      [serviceItemExternalInProgress.id]: serviceItemExternalInProgress,
-      [serviceItemInternalOk.id]: serviceItemInternalOk,
-      [serviceItemInactive.id]: serviceItemInactive,
-      [serviceItemOnSuspended.id]: serviceItemOnSuspended,
-    },
-    serviceOrders: { [serviceOrderInProgress.id]: serviceOrderInProgress },
+    equipment: toRecord([eqA, eqB, eqSuspended]),
+    vendors: toRecord([calibratorVendor]),
+    persons: toRecord([personTanaka, personSato, personSuzuki]),
+    serviceItems: toRecord([
+      serviceItemExternalOverdue,
+      serviceItemExternalInProgress,
+      serviceItemInternalOk,
+      serviceItemInactive,
+      serviceItemOnSuspended,
+    ]),
+    serviceOrders: toRecord([serviceOrderInProgress]),
   });
 };

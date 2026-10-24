@@ -15,6 +15,7 @@ import {
   buildSeedServiceOrders,
   buildSeedRecords,
 } from '@/dev/seedTransactionData';
+import { emptyAppState } from '@/store/persistence';
 import type { AppState, IsoDateString } from '@/store/types';
 import { useAppStore } from '@/store/useAppStore';
 import { todayIsoDate } from '@/utils/time';
@@ -31,20 +32,17 @@ export const buildSeedState = (today: IsoDateString): AppState => ({
   notifications: {},
 });
 
+/** エンティティキーの列挙を emptyAppState に一本化するための絞り込み（手書き列挙の追随漏れ防止） */
+const isAppStateKey = (key: string): key is keyof AppState => Object.hasOwn(emptyAppState(), key);
+
 /**
  * 全ストレージが空の場合のみシードを投入する（ユーザー入力データを上書きしないため）。
  */
 export const seedIfEmpty = (): boolean => {
   const state = useAppStore.getState();
-  const isEmpty = [
-    state.vendors,
-    state.persons,
-    state.equipment,
-    state.serviceItems,
-    state.serviceRecords,
-    state.serviceOrders,
-    state.notifications,
-  ].every((entities) => Object.keys(entities).length === 0);
+  const isEmpty = Object.keys(emptyAppState())
+    .filter((key) => isAppStateKey(key))
+    .every((key) => Object.keys(state[key]).length === 0);
 
   if (!isEmpty) return false;
 

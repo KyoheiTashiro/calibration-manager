@@ -9,19 +9,12 @@ import {
   type ServiceOrder,
   CYCLE,
   type Cycle,
-  type Equipment,
-  EQUIPMENT_STATUS,
   EXECUTION,
   type ServiceItem,
-  type ServiceRecord,
   type IsoDateString,
   SERVICE_ITEM_TYPE,
-  NOTIFICATION_TARGET_TYPE,
-  NOTIFICATION_TYPE,
-  type Notification,
   SERVICE_ORDER_STATUS,
   type Person,
-  SERVICE_RECORD_RESULT,
   type Vendor,
 } from '@/store/types';
 import { daysInMonth, formatIsoDate } from '@/utils/time';
@@ -75,18 +68,6 @@ export const personArb: fc.Arbitrary<Person> = fc.record({
   isActive: fc.boolean(),
 });
 
-export const equipmentArb: fc.Arbitrary<Equipment> = fc.record({
-  id: fc.uuid(),
-  managementNo: fc.string({ minLength: 1 }),
-  name: fc.string({ minLength: 1 }),
-  model: optionalArb(fc.string()),
-  serialNo: optionalArb(fc.string()),
-  manufacturerId: optionalArb(fc.uuid()),
-  location: optionalArb(fc.string()),
-  status: fc.constantFrom(...Object.values(EQUIPMENT_STATUS)),
-  note: optionalArb(fc.string()),
-});
-
 export const serviceItemArb: fc.Arbitrary<ServiceItem> = fc.record({
   id: fc.uuid(),
   equipmentId: fc.uuid(),
@@ -104,16 +85,6 @@ export const serviceItemArb: fc.Arbitrary<ServiceItem> = fc.record({
   isActive: fc.boolean(),
 });
 
-export const serviceRecordArb: fc.Arbitrary<ServiceRecord> = fc.record({
-  id: fc.uuid(),
-  serviceItemId: fc.uuid(),
-  doneDate: isoDateArb,
-  doneBy: fc.string({ minLength: 1 }),
-  result: fc.constantFrom(...Object.values(SERVICE_RECORD_RESULT)),
-  serviceOrderId: optionalArb(fc.uuid()),
-  note: optionalArb(fc.string()),
-});
-
 export const serviceOrderArb: fc.Arbitrary<ServiceOrder> = fc.record({
   id: fc.uuid(),
   serviceItemId: fc.uuid(),
@@ -124,15 +95,4 @@ export const serviceOrderArb: fc.Arbitrary<ServiceOrder> = fc.record({
   returnedDate: optionalArb(isoDateArb),
   cost: optionalArb(fc.integer({ min: 0, max: 10_000_000 })),
   note: optionalArb(fc.string()),
-});
-
-export const notificationArb: fc.Arbitrary<Notification> = fc.record({
-  id: fc.uuid(),
-  type: fc.constantFrom(...Object.values(NOTIFICATION_TYPE)),
-  targetType: fc.constantFrom(...Object.values(NOTIFICATION_TARGET_TYPE)),
-  targetId: fc.uuid(),
-  personId: fc.uuid(),
-  message: fc.string({ minLength: 1 }),
-  createdDate: isoDateArb,
-  isRead: fc.boolean(),
 });

@@ -12,8 +12,19 @@ import {
 } from '@/store/types';
 import { addDays } from '@/utils/time';
 
+/** 項目シードの共通既定値（発注余裕日・通知開始日数は既定値、有効）。個別値は overrides で上書きする */
+const seedItem = (
+  overrides: Omit<ServiceItem, 'bufferDays' | 'noticeDaysBefore' | 'isActive'> &
+    Partial<Pick<ServiceItem, 'isActive'>>,
+): ServiceItem => ({
+  bufferDays: DEFAULT_BUFFER_DAYS,
+  noticeDaysBefore: DEFAULT_NOTICE_DAYS_BEFORE,
+  isActive: true,
+  ...overrides,
+});
+
 export const buildSeedServiceItems = (today: IsoDateString): Record<string, ServiceItem> => ({
-  'seed-item-overdue': {
+  'seed-item-overdue': seedItem({
     id: 'seed-item-overdue',
     equipmentId: 'seed-equipment-001',
     type: SERVICE_ITEM_TYPE.INSPECTION,
@@ -21,13 +32,10 @@ export const buildSeedServiceItems = (today: IsoDateString): Record<string, Serv
     name: '絶縁抵抗点検',
     cycle: CYCLE.Y1,
     personId: 'seed-person-sato',
-    bufferDays: DEFAULT_BUFFER_DAYS,
-    noticeDaysBefore: DEFAULT_NOTICE_DAYS_BEFORE,
     nextDueDate: addDays(today, -10) ?? today,
     lastDoneDate: addDays(today, -375) ?? today,
-    isActive: true,
-  },
-  'seed-item-order-now': {
+  }),
+  'seed-item-order-now': seedItem({
     id: 'seed-item-order-now',
     equipmentId: 'seed-equipment-002',
     type: SERVICE_ITEM_TYPE.CALIBRATION,
@@ -36,15 +44,12 @@ export const buildSeedServiceItems = (today: IsoDateString): Record<string, Serv
     cycle: CYCLE.Y1,
     vendorId: 'seed-vendor-tokyo',
     personId: 'seed-person-suzuki',
-    bufferDays: DEFAULT_BUFFER_DAYS,
-    noticeDaysBefore: DEFAULT_NOTICE_DAYS_BEFORE,
     nextDueDate: addDays(today, 20) ?? today,
     // なぜ -345 か: 周期1Yの自動計算(lastDone + 365日)と nextDueDate(today+20)が
     // おおむね一致するようにし、画面上の前回実施日と次回期限の整合を保つため。
     lastDoneDate: addDays(today, -345) ?? today,
-    isActive: true,
-  },
-  'seed-item-in-progress': {
+  }),
+  'seed-item-in-progress': seedItem({
     id: 'seed-item-in-progress',
     equipmentId: 'seed-equipment-003',
     type: SERVICE_ITEM_TYPE.CALIBRATION,
@@ -53,12 +58,9 @@ export const buildSeedServiceItems = (today: IsoDateString): Record<string, Serv
     cycle: CYCLE.Y1,
     vendorId: 'seed-vendor-osaka',
     personId: 'seed-person-takahashi',
-    bufferDays: DEFAULT_BUFFER_DAYS,
-    noticeDaysBefore: DEFAULT_NOTICE_DAYS_BEFORE,
     nextDueDate: addDays(today, 25) ?? today,
-    isActive: true,
-  },
-  'seed-item-due-soon': {
+  }),
+  'seed-item-due-soon': seedItem({
     id: 'seed-item-due-soon',
     equipmentId: 'seed-equipment-001',
     type: SERVICE_ITEM_TYPE.INSPECTION,
@@ -66,13 +68,10 @@ export const buildSeedServiceItems = (today: IsoDateString): Record<string, Serv
     name: '動作点検',
     cycle: CYCLE.M6,
     personId: 'seed-person-sato',
-    bufferDays: DEFAULT_BUFFER_DAYS,
-    noticeDaysBefore: DEFAULT_NOTICE_DAYS_BEFORE,
     nextDueDate: addDays(today, 7) ?? today,
     lastDoneDate: addDays(today, -173) ?? today,
-    isActive: true,
-  },
-  'seed-item-ok': {
+  }),
+  'seed-item-ok': seedItem({
     id: 'seed-item-ok',
     equipmentId: 'seed-equipment-004',
     type: SERVICE_ITEM_TYPE.INSPECTION,
@@ -80,13 +79,10 @@ export const buildSeedServiceItems = (today: IsoDateString): Record<string, Serv
     name: '定期点検',
     cycle: CYCLE.Y1,
     personId: 'seed-person-suzuki',
-    bufferDays: DEFAULT_BUFFER_DAYS,
-    noticeDaysBefore: DEFAULT_NOTICE_DAYS_BEFORE,
     nextDueDate: addDays(today, 180) ?? today,
     lastDoneDate: addDays(today, -185) ?? today,
-    isActive: true,
-  },
-  'seed-item-ok-external': {
+  }),
+  'seed-item-ok-external': seedItem({
     id: 'seed-item-ok-external',
     equipmentId: 'seed-equipment-004',
     type: SERVICE_ITEM_TYPE.CALIBRATION,
@@ -96,14 +92,11 @@ export const buildSeedServiceItems = (today: IsoDateString): Record<string, Serv
     vendorId: 'seed-vendor-both',
     leadTimeDays: 10,
     personId: 'seed-person-takahashi',
-    bufferDays: DEFAULT_BUFFER_DAYS,
-    noticeDaysBefore: DEFAULT_NOTICE_DAYS_BEFORE,
     nextDueDate: addDays(today, 120) ?? today,
-    isActive: true,
-  },
+  }),
   // なぜ追加するか: 一覧の表示対象（稼働機器×有効項目）で 種別×実施区分 の4組合せ
   // （点検×内部/点検×外部/校正×内部/校正×外部）を網羅し、フィルタ確認で0件にならないようにする。
-  'seed-item-external-inspection': {
+  'seed-item-external-inspection': seedItem({
     id: 'seed-item-external-inspection',
     equipmentId: 'seed-equipment-002',
     type: SERVICE_ITEM_TYPE.INSPECTION,
@@ -112,13 +105,10 @@ export const buildSeedServiceItems = (today: IsoDateString): Record<string, Serv
     cycle: CYCLE.Y1,
     vendorId: 'seed-vendor-tokyo',
     personId: 'seed-person-suzuki',
-    bufferDays: DEFAULT_BUFFER_DAYS,
-    noticeDaysBefore: DEFAULT_NOTICE_DAYS_BEFORE,
     nextDueDate: addDays(today, 150) ?? today,
     lastDoneDate: addDays(today, -215) ?? today,
-    isActive: true,
-  },
-  'seed-item-internal-calibration': {
+  }),
+  'seed-item-internal-calibration': seedItem({
     id: 'seed-item-internal-calibration',
     equipmentId: 'seed-equipment-003',
     type: SERVICE_ITEM_TYPE.CALIBRATION,
@@ -126,13 +116,10 @@ export const buildSeedServiceItems = (today: IsoDateString): Record<string, Serv
     name: '基準器校正',
     cycle: CYCLE.M6,
     personId: 'seed-person-sato',
-    bufferDays: DEFAULT_BUFFER_DAYS,
-    noticeDaysBefore: DEFAULT_NOTICE_DAYS_BEFORE,
     nextDueDate: addDays(today, 15) ?? today,
     lastDoneDate: addDays(today, -168) ?? today,
-    isActive: true,
-  },
-  'seed-item-inactive': {
+  }),
+  'seed-item-inactive': seedItem({
     id: 'seed-item-inactive',
     equipmentId: 'seed-equipment-002',
     type: SERVICE_ITEM_TYPE.INSPECTION,
@@ -140,14 +127,12 @@ export const buildSeedServiceItems = (today: IsoDateString): Record<string, Serv
     name: '旧点検項目',
     cycle: CYCLE.M6,
     personId: 'seed-person-sato',
-    bufferDays: DEFAULT_BUFFER_DAYS,
-    noticeDaysBefore: DEFAULT_NOTICE_DAYS_BEFORE,
     nextDueDate: addDays(today, 50) ?? today,
     isActive: false,
-  },
+  }),
   // なぜ追加するか: 廃棄機器（EQ-006）にも履歴を紐付け、全シード機器が項目を持つ状態にする。
   // 廃棄時の運用（項目は無効化して履歴保持）を画面確認できるよう isActive: false とする。
-  'seed-item-retired-eq': {
+  'seed-item-retired-eq': seedItem({
     id: 'seed-item-retired-eq',
     equipmentId: 'seed-equipment-006',
     type: SERVICE_ITEM_TYPE.INSPECTION,
@@ -155,13 +140,11 @@ export const buildSeedServiceItems = (today: IsoDateString): Record<string, Serv
     name: '定期点検',
     cycle: CYCLE.Y1,
     personId: 'seed-person-tanaka',
-    bufferDays: DEFAULT_BUFFER_DAYS,
-    noticeDaysBefore: DEFAULT_NOTICE_DAYS_BEFORE,
     nextDueDate: addDays(today, -30) ?? today,
     lastDoneDate: addDays(today, -395) ?? today,
     isActive: false,
-  },
-  'seed-item-suspended-eq': {
+  }),
+  'seed-item-suspended-eq': seedItem({
     id: 'seed-item-suspended-eq',
     equipmentId: 'seed-equipment-005',
     type: SERVICE_ITEM_TYPE.CALIBRATION,
@@ -170,11 +153,8 @@ export const buildSeedServiceItems = (today: IsoDateString): Record<string, Serv
     cycle: CYCLE.Y1,
     vendorId: 'seed-vendor-tokyo',
     personId: 'seed-person-takahashi',
-    bufferDays: DEFAULT_BUFFER_DAYS,
-    noticeDaysBefore: DEFAULT_NOTICE_DAYS_BEFORE,
     nextDueDate: addDays(today, 60) ?? today,
-    isActive: true,
-  },
+  }),
 });
 
 export const buildSeedRecords = (today: IsoDateString): Record<string, ServiceRecord> => ({

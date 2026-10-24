@@ -16,6 +16,7 @@ import {
   type Vendor,
 } from '@/store/types';
 import { seedStore } from '@/test/renderWithStore';
+import { toRecord } from '@/test/serviceItemRowFixtures';
 
 /** 全属性を持つ稼働機器（基本情報カードのメーカー解決・状態バッジ表示を検証する） */
 export const equipmentFull: Equipment = {
@@ -180,30 +181,24 @@ export const recordExternalServiceItemOlder: ServiceRecord = {
 
 export const seedEquipmentFullMasters = (): void => {
   seedStore({
-    equipment: { [equipmentFull.id]: equipmentFull },
-    vendors: {
-      [manufacturerVendor.id]: manufacturerVendor,
-      [calibratorVendor.id]: calibratorVendor,
-    },
-    persons: {
-      [activePerson.id]: activePerson,
-      [inactivePerson.id]: inactivePerson,
-    },
+    equipment: toRecord([equipmentFull]),
+    vendors: toRecord([manufacturerVendor, calibratorVendor]),
+    persons: toRecord([activePerson, inactivePerson]),
   });
 };
 
 export const seedEquipmentFullServiceItemsAndRecords = (): void => {
   seedStore({
-    serviceItems: {
-      [serviceItemOverdue.id]: serviceItemOverdue,
-      [serviceItemOkInactivePerson.id]: serviceItemOkInactivePerson,
-      [serviceItemDeactivated.id]: serviceItemDeactivated,
-      [serviceItemExternal.id]: serviceItemExternal,
-    },
-    serviceRecords: {
-      [recordOverdueServiceItem.id]: recordOverdueServiceItem,
-      [recordExternalServiceItemSameDay.id]: recordExternalServiceItemSameDay,
-      [recordExternalServiceItemOlder.id]: recordExternalServiceItemOlder,
-    },
+    serviceItems: toRecord([
+      serviceItemOverdue,
+      serviceItemOkInactivePerson,
+      serviceItemDeactivated,
+      serviceItemExternal,
+    ]),
+    serviceRecords: toRecord([
+      recordOverdueServiceItem,
+      recordExternalServiceItemSameDay,
+      recordExternalServiceItemOlder,
+    ]),
   });
 };

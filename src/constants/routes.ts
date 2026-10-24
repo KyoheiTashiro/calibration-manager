@@ -1,3 +1,5 @@
+import { generatePath } from 'react-router-dom';
+
 /**
  * ルート定義（App.tsx）とサイドバー・画面間リンクはすべてこの定数を参照し、
  * パス文字列のハードコードを禁止する。
@@ -17,6 +19,8 @@ export const ROUTES = {
   MANUAL: '/manual',
 } as const;
 
-export const equipmentDetailPath = (equipmentId: string): string => `/equipment/${equipmentId}`;
+export const equipmentDetailPath = (equipmentId: string): string =>
+  generatePath(ROUTES.EQUIPMENT_DETAIL, { id: equipmentId });
 
-export const equipmentEditPath = (equipmentId: string): string => `/equipment/${equipmentId}/edit`;
+export const equipmentEditPath = (equipmentId: string): string =>
+  generatePath(ROUTES.EQUIPMENT_EDIT, { id: equipmentId });
