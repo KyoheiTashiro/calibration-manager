@@ -7,6 +7,7 @@
  * 検証成功後（submit ハンドラ）に限る。ServiceItemModal / schema.ts と同方針。
  */
 
+import { optionalNonNegativeIntegerString } from '@/utils/form';
 import { isIsoDateString } from '@/utils/time';
 import { z } from 'zod';
 
@@ -19,10 +20,6 @@ export const Schema = z.object({
     message: '返却予定日の形式が不正です',
   }),
   // なぜ整数限定か: D-021。ServiceOrderModal(案件作成)の費用検証と粒度を統一する。
-  cost: z
-    .string()
-    .refine((value) => value === '' || (Number.isInteger(Number(value)) && Number(value) >= 0), {
-      message: '費用は0以上の数値で入力してください',
-    }),
+  cost: optionalNonNegativeIntegerString('費用は0以上の数値で入力してください'),
 });
 export type FormType = z.infer<typeof Schema>;

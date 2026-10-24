@@ -15,13 +15,6 @@ export const Normal: StoryObj<typeof meta> = {
   },
 };
 
-export const WithError: StoryObj<typeof meta> = {
-  args: {
-    label: '校正済み',
-    error: '校正済みの確認が必要です',
-  },
-};
-
 export const Required: StoryObj<typeof meta> = {
   args: {
     label: '検査済み',

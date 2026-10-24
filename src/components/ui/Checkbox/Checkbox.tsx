@@ -2,17 +2,14 @@ import { useId, type InputHTMLAttributes, type ReactElement, type Ref } from 're
 
 type Props = {
   label: string;
-  error?: string;
   ref?: Ref<HTMLInputElement>;
 } & InputHTMLAttributes<HTMLInputElement>;
 
 // なぜ: チェックボックスはラベルを右横に置くレイアウトが必要で、TextField の
 // 上ラベル構造と異なるため別コンポーネントにする。
-export const Checkbox = ({ label, error, ref, ...rest }: Props): ReactElement => {
+export const Checkbox = ({ label, ref, ...rest }: Props): ReactElement => {
   const generatedId = useId();
   const inputId = rest.id ?? generatedId;
-  const errorId = `${inputId}-error`;
-  const hasError = error !== undefined && error !== '';
 
   return (
     <div>
@@ -22,17 +19,10 @@ export const Checkbox = ({ label, error, ref, ...rest }: Props): ReactElement =>
           {...rest}
           ref={ref}
           id={inputId}
-          aria-invalid={hasError ? 'true' : undefined}
-          aria-describedby={hasError ? errorId : undefined}
           className='h-4 w-4 rounded border-slate-300'
         />
         {label}
       </label>
-      {hasError && (
-        <p id={errorId} className='text-xs text-red-600'>
-          {error}
-        </p>
-      )}
     </div>
   );
 };

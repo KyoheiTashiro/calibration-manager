@@ -8,18 +8,13 @@ import type { ReactElement, ReactNode } from 'react';
 // テーブル本体のみをコンテナ内でスクロールさせる（WCAG 1.4.10 のデータテーブル例外対応）。
 type TableProps = {
   children: ReactNode;
-  className?: string;
 };
 
-export const Table = ({ children, className }: TableProps): ReactElement => {
-  const tableClassName = ['w-full border-collapse text-sm', className].filter(Boolean).join(' ');
-
-  return (
-    <div className='overflow-x-auto'>
-      <table className={tableClassName}>{children}</table>
-    </div>
-  );
-};
+export const Table = ({ children }: TableProps): ReactElement => (
+  <div className='overflow-x-auto'>
+    <table className='w-full border-collapse text-sm'>{children}</table>
+  </div>
+);
 
 type TableHeadProps = {
   children: ReactNode;

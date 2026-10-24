@@ -7,7 +7,7 @@ import { Schema, defaultValues, type FormType } from '@/components/domain/Person
 import { Button, Checkbox, ConfirmModal, Modal, TextField } from '@/components/ui';
 import type { Person } from '@/store/types';
 import { useAppStore } from '@/store/useAppStore';
-import { createSaveHandler, emptyToUndefined } from '@/utils/form';
+import { createFormSubmitHandler, emptyToUndefined } from '@/utils/form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState, type ReactElement } from 'react';
 import { useForm } from 'react-hook-form';
@@ -81,7 +81,7 @@ export const PersonModal = ({ open, person, onClose }: Props): ReactElement => {
     setPendingDeactivation(null);
   };
 
-  const handleSave = createSaveHandler(handleSubmit, onSubmit);
+  const handleSave = createFormSubmitHandler(handleSubmit(onSubmit));
 
   return (
     <>
@@ -96,7 +96,7 @@ export const PersonModal = ({ open, person, onClose }: Props): ReactElement => {
           <TextField label='氏名' required error={errors.name?.message} {...register('name')} />
           <TextField label='メール' required error={errors.email?.message} {...register('email')} />
           <TextField label='部署' error={errors.department?.message} {...register('department')} />
-          <Checkbox label='有効' error={errors.isActive?.message} {...register('isActive')} />
+          <Checkbox label='有効' {...register('isActive')} />
         </div>
       </Modal>
       {pendingDeactivation ? (

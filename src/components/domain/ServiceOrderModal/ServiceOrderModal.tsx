@@ -6,16 +6,16 @@
  * 呼び出し元は閉時アンマウント（条件マウント）必須。
  */
 
+import { CalibratorVendorSelect } from '@/components/domain/CalibratorVendorSelect';
+import { useServiceItemTargetLabel } from '@/components/domain/hooks/useServiceItemTargetLabel';
 import { defaultValues, Schema, type FormType } from '@/components/domain/ServiceOrderModal/schema';
-import { Button, ControlledSelect, DateField, Modal, TextField } from '@/components/ui';
-import { ROUTES } from '@/constants/routes';
+import { Button, DateField, Modal, TextField } from '@/components/ui';
 import { useAppStore } from '@/store/useAppStore';
-import { createSaveHandler, emptyToUndefined } from '@/utils/form';
+import { createFormSubmitHandler, emptyToUndefined } from '@/utils/form';
 import { recordValue } from '@/utils/record';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState, type ReactElement } from 'react';
 import { useForm } from 'react-hook-form';
-import { Link } from 'react-router-dom';
 
 type Props = {
   open: boolean;
@@ -26,9 +26,6 @@ type Props = {
 
 export const ServiceOrderModal = ({ open, serviceItemId, onClose }: Props): ReactElement => {
   const serviceItem = useAppStore((state) => recordValue(state.serviceItems, serviceItemId));
-  const equipment = useAppStore((state) =>
-    serviceItem ? recordValue(state.equipment, serviceItem.equipmentId) : undefined,
-  );
   const vendors = useAppStore((state) => state.vendors);
   const addServiceOrder = useAppStore((state) => state.addServiceOrder);
 
@@ -48,16 +45,7 @@ export const ServiceOrderModal = ({ open, serviceItemId, onClose }: Props): Reac
     defaultValues: { ...defaultValues, vendorId: defaultVendorId },
   });
 
-  const calibratorVendors = Object.values(vendors).filter((vendor) => vendor.isCalibrator);
-  const vendorOptions = calibratorVendors.map((vendor) => ({
-    value: vendor.id,
-    label: vendor.name,
-  }));
-
-  const targetLabel =
-    serviceItem && equipment
-      ? `対象:${equipment.managementNo} ${equipment.name} / ${serviceItem.name}`
-      : '対象:(項目情報が見つかりません)';
+  const targetLabel = useServiceItemTargetLabel(serviceItemId);
 
   // なぜ: submitFailed を閉時にリセットし、同一対象で開き直した際の残留エラー表示を防ぐ
   // （ServiceRecordModal.tsx と同パターン。起動元のマウント方法に依存させない）。
@@ -83,7 +71,7 @@ export const ServiceOrderModal = ({ open, serviceItemId, onClose }: Props): Reac
     handleClose();
   };
 
-  const handleSave = createSaveHandler(handleSubmit, onSubmit);
+  const handleSave = createFormSubmitHandler(handleSubmit(onSubmit));
 
   return (
     <Modal
@@ -98,29 +86,11 @@ export const ServiceOrderModal = ({ open, serviceItemId, onClose }: Props): Reac
           <span className='block text-sm text-slate-700'>対象</span>
           <p className='text-sm text-slate-800'>{targetLabel}</p>
         </div>
-        {calibratorVendors.length === 0 ? (
-          <div>
-            <span className='block text-sm text-slate-700'>
-              校正依頼先<span className='text-red-600'>*</span>
-            </span>
-            <p className='text-sm text-slate-600'>
-              校正業者が未登録です
-              <Link to={ROUTES.VENDOR_LIST} className='text-primary ml-1 underline'>
-                メーカー/取引先一覧へ
-              </Link>
-            </p>
-          </div>
-        ) : (
-          <ControlledSelect
-            control={control}
-            name='vendorId'
-            label='校正依頼先'
-            required
-            placeholder='選択してください'
-            options={vendorOptions}
-            error={errors.vendorId?.message}
-          />
-        )}
+        <CalibratorVendorSelect
+          control={control}
+          name='vendorId'
+          error={errors.vendorId?.message}
+        />
         <DateField label='返却予定日' error={errors.dueDate?.message} {...register('dueDate')} />
         <TextField label='費用' type='number' error={errors.cost?.message} {...register('cost')} />
         <TextField label='備考' error={errors.note?.message} {...register('note')} />

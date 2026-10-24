@@ -23,15 +23,3 @@ export const strokeIconProps = (className?: string): SVGProps<SVGSVGElement> => 
   'aria-hidden': 'true',
   className,
 });
-
-/**
- * 塗りつぶし（fill）系アイコン共通のSVG属性を返すヘルパ。
- * なぜ: strokeIconProps と同様にaria-hidden・currentColor方針を共有しつつ、
- * ベル等の塗りつぶし表現が自然なアイコン向けに別途用意する。
- */
-export const fillIconProps = (className?: string): SVGProps<SVGSVGElement> => ({
-  viewBox: ICON_VIEW_BOX,
-  fill: 'currentColor',
-  'aria-hidden': 'true',
-  className,
-});

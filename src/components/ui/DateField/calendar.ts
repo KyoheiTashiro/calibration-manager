@@ -1,4 +1,4 @@
-import { daysInMonth, weekdayOf } from '@/utils/time';
+import { type CalendarDate, daysInMonth, weekdayOf } from '@/utils/time';
 
 /** 月グリッドの1マス。月の日数に含まれない空白セルは null */
 export type CalendarCell = number | null;
@@ -40,15 +40,12 @@ export const shiftMonth = (year: number, month: number, delta: number): YearMont
   return { year: year + yearOffset, month: normalizedMonth + 1 };
 };
 
-/** 年月日を持つ最小限の形（parseIsoDate の戻り値と互換） */
-export type CalendarDayLike = { year: number; month: number; day: number };
-
 /**
  * `target`（null 許容）が year/month/day と一致するかを判定する。
  * カレンダーグリッドの「選択日」「今日」ハイライト判定を共通化する。
  */
 export const isSameYearMonthDay = (
-  target: CalendarDayLike | null,
+  target: CalendarDate | null,
   year: number,
   month: number,
   day: number,

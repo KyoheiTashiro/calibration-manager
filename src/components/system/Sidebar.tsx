@@ -26,31 +26,25 @@ const NAV_ITEMS: NavItem[] = [
   { path: ROUTES.MANUAL, label: '利用マニュアル' },
 ];
 
-export const Sidebar = ({ onNavigate }: Props): ReactElement => {
-  const handleNavigate = (): void => {
-    onNavigate?.();
-  };
-
-  return (
-    <nav aria-label='メインナビゲーション' className='bg-subBg h-full w-60'>
-      <ul className='flex flex-col gap-1 p-2'>
-        {NAV_ITEMS.map((navItem) => (
-          <li key={navItem.path}>
-            <NavLink
-              to={navItem.path}
-              end={navItem.end}
-              onClick={handleNavigate}
-              className={({ isActive }): string =>
-                `block rounded px-3 py-2 text-sm ${
-                  isActive ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-100'
-                }`
-              }
-            >
-              {navItem.label}
-            </NavLink>
-          </li>
-        ))}
-      </ul>
-    </nav>
-  );
-};
+export const Sidebar = ({ onNavigate }: Props): ReactElement => (
+  <nav aria-label='メインナビゲーション' className='bg-subBg h-full w-60'>
+    <ul className='flex flex-col gap-1 p-2'>
+      {NAV_ITEMS.map((navItem) => (
+        <li key={navItem.path}>
+          <NavLink
+            to={navItem.path}
+            end={navItem.end}
+            onClick={onNavigate}
+            className={({ isActive }): string =>
+              `block rounded px-3 py-2 text-sm ${
+                isActive ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-100'
+              }`
+            }
+          >
+            {navItem.label}
+          </NavLink>
+        </li>
+      ))}
+    </ul>
+  </nav>
+);

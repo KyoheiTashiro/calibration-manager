@@ -1,3 +1,4 @@
+import { Button } from '@/components/ui/Button';
 import { useDialog } from '@/components/ui/hooks/useDialog';
 import {
   useId,
@@ -55,12 +56,8 @@ export const Modal = ({
 
   // なぜ: 破棄確認を出したまま親が open=false で強制クローズした場合に確認オーバーレイの
   // stateが残留し、次回オープン時に亡霊表示されるのを防ぐ。dialogのcloseイベント
-  // （どの経路で閉じても発火する）でリセットする。
-  const handleDialogClose = (): void => {
-    setConfirmDiscardOpen(false);
-  };
-
-  const handleCancelDiscard = (): void => {
+  // （どの経路で閉じても発火する）でリセットする。破棄確認の「キャンセル」も同じ処理。
+  const closeConfirmDiscard = (): void => {
     setConfirmDiscardOpen(false);
   };
 
@@ -76,7 +73,7 @@ export const Modal = ({
       aria-labelledby={titleId}
       onCancel={handleCancel}
       onClick={handleClick}
-      onClose={handleDialogClose}
+      onClose={closeConfirmDiscard}
       className='border-line m-auto w-full max-w-lg rounded-lg border p-0 backdrop:bg-slate-900/50'
     >
       <div className='relative flex max-h-[85vh] flex-col'>
@@ -104,20 +101,12 @@ export const Modal = ({
           <div className='absolute inset-0 flex flex-col items-center justify-center gap-4 bg-white/95 px-4 text-center'>
             <p className='text-sm font-medium'>編集内容を破棄しますか?</p>
             <div className='flex gap-2'>
-              <button
-                type='button'
-                onClick={handleCancelDiscard}
-                className='h-9 rounded border border-slate-300 px-4 text-sm text-slate-700'
-              >
+              <Button variant='secondary' onClick={closeConfirmDiscard}>
                 キャンセル
-              </button>
-              <button
-                type='button'
-                onClick={handleConfirmDiscard}
-                className='bg-danger h-9 rounded px-4 text-sm text-white'
-              >
+              </Button>
+              <Button variant='danger' onClick={handleConfirmDiscard}>
                 破棄
-              </button>
+              </Button>
             </div>
           </div>
         ) : null}

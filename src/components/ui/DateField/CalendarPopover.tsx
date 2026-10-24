@@ -6,7 +6,7 @@ import {
   shiftMonth,
 } from '@/components/ui/DateField/calendar';
 import { addDays, daysInMonth, formatIsoDate, parseIsoDate, todayIsoDate } from '@/utils/time';
-import { useCallback, useRef, useState, type KeyboardEvent, type ReactElement } from 'react';
+import { useCallback, useState, type KeyboardEvent, type ReactElement } from 'react';
 
 const WEEKDAY_LABELS = ['日', '月', '火', '水', '木', '金', '土'];
 
@@ -54,9 +54,7 @@ type Props = {
 
 export const CalendarPopover = ({ initialValue, onSelect, onClose }: Props): ReactElement => {
   const [cursorIso, setCursorIso] = useState(() => resolveInitialCursorIso(initialValue));
-  const gridRef = useRef<HTMLDivElement>(null);
   const setGridRef = useCallback((node: HTMLDivElement | null) => {
-    gridRef.current = node;
     node?.focus();
   }, []);
 

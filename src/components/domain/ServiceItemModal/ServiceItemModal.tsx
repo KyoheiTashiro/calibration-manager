@@ -2,6 +2,7 @@
  * 点検校正項目（ServiceItem）の追加・編集モーダル。RHF + zodResolver。
  */
 
+import { CalibratorVendorSelect } from '@/components/domain/CalibratorVendorSelect';
 import { Schema, defaultValues, type FormType } from '@/components/domain/ServiceItemModal/schema';
 import {
   Button,
@@ -20,7 +21,7 @@ import {
 } from '@/features/serviceItems/constants';
 import { EXECUTION, type ServiceItem } from '@/store/types';
 import { useAppStore } from '@/store/useAppStore';
-import { createSaveHandler, emptyToUndefined } from '@/utils/form';
+import { createFormSubmitHandler, emptyToUndefined } from '@/utils/form';
 import { recordValue } from '@/utils/record';
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { ChangeEvent, ReactElement } from 'react';
@@ -61,7 +62,6 @@ export const ServiceItemModal = ({
   onClose,
 }: Props): ReactElement => {
   const equipment = useAppStore((state) => recordValue(state.equipment, equipmentId));
-  const vendors = useAppStore((state) => state.vendors);
   const persons = useAppStore((state) => state.persons);
   const addServiceItem = useAppStore((state) => state.addServiceItem);
   const updateServiceItem = useAppStore((state) => state.updateServiceItem);
@@ -84,12 +84,6 @@ export const ServiceItemModal = ({
   };
 
   const execution = useWatch({ control, name: 'execution' });
-
-  const calibratorVendors = Object.values(vendors).filter((vendor) => vendor.isCalibrator);
-  const vendorOptions = calibratorVendors.map((vendor) => ({
-    value: vendor.id,
-    label: vendor.name,
-  }));
 
   const activePersons = Object.values(persons).filter((person) => person.isActive);
   const currentPerson = serviceItem ? persons[serviceItem.personId] : undefined;
@@ -138,7 +132,7 @@ export const ServiceItemModal = ({
     handleClose();
   };
 
-  const handleSave = createSaveHandler(handleSubmit, onSubmit);
+  const handleSave = createFormSubmitHandler(handleSubmit(onSubmit));
 
   return (
     <Modal
@@ -185,29 +179,11 @@ export const ServiceItemModal = ({
         />
         {execution === EXECUTION.EXTERNAL ? (
           <div className='border-line flex flex-col gap-4 border-t pt-4'>
-            {calibratorVendors.length === 0 ? (
-              <div>
-                <span className='block text-sm text-slate-700'>
-                  校正依頼先<span className='text-red-600'>*</span>
-                </span>
-                <p className='text-sm text-slate-600'>
-                  校正業者が未登録です
-                  <Link to={ROUTES.VENDOR_LIST} className='text-primary ml-1 underline'>
-                    メーカー/取引先一覧へ
-                  </Link>
-                </p>
-              </div>
-            ) : (
-              <ControlledSelect
-                control={control}
-                name='vendorId'
-                label='校正依頼先'
-                required
-                placeholder='選択してください'
-                options={vendorOptions}
-                error={errors.vendorId?.message}
-              />
-            )}
+            <CalibratorVendorSelect
+              control={control}
+              name='vendorId'
+              error={errors.vendorId?.message}
+            />
             <TextField
               label='納期(日)'
               type='number'

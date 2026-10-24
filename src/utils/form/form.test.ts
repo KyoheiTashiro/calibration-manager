@@ -1,6 +1,5 @@
 import {
   createFormSubmitHandler,
-  createSaveHandler,
   emptyToUndefined,
   maxLengthMessage,
   optionalNonNegativeIntegerString,
@@ -19,33 +18,6 @@ describe('emptyToUndefined', () => {
 
   it('空文字以外の文字列はそのまま返す', () => {
     expect(emptyToUndefined('value')).toBe('value');
-  });
-});
-
-describe('createSaveHandler', () => {
-  it('handleSubmit(onSubmit)()を呼び出す関数を返す', async () => {
-    const submitFn = vi.fn().mockResolvedValue(undefined);
-    const handleSubmit = vi.fn().mockReturnValue(submitFn);
-    const onSubmit = vi.fn();
-
-    const handleSave = createSaveHandler(handleSubmit, onSubmit);
-    handleSave();
-
-    expect(handleSubmit).toHaveBeenCalledWith(onSubmit);
-    await Promise.resolve();
-    expect(submitFn).toHaveBeenCalledTimes(1);
-  });
-
-  it('handleSubmit(onSubmit)()がrejectしても例外を投げない', async () => {
-    const submitFn = vi.fn().mockRejectedValue(new Error('到達しない想定'));
-    const handleSubmit = vi.fn().mockReturnValue(submitFn);
-    const onSubmit = vi.fn();
-
-    const handleSave = createSaveHandler(handleSubmit, onSubmit);
-    expect(() => {
-      handleSave();
-    }).not.toThrow();
-    await Promise.resolve();
   });
 });
 

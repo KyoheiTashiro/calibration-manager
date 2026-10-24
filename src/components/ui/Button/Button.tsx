@@ -6,7 +6,6 @@ type Props = {
   type?: 'button' | 'submit';
   disabled?: boolean;
   onClick?: () => void;
-  className?: string;
   children: ReactNode;
 };
 
@@ -27,19 +26,11 @@ export const Button = ({
   type = 'button',
   disabled,
   onClick,
-  className,
   children,
 }: Props): ReactElement => {
   const baseClassName =
     'inline-flex cursor-pointer items-center justify-center rounded font-medium transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-50';
-  const mergedClassName = [
-    baseClassName,
-    SIZE_CLASS_NAME[size],
-    VARIANT_CLASS_NAME[variant],
-    className,
-  ]
-    .filter(Boolean)
-    .join(' ');
+  const mergedClassName = `${baseClassName} ${SIZE_CLASS_NAME[size]} ${VARIANT_CLASS_NAME[variant]}`;
 
   return (
     // oxlint-disable-next-line react/button-has-type -- typeはPropsで"button"|"submit"に制約済み

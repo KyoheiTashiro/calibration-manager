@@ -7,7 +7,7 @@ import { Schema, defaultValues, type FormType } from '@/components/domain/Vendor
 import { Button, Checkbox, Modal, TextField } from '@/components/ui';
 import type { Vendor } from '@/store/types';
 import { useAppStore } from '@/store/useAppStore';
-import { createSaveHandler, emptyToUndefined } from '@/utils/form';
+import { createFormSubmitHandler, emptyToUndefined } from '@/utils/form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { ChangeEvent, ReactElement } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
@@ -87,7 +87,7 @@ export const VendorModal = ({ open, vendor, onClose }: Props): ReactElement => {
     handleClose();
   };
 
-  const handleSave = createSaveHandler(handleSubmit, onSubmit);
+  const handleSave = createFormSubmitHandler(handleSubmit(onSubmit));
 
   return (
     <Modal

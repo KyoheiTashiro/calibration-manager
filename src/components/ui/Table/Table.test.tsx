@@ -51,26 +51,6 @@ describe('Table', () => {
     expect(table.className).toContain('text-sm');
   });
 
-  it('className を渡すと table 要素に追加される', () => {
-    render(
-      <Table className='min-w-max'>
-        <TableHead>
-          <tr>
-            <th>管理番号</th>
-          </tr>
-        </TableHead>
-        <TableBody>
-          <tr>
-            <td>EQ-001</td>
-          </tr>
-        </TableBody>
-      </Table>,
-    );
-
-    const table = screen.getByRole('table');
-    expect(table.className).toContain('min-w-max');
-  });
-
   it('children（行・セル）が正しくレンダーされる', () => {
     render(
       <Table>

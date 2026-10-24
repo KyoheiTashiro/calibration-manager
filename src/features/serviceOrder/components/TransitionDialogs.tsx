@@ -19,7 +19,7 @@ import {
 } from '@/features/serviceOrder/returnDialog/schema';
 import { SERVICE_ORDER_STATUS, type ServiceOrder } from '@/store/types';
 import { useAppStore } from '@/store/useAppStore';
-import { createSaveHandler } from '@/utils/form';
+import { createFormSubmitHandler, emptyToUndefined } from '@/utils/form';
 import { isIsoDateString, todayIsoDate } from '@/utils/time';
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { ReactElement } from 'react';
@@ -52,26 +52,22 @@ export const ServiceOrderDialog = ({ serviceOrder, onClose }: Props): ReactEleme
   const dueDate = useWatch({ control, name: 'dueDate' });
 
   const showDueDateWarning =
-    typeof orderedDate === 'string' &&
-    isIsoDateString(orderedDate) &&
-    typeof dueDate === 'string' &&
-    dueDate !== '' &&
-    isIsoDateString(dueDate) &&
-    orderedDate > dueDate;
+    isIsoDateString(orderedDate) && isIsoDateString(dueDate) && orderedDate > dueDate;
 
   const onSubmit = (values: OrderDialogFormType): void => {
     const transitioned = updateServiceOrderStatus(serviceOrder.id, SERVICE_ORDER_STATUS.ORDERED);
     if (transitioned) {
+      const cost = emptyToUndefined(values.cost);
       updateServiceOrder(serviceOrder.id, {
         orderedDate: values.orderedDate,
-        dueDate: values.dueDate === '' ? undefined : values.dueDate,
-        cost: values.cost === '' ? undefined : Number(values.cost),
+        dueDate: emptyToUndefined(values.dueDate),
+        cost: cost === undefined ? undefined : Number(cost),
       });
     }
     onClose();
   };
 
-  const handleSave = createSaveHandler(handleSubmit, onSubmit);
+  const handleSave = createFormSubmitHandler(handleSubmit(onSubmit));
 
   return (
     <Modal
@@ -120,7 +116,6 @@ export const ReturnDialog = ({ serviceOrder, onClose }: Props): ReactElement => 
 
   const showReturnWarning =
     serviceOrder.orderedDate !== undefined &&
-    typeof returnedDate === 'string' &&
     isIsoDateString(returnedDate) &&
     serviceOrder.orderedDate > returnedDate;
 
@@ -132,7 +127,7 @@ export const ReturnDialog = ({ serviceOrder, onClose }: Props): ReactElement => 
     onClose();
   };
 
-  const handleSave = createSaveHandler(handleSubmit, onSubmit);
+  const handleSave = createFormSubmitHandler(handleSubmit(onSubmit));
 
   return (
     <Modal

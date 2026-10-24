@@ -4,6 +4,7 @@
  * 呼び出し元は閉時アンマウント（条件マウント）必須。
  */
 
+import { useServiceItemTargetLabel } from '@/components/domain/hooks/useServiceItemTargetLabel';
 import { Schema, type FormType } from '@/components/domain/ServiceRecordModal/schema';
 import { Button, DateField, Modal, RadioGroup, TextField } from '@/components/ui';
 import { SERVICE_RECORD_RESULT_OPTIONS } from '@/features/serviceItems/constants';
@@ -15,7 +16,7 @@ import {
   type Vendor,
 } from '@/store/types';
 import { useAppStore } from '@/store/useAppStore';
-import { createSaveHandler } from '@/utils/form';
+import { createFormSubmitHandler } from '@/utils/form';
 import { recordValue } from '@/utils/record';
 import { todayIsoDate } from '@/utils/time';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -37,11 +38,9 @@ const resolvePrefillDoneBy = (
   vendors: Record<string, Vendor>,
 ): string => {
   if (serviceOrder) return recordValue(vendors, serviceOrder.vendorId)?.name ?? '';
-  if (serviceItem !== undefined && serviceItem.execution === EXECUTION.EXTERNAL) {
-    const { vendorId } = serviceItem;
-    if (vendorId !== undefined && vendorId !== '') {
-      return recordValue(vendors, vendorId)?.name ?? '';
-    }
+  // なぜ vendorId === '' を別判定しないか: recordValue は不在キー('' を含む)に undefined を返すため
+  if (serviceItem?.execution === EXECUTION.EXTERNAL && serviceItem.vendorId !== undefined) {
+    return recordValue(vendors, serviceItem.vendorId)?.name ?? '';
   }
   return '';
 };
@@ -53,9 +52,6 @@ export const ServiceRecordModal = ({
   onClose,
 }: Props): ReactElement => {
   const serviceItem = useAppStore((state) => recordValue(state.serviceItems, serviceItemId));
-  const equipment = useAppStore((state) =>
-    serviceItem ? recordValue(state.equipment, serviceItem.equipmentId) : undefined,
-  );
   const vendors = useAppStore((state) => state.vendors);
   const hasServiceOrderId = serviceOrderId !== undefined && serviceOrderId !== '';
   const serviceOrder = useAppStore((state) =>
@@ -92,10 +88,7 @@ export const ServiceRecordModal = ({
     ? (recordValue(vendors, serviceOrder.vendorId)?.name ?? '')
     : '';
 
-  const targetLabel =
-    serviceItem && equipment
-      ? `対象:${equipment.managementNo} ${equipment.name} / ${serviceItem.name}`
-      : '対象:(項目情報が見つかりません)';
+  const targetLabel = useServiceItemTargetLabel(serviceItemId);
 
   // なぜ: submitFailed を閉時にリセットし、同一対象で開き直した際の残留エラー表示を防ぐ
   // （起動元の key remount に依存させない。ボード等どのマウント方法でも安全にする）。
@@ -120,7 +113,7 @@ export const ServiceRecordModal = ({
     handleClose();
   };
 
-  const handleSave = createSaveHandler(handleSubmit, onSubmit);
+  const handleSave = createFormSubmitHandler(handleSubmit(onSubmit));
 
   return (
     <Modal

@@ -1,3 +1,4 @@
+import { Button } from '@/components/ui/Button';
 import { useDialog } from '@/components/ui/hooks/useDialog';
 import {
   useEffect,
@@ -18,11 +19,6 @@ type Props = {
   onConfirm: () => void;
   onCancel: () => void;
 };
-
-const CONFIRM_BUTTON_CLASSES = {
-  danger: 'bg-danger hover:bg-red-700',
-  primary: 'bg-primary hover:bg-primaryHover',
-} as const;
 
 export const ConfirmModal = ({
   open,
@@ -83,13 +79,9 @@ export const ConfirmModal = ({
           >
             キャンセル
           </button>
-          <button
-            type='button'
-            onClick={onConfirm}
-            className={`${CONFIRM_BUTTON_CLASSES[variant]} h-9 rounded px-4 text-sm text-white`}
-          >
+          <Button variant={variant} onClick={onConfirm}>
             {confirmLabel}
-          </button>
+          </Button>
         </div>
       </div>
     </dialog>
