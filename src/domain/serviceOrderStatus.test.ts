@@ -1,9 +1,11 @@
 import {
   canTransitionServiceOrderStatus,
+  hasActiveServiceOrder,
   isActiveServiceOrderStatus,
+  isAwaitingReturnStatus,
   SERVICE_ORDER_STATUS_TRANSITIONS,
 } from '@/domain/serviceOrderStatus';
-import { SERVICE_ORDER_STATUS, type ServiceOrderStatus } from '@/store/types';
+import { type ServiceOrder, SERVICE_ORDER_STATUS, type ServiceOrderStatus } from '@/store/types';
 import { describe, expect, it } from 'vitest';
 
 const ALL_STATUSES: ServiceOrderStatus[] = Object.values(SERVICE_ORDER_STATUS);
@@ -127,5 +129,36 @@ describe('isActiveServiceOrderStatus', () => {
   it('completed / cancelled は有効な案件ではない', () => {
     expect(isActiveServiceOrderStatus(SERVICE_ORDER_STATUS.COMPLETED)).toBe(false);
     expect(isActiveServiceOrderStatus(SERVICE_ORDER_STATUS.CANCELLED)).toBe(false);
+  });
+});
+
+describe('isAwaitingReturnStatus', () => {
+  it('ordered / inCalibration のみ true', () => {
+    const awaiting = ALL_STATUSES.filter((status) => isAwaitingReturnStatus(status));
+    expect(awaiting).toEqual([SERVICE_ORDER_STATUS.ORDERED, SERVICE_ORDER_STATUS.IN_CALIBRATION]);
+  });
+});
+
+const order = (serviceItemId: string, status: ServiceOrderStatus): ServiceOrder => ({
+  id: `${serviceItemId}-${status}`,
+  serviceItemId,
+  vendorId: 'vendor-1',
+  status,
+});
+
+describe('hasActiveServiceOrder', () => {
+  it('対象項目に有効な案件があれば true', () => {
+    expect(hasActiveServiceOrder([order('item-1', SERVICE_ORDER_STATUS.PLANNED)], 'item-1')).toBe(
+      true,
+    );
+  });
+
+  it('他項目の有効案件・対象項目の終端案件のみなら false', () => {
+    const orders = [
+      order('item-2', SERVICE_ORDER_STATUS.ORDERED),
+      order('item-1', SERVICE_ORDER_STATUS.COMPLETED),
+      order('item-1', SERVICE_ORDER_STATUS.CANCELLED),
+    ];
+    expect(hasActiveServiceOrder(orders, 'item-1')).toBe(false);
   });
 });

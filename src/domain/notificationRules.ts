@@ -6,8 +6,8 @@
  */
 
 import { DELIVERY_DUE_SOON_NOTICE_DAYS } from '@/domain/constants';
-import { recommendedOrderDate } from '@/domain/leadTime';
-import { isActiveServiceOrderStatus } from '@/domain/serviceOrderStatus';
+import { isDueSoon, isOrderDue } from '@/domain/serviceItemStatus';
+import { isAwaitingReturnStatus } from '@/domain/serviceOrderStatus';
 import {
   type ServiceOrder,
   type Equipment,
@@ -17,7 +17,6 @@ import {
   NOTIFICATION_TARGET_TYPE,
   NOTIFICATION_TYPE,
   type Notification,
-  SERVICE_ORDER_STATUS,
   type Vendor,
 } from '@/store/types';
 import { recordValue } from '@/utils/record';
@@ -60,15 +59,12 @@ const serviceItemNotificationSeeds = (
       type: NOTIFICATION_TYPE.OVERDUE,
       message: `${prefix}${serviceItem.name}が期限を過ぎています`,
     });
-  } else {
-    const dueSoonFrom = addDays(serviceItem.nextDueDate, -serviceItem.noticeDaysBefore);
-    if (dueSoonFrom !== null && today >= dueSoonFrom) {
-      seeds.push({
-        ...baseSeed,
-        type: NOTIFICATION_TYPE.DUE_SOON,
-        message: `${prefix}${serviceItem.name}の期限が近づいています`,
-      });
-    }
+  } else if (isDueSoon(serviceItem, today)) {
+    seeds.push({
+      ...baseSeed,
+      type: NOTIFICATION_TYPE.DUE_SOON,
+      message: `${prefix}${serviceItem.name}の期限が近づいています`,
+    });
   }
 
   if (serviceItem.execution === EXECUTION.EXTERNAL) {
@@ -76,13 +72,7 @@ const serviceItemNotificationSeeds = (
       serviceItem.vendorId === undefined
         ? null
         : (recordValue(vendors, serviceItem.vendorId) ?? null);
-    const orderDate = recommendedOrderDate(serviceItem, vendor);
-    const hasActiveServiceOrder = serviceOrders.some(
-      (serviceOrder) =>
-        serviceOrder.serviceItemId === serviceItem.id &&
-        isActiveServiceOrderStatus(serviceOrder.status),
-    );
-    if (orderDate !== null && today >= orderDate && !hasActiveServiceOrder) {
+    if (isOrderDue(serviceItem, vendor, serviceOrders, today)) {
       seeds.push({
         ...baseSeed,
         type: NOTIFICATION_TYPE.ORDER_RECOMMENDED,
@@ -106,10 +96,7 @@ const serviceOrderNotificationSeeds = (
   equipment: Record<string, Equipment>,
   today: IsoDateString,
 ): NotificationSeed[] => {
-  const isAwaitingReturn =
-    serviceOrder.status === SERVICE_ORDER_STATUS.ORDERED ||
-    serviceOrder.status === SERVICE_ORDER_STATUS.IN_CALIBRATION;
-  if (!isAwaitingReturn || serviceOrder.dueDate === undefined) return [];
+  if (!isAwaitingReturnStatus(serviceOrder.status) || serviceOrder.dueDate === undefined) return [];
   const serviceItem = serviceItemById.get(serviceOrder.serviceItemId);
   if (!serviceItem) return [];
 

@@ -13,7 +13,7 @@
  *   テーブル自体には遷移として存在する（ボードの「記録登録」ボタン表示判定にも使う）。
  */
 
-import { SERVICE_ORDER_STATUS, type ServiceOrderStatus } from '@/store/types';
+import { type ServiceOrder, SERVICE_ORDER_STATUS, type ServiceOrderStatus } from '@/store/types';
 
 export const SERVICE_ORDER_STATUS_TRANSITIONS = {
   [SERVICE_ORDER_STATUS.PLANNED]: [SERVICE_ORDER_STATUS.ORDERED, SERVICE_ORDER_STATUS.CANCELLED],
@@ -44,3 +44,18 @@ export const canTransitionServiceOrderStatus = (
  */
 export const isActiveServiceOrderStatus = (status: ServiceOrderStatus): boolean =>
   status !== SERVICE_ORDER_STATUS.COMPLETED && status !== SERVICE_ORDER_STATUS.CANCELLED;
+
+/** 発注済かつ未返却（ordered / inCalibration）。項目の inProgress 判定と返却予定通知の対象判定で共用する */
+export const isAwaitingReturnStatus = (status: ServiceOrderStatus): boolean =>
+  status === SERVICE_ORDER_STATUS.ORDERED || status === SERVICE_ORDER_STATUS.IN_CALIBRATION;
+
+/** 指定項目に有効な案件（isActiveServiceOrderStatus）が1件でもあるか */
+export const hasActiveServiceOrder = (
+  serviceOrders: readonly ServiceOrder[],
+  serviceItemId: string,
+): boolean =>
+  serviceOrders.some(
+    (serviceOrder) =>
+      serviceOrder.serviceItemId === serviceItemId &&
+      isActiveServiceOrderStatus(serviceOrder.status),
+  );

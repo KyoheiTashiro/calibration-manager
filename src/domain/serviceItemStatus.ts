@@ -4,13 +4,12 @@
  */
 
 import { recommendedOrderDate } from '@/domain/leadTime';
-import { isActiveServiceOrderStatus } from '@/domain/serviceOrderStatus';
+import { hasActiveServiceOrder, isAwaitingReturnStatus } from '@/domain/serviceOrderStatus';
 import {
   type ServiceOrder,
   EXECUTION,
   type ServiceItem,
   type IsoDateString,
-  SERVICE_ORDER_STATUS,
   type Vendor,
 } from '@/store/types';
 import { addDays } from '@/utils/time';
@@ -27,6 +26,36 @@ export const SERVICE_ITEM_STATUS = {
   OK: 'ok',
 } as const;
 export type ServiceItemStatus = (typeof SERVICE_ITEM_STATUS)[keyof typeof SERVICE_ITEM_STATUS];
+
+/**
+ * 期限接近（今日 ≥ nextDueDate − noticeDaysBefore）。項目ステータス dueSoon と
+ * 通知 dueSoon で共用する。期限超過との排他は呼び出し側で先に判定する。
+ */
+export const isDueSoon = (
+  serviceItem: Pick<ServiceItem, 'nextDueDate' | 'noticeDaysBefore'>,
+  today: IsoDateString,
+): boolean => {
+  const dueSoonFrom = addDays(serviceItem.nextDueDate, -serviceItem.noticeDaysBefore);
+  return dueSoonFrom !== null && today >= dueSoonFrom;
+};
+
+/**
+ * 発注時期到来（今日 ≥ 発注推奨日 かつ 有効な案件なし）。項目ステータス orderNow と
+ * 通知 orderRecommended で共用する（D-042）。
+ */
+export const isOrderDue = (
+  serviceItem: ServiceItem,
+  vendor: Pick<Vendor, 'standardLeadTimeDays'> | null,
+  serviceOrders: readonly ServiceOrder[],
+  today: IsoDateString,
+): boolean => {
+  const orderDate = recommendedOrderDate(serviceItem, vendor);
+  return (
+    orderDate !== null &&
+    today >= orderDate &&
+    !hasActiveServiceOrder(serviceOrders, serviceItem.id)
+  );
+};
 
 /**
  * 項目ステータスを優先度順（overdue > orderNow > inProgress > dueSoon > ok）に判定する。
@@ -59,24 +88,16 @@ export const deriveServiceItemStatus = (
   const isExternal = serviceItem.execution === EXECUTION.EXTERNAL;
 
   if (isExternal) {
-    const orderDate = recommendedOrderDate(serviceItem, vendor);
-    const hasActiveServiceOrder = itemServiceOrders.some((serviceOrder) =>
-      isActiveServiceOrderStatus(serviceOrder.status),
-    );
-    if (orderDate !== null && today >= orderDate && !hasActiveServiceOrder) {
+    if (isOrderDue(serviceItem, vendor, itemServiceOrders, today)) {
       return SERVICE_ITEM_STATUS.ORDER_NOW;
     }
-
-    const hasInProgressServiceOrder = itemServiceOrders.some(
-      (serviceOrder) =>
-        serviceOrder.status === SERVICE_ORDER_STATUS.ORDERED ||
-        serviceOrder.status === SERVICE_ORDER_STATUS.IN_CALIBRATION,
+    const hasInProgressServiceOrder = itemServiceOrders.some((serviceOrder) =>
+      isAwaitingReturnStatus(serviceOrder.status),
     );
     if (hasInProgressServiceOrder) return SERVICE_ITEM_STATUS.IN_PROGRESS;
   }
 
-  const dueSoonFrom = addDays(serviceItem.nextDueDate, -serviceItem.noticeDaysBefore);
-  if (dueSoonFrom !== null && today >= dueSoonFrom) return SERVICE_ITEM_STATUS.DUE_SOON;
+  if (isDueSoon(serviceItem, today)) return SERVICE_ITEM_STATUS.DUE_SOON;
 
   return SERVICE_ITEM_STATUS.OK;
 };
