@@ -71,14 +71,9 @@ export const ConfirmModal = ({
         </h2>
         <p className='text-sm text-slate-700'>{message}</p>
         <div className='flex justify-end gap-2'>
-          <button
-            ref={cancelButtonRef}
-            type='button'
-            onClick={onCancel}
-            className='h-9 rounded border border-slate-300 px-4 text-sm text-slate-700'
-          >
+          <Button ref={cancelButtonRef} variant='secondary' onClick={onCancel}>
             キャンセル
-          </button>
+          </Button>
           <Button variant={variant} onClick={onConfirm}>
             {confirmLabel}
           </Button>

@@ -104,7 +104,15 @@ export const NotificationCenter = (): ReactElement => {
         }}
       />
 
-      {rows.length > 0 && <Pagination {...pagination} />}
+      {rows.length > 0 && (
+        <Pagination
+          page={pagination.page}
+          pageSize={pagination.pageSize}
+          totalCount={pagination.totalCount}
+          onPageChange={pagination.setPage}
+          onPageSizeChange={pagination.setPageSize}
+        />
+      )}
     </div>
   );
 };

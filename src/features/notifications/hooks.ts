@@ -12,9 +12,14 @@ export type NotificationTab = (typeof NOTIFICATION_TAB)[keyof typeof NOTIFICATIO
 export const isNotificationTab = (value: string): value is NotificationTab =>
   isOneOf(value, Object.values(NOTIFICATION_TAB));
 
-/** createdDate 降順・id 昇順。ISO 日付文字列は辞書順比較がそのまま日付順比較になる（utils/time.ts） */
+// なぜ localeCompare でなくコード単位比較か: ロケール照合だと id のタイブレーク順が
+// 環境依存になる。ISO 日付文字列はコード単位比較がそのまま日付順比較になる（utils/time.ts）
+const compareCodeUnits = (left: string, right: string): number =>
+  left < right ? -1 : Number(left > right);
+
+/** createdDate 降順・id 昇順 */
 export const compareNotificationsByDate = (left: Notification, right: Notification): number =>
-  right.createdDate.localeCompare(left.createdDate) || left.id.localeCompare(right.id);
+  compareCodeUnits(right.createdDate, left.createdDate) || compareCodeUnits(left.id, right.id);
 
 export const sortNotifications = (notifications: readonly Notification[]): Notification[] =>
   notifications.toSorted(compareNotificationsByDate);

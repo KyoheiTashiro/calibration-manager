@@ -9,6 +9,7 @@ import {
 import { patchEntity } from '@/store/entityActions';
 import type { AppSliceCreator } from '@/store/storeState';
 import { type ServiceOrder, SERVICE_ORDER_STATUS, type ServiceOrderStatus } from '@/store/types';
+import { createId } from '@/utils/id';
 import { recordValue } from '@/utils/record';
 
 export type AddServiceOrderInput = Omit<ServiceOrder, 'id' | 'status'>;
@@ -39,7 +40,7 @@ export const createServiceOrderSlice: AppSliceCreator<ServiceOrderSlice> = (set,
     if (recordValue(serviceItems, input.serviceItemId) === undefined) return null;
     if (hasActiveServiceOrder(Object.values(serviceOrders), input.serviceItemId)) return null;
 
-    const id = crypto.randomUUID();
+    const id = createId();
     set((state) => {
       state.serviceOrders[id] = { ...input, id, status: SERVICE_ORDER_STATUS.PLANNED };
     });

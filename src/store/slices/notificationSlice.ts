@@ -7,6 +7,7 @@ import { computeExpectedNotifications, type NotificationSeed } from '@/domain/no
 import { isServiceItemInScope } from '@/store/selectors';
 import type { AppSliceCreator } from '@/store/storeState';
 import type { IsoDateString, Notification } from '@/store/types';
+import { createId } from '@/utils/id';
 import { recordValue } from '@/utils/record';
 
 const duplicationKey = (seed: Pick<NotificationSeed, 'targetType' | 'targetId' | 'type'>): string =>
@@ -49,7 +50,7 @@ export const createNotificationSlice: AppSliceCreator<NotificationSlice> = (set,
 
     set((state) => {
       for (const seed of freshSeeds) {
-        const id = crypto.randomUUID();
+        const id = createId();
         state.notifications[id] = { ...seed, id, createdDate: today, isRead: false };
       }
     });

@@ -20,7 +20,7 @@
   - `renderWithStore(ui, { initialEntries, routePath })`: RTL render を `MemoryRouter` で包む。`routePath` 指定で `<Routes><Route>` 囲み（`useParams` 解決用）
   - `seedStore(partial)`: zustand `setState` で state を部分上書き（persist 汚染なし）
   - `setupStoreIsolation()`: 各テストファイルの `beforeEach(setupStoreIsolation)` で呼ぶ。`resetAll()` + `localStorage.clear()`
-- `arbitraries.ts`: fast-check の Arbitrary 定義（`equipmentArb` / `serviceItemArb` / `serviceRecordArb` / `serviceOrderArb` / `vendorArb` など）
+- `arbitraries.ts`: fast-check の Arbitrary 定義（`serviceItemArb` / `serviceOrderArb` / `vendorArb` / `personArb` など）
 
 ## domain層（必須）
 

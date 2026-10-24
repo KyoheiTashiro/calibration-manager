@@ -3,16 +3,12 @@ import type { ReactElement } from 'react';
 
 import { buildPageItems, ELLIPSIS, PAGE_SIZE_OPTIONS } from './pageItems';
 
-/**
- * プロパティ名は usePagination の戻り値と揃えてあり、`<Pagination {...pagination} />` で渡せる
- * (pagedItems 等の余剰プロパティは分割代入で捨て、DOM へは渡さない)。
- */
 type Props = {
   page: number;
   pageSize: number;
   totalCount: number;
-  setPage: (page: number) => void;
-  setPageSize: (pageSize: number) => void;
+  onPageChange: (page: number) => void;
+  onPageSizeChange: (pageSize: number) => void;
 };
 
 // 非現在ページ・省略記号・前へ/次へで共通の枠サイズ・余白・角丸を揃えるための共通クラス
@@ -37,8 +33,8 @@ export const Pagination = ({
   page,
   pageSize,
   totalCount,
-  setPage,
-  setPageSize,
+  onPageChange,
+  onPageSizeChange,
 }: Props): ReactElement => {
   const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
   const currentPage = Math.min(Math.max(page, 1), totalPages);
@@ -59,7 +55,7 @@ export const Pagination = ({
               type='button'
               disabled={currentPage === 1}
               onClick={() => {
-                setPage(currentPage - 1);
+                onPageChange(currentPage - 1);
               }}
               className={`${PAGER_BUTTON_BASE_CLASS} ${PAGER_BUTTON_INACTIVE_CLASS}`}
             >
@@ -88,7 +84,7 @@ export const Pagination = ({
                   type='button'
                   aria-current={isCurrent ? 'page' : undefined}
                   onClick={() => {
-                    if (!isCurrent) setPage(item);
+                    if (!isCurrent) onPageChange(item);
                   }}
                   className={`${PAGER_BUTTON_BASE_CLASS} ${
                     isCurrent ? PAGER_BUTTON_ACTIVE_CLASS : PAGER_BUTTON_INACTIVE_CLASS
@@ -102,7 +98,7 @@ export const Pagination = ({
               type='button'
               disabled={currentPage === totalPages}
               onClick={() => {
-                setPage(currentPage + 1);
+                onPageChange(currentPage + 1);
               }}
               className={`${PAGER_BUTTON_BASE_CLASS} ${PAGER_BUTTON_INACTIVE_CLASS}`}
             >
@@ -117,7 +113,7 @@ export const Pagination = ({
             options={PAGE_SIZE_SELECT_OPTIONS}
             value={String(pageSize)}
             onChange={(value) => {
-              setPageSize(Number(value));
+              onPageSizeChange(Number(value));
             }}
           />
         </div>

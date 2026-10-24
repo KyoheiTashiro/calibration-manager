@@ -131,7 +131,13 @@ export const ServiceItemTable = ({
           })}
         </TableBody>
       </Table>
-      <Pagination {...pagination} />
+      <Pagination
+        page={pagination.page}
+        pageSize={pagination.pageSize}
+        totalCount={pagination.totalCount}
+        onPageChange={pagination.setPage}
+        onPageSizeChange={pagination.setPageSize}
+      />
     </>
   );
 };

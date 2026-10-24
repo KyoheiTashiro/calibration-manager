@@ -6,6 +6,7 @@ import { addCycle } from '@/domain/dateCycle';
 import { canTransitionServiceOrderStatus } from '@/domain/serviceOrderStatus';
 import type { AppSliceCreator } from '@/store/storeState';
 import { type ServiceRecord, SERVICE_ORDER_STATUS, SERVICE_RECORD_RESULT } from '@/store/types';
+import { createId } from '@/utils/id';
 import { recordValue } from '@/utils/record';
 
 export type AddServiceRecordInput = Omit<ServiceRecord, 'id'>;
@@ -50,7 +51,7 @@ export const createServiceRecordSlice: AppSliceCreator<ServiceRecordSlice> = (se
       }
     }
 
-    const id = crypto.randomUUID();
+    const id = createId();
     set((state) => {
       state.serviceRecords[id] = { ...input, id };
       const draftServiceItem = recordValue(state.serviceItems, input.serviceItemId);

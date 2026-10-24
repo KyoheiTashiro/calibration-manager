@@ -100,6 +100,18 @@ const compareServiceItemRows = (left: ServiceItemRow, right: ServiceItemRow): nu
   left.serviceItem.nextDueDate.localeCompare(right.serviceItem.nextDueDate) ||
   left.serviceItem.id.localeCompare(right.serviceItem.id);
 
+const serviceOrdersByItemId = (
+  serviceOrders: Record<string, ServiceOrder>,
+): Map<string, ServiceOrder[]> => {
+  const grouped = new Map<string, ServiceOrder[]>();
+  for (const serviceOrder of Object.values(serviceOrders)) {
+    const itemServiceOrders = grouped.get(serviceOrder.serviceItemId) ?? [];
+    itemServiceOrders.push(serviceOrder);
+    grouped.set(serviceOrder.serviceItemId, itemServiceOrders);
+  }
+  return grouped;
+};
+
 /**
  * 表示対象の項目行を構築する横断 selector。
  *
@@ -110,14 +122,15 @@ export const serviceItemRowsOf = (
   state: Pick<AppState, 'serviceItems' | 'equipment' | 'serviceOrders' | 'vendors' | 'persons'>,
   today: IsoDateString,
 ): ServiceItemRow[] => {
+  // 項目ごとに serviceOrdersOf で全案件を走査すると O(項目数×案件数) になるため先に1回で振り分ける
+  const ordersByItemId = serviceOrdersByItemId(state.serviceOrders);
   const rows: ServiceItemRow[] = [];
   for (const serviceItem of Object.values(state.serviceItems)) {
     const equipment = recordValue(state.equipment, serviceItem.equipmentId);
     if (!isServiceItemInScope(serviceItem, equipment)) continue;
 
-    const vendor =
-      serviceItem.vendorId === undefined ? null : (state.vendors[serviceItem.vendorId] ?? null);
-    const itemServiceOrders = serviceOrdersOf(state, serviceItem.id);
+    const vendor = recordValue(state.vendors, serviceItem.vendorId ?? '') ?? null;
+    const itemServiceOrders = ordersByItemId.get(serviceItem.id) ?? [];
     const isExternal = serviceItem.execution === EXECUTION.EXTERNAL;
 
     rows.push({

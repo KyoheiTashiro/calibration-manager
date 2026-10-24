@@ -96,7 +96,7 @@ export const PersonModal = ({ open, person, onClose }: Props): ReactElement => {
           <TextField label='氏名' required error={errors.name?.message} {...register('name')} />
           <TextField label='メール' required error={errors.email?.message} {...register('email')} />
           <TextField label='部署' error={errors.department?.message} {...register('department')} />
-          <Checkbox label='有効' {...register('isActive')} />
+          <Checkbox label='有効' error={errors.isActive?.message} {...register('isActive')} />
         </div>
       </Modal>
       {pendingDeactivation ? (

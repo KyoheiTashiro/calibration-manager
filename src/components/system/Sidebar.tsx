@@ -34,7 +34,7 @@ export const Sidebar = ({ onNavigate }: Props): ReactElement => (
           <NavLink
             to={navItem.path}
             end={navItem.end}
-            onClick={onNavigate}
+            onClick={() => onNavigate?.()}
             className={({ isActive }): string =>
               `block rounded px-3 py-2 text-sm ${
                 isActive ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-100'

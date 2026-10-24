@@ -33,16 +33,16 @@ export const buildSeedState = (today: IsoDateString): AppState => ({
 });
 
 /** エンティティキーの列挙を emptyAppState に一本化するための絞り込み（手書き列挙の追随漏れ防止） */
-const isAppStateKey = (key: string): key is keyof AppState => Object.hasOwn(emptyAppState(), key);
+const EMPTY_APP_STATE = emptyAppState();
+const isAppStateKey = (key: string): key is keyof AppState => Object.hasOwn(EMPTY_APP_STATE, key);
+const APP_STATE_KEYS = Object.keys(EMPTY_APP_STATE).filter((key) => isAppStateKey(key));
 
 /**
  * 全ストレージが空の場合のみシードを投入する（ユーザー入力データを上書きしないため）。
  */
 export const seedIfEmpty = (): boolean => {
   const state = useAppStore.getState();
-  const isEmpty = Object.keys(emptyAppState())
-    .filter((key) => isAppStateKey(key))
-    .every((key) => Object.keys(state[key]).length === 0);
+  const isEmpty = APP_STATE_KEYS.every((key) => Object.keys(state[key]).length === 0);
 
   if (!isEmpty) return false;
 

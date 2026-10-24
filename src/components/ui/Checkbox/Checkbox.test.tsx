@@ -26,6 +26,24 @@ describe('Checkbox', () => {
     expect(screen.getByRole('checkbox', { name: '校正業者' })).toBeChecked();
   });
 
+  it('error 指定時にエラーメッセージが表示され aria-describedby で紐付く', () => {
+    render(<Checkbox label='メーカー' error='選択が不正です' />);
+
+    const checkbox = screen.getByRole('checkbox', { name: 'メーカー' });
+    const errorMessage = screen.getByText('選択が不正です');
+    expect(errorMessage).toHaveClass('text-xs', 'text-red-600');
+    expect(checkbox).toHaveAttribute('aria-describedby', errorMessage.id);
+    expect(checkbox).toHaveAttribute('aria-invalid', 'true');
+  });
+
+  it('error 未指定時は aria-describedby / aria-invalid が付かない', () => {
+    render(<Checkbox label='メーカー' />);
+
+    const checkbox = screen.getByRole('checkbox', { name: 'メーカー' });
+    expect(checkbox).not.toHaveAttribute('aria-describedby');
+    expect(checkbox).not.toHaveAttribute('aria-invalid');
+  });
+
   it('name/ref 等のネイティブ props がそのまま素通しされる', () => {
     const ref = createRef<HTMLInputElement>();
     render(<Checkbox label='メーカー' name='isManufacturer' ref={ref} />);

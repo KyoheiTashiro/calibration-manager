@@ -1,5 +1,5 @@
 import { UNSET_LABEL } from '@/constants/labels';
-import { statusOptions, type SelectOption } from '@/features/equipment/form/shared/mapping';
+import { EQUIPMENT_STATUS_LABELS } from '@/features/equipment/constants';
 import { serviceItemsOf } from '@/store/selectors';
 import { EQUIPMENT_STATUS, type Equipment, type EquipmentStatus } from '@/store/types';
 import { useAppStore } from '@/store/useAppStore';
@@ -18,14 +18,17 @@ const STATUS_FILTER = {
 } as const;
 export type StatusFilter = (typeof STATUS_FILTER)[keyof typeof STATUS_FILTER];
 
-export const STATUS_FILTER_OPTIONS: SelectOption[] = [
+export const STATUS_FILTER_OPTIONS: { value: StatusFilter; label: string }[] = [
   { value: STATUS_FILTER.ALL, label: '全て' },
-  ...statusOptions,
+  ...Object.values(EQUIPMENT_STATUS).map((status) => ({
+    value: status,
+    label: EQUIPMENT_STATUS_LABELS[status],
+  })),
 ];
 
 /**
  * 文字列が StatusFilter か判定する実行時型ガード。<select> の onChange イベント値は
- * 型上ただの string のため、Select の options（STATUS_FILTER_OPTIONS）に実在する値かを
+ * 型上ただの string のため、STATUS_FILTER に実在する値かを
  * 検証してから安全に絞り込む（as によるアサーションを避けるため）。
  */
 export const isStatusFilter = (value: string): value is StatusFilter =>

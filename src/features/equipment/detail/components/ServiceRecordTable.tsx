@@ -52,7 +52,13 @@ export const ServiceRecordTable = ({ serviceRecordRows }: Props): ReactElement =
           ))}
         </TableBody>
       </Table>
-      <Pagination {...pagination} />
+      <Pagination
+        page={pagination.page}
+        pageSize={pagination.pageSize}
+        totalCount={pagination.totalCount}
+        onPageChange={pagination.setPage}
+        onPageSizeChange={pagination.setPageSize}
+      />
     </>
   );
 };

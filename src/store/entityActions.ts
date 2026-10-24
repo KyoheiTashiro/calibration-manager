@@ -4,6 +4,7 @@
  */
 
 import type { AppSliceCreator, StoreState } from '@/store/storeState';
+import { createId } from '@/utils/id';
 import { recordValue } from '@/utils/record';
 import type { Draft } from 'immer';
 
@@ -16,7 +17,7 @@ export const addEntity = <Input extends object>(
   selectRecord: SelectRecord<Input & { id: string }>,
   input: Input,
 ): string => {
-  const id = crypto.randomUUID();
+  const id = createId();
   set((state) => {
     selectRecord(state)[id] = { ...input, id };
   });

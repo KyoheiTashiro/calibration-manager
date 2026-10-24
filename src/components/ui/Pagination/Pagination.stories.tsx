@@ -27,8 +27,8 @@ const PaginationDemo = ({ totalCount }: Props): ReactElement => {
       page={page}
       pageSize={pageSize}
       totalCount={totalCount}
-      setPage={setPage}
-      setPageSize={(nextPageSize) => {
+      onPageChange={setPage}
+      onPageSizeChange={(nextPageSize) => {
         setPageSize(nextPageSize);
       }}
     />
@@ -42,8 +42,8 @@ export const Default: StoryObj<typeof meta> = {
     page: 1,
     pageSize: DEFAULT_PAGE_SIZE,
     totalCount: 123,
-    setPage: (): void => undefined,
-    setPageSize: (): void => undefined,
+    onPageChange: (): void => undefined,
+    onPageSizeChange: (): void => undefined,
   },
   render: (): ReactElement => <PaginationDemo totalCount={123} />,
 };
@@ -53,8 +53,8 @@ export const SinglePage: StoryObj<typeof meta> = {
     page: 1,
     pageSize: DEFAULT_PAGE_SIZE,
     totalCount: 5,
-    setPage: (): void => undefined,
-    setPageSize: (): void => undefined,
+    onPageChange: (): void => undefined,
+    onPageSizeChange: (): void => undefined,
   },
   render: (): ReactElement => <PaginationDemo totalCount={5} />,
 };
@@ -64,8 +64,8 @@ export const Empty: StoryObj<typeof meta> = {
     page: 1,
     pageSize: DEFAULT_PAGE_SIZE,
     totalCount: 0,
-    setPage: (): void => undefined,
-    setPageSize: (): void => undefined,
+    onPageChange: (): void => undefined,
+    onPageSizeChange: (): void => undefined,
   },
   render: (): ReactElement => <PaginationDemo totalCount={0} />,
 };
@@ -75,8 +75,8 @@ export const ManyPages: StoryObj<typeof meta> = {
     page: 1,
     pageSize: DEFAULT_PAGE_SIZE,
     totalCount: 1000,
-    setPage: (): void => undefined,
-    setPageSize: (): void => undefined,
+    onPageChange: (): void => undefined,
+    onPageSizeChange: (): void => undefined,
   },
   render: (): ReactElement => <PaginationDemo totalCount={1000} />,
 };

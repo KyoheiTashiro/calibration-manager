@@ -122,7 +122,15 @@ export const VendorList = (): ReactElement => {
             </Table>
           )}
 
-          {filteredVendorList.length > 0 && <Pagination {...pagination} />}
+          {filteredVendorList.length > 0 && (
+            <Pagination
+              page={pagination.page}
+              pageSize={pagination.pageSize}
+              totalCount={pagination.totalCount}
+              onPageChange={pagination.setPage}
+              onPageSizeChange={pagination.setPageSize}
+            />
+          )}
         </>
       )}
 

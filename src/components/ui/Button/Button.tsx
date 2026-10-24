@@ -1,4 +1,4 @@
-import type { ReactElement, ReactNode } from 'react';
+import type { ReactElement, ReactNode, Ref } from 'react';
 
 type Props = {
   variant?: 'primary' | 'secondary' | 'danger';
@@ -7,6 +7,7 @@ type Props = {
   disabled?: boolean;
   onClick?: () => void;
   children: ReactNode;
+  ref?: Ref<HTMLButtonElement>;
 };
 
 const SIZE_CLASS_NAME = {
@@ -27,6 +28,7 @@ export const Button = ({
   disabled,
   onClick,
   children,
+  ref,
 }: Props): ReactElement => {
   const baseClassName =
     'inline-flex cursor-pointer items-center justify-center rounded font-medium transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-50';
@@ -34,7 +36,7 @@ export const Button = ({
 
   return (
     // oxlint-disable-next-line react/button-has-type -- typeはPropsで"button"|"submit"に制約済み
-    <button type={type} disabled={disabled} onClick={onClick} className={mergedClassName}>
+    <button ref={ref} type={type} disabled={disabled} onClick={onClick} className={mergedClassName}>
       {children}
     </button>
   );

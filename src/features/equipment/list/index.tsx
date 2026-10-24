@@ -127,7 +127,15 @@ export const EquipmentList = (): ReactElement => {
               </TableBody>
             </Table>
           )}
-          {filteredEquipmentList.length > 0 && <Pagination {...pagination} />}
+          {filteredEquipmentList.length > 0 && (
+            <Pagination
+              page={pagination.page}
+              pageSize={pagination.pageSize}
+              totalCount={pagination.totalCount}
+              onPageChange={pagination.setPage}
+              onPageSizeChange={pagination.setPageSize}
+            />
+          )}
         </>
       )}
     </div>
