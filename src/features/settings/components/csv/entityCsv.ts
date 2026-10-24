@@ -10,6 +10,7 @@ import {
 } from '@/store/schema';
 import { type AppState, NOTIFICATION_TARGET_TYPE } from '@/store/types';
 import { serializeCsv } from '@/utils/csv';
+import { isOneOf } from '@/utils/guard';
 import type { z } from 'zod';
 
 export type CsvEntityKind = keyof AppState;
@@ -27,6 +28,10 @@ export const CSV_ENTITY_KINDS = [
   'serviceRecords',
   'notifications',
 ] as const satisfies readonly CsvEntityKind[];
+
+/** Select / Tabs の onChange 値(string)を CsvEntityKind へ絞り込む */
+export const isCsvEntityKind = (value: string): value is CsvEntityKind =>
+  isOneOf(value, CSV_ENTITY_KINDS);
 
 export type EntityOf<Kind extends CsvEntityKind> = AppState[Kind][string];
 

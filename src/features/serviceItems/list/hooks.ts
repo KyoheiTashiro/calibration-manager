@@ -13,6 +13,7 @@ import {
   type ServiceItemType,
   type Person,
 } from '@/store/types';
+import { isOneOf } from '@/utils/guard';
 
 export const FILTER_ALL = 'all' as const;
 
@@ -23,17 +24,10 @@ export type ServiceItemListFilters = {
   personId: string; // Person.id または "all"("all" は string の部分集合のため union にしない)
 };
 
-const SERVICE_ITEM_STATUS_VALUES: readonly ServiceItemStatus[] = Object.values(SERVICE_ITEM_STATUS);
-const SERVICE_ITEM_TYPE_VALUES: readonly ServiceItemType[] = Object.values(SERVICE_ITEM_TYPE);
-const EXECUTION_VALUES: readonly Execution[] = Object.values(EXECUTION);
-
-const isEnumValue = <Enum extends string>(raw: string, allowed: readonly Enum[]): raw is Enum =>
-  allowed.some((value) => value === raw);
-
 const readEnumParam = <Enum extends string>(
   raw: string | null,
   allowed: readonly Enum[],
-): Enum | typeof FILTER_ALL => (raw !== null && isEnumValue(raw, allowed) ? raw : FILTER_ALL);
+): Enum | typeof FILTER_ALL => (raw !== null && isOneOf(raw, allowed) ? raw : FILTER_ALL);
 
 export const parseServiceItemListFilters = (
   params: URLSearchParams,
@@ -41,9 +35,9 @@ export const parseServiceItemListFilters = (
 ): ServiceItemListFilters => {
   const personId = params.get('personId');
   return {
-    status: readEnumParam<ServiceItemStatus>(params.get('status'), SERVICE_ITEM_STATUS_VALUES),
-    type: readEnumParam<ServiceItemType>(params.get('type'), SERVICE_ITEM_TYPE_VALUES),
-    execution: readEnumParam<Execution>(params.get('execution'), EXECUTION_VALUES),
+    status: readEnumParam(params.get('status'), Object.values(SERVICE_ITEM_STATUS)),
+    type: readEnumParam(params.get('type'), Object.values(SERVICE_ITEM_TYPE)),
+    execution: readEnumParam(params.get('execution'), Object.values(EXECUTION)),
     personId: personId !== null && personId in persons ? personId : FILTER_ALL,
   };
 };

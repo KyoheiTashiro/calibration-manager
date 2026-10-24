@@ -9,21 +9,7 @@ import {
   type IsoDateString,
   type Vendor,
 } from '@/store/types';
-
-// ServiceItem 型も同様の理由で再 export する(index.tsx の @/store/types への
-// 直接依存を減らし import/max-dependencies 対策とする)
-export type { ServiceItem } from '@/store/types';
-
-// 担当者表示名は selectors へ昇格済み(D-024)。この画面の表示ロジック一式を
-// hooks 経由で供給するため再 export する(index.tsx の依存数も抑える)
-export { personLabelOf } from '@/store/selectors';
-
-// useSafeNavigate も同様に hooks 経由で再 export し、index.tsx が @/utils への
-// 直接依存を持たないようにする(import/max-dependencies 対策)
-export { useSafeNavigate } from '@/utils/navigation';
-
-// todayIsoDate も同様の理由で hooks 経由で再 export する(import/max-dependencies 対策)
-export { todayIsoDate } from '@/utils/time';
+import { recordValue } from '@/utils/record';
 
 export type ServiceRecordRow = { serviceRecord: ServiceRecord; serviceItemName: string };
 
@@ -68,10 +54,7 @@ export const displayedServiceItemStatus = (
   today: IsoDateString,
 ): ServiceItemStatus | null => {
   if (equipmentStatus !== EQUIPMENT_STATUS.ACTIVE) return null;
-  const vendor =
-    serviceItem.vendorId !== undefined && serviceItem.vendorId !== ''
-      ? (vendors[serviceItem.vendorId] ?? null)
-      : null;
+  const vendor = recordValue(vendors, serviceItem.vendorId ?? '') ?? null;
   return deriveServiceItemStatus(
     serviceItem,
     serviceOrdersOf({ serviceOrders }, serviceItem.id),

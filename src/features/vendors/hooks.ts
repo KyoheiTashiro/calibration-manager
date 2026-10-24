@@ -6,15 +6,14 @@
 import { isVendorReferenced } from '@/store/selectors';
 import type { Vendor } from '@/store/types';
 import { useAppStore } from '@/store/useAppStore';
+import { matchesSearchText } from '@/utils/search';
 import { useMemo, useState } from 'react';
 
-const matchesSearch = (vendor: Vendor, normalizedSearch: string): boolean => {
-  if (normalizedSearch === '') return true;
-  const haystack = [vendor.name, vendor.contactPerson ?? '', vendor.phone ?? '', vendor.email ?? '']
-    .join('\n')
-    .toLowerCase();
-  return haystack.includes(normalizedSearch);
-};
+const matchesSearch = (vendor: Vendor, normalizedSearch: string): boolean =>
+  matchesSearchText(
+    [vendor.name, vendor.contactPerson, vendor.phone, vendor.email],
+    normalizedSearch,
+  );
 
 type UseVendorListResult = {
   totalCount: number;

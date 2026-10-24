@@ -15,8 +15,8 @@ describe('Pagination', () => {
         page={1}
         pageSize={20}
         totalCount={123}
-        onPageChange={vi.fn<() => void>()}
-        onPageSizeChange={vi.fn<() => void>()}
+        setPage={vi.fn<() => void>()}
+        setPageSize={vi.fn<() => void>()}
       />,
     );
 
@@ -29,8 +29,8 @@ describe('Pagination', () => {
         page={2}
         pageSize={20}
         totalCount={123}
-        onPageChange={vi.fn<() => void>()}
-        onPageSizeChange={vi.fn<() => void>()}
+        setPage={vi.fn<() => void>()}
+        setPageSize={vi.fn<() => void>()}
       />,
     );
 
@@ -43,8 +43,8 @@ describe('Pagination', () => {
         page={1}
         pageSize={20}
         totalCount={0}
-        onPageChange={vi.fn<() => void>()}
-        onPageSizeChange={vi.fn<() => void>()}
+        setPage={vi.fn<() => void>()}
+        setPageSize={vi.fn<() => void>()}
       />,
     );
 
@@ -59,8 +59,8 @@ describe('Pagination', () => {
         page={1}
         pageSize={20}
         totalCount={5}
-        onPageChange={vi.fn<() => void>()}
-        onPageSizeChange={vi.fn<() => void>()}
+        setPage={vi.fn<() => void>()}
+        setPageSize={vi.fn<() => void>()}
       />,
     );
 
@@ -77,8 +77,8 @@ describe('Pagination', () => {
         page={10}
         pageSize={10}
         totalCount={200}
-        onPageChange={vi.fn<() => void>()}
-        onPageSizeChange={vi.fn<() => void>()}
+        setPage={vi.fn<() => void>()}
+        setPageSize={vi.fn<() => void>()}
       />,
     );
 
@@ -101,8 +101,8 @@ describe('Pagination', () => {
         page={5}
         pageSize={10}
         totalCount={100}
-        onPageChange={vi.fn<() => void>()}
-        onPageSizeChange={vi.fn<() => void>()}
+        setPage={vi.fn<() => void>()}
+        setPageSize={vi.fn<() => void>()}
       />,
     );
 
@@ -116,8 +116,8 @@ describe('Pagination', () => {
         page={1}
         pageSize={10}
         totalCount={100}
-        onPageChange={vi.fn<() => void>()}
-        onPageSizeChange={vi.fn<() => void>()}
+        setPage={vi.fn<() => void>()}
+        setPageSize={vi.fn<() => void>()}
       />,
     );
 
@@ -131,8 +131,8 @@ describe('Pagination', () => {
         page={10}
         pageSize={10}
         totalCount={100}
-        onPageChange={vi.fn<() => void>()}
-        onPageSizeChange={vi.fn<() => void>()}
+        setPage={vi.fn<() => void>()}
+        setPageSize={vi.fn<() => void>()}
       />,
     );
 
@@ -146,8 +146,8 @@ describe('Pagination', () => {
         page={5}
         pageSize={10}
         totalCount={100}
-        onPageChange={vi.fn<() => void>()}
-        onPageSizeChange={vi.fn<() => void>()}
+        setPage={vi.fn<() => void>()}
+        setPageSize={vi.fn<() => void>()}
       />,
     );
 
@@ -155,15 +155,15 @@ describe('Pagination', () => {
     expect(screen.getByRole('button', { name: '次へ' })).toBeEnabled();
   });
 
-  it('ページ番号をクリックすると onPageChange がその番号で呼ばれる', () => {
+  it('ページ番号をクリックすると setPage がその番号で呼ばれる', () => {
     const handlePageChange = vi.fn<() => void>();
     render(
       <Pagination
         page={5}
         pageSize={10}
         totalCount={100}
-        onPageChange={handlePageChange}
-        onPageSizeChange={vi.fn<() => void>()}
+        setPage={handlePageChange}
+        setPageSize={vi.fn<() => void>()}
       />,
     );
 
@@ -173,15 +173,15 @@ describe('Pagination', () => {
     expect(handlePageChange).toHaveBeenCalledWith(6);
   });
 
-  it('現在ページのボタンをクリックしても onPageChange は呼ばれない', () => {
+  it('現在ページのボタンをクリックしても setPage は呼ばれない', () => {
     const handlePageChange = vi.fn<() => void>();
     render(
       <Pagination
         page={5}
         pageSize={10}
         totalCount={100}
-        onPageChange={handlePageChange}
-        onPageSizeChange={vi.fn<() => void>()}
+        setPage={handlePageChange}
+        setPageSize={vi.fn<() => void>()}
       />,
     );
 
@@ -190,15 +190,15 @@ describe('Pagination', () => {
     expect(handlePageChange).not.toHaveBeenCalled();
   });
 
-  it('「次へ」クリックで onPageChange(page+1)、「前へ」クリックで onPageChange(page-1) が呼ばれる', () => {
+  it('「次へ」クリックで setPage(page+1)、「前へ」クリックで setPage(page-1) が呼ばれる', () => {
     const handlePageChange = vi.fn<() => void>();
     render(
       <Pagination
         page={5}
         pageSize={10}
         totalCount={100}
-        onPageChange={handlePageChange}
-        onPageSizeChange={vi.fn<() => void>()}
+        setPage={handlePageChange}
+        setPageSize={vi.fn<() => void>()}
       />,
     );
 
@@ -209,7 +209,7 @@ describe('Pagination', () => {
     expect(handlePageChange).toHaveBeenCalledWith(4);
   });
 
-  it('表示件数セレクタを変更すると onPageSizeChange が数値で呼ばれる', async () => {
+  it('表示件数セレクタを変更すると setPageSize が数値で呼ばれる', async () => {
     const user = userEvent.setup();
     const handlePageSizeChange = vi.fn<() => void>();
     render(
@@ -217,8 +217,8 @@ describe('Pagination', () => {
         page={1}
         pageSize={20}
         totalCount={123}
-        onPageChange={vi.fn<() => void>()}
-        onPageSizeChange={handlePageSizeChange}
+        setPage={vi.fn<() => void>()}
+        setPageSize={handlePageSizeChange}
       />,
     );
 
@@ -235,8 +235,8 @@ describe('Pagination', () => {
         page={99}
         pageSize={10}
         totalCount={70}
-        onPageChange={vi.fn<() => void>()}
-        onPageSizeChange={vi.fn<() => void>()}
+        setPage={vi.fn<() => void>()}
+        setPageSize={vi.fn<() => void>()}
       />,
     );
 

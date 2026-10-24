@@ -33,14 +33,7 @@ export const PersonList = (): ReactElement => {
     statusFilter,
     setStatusFilter,
   } = usePersonList();
-  const {
-    page,
-    pageSize,
-    totalCount: pagedTotalCount,
-    pagedItems,
-    setPage,
-    setPageSize,
-  } = usePagination(filteredPersonList, `${searchText}|${statusFilter}`);
+  const pagination = usePagination(filteredPersonList, `${searchText}|${statusFilter}`);
   const { modalState, handleAddClick, handleEditClick, handleModalClose } =
     useEntityModal<Person>();
 
@@ -94,7 +87,7 @@ export const PersonList = (): ReactElement => {
                 </tr>
               </TableHead>
               <TableBody>
-                {pagedItems.map((person) => (
+                {pagination.pagedItems.map((person) => (
                   <tr key={person.id}>
                     <Td>{person.name}</Td>
                     <Td>{person.department ?? UNSET_LABEL}</Td>
@@ -128,15 +121,7 @@ export const PersonList = (): ReactElement => {
             </Table>
           )}
 
-          {filteredPersonList.length > 0 && (
-            <Pagination
-              page={page}
-              pageSize={pageSize}
-              totalCount={pagedTotalCount}
-              onPageChange={setPage}
-              onPageSizeChange={setPageSize}
-            />
-          )}
+          {filteredPersonList.length > 0 && <Pagination {...pagination} />}
         </>
       )}
 

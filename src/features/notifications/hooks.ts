@@ -1,5 +1,6 @@
 import { equipmentDetailPath, ROUTES } from '@/constants/routes';
 import { NOTIFICATION_TARGET_TYPE, type ServiceItem, type Notification } from '@/store/types';
+import { isOneOf } from '@/utils/guard';
 import { recordValue } from '@/utils/record';
 
 export const NOTIFICATION_TAB = {
@@ -9,19 +10,14 @@ export const NOTIFICATION_TAB = {
 export type NotificationTab = (typeof NOTIFICATION_TAB)[keyof typeof NOTIFICATION_TAB];
 
 export const isNotificationTab = (value: string): value is NotificationTab =>
-  Object.values(NOTIFICATION_TAB).some((tab) => tab === value);
+  isOneOf(value, Object.values(NOTIFICATION_TAB));
 
-/** ISO 日付文字列は辞書順比較がそのまま日付順比較になる（utils/time.ts） */
+/** createdDate 降順・id 昇順。ISO 日付文字列は辞書順比較がそのまま日付順比較になる（utils/time.ts） */
+export const compareNotificationsByDate = (left: Notification, right: Notification): number =>
+  right.createdDate.localeCompare(left.createdDate) || left.id.localeCompare(right.id);
+
 export const sortNotifications = (notifications: readonly Notification[]): Notification[] =>
-  notifications.toSorted((left, right) => {
-    if (left.createdDate !== right.createdDate) {
-      return left.createdDate > right.createdDate ? -1 : 1;
-    }
-    if (left.id !== right.id) {
-      return left.id > right.id ? 1 : -1;
-    }
-    return 0;
-  });
+  notifications.toSorted(compareNotificationsByDate);
 
 export const selectTabNotifications = (
   notifications: readonly Notification[],

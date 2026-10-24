@@ -22,14 +22,7 @@ import type { ReactElement } from 'react';
 
 export const VendorList = (): ReactElement => {
   const { totalCount, filteredVendorList, searchText, setSearchText } = useVendorList();
-  const {
-    page,
-    pageSize,
-    totalCount: pagedTotalCount,
-    pagedItems,
-    setPage,
-    setPageSize,
-  } = usePagination(filteredVendorList, searchText);
+  const pagination = usePagination(filteredVendorList, searchText);
 
   const { modalState, handleAddClick, handleEditClick, handleModalClose } =
     useEntityModal<Vendor>();
@@ -85,7 +78,7 @@ export const VendorList = (): ReactElement => {
                 </tr>
               </TableHead>
               <TableBody>
-                {pagedItems.map((vendor) => (
+                {pagination.pagedItems.map((vendor) => (
                   <tr key={vendor.id}>
                     <Td>{vendor.name}</Td>
                     <Td>
@@ -129,15 +122,7 @@ export const VendorList = (): ReactElement => {
             </Table>
           )}
 
-          {filteredVendorList.length > 0 && (
-            <Pagination
-              page={page}
-              pageSize={pageSize}
-              totalCount={pagedTotalCount}
-              onPageChange={setPage}
-              onPageSizeChange={setPageSize}
-            />
-          )}
+          {filteredVendorList.length > 0 && <Pagination {...pagination} />}
         </>
       )}
 

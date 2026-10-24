@@ -4,6 +4,7 @@ import {
   CSV_ENTITY_KINDS,
   type CsvEntityKind,
   ENTITY_CSV_SPECS,
+  isCsvEntityKind,
 } from '@/features/settings/components/csv/entityCsv';
 import { useEffect, useRef, useState, type ReactElement } from 'react';
 
@@ -11,9 +12,6 @@ import { ImportCheckTable } from './ImportCheckTable';
 
 /** タブの並びは CSV_ENTITY_KINDS(推奨インポート順)と共通。マニュアル本文の記載と一致させる(D-058 / D-060) */
 const TABS = CSV_ENTITY_KINDS.map((kind) => ({ key: kind, label: ENTITY_CSV_SPECS[kind].label }));
-
-const isCsvEntityKind = (key: string): key is CsvEntityKind =>
-  (CSV_ENTITY_KINDS as readonly string[]).includes(key);
 
 export const ImportCheckTabs = (): ReactElement => {
   const [activeKind, setActiveKind] = useState<CsvEntityKind>(CSV_ENTITY_KINDS[0]);

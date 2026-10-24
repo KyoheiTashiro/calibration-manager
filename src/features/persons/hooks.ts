@@ -1,5 +1,7 @@
 import type { Person } from '@/store/types';
 import { useAppStore } from '@/store/useAppStore';
+import { isOneOf } from '@/utils/guard';
+import { matchesSearchText } from '@/utils/search';
 import { useMemo, useState } from 'react';
 
 /**
@@ -24,18 +26,15 @@ export const STATUS_FILTER_OPTIONS: { value: StatusFilter; label: string }[] = [
  * 型上ただの string のため、options に実在する値かを検証してから絞り込む。
  */
 export const isStatusFilter = (value: string): value is StatusFilter =>
-  STATUS_FILTER_OPTIONS.some((option) => option.value === value);
+  isOneOf(value, Object.values(STATUS_FILTER));
 
 const matchesStatusFilter = (person: Person, filter: StatusFilter): boolean => {
   if (filter === STATUS_FILTER.ALL) return true;
   return filter === STATUS_FILTER.ACTIVE ? person.isActive : !person.isActive;
 };
 
-const matchesSearch = (person: Person, normalizedSearch: string): boolean => {
-  if (normalizedSearch === '') return true;
-  const haystack = [person.name, person.department ?? '', person.email].join('\n').toLowerCase();
-  return haystack.includes(normalizedSearch);
-};
+const matchesSearch = (person: Person, normalizedSearch: string): boolean =>
+  matchesSearchText([person.name, person.department, person.email], normalizedSearch);
 
 type UsePersonListResult = {
   totalCount: number;

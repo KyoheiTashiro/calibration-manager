@@ -2,27 +2,23 @@ import { ServiceItemModal, ServiceRecordModal } from '@/components/domain';
 import { Button } from '@/components/ui';
 import { ROUTES, equipmentEditPath } from '@/constants/routes';
 import { EquipmentInfoCard } from '@/features/equipment/detail/components/EquipmentInfoCard';
-import { ServiceItemSection } from '@/features/equipment/detail/components/ServiceItemSection';
-import { ServiceRecordSection } from '@/features/equipment/detail/components/ServiceRecordSection';
-import {
-  historyRowsOf,
-  sortedServiceItemsOf,
-  todayIsoDate,
-  useSafeNavigate,
-  type ServiceItem,
-} from '@/features/equipment/detail/hooks';
+import { ServiceItemTable } from '@/features/equipment/detail/components/ServiceItemTable';
+import { ServiceRecordTable } from '@/features/equipment/detail/components/ServiceRecordTable';
+import { historyRowsOf, sortedServiceItemsOf } from '@/features/equipment/detail/hooks';
+import type { ServiceItem } from '@/store/types';
 import { useAppStore } from '@/store/useAppStore';
+import { useSafeNavigate } from '@/utils/navigation';
+import { todayIsoDate } from '@/utils/time';
 import { useState, type ReactElement } from 'react';
 import { Navigate, useParams } from 'react-router-dom';
 
 const MODAL_KIND = {
-  ADD: 'add',
-  EDIT: 'edit',
+  SERVICE_ITEM: 'serviceItem',
   SERVICE_RECORD: 'serviceRecord',
 } as const;
 type ModalState =
-  | { kind: typeof MODAL_KIND.ADD }
-  | { kind: typeof MODAL_KIND.EDIT; serviceItem: ServiceItem }
+  /** serviceItem が undefined なら新規追加、指定時は編集 */
+  | { kind: typeof MODAL_KIND.SERVICE_ITEM; serviceItem?: ServiceItem }
   | { kind: typeof MODAL_KIND.SERVICE_RECORD; serviceItemId: string };
 
 export const EquipmentDetail = (): ReactElement => {
@@ -45,10 +41,10 @@ export const EquipmentDetail = (): ReactElement => {
   }
 
   const handleAddServiceItemClick = (): void => {
-    setModal({ kind: MODAL_KIND.ADD });
+    setModal({ kind: MODAL_KIND.SERVICE_ITEM });
   };
   const handleEditServiceItemClick = (serviceItem: ServiceItem): void => {
-    setModal({ kind: MODAL_KIND.EDIT, serviceItem });
+    setModal({ kind: MODAL_KIND.SERVICE_ITEM, serviceItem });
   };
   const handleModalClose = (): void => {
     setModal(null);
@@ -81,7 +77,7 @@ export const EquipmentDetail = (): ReactElement => {
           <Button onClick={handleAddServiceItemClick}>+ 項目を追加</Button>
         </div>
 
-        <ServiceItemSection
+        <ServiceItemTable
           serviceItems={serviceItemList}
           equipmentStatus={currentEquipment.status}
           serviceOrders={serviceOrders}
@@ -99,13 +95,10 @@ export const EquipmentDetail = (): ReactElement => {
       <div className='flex flex-col gap-2'>
         <h2 className='text-lg font-semibold'>実施記録</h2>
 
-        <ServiceRecordSection serviceRecordRows={serviceRecordRows} />
+        <ServiceRecordTable serviceRecordRows={serviceRecordRows} />
       </div>
 
-      {modal?.kind === MODAL_KIND.ADD ? (
-        <ServiceItemModal open equipmentId={currentEquipment.id} onClose={handleModalClose} />
-      ) : null}
-      {modal?.kind === MODAL_KIND.EDIT ? (
+      {modal?.kind === MODAL_KIND.SERVICE_ITEM ? (
         <ServiceItemModal
           open
           equipmentId={currentEquipment.id}

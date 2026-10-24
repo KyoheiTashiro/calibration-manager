@@ -1,17 +1,5 @@
-import {
-  Badge,
-  Button,
-  ConfirmModal,
-  EmptyState,
-  Pagination,
-  Tabs,
-  usePagination,
-} from '@/components/ui';
-import {
-  NOTIFICATION_TYPE_BADGE_CLASSES,
-  NOTIFICATION_TYPE_ICONS,
-  NOTIFICATION_TYPE_LABELS,
-} from '@/features/notifications/constants';
+import { Button, ConfirmModal, EmptyState, Pagination, Tabs, usePagination } from '@/components/ui';
+import { NotificationTypeBadge } from '@/features/notifications/components/NotificationTypeBadge';
 import {
   isNotificationTab,
   NOTIFICATION_TAB,
@@ -37,10 +25,7 @@ export const NotificationCenter = (): ReactElement => {
   const [markAllConfirmOpen, setMarkAllConfirmOpen] = useState(false);
 
   const rows = selectTabNotifications(Object.values(notifications), activeTab);
-  const { page, pageSize, totalCount, pagedItems, setPage, setPageSize } = usePagination(
-    rows,
-    activeTab,
-  );
+  const pagination = usePagination(rows, activeTab);
 
   const handleRowClick = (notification: Notification): void => {
     markAsRead(notification.id);
@@ -84,29 +69,23 @@ export const NotificationCenter = (): ReactElement => {
         <EmptyState message={emptyMessage} />
       ) : (
         <ul className='flex flex-col divide-y divide-slate-200 border-b border-slate-200'>
-          {pagedItems.map((notification) => {
-            const TypeIcon = NOTIFICATION_TYPE_ICONS[notification.type];
-            return (
-              <li key={notification.id}>
-                <button
-                  type='button'
-                  onClick={(): void => {
-                    handleRowClick(notification);
-                  }}
-                  className='flex w-full flex-col gap-1 px-2 py-3 text-left hover:bg-slate-50'
-                >
-                  <div className='flex items-center gap-2'>
-                    <Badge className={NOTIFICATION_TYPE_BADGE_CLASSES[notification.type]}>
-                      <TypeIcon className='mr-1 h-3.5 w-3.5' />
-                      {NOTIFICATION_TYPE_LABELS[notification.type]}
-                    </Badge>
-                    <span className='text-sm text-slate-800'>{notification.message}</span>
-                  </div>
-                  <span className='text-xs text-slate-500'>{notification.createdDate}</span>
-                </button>
-              </li>
-            );
-          })}
+          {pagination.pagedItems.map((notification) => (
+            <li key={notification.id}>
+              <button
+                type='button'
+                onClick={(): void => {
+                  handleRowClick(notification);
+                }}
+                className='flex w-full flex-col gap-1 px-2 py-3 text-left hover:bg-slate-50'
+              >
+                <div className='flex items-center gap-2'>
+                  <NotificationTypeBadge type={notification.type} />
+                  <span className='text-sm text-slate-800'>{notification.message}</span>
+                </div>
+                <span className='text-xs text-slate-500'>{notification.createdDate}</span>
+              </button>
+            </li>
+          ))}
         </ul>
       )}
 
@@ -125,15 +104,7 @@ export const NotificationCenter = (): ReactElement => {
         }}
       />
 
-      {rows.length > 0 && (
-        <Pagination
-          page={page}
-          pageSize={pageSize}
-          totalCount={totalCount}
-          onPageChange={setPage}
-          onPageSizeChange={setPageSize}
-        />
-      )}
+      {rows.length > 0 && <Pagination {...pagination} />}
     </div>
   );
 };

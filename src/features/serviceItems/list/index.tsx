@@ -43,14 +43,7 @@ export const ServiceItemList = (): ReactElement => {
     [serviceItems, equipment, serviceOrders, vendors, persons],
   );
   const filteredRows = filterServiceItemRows(rows, filters);
-  const {
-    page,
-    pageSize,
-    totalCount: pagedTotalCount,
-    pagedItems,
-    setPage,
-    setPageSize,
-  } = usePagination(filteredRows, searchParams.toString());
+  const pagination = usePagination(filteredRows, searchParams.toString());
 
   const handleFilterChange = (key: keyof ServiceItemListFilters, value: string): void => {
     const next = new URLSearchParams(searchParams);
@@ -90,7 +83,7 @@ export const ServiceItemList = (): ReactElement => {
             />
           ) : (
             <ServiceItemTable
-              rows={pagedItems}
+              rows={pagination.pagedItems}
               onRecord={(row) => {
                 setModal({ kind: MODAL_KIND.SERVICE_RECORD, row });
               }}
@@ -102,15 +95,7 @@ export const ServiceItemList = (): ReactElement => {
               }}
             />
           )}
-          {filteredRows.length > 0 && (
-            <Pagination
-              page={page}
-              pageSize={pageSize}
-              totalCount={pagedTotalCount}
-              onPageChange={setPage}
-              onPageSizeChange={setPageSize}
-            />
-          )}
+          {filteredRows.length > 0 && <Pagination {...pagination} />}
         </>
       )}
 

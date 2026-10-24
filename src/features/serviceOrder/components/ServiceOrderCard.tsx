@@ -4,6 +4,7 @@
 
 import { Button } from '@/components/ui';
 import { UNSET_LABEL } from '@/constants/labels';
+import { isActiveServiceOrderStatus } from '@/domain/serviceOrderStatus';
 import { CARD_ACTION, type CardAction } from '@/features/serviceOrder/constants';
 import {
   SERVICE_ORDER_STATUS,
@@ -64,9 +65,7 @@ export const ServiceOrderCard = ({
   const serviceItemName = serviceItem?.name ?? NO_REFERENCE_LABEL;
   const vendorName = vendor?.name ?? NO_REFERENCE_LABEL;
 
-  const isClosed =
-    serviceOrder.status === SERVICE_ORDER_STATUS.COMPLETED ||
-    serviceOrder.status === SERVICE_ORDER_STATUS.CANCELLED;
+  const isClosed = !isActiveServiceOrderStatus(serviceOrder.status);
 
   const renderActions = (): ReactNode =>
     STATUS_ACTIONS[serviceOrder.status].map(({ label, action, variant }) => (

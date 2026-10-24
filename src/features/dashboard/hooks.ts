@@ -1,4 +1,5 @@
 import { SERVICE_ITEM_STATUS, type ServiceItemStatus } from '@/domain/serviceItemStatus';
+import { compareNotificationsByDate } from '@/features/notifications/hooks';
 import type { ServiceItemRow } from '@/store/selectors';
 import type { Notification } from '@/store/types';
 
@@ -15,7 +16,7 @@ const ACTION_PRIORITY: readonly ServiceItemStatus[] = [
   SERVICE_ITEM_STATUS.DUE_SOON,
 ];
 
-export const NOTIFICATION_PREVIEW_LIMIT = 5;
+const NOTIFICATION_PREVIEW_LIMIT = 5;
 
 export const countByStatus = (
   rows: readonly ServiceItemRow[],
@@ -41,10 +42,8 @@ export const actionRequiredRows = (rows: readonly ServiceItemRow[]): ServiceItem
 
 const compareNotifications = (left: Notification, right: Notification): number => {
   if (left.isRead !== right.isRead) return left.isRead ? 1 : -1;
-  return right.createdDate.localeCompare(left.createdDate) || left.id.localeCompare(right.id);
+  return compareNotificationsByDate(left, right);
 };
 
-export const latestNotifications = (
-  notifications: Record<string, Notification>,
-  limit: number = NOTIFICATION_PREVIEW_LIMIT,
-): Notification[] => Object.values(notifications).toSorted(compareNotifications).slice(0, limit);
+export const latestNotifications = (notifications: Record<string, Notification>): Notification[] =>
+  Object.values(notifications).toSorted(compareNotifications).slice(0, NOTIFICATION_PREVIEW_LIMIT);

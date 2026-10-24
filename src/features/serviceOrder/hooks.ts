@@ -70,11 +70,11 @@ export const useServiceOrderBoard = (): UseServiceOrderBoardResult => {
       [SERVICE_ORDER_STATUS.COMPLETED]: [],
       [SERVICE_ORDER_STATUS.CANCELLED]: [],
     };
-    for (const serviceOrder of Object.values(serviceOrders)) {
+    // 先に全体をソートしてから振り分けると、各列は列内順序を保ったまま並ぶ
+    for (const serviceOrder of Object.values(serviceOrders).toSorted(
+      compareServiceOrdersForColumn,
+    )) {
       grouped[serviceOrder.status].push(serviceOrder);
-    }
-    for (const status of Object.values(SERVICE_ORDER_STATUS)) {
-      grouped[status] = grouped[status].toSorted(compareServiceOrdersForColumn);
     }
     return grouped;
   }, [serviceOrders]);
@@ -82,10 +82,7 @@ export const useServiceOrderBoard = (): UseServiceOrderBoardResult => {
   // 空状態(全列0件)は表示トグルに関わらず「全ステータス合計0件」で判定する。
   // displayedColumns（表示中の列）だけを対象にすると、例えば completed のみ1件でトグルOFFの場合に
   // 進行中4列がたまたま0件なだけで「案件はありません」という事実に反する空状態を出してしまう。
-  const totalServiceOrderCount = Object.values(serviceOrdersByStatus).reduce(
-    (total, columnServiceOrders) => total + columnServiceOrders.length,
-    0,
-  );
+  const totalServiceOrderCount = Object.keys(serviceOrders).length;
 
   const closeDialog = (): void => {
     setDialog(null);

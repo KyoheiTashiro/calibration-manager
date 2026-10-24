@@ -1,24 +1,20 @@
 /* oxlint-disable eslint/max-lines -- 利用マニュアルは静的な文章の集合で、行数上限による機械分割は文章の見通しを損なうため(D-054) */
-/* oxlint-disable react/no-multi-comp -- CsvFileNameTable はJSXネスト深さ抑制のための内部切り出しで、Manual画面専用のため同ファイルに置く */
+/* oxlint-disable react/no-multi-comp -- CsvFileNameTable / ManualSection はJSXネスト深さ抑制のための内部切り出しで、Manual画面専用のため同ファイルに置く */
 import { StatusBadge } from '@/components/domain';
-import { Badge } from '@/components/ui';
 import { Table, TableBody, TableHead, Td, Th } from '@/components/ui/Table';
 import { ROUTES } from '@/constants/routes';
 import { DELIVERY_DUE_SOON_NOTICE_DAYS } from '@/domain/constants';
 import { SERVICE_ITEM_STATUS, type ServiceItemStatus } from '@/domain/serviceItemStatus';
 import { statusBadgeLabel } from '@/domain/statusBadge';
-import {
-  NOTIFICATION_TYPE_BADGE_CLASSES,
-  NOTIFICATION_TYPE_ICONS,
-  NOTIFICATION_TYPE_LABELS,
-} from '@/features/notifications/constants';
+import { NotificationTypeBadge } from '@/features/notifications/components/NotificationTypeBadge';
+import { NOTIFICATION_TYPE_LABELS } from '@/features/notifications/constants';
 import {
   CSV_ENTITY_KINDS,
   ENTITY_CSV_SPECS,
   entityCsvFileName,
 } from '@/features/settings/components/csv/entityCsv';
 import { NOTIFICATION_TYPE, type NotificationType } from '@/store/types';
-import { useRef, type ReactElement } from 'react';
+import { useRef, type ReactElement, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 
 import { ImportCheckTabs } from './importCheck/ImportCheckTabs';
@@ -155,6 +151,19 @@ const CsvFileNameTable = (): ReactElement => (
   </Table>
 );
 
+type ManualSectionProps = {
+  section: { id: string; title: string };
+  children: ReactNode;
+};
+
+/* 本文セクションの枠と見出し。id は目次(TocFab)のスクロール先 */
+const ManualSection = ({ section, children }: ManualSectionProps): ReactElement => (
+  <section id={section.id} className='flex flex-col gap-3 rounded border border-slate-200 p-4'>
+    <h2 className='border-b border-slate-200 pb-2 text-lg font-semibold'>{section.title}</h2>
+    {children}
+  </section>
+);
+
 export const Manual = (): ReactElement => {
   const searchContentRef = useRef<HTMLDivElement>(null);
 
@@ -172,13 +181,7 @@ export const Manual = (): ReactElement => {
 
       {/* 検索対象を本文セクションに限定し、検索バー自身や目次FABを対象外にするため */}
       <div ref={searchContentRef} className='flex flex-col gap-4'>
-        <section
-          id={MANUAL_SECTIONS.VIDEO.id}
-          className='flex flex-col gap-3 rounded border border-slate-200 p-4'
-        >
-          <h2 className='border-b border-slate-200 pb-2 text-lg font-semibold'>
-            {MANUAL_SECTIONS.VIDEO.title}
-          </h2>
+        <ManualSection section={MANUAL_SECTIONS.VIDEO}>
           <p>
             アプリの考え方と使い始めの手順を、約7分の動画で説明しています(音声・字幕付き)。
             動画の再生にはインターネット接続が必要です。
@@ -193,30 +196,18 @@ export const Manual = (): ReactElement => {
             {/* 字幕は映像に焼き込み済みのため、二重表示を避けて既定では非表示(default なし) */}
             <track kind='captions' srcLang='ja' label='日本語' src={EXPLAINER_VIDEO_CAPTIONS_SRC} />
           </video>
-        </section>
+        </ManualSection>
 
-        <section
-          id={MANUAL_SECTIONS.INTRO.id}
-          className='flex flex-col gap-3 rounded border border-slate-200 p-4'
-        >
-          <h2 className='border-b border-slate-200 pb-2 text-lg font-semibold'>
-            {MANUAL_SECTIONS.INTRO.title}
-          </h2>
+        <ManualSection section={MANUAL_SECTIONS.INTRO}>
           <p>このアプリは、機器の点検・校正の期限をまとめて管理するツールです。</p>
           <p>
             データはすべてお使いのブラウザー内に保存されます。外部のサーバーには
             送信されないため、インターネット接続がなくても利用できます。一方で、データは端末・
             ブラウザーごとに独立しており、別の環境から同じデータを見ることはできません。
           </p>
-        </section>
+        </ManualSection>
 
-        <section
-          id={MANUAL_SECTIONS.FLOW.id}
-          className='flex flex-col gap-3 rounded border border-slate-200 p-4'
-        >
-          <h2 className='border-b border-slate-200 pb-2 text-lg font-semibold'>
-            {MANUAL_SECTIONS.FLOW.title}
-          </h2>
+        <ManualSection section={MANUAL_SECTIONS.FLOW}>
           <ol className='flex list-decimal flex-col gap-2 pl-5'>
             <li>
               はじめに、機器の登録で使う基本情報(
@@ -265,15 +256,9 @@ export const Manual = (): ReactElement => {
               画面のボードに表示され、発注から返却・実施記録の登録までの進み具合を管理できます。
             </li>
           </ol>
-        </section>
+        </ManualSection>
 
-        <section
-          id={MANUAL_SECTIONS.STATUS.id}
-          className='flex flex-col gap-3 rounded border border-slate-200 p-4'
-        >
-          <h2 className='border-b border-slate-200 pb-2 text-lg font-semibold'>
-            {MANUAL_SECTIONS.STATUS.title}
-          </h2>
+        <ManualSection section={MANUAL_SECTIONS.STATUS}>
           <h3 className='border-primary border-l-4 pl-2 font-semibold'>点検校正項目のステータス</h3>
           <p>
             点検校正項目一覧やダッシュボードなどで表示されるステータスです。複数に当てはまる場合は、
@@ -305,28 +290,16 @@ export const Manual = (): ReactElement => {
             」は対応が不要な状態のため、対応する通知はありません。
           </p>
           <ul className='flex flex-col gap-2'>
-            {Object.values(NOTIFICATION_TYPE).map((type) => {
-              const TypeIcon = NOTIFICATION_TYPE_ICONS[type];
-              return (
-                <li key={type} className='flex items-center gap-2'>
-                  <Badge className={NOTIFICATION_TYPE_BADGE_CLASSES[type]}>
-                    <TypeIcon className='mr-1 h-3.5 w-3.5' />
-                    {NOTIFICATION_TYPE_LABELS[type]}
-                  </Badge>
-                  <span>{NOTIFICATION_TYPE_DESCRIPTIONS[type]}</span>
-                </li>
-              );
-            })}
+            {Object.values(NOTIFICATION_TYPE).map((type) => (
+              <li key={type} className='flex items-center gap-2'>
+                <NotificationTypeBadge type={type} />
+                <span>{NOTIFICATION_TYPE_DESCRIPTIONS[type]}</span>
+              </li>
+            ))}
           </ul>
-        </section>
+        </ManualSection>
 
-        <section
-          id={MANUAL_SECTIONS.DUE_DATES.id}
-          className='flex flex-col gap-3 rounded border border-slate-200 p-4'
-        >
-          <h2 className='border-b border-slate-200 pb-2 text-lg font-semibold'>
-            {MANUAL_SECTIONS.DUE_DATES.title}
-          </h2>
+        <ManualSection section={MANUAL_SECTIONS.DUE_DATES}>
           <h3 className='border-primary border-l-4 pl-2 font-semibold'>次回期限</h3>
           <p>
             次回期限は「前回実施日 +
@@ -364,15 +337,9 @@ export const Manual = (): ReactElement => {
             から44日さかのぼった 8/17
             になります。この日を過ぎても発注していない点検校正項目が「要発注」として表示されます。
           </p>
-        </section>
+        </ManualSection>
 
-        <section
-          id={MANUAL_SECTIONS.SCREENS.id}
-          className='flex flex-col gap-3 rounded border border-slate-200 p-4'
-        >
-          <h2 className='border-b border-slate-200 pb-2 text-lg font-semibold'>
-            {MANUAL_SECTIONS.SCREENS.title}
-          </h2>
+        <ManualSection section={MANUAL_SECTIONS.SCREENS}>
           {SCREEN_GUIDES.map((guide) => (
             <div key={guide.route}>
               <h3 className='font-semibold'>
@@ -383,15 +350,9 @@ export const Manual = (): ReactElement => {
               <p>{guide.description}</p>
             </div>
           ))}
-        </section>
+        </ManualSection>
 
-        <section
-          id={MANUAL_SECTIONS.CSV.id}
-          className='flex flex-col gap-3 rounded border border-slate-200 p-4'
-        >
-          <h2 className='border-b border-slate-200 pb-2 text-lg font-semibold'>
-            {MANUAL_SECTIONS.CSV.title}
-          </h2>
+        <ManualSection section={MANUAL_SECTIONS.CSV}>
           <p>
             <Link to={ROUTES.SETTINGS} className='text-primary underline'>
               設定画面
@@ -491,15 +452,9 @@ export const Manual = (): ReactElement => {
             数式の実行を確認する警告が表示されることがあります。その場合は、内容に心当たりがあるか
             確認できるまで「許可しない」を選ぶことを推奨します。
           </p>
-        </section>
+        </ManualSection>
 
-        <section
-          id={MANUAL_SECTIONS.PRIVACY.id}
-          className='flex flex-col gap-3 rounded border border-slate-200 p-4'
-        >
-          <h2 className='border-b border-slate-200 pb-2 text-lg font-semibold'>
-            {MANUAL_SECTIONS.PRIVACY.title}
-          </h2>
+        <ManualSection section={MANUAL_SECTIONS.PRIVACY}>
           <p>
             このアプリは、利用者の個人情報や利用状況を収集しません。入力したデータはすべて
             お使いのブラウザー内にのみ保存され、外部のサーバーには送信されません。
@@ -525,15 +480,9 @@ export const Manual = (): ReactElement => {
             </a>
             を参照してください。
           </p>
-        </section>
+        </ManualSection>
 
-        <section
-          id={MANUAL_SECTIONS.LICENSE.id}
-          className='flex flex-col gap-3 rounded border border-slate-200 p-4'
-        >
-          <h2 className='border-b border-slate-200 pb-2 text-lg font-semibold'>
-            {MANUAL_SECTIONS.LICENSE.title}
-          </h2>
+        <ManualSection section={MANUAL_SECTIONS.LICENSE}>
           <p>
             このアプリはオープンソースソフトウェアです。ソースコードはMITライセンスのもと、
             <a
@@ -558,7 +507,7 @@ export const Manual = (): ReactElement => {
             </a>
             に従い、ソースコードを自由に改変・拡張してご利用いただけます。
           </p>
-        </section>
+        </ManualSection>
       </div>
     </div>
   );

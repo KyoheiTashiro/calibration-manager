@@ -40,14 +40,7 @@ export const EquipmentList = (): ReactElement => {
     serviceItemCountOf,
     nearestDueDateOf,
   } = useEquipmentList();
-  const {
-    page,
-    pageSize,
-    totalCount: pagedTotalCount,
-    pagedItems,
-    setPage,
-    setPageSize,
-  } = usePagination(filteredEquipmentList, `${searchText}|${statusFilter}`);
+  const pagination = usePagination(filteredEquipmentList, `${searchText}|${statusFilter}`);
 
   const handleAddClick = (): void => {
     safeNavigate(ROUTES.EQUIPMENT_CREATE);
@@ -110,7 +103,7 @@ export const EquipmentList = (): ReactElement => {
                 </tr>
               </TableHead>
               <TableBody>
-                {pagedItems.map((entry) => (
+                {pagination.pagedItems.map((entry) => (
                   <tr
                     key={entry.id}
                     {...activatableRowProps(() => {
@@ -134,15 +127,7 @@ export const EquipmentList = (): ReactElement => {
               </TableBody>
             </Table>
           )}
-          {filteredEquipmentList.length > 0 && (
-            <Pagination
-              page={page}
-              pageSize={pageSize}
-              totalCount={pagedTotalCount}
-              onPageChange={setPage}
-              onPageSizeChange={setPageSize}
-            />
-          )}
+          {filteredEquipmentList.length > 0 && <Pagination {...pagination} />}
         </>
       )}
     </div>

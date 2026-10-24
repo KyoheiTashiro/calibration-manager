@@ -22,10 +22,6 @@ type Props = {
 export const ActionRequiredList = ({ rows, onNavigate }: Props): ReactElement => {
   if (rows.length === 0) return <EmptyState message='対応が必要な項目はありません' />;
 
-  const activate = (equipmentId: string): void => {
-    onNavigate(equipmentDetailPath(equipmentId));
-  };
-
   return (
     <Table>
       <TableHead>
@@ -44,7 +40,7 @@ export const ActionRequiredList = ({ rows, onNavigate }: Props): ReactElement =>
           <tr
             key={row.serviceItem.id}
             {...activatableRowProps(() => {
-              activate(row.equipment.id);
+              onNavigate(equipmentDetailPath(row.equipment.id));
             })}
           >
             <Td>

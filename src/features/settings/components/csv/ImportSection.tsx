@@ -3,6 +3,7 @@ import {
   CSV_ENTITY_KINDS,
   type CsvEntityKind,
   ENTITY_CSV_SPECS,
+  isCsvEntityKind,
 } from '@/features/settings/components/csv/entityCsv';
 import {
   type ImportRowError,
@@ -17,9 +18,6 @@ const ENTITY_OPTIONS = CSV_ENTITY_KINDS.map((kind) => ({
   value: kind,
   label: ENTITY_CSV_SPECS[kind].label,
 }));
-
-const isCsvEntityKind = (value: string): value is CsvEntityKind =>
-  CSV_ENTITY_KINDS.some((kind) => kind === value);
 
 const IMPORT_STEP = { IDLE: 'idle', PREVIEW: 'preview', DONE: 'done' } as const;
 
@@ -100,10 +98,6 @@ export const ImportSection = ({ state }: Props): ReactElement => {
     }
   };
 
-  const handleCancel = (): void => {
-    clearSelection();
-  };
-
   const handleConfirmImport = (): void => {
     setConfirmOpen(false);
     if (viewState.step !== IMPORT_STEP.PREVIEW) return;
@@ -111,8 +105,7 @@ export const ImportSection = ({ state }: Props): ReactElement => {
     if (entities === null) return;
     replaceEntities(kind, entities);
     const message = `${label}を ${validCount} 件取り込みました`;
-    validationSeq.current += 1;
-    if (fileInputRef.current) fileInputRef.current.value = '';
+    clearSelection();
     setViewState({ step: IMPORT_STEP.DONE, message });
   };
 
@@ -172,7 +165,7 @@ export const ImportSection = ({ state }: Props): ReactElement => {
       <div className='border-line rounded border p-3 text-sm'>{renderPreview()}</div>
 
       <div className='flex justify-end gap-2'>
-        <Button variant='secondary' onClick={handleCancel}>
+        <Button variant='secondary' onClick={clearSelection}>
           キャンセル
         </Button>
         <Button

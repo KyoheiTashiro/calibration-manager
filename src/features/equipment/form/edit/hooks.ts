@@ -49,9 +49,8 @@ export const useEditEquipmentForm = (): UseEditEquipmentFormResult => {
   const currentEquipment = id === undefined ? undefined : equipmentMap[id];
 
   // 廃棄（retired）への変更確認ダイアログを表示中、保存待ちの入力値を保持しておく。
-  // ダイアログを経由しない通常保存では使わない。
+  // ダイアログを経由しない通常保存では使わない。null 以外の間はダイアログ表示中を意味する。
   const [pendingValues, setPendingValues] = useState<FormType | null>(null);
-  const [retireConfirmOpen, setRetireConfirmOpen] = useState(false);
 
   const currentFormValues = toFormValues(currentEquipment);
 
@@ -78,7 +77,6 @@ export const useEditEquipmentForm = (): UseEditEquipmentFormResult => {
       values.status === EQUIPMENT_STATUS.RETIRED;
     if (isRetiring) {
       setPendingValues(values);
-      setRetireConfirmOpen(true);
       return;
     }
     persist(values);
@@ -86,7 +84,6 @@ export const useEditEquipmentForm = (): UseEditEquipmentFormResult => {
 
   const handleRetireConfirm = (): void => {
     if (pendingValues !== null) persist(pendingValues);
-    setRetireConfirmOpen(false);
     setPendingValues(null);
   };
 
@@ -99,11 +96,10 @@ export const useEditEquipmentForm = (): UseEditEquipmentFormResult => {
     control,
     onFormSubmit: handleSubmit(onSubmit),
     manufacturerOptions,
-    retireConfirmOpen,
+    retireConfirmOpen: pendingValues !== null,
     closeRetireConfirm: (): void => {
       // キャンセル時は保存しない。フォームの編集内容はRHF側の状態のまま保持されるため
       // pendingValues を破棄するだけでよい。
-      setRetireConfirmOpen(false);
       setPendingValues(null);
     },
     handleRetireConfirm,
