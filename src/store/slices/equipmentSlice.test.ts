@@ -60,37 +60,4 @@ describe('equipmentSlice', () => {
       expect(useAppStore.getState().equipment['no-such-id']).toBeUndefined();
     });
   });
-
-  describe('setEquipmentStatus', () => {
-    it('statusをsuspendedに切り替えられる', () => {
-      const id = useAppStore.getState().addEquipment(buildEquipmentInput({ status: 'active' }));
-
-      useAppStore.getState().setEquipmentStatus(id, 'suspended');
-
-      expect(useAppStore.getState().equipment[id]?.status).toBe('suspended');
-    });
-
-    it('statusをretiredに切り替えられる', () => {
-      const id = useAppStore.getState().addEquipment(buildEquipmentInput({ status: 'active' }));
-
-      useAppStore.getState().setEquipmentStatus(id, 'retired');
-
-      expect(useAppStore.getState().equipment[id]?.status).toBe('retired');
-    });
-
-    it('statusをactiveに切り替えられる', () => {
-      const id = useAppStore.getState().addEquipment(buildEquipmentInput({ status: 'suspended' }));
-
-      useAppStore.getState().setEquipmentStatus(id, 'active');
-
-      expect(useAppStore.getState().equipment[id]?.status).toBe('active');
-    });
-
-    it('存在しないidを指定してもno-opで例外を投げない', () => {
-      expect(() => {
-        useAppStore.getState().setEquipmentStatus('no-such-id', 'retired');
-      }).not.toThrow();
-      expect(useAppStore.getState().equipment['no-such-id']).toBeUndefined();
-    });
-  });
 });

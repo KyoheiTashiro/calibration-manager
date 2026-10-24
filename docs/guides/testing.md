@@ -67,10 +67,9 @@
 
 - `src/domain/**`（`dateCycle.ts` / `leadTime.ts` / `serviceItemStatus.ts` / `notificationRules.ts` 等）: lines 98 / functions 100 / branches 98 / statements 98
 - `src/store/**`: lines 97 / functions 96 / branches 92 / statements 97
-- `src/utils/id/index.ts`: 100 / 100 / 100 / 100
 - `src/utils/csv/index.ts`: lines 97 / functions 95 / branches 90 / statements 97
 
-明示的な `exclude` 設定は置かず provider 既定の除外に任せる。閾値ゲートは上記4パターンに限定され、component（`.tsx`）や `src/components/system/**` は対象外。
+明示的な `exclude` 設定は置かず provider 既定の除外に任せる。閾値ゲートは上記3パターンに限定され、component（`.tsx`）や `src/components/system/**` は対象外。
 
 ## アクセシビリティ
 

@@ -4,9 +4,9 @@
  */
 
 import { computeExpectedNotifications, type NotificationSeed } from '@/domain/notificationRules';
+import { isServiceItemInScope } from '@/store/selectors';
 import type { AppSliceCreator } from '@/store/storeState';
-import { EQUIPMENT_STATUS, type IsoDateString, type Notification } from '@/store/types';
-import { createId } from '@/utils/id';
+import type { IsoDateString, Notification } from '@/store/types';
 import { recordValue } from '@/utils/record';
 
 const duplicationKey = (seed: Pick<NotificationSeed, 'targetType' | 'targetId' | 'type'>): string =>
@@ -29,10 +29,8 @@ export const createNotificationSlice: AppSliceCreator<NotificationSlice> = (set,
 
   generateNotifications: (today): void => {
     const { serviceItems, serviceOrders, vendors, equipment, notifications } = get();
-    const targetServiceItems = Object.values(serviceItems).filter(
-      (serviceItem) =>
-        serviceItem.isActive &&
-        recordValue(equipment, serviceItem.equipmentId)?.status === EQUIPMENT_STATUS.ACTIVE,
+    const targetServiceItems = Object.values(serviceItems).filter((serviceItem) =>
+      isServiceItemInScope(serviceItem, recordValue(equipment, serviceItem.equipmentId)),
     );
     const seeds = computeExpectedNotifications(
       targetServiceItems,
@@ -51,7 +49,7 @@ export const createNotificationSlice: AppSliceCreator<NotificationSlice> = (set,
 
     set((state) => {
       for (const seed of freshSeeds) {
-        const id = createId();
+        const id = crypto.randomUUID();
         state.notifications[id] = { ...seed, id, createdDate: today, isRead: false };
       }
     });

@@ -29,9 +29,9 @@ useAppStore = create<StoreState>()(
 | スライス                | 状態                                          | 主なアクション                                            | 実装パス                      |
 | ----------------------- | --------------------------------------------- | --------------------------------------------------------- | --------------------------------- |
 | `vendorSlice`           | `vendors: Record<string, Vendor>`             | `addVendor` / `updateVendor` / `removeVendor`             | `slices/vendorSlice.ts`           |
-| `personSlice`           | `persons: Record<string, Person>`             | `addPerson` / `updatePerson` / `setPersonActive`          | `slices/personSlice.ts`           |
-| `equipmentSlice`        | `equipment: Record<string, Equipment>`        | `addEquipment` / `updateEquipment` / `setEquipmentStatus` | `slices/equipmentSlice.ts`        |
-| `serviceItemSlice`   | `serviceItems: Record<string, ServiceItem>`       | `addServiceItem` / `updateServiceItem` / `setServiceItemActive`                | `slices/serviceItemSlice.ts`   |
+| `personSlice`           | `persons: Record<string, Person>`             | `addPerson` / `updatePerson`                              | `slices/personSlice.ts`           |
+| `equipmentSlice`        | `equipment: Record<string, Equipment>`        | `addEquipment` / `updateEquipment`                        | `slices/equipmentSlice.ts`        |
+| `serviceItemSlice`   | `serviceItems: Record<string, ServiceItem>`       | `addServiceItem` / `updateServiceItem`                | `slices/serviceItemSlice.ts`   |
 | `serviceRecordSlice` | `serviceRecords: Record<string, ServiceRecord>` | `addServiceRecord`                                   | `slices/serviceRecordSlice.ts` |
 | `serviceOrderSlice` | `serviceOrders: Record<string, ServiceOrder>`    | `addServiceOrder` / `updateServiceOrder` / `updateServiceOrderStatus`          | `slices/serviceOrderSlice.ts` |
 | `notificationSlice`     | `notifications: Record<string, Notification>` | `generateNotifications` / `markAsRead` / `markAllAsRead`  | `slices/notificationSlice.ts`     |
@@ -44,9 +44,9 @@ useAppStore = create<StoreState>()(
 データ整合は各アクションが手続き的に維持する。参照を壊さない設計とする。
 
 - `removeVendor(id)`: Equipment.manufacturerId / ServiceItem.vendorId / ServiceOrder.vendorId のいずれかから参照されている場合は削除不可とし、no-op（真偽値を返す）とする。UIは事前に確認ダイアログ（screen-design §0.6）を出し、参照が残っている場合はエラー表示する。
-- `setPersonActive(id, isActive)`: Personは物理削除しない（domain-model.md §3.2）。無効化はscreen-design §0.6の確認ダイアログ対象。
-- `setEquipmentStatus(id, status)`: 機器は論理削除のみ（`retired`）。`retired`への変更は確認ダイアログ対象（screen-design §0.6）。`suspended`/`retired`は期限計算・通知の対象外（domain-model.md §3.3）。休止からの再稼働時の期限リセットは据え置き（リセットしない）で確定（D-002）。
-- `setServiceItemActive(id, isActive)`: 他エンティティと整合を取り、物理削除は行わずisActiveで無効化する（実装判断）。
+- Person の無効化（`updatePerson(id, { isActive })`）: Personは物理削除しない（domain-model.md §3.2）。無効化はscreen-design §0.6の確認ダイアログ対象。
+- 機器の状態変更（`updateEquipment(id, { status })`）: 機器は論理削除のみ（`retired`）。`retired`への変更は確認ダイアログ対象（screen-design §0.6）。`suspended`/`retired`は期限計算・通知の対象外（domain-model.md §3.3）。休止からの再稼働時の期限リセットは据え置き（リセットしない）で確定（D-002）。
+- 項目の無効化（`updateServiceItem(id, { isActive })`）: 他エンティティと整合を取り、物理削除は行わずisActiveで無効化する（実装判断）。
 - `addServiceRecord(serviceItemId, doneDate, doneBy, result, serviceOrderId?, note?)`: ServiceRecordを追加した上で、
   - `serviceItem.lastDoneDate = doneDate` は `result` に関わらず無条件で更新する（D-015）。
   - `result !== 'fail'` の場合のみ `serviceItem.nextDueDate = addCycle(doneDate, serviceItem.cycle)`（暦月ベース加算。domain-model.md §4.1）に更新する。`result === 'fail'` の場合は次回期限のみ据え置く（domain-model.md §3.5、D-015）。

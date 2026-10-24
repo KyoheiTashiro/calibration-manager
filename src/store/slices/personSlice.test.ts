@@ -52,29 +52,4 @@ describe('personSlice', () => {
       expect(useAppStore.getState().persons['no-such-id']).toBeUndefined();
     });
   });
-
-  describe('setPersonActive', () => {
-    it('isActiveをfalseに切り替えられる', () => {
-      const id = useAppStore.getState().addPerson(buildPersonInput({ isActive: true }));
-
-      useAppStore.getState().setPersonActive(id, false);
-
-      expect(useAppStore.getState().persons[id]?.isActive).toBe(false);
-    });
-
-    it('isActiveをtrueに切り替えられる', () => {
-      const id = useAppStore.getState().addPerson(buildPersonInput({ isActive: false }));
-
-      useAppStore.getState().setPersonActive(id, true);
-
-      expect(useAppStore.getState().persons[id]?.isActive).toBe(true);
-    });
-
-    it('存在しないidを指定してもno-opで例外を投げない', () => {
-      expect(() => {
-        useAppStore.getState().setPersonActive('no-such-id', true);
-      }).not.toThrow();
-      expect(useAppStore.getState().persons['no-such-id']).toBeUndefined();
-    });
-  });
 });

@@ -67,29 +67,4 @@ describe('serviceItemSlice', () => {
       expect(useAppStore.getState().serviceItems['no-such-id']).toBeUndefined();
     });
   });
-
-  describe('setServiceItemActive', () => {
-    it('isActiveをfalseに切り替えられる', () => {
-      const id = useAppStore.getState().addServiceItem(buildServiceItemInput({ isActive: true }));
-
-      useAppStore.getState().setServiceItemActive(id, false);
-
-      expect(useAppStore.getState().serviceItems[id]?.isActive).toBe(false);
-    });
-
-    it('isActiveをtrueに切り替えられる', () => {
-      const id = useAppStore.getState().addServiceItem(buildServiceItemInput({ isActive: false }));
-
-      useAppStore.getState().setServiceItemActive(id, true);
-
-      expect(useAppStore.getState().serviceItems[id]?.isActive).toBe(true);
-    });
-
-    it('存在しないidを指定してもno-opで例外を投げない', () => {
-      expect(() => {
-        useAppStore.getState().setServiceItemActive('no-such-id', true);
-      }).not.toThrow();
-      expect(useAppStore.getState().serviceItems['no-such-id']).toBeUndefined();
-    });
-  });
 });

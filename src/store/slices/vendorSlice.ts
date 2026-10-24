@@ -2,10 +2,10 @@
  * removeVendor は参照整合カスケードを持つ。
  */
 
+import { addEntity, patchEntity } from '@/store/entityActions';
 import { isVendorReferenced } from '@/store/selectors';
 import type { AppSliceCreator } from '@/store/storeState';
 import type { Vendor } from '@/store/types';
-import { createId } from '@/utils/id';
 import { recordValue } from '@/utils/record';
 
 export type VendorSlice = {
@@ -24,20 +24,10 @@ export type VendorSlice = {
 export const createVendorSlice: AppSliceCreator<VendorSlice> = (set, get) => ({
   vendors: {},
 
-  addVendor: (input): string => {
-    const id = createId();
-    set((state) => {
-      state.vendors[id] = { ...input, id };
-    });
-    return id;
-  },
+  addVendor: (input): string => addEntity(set, (state) => state.vendors, input),
 
   updateVendor: (id, patch): void => {
-    set((state) => {
-      const vendor = recordValue(state.vendors, id);
-      if (vendor === undefined) return;
-      Object.assign(vendor, patch);
-    });
+    patchEntity(set, (state) => state.vendors, id, patch);
   },
 
   removeVendor: (id): boolean => {

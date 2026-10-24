@@ -6,7 +6,7 @@
 import { UNSET_LABEL } from '@/constants/labels';
 import { recommendedOrderDate } from '@/domain/leadTime';
 import { deriveServiceItemStatus, type ServiceItemStatus } from '@/domain/serviceItemStatus';
-import { isActiveServiceOrderStatus } from '@/domain/serviceOrderStatus';
+import { hasActiveServiceOrder } from '@/domain/serviceOrderStatus';
 import {
   EQUIPMENT_STATUS,
   EXECUTION,
@@ -76,6 +76,15 @@ export const isVendorReferenced = (
 export const unreadNotificationCount = (state: Pick<AppState, 'notifications'>): number =>
   Object.values(state.notifications).filter((notification) => !notification.isRead).length;
 
+/**
+ * 期限計算・通知の対象項目か（項目が有効 かつ 紐づく機器が稼働中）。
+ * 項目行の導出と通知生成で同一規則を使う。機器が見つからない（dangling）場合は対象外。
+ */
+export const isServiceItemInScope = (
+  serviceItem: ServiceItem,
+  equipment: Equipment | undefined,
+): equipment is Equipment => serviceItem.isActive && equipment?.status === EQUIPMENT_STATUS.ACTIVE;
+
 /** 項目一覧・ダッシュボードで共有する1行（表示に必要な導出値を同梱） */
 export type ServiceItemRow = {
   serviceItem: ServiceItem;
@@ -103,28 +112,22 @@ export const serviceItemRowsOf = (
 ): ServiceItemRow[] => {
   const rows: ServiceItemRow[] = [];
   for (const serviceItem of Object.values(state.serviceItems)) {
-    if (!serviceItem.isActive) continue;
     const equipment = recordValue(state.equipment, serviceItem.equipmentId);
-    if (equipment === undefined) continue; // dangling: 参照先機器なし
-    if (equipment.status !== EQUIPMENT_STATUS.ACTIVE) continue;
+    if (!isServiceItemInScope(serviceItem, equipment)) continue;
 
     const vendor =
       serviceItem.vendorId === undefined ? null : (state.vendors[serviceItem.vendorId] ?? null);
-    const itemServiceOrders: ServiceOrder[] = serviceOrdersOf(
-      { serviceOrders: state.serviceOrders },
-      serviceItem.id,
-    );
+    const itemServiceOrders = serviceOrdersOf(state, serviceItem.id);
     const isExternal = serviceItem.execution === EXECUTION.EXTERNAL;
 
     rows.push({
       serviceItem,
       equipment,
       status: deriveServiceItemStatus(serviceItem, itemServiceOrders, vendor, today),
-      personLabel: personLabelOf({ persons: state.persons }, serviceItem.personId),
+      personLabel: personLabelOf(state, serviceItem.personId),
       recommendedOrderDate: recommendedOrderDate(serviceItem, vendor),
       canCreateServiceOrder:
-        isExternal &&
-        !itemServiceOrders.some((serviceOrder) => isActiveServiceOrderStatus(serviceOrder.status)),
+        isExternal && !hasActiveServiceOrder(itemServiceOrders, serviceItem.id),
     });
   }
   return rows.toSorted(compareServiceItemRows);

@@ -3,43 +3,23 @@
  * 対象外だが、その除外は派生側（serviceItemStatus / generateNotifications）の責務。
  */
 
+import { addEntity, patchEntity } from '@/store/entityActions';
 import type { AppSliceCreator } from '@/store/storeState';
-import type { Equipment, EquipmentStatus } from '@/store/types';
-import { createId } from '@/utils/id';
-import { recordValue } from '@/utils/record';
+import type { Equipment } from '@/store/types';
 
 export type EquipmentSlice = {
   equipment: Record<string, Equipment>;
   /** @returns 生成したEquipmentのid */
   addEquipment: (input: Omit<Equipment, 'id'>) => string;
   updateEquipment: (id: string, patch: Partial<Omit<Equipment, 'id'>>) => void;
-  setEquipmentStatus: (id: string, status: EquipmentStatus) => void;
 };
 
 export const createEquipmentSlice: AppSliceCreator<EquipmentSlice> = (set) => ({
   equipment: {},
 
-  addEquipment: (input): string => {
-    const id = createId();
-    set((state) => {
-      state.equipment[id] = { ...input, id };
-    });
-    return id;
-  },
+  addEquipment: (input): string => addEntity(set, (state) => state.equipment, input),
 
   updateEquipment: (id, patch): void => {
-    set((state) => {
-      const entry = recordValue(state.equipment, id);
-      if (entry === undefined) return;
-      Object.assign(entry, patch);
-    });
-  },
-
-  setEquipmentStatus: (id, status): void => {
-    set((state) => {
-      const entry = recordValue(state.equipment, id);
-      if (entry === undefined) return;
-      entry.status = status;
-    });
+    patchEntity(set, (state) => state.equipment, id, patch);
   },
 });
