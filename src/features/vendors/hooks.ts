@@ -43,49 +43,51 @@ export const useVendorList = (): UseVendorListResult => {
   };
 };
 
+export const VENDOR_DELETE_DIALOG = {
+  /** 削除確認ダイアログ */
+  CONFIRM: 'confirm',
+  /** 「参照されているため削除できません」ダイアログ */
+  REFERENCED: 'referenced',
+} as const;
+
+/** 削除確認と参照エラーは同時に開かない(排他)ため 1 つの union で持つ。null = どちらも閉 */
+export type VendorDeleteDialog =
+  | { kind: typeof VENDOR_DELETE_DIALOG.CONFIRM; vendorId: string }
+  | { kind: typeof VENDOR_DELETE_DIALOG.REFERENCED };
+
 type UseVendorDeleteResult = {
-  deleteTargetId: string | undefined;
-  referencedErrorOpen: boolean;
+  dialog: VendorDeleteDialog | null;
   handleDeleteClick: (vendorId: string) => void;
   handleConfirmDelete: () => void;
-  handleCancelDelete: () => void;
-  closeReferencedError: () => void;
+  closeDialog: () => void;
 };
 
 export const useVendorDelete = (): UseVendorDeleteResult => {
   const removeVendor = useAppStore((state) => state.removeVendor);
-  const [deleteTargetId, setDeleteTargetId] = useState<string>();
-  const [referencedErrorOpen, setReferencedErrorOpen] = useState(false);
+  const [dialog, setDialog] = useState<VendorDeleteDialog | null>(null);
 
   const handleDeleteClick = (vendorId: string): void => {
     if (isVendorReferenced(useAppStore.getState(), vendorId)) {
-      setReferencedErrorOpen(true);
+      setDialog({ kind: VENDOR_DELETE_DIALOG.REFERENCED });
       return;
     }
-    setDeleteTargetId(vendorId);
+    setDialog({ kind: VENDOR_DELETE_DIALOG.CONFIRM, vendorId });
   };
 
   const handleConfirmDelete = (): void => {
-    if (deleteTargetId === undefined) return;
-    const succeeded = removeVendor(deleteTargetId);
-    setDeleteTargetId(undefined);
+    if (dialog?.kind !== VENDOR_DELETE_DIALOG.CONFIRM) return;
+    const succeeded = removeVendor(dialog.vendorId);
     // なぜ: 確認ダイアログ表示中に別経路で参照が発生した競合等、false 返却時も
     // 「参照されているため削除できません」表示にフォールバックする。
-    if (!succeeded) {
-      setReferencedErrorOpen(true);
-    }
+    setDialog(succeeded ? null : { kind: VENDOR_DELETE_DIALOG.REFERENCED });
   };
 
   return {
-    deleteTargetId,
-    referencedErrorOpen,
+    dialog,
     handleDeleteClick,
     handleConfirmDelete,
-    handleCancelDelete: (): void => {
-      setDeleteTargetId(undefined);
-    },
-    closeReferencedError: (): void => {
-      setReferencedErrorOpen(false);
+    closeDialog: (): void => {
+      setDialog(null);
     },
   };
 };

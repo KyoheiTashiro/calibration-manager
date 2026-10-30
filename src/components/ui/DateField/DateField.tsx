@@ -41,11 +41,12 @@ export const DateField = ({ label, error, required, ref, ...rest }: Props): Reac
   const errorId = `${inputId}-error`;
   const hasError = error !== undefined && error !== '';
 
-  const [isOpen, setIsOpen] = useState(false);
   // なぜ state で保持するか: ポップオーバーを開いた瞬間の入力値をカレンダーの初期カーソルに使う。
   // render 中に ref.current を読むのは React Compiler のルール違反になるため、
   // 開くイベントハンドラの中でのみ ref を読み、その結果を state にスナップショットする。
-  const [initialValueOnOpen, setInitialValueOnOpen] = useState('');
+  // null = 閉。開閉フラグを別に持つと「閉じているのに値あり」が作れるため値 1 つに統合する。
+  const [initialValueOnOpen, setInitialValueOnOpen] = useState<string | null>(null);
+  const isOpen = initialValueOnOpen !== null;
   const wrapperRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -61,7 +62,7 @@ export const DateField = ({ label, error, required, ref, ...rest }: Props): Reac
   );
 
   const closeCalendar = (returnFocus: boolean): void => {
-    setIsOpen(false);
+    setInitialValueOnOpen(null);
     if (returnFocus) buttonRef.current?.focus();
   };
 
@@ -111,8 +112,7 @@ export const DateField = ({ label, error, required, ref, ...rest }: Props): Reac
           aria-expanded={isOpen}
           disabled={rest.disabled}
           onClick={() => {
-            setInitialValueOnOpen(inputRef.current?.value ?? '');
-            setIsOpen((previous) => !previous);
+            setInitialValueOnOpen(isOpen ? null : (inputRef.current?.value ?? ''));
           }}
           className='absolute top-1/2 right-2 -translate-y-1/2'
         >

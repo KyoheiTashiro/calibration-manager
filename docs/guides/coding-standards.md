@@ -122,6 +122,7 @@ Lint/Format は **oxlint + oxfmt**（ESLint/Prettier ではない）。多くは
 - **action 内ガードは early-return**（`const serviceItem = state.serviceItems[id]; if (!serviceItem) return;`）。
 - **横断 selector（複数エンティティ導出）は `src/store/selectors.ts` に純関数で**（store を引数に取りテスト可能に）。
 - **ローカル state vs store**: 永続化対象（equipment/service-items/service-records/service-orders/vendors/persons/notifications 等、`partialize` で限定）は store。UI 一時状態（編集中 id・モーダル開閉・選択 Set）は `useState`。項目ステータス（`deriveServiceItemStatus`）・発注推奨日は**永続化せず純関数で派生**（ドメインモデル §4）。
+- **ローカル state は「ありえない状態」を作れない形で持つ(D-101)**: 他 state から導出できる値は state にしない。「開閉フラグ + 開いている間だけ意味を持つ値」は `値 | null`(null = 閉)の 1 state に統合する(例: `DateField` の `initialValueOnOpen`、`useVendorDelete` の `dialog`)。3 つ以上の state が組合せで不変条件を持つ場合のみ `useReducer` とし、reducer は別ファイルの純関数にして境界値を単体テストで固定する(例: `features/manual/search/searchReducer.ts`)。独立した単純 state(モーダル開閉 1 個など)は `useState` のまま。
 
 ## 6. import
 

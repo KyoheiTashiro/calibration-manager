@@ -15,7 +15,7 @@ import {
 } from '@/components/ui';
 import { UNSET_LABEL } from '@/constants/labels';
 import { VendorTypeBadges } from '@/features/vendors/components/VendorTypeBadges';
-import { useVendorDelete, useVendorList } from '@/features/vendors/hooks';
+import { useVendorDelete, useVendorList, VENDOR_DELETE_DIALOG } from '@/features/vendors/hooks';
 import type { Vendor } from '@/store/types';
 import { useEntityModal } from '@/utils/modal';
 import type { ReactElement } from 'react';
@@ -27,14 +27,7 @@ export const VendorList = (): ReactElement => {
   const { modalState, handleAddClick, handleEditClick, handleModalClose } =
     useEntityModal<Vendor>();
 
-  const {
-    deleteTargetId,
-    referencedErrorOpen,
-    handleDeleteClick,
-    handleConfirmDelete,
-    handleCancelDelete,
-    closeReferencedError,
-  } = useVendorDelete();
+  const { dialog, handleDeleteClick, handleConfirmDelete, closeDialog } = useVendorDelete();
 
   return (
     <div className='flex flex-col gap-4'>
@@ -134,23 +127,31 @@ export const VendorList = (): ReactElement => {
         </>
       )}
 
-      <VendorModal open={modalState.open} vendor={modalState.entity} onClose={handleModalClose} />
+      <VendorModal
+        open={modalState.open}
+        vendor={modalState.open ? modalState.entity : undefined}
+        onClose={handleModalClose}
+      />
 
       <ConfirmModal
-        open={deleteTargetId !== undefined}
+        open={dialog?.kind === VENDOR_DELETE_DIALOG.CONFIRM}
         title='取引先の削除'
         message='この取引先を削除しますか?'
         confirmLabel='削除'
         onConfirm={handleConfirmDelete}
-        onCancel={handleCancelDelete}
+        onCancel={closeDialog}
       />
 
-      <Modal open={referencedErrorOpen} title='削除できません' onClose={closeReferencedError}>
+      <Modal
+        open={dialog?.kind === VENDOR_DELETE_DIALOG.REFERENCED}
+        title='削除できません'
+        onClose={closeDialog}
+      >
         <p role='alert' className='text-sm text-slate-700'>
           この取引先は参照されているため削除できません
         </p>
         <div className='flex justify-end pt-4'>
-          <Button onClick={closeReferencedError}>OK</Button>
+          <Button onClick={closeDialog}>OK</Button>
         </div>
       </Modal>
     </div>

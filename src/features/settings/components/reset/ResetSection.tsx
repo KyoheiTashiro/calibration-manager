@@ -4,13 +4,12 @@ import { type ChangeEvent, type ReactElement, useState } from 'react';
 
 export const ResetSection = (): ReactElement => {
   const resetAll = useAppStore((store) => store.resetAll);
-  const [open, setOpen] = useState(false);
-  const [understood, setUnderstood] = useState(false);
+  // なぜ開閉フラグと分けないか: チェック状態はモーダルが開いている間だけ意味を持つ。
+  // null = 閉 にまとめると、閉じるだけでチェックも消え、再オープン時の亡霊活性が構造上起きない。
+  const [modal, setModal] = useState<{ understood: boolean } | null>(null);
 
-  // なぜ: モーダルを閉じたらチェック状態をリセットする(再オープン時の亡霊活性を防ぐ)。
   const handleClose = (): void => {
-    setOpen(false);
-    setUnderstood(false);
+    setModal(null);
   };
 
   const handleDelete = (): void => {
@@ -19,7 +18,7 @@ export const ResetSection = (): ReactElement => {
   };
 
   const handleCheckChange = (event: ChangeEvent<HTMLInputElement>): void => {
-    setUnderstood(event.target.checked);
+    setModal({ understood: event.target.checked });
   };
 
   return (
@@ -31,7 +30,7 @@ export const ResetSection = (): ReactElement => {
         <Button
           variant='danger'
           onClick={() => {
-            setOpen(true);
+            setModal({ understood: false });
           }}
         >
           データを全削除
@@ -39,7 +38,7 @@ export const ResetSection = (): ReactElement => {
       </div>
 
       <Modal
-        open={open}
+        open={modal !== null}
         title='データを全削除'
         onClose={handleClose}
         footer={
@@ -47,7 +46,7 @@ export const ResetSection = (): ReactElement => {
             <Button variant='secondary' onClick={handleClose}>
               キャンセル
             </Button>
-            <Button variant='danger' disabled={!understood} onClick={handleDelete}>
+            <Button variant='danger' disabled={modal?.understood !== true} onClick={handleDelete}>
               削除
             </Button>
           </>
@@ -59,7 +58,7 @@ export const ResetSection = (): ReactElement => {
           </p>
           <Checkbox
             label='全データを削除することを理解しました'
-            checked={understood}
+            checked={modal?.understood ?? false}
             onChange={handleCheckChange}
           />
         </div>

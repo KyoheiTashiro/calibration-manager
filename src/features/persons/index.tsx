@@ -133,7 +133,11 @@ export const PersonList = (): ReactElement => {
         </>
       )}
 
-      <PersonModal open={modalState.open} person={modalState.entity} onClose={handleModalClose} />
+      <PersonModal
+        open={modalState.open}
+        person={modalState.open ? modalState.entity : undefined}
+        onClose={handleModalClose}
+      />
     </div>
   );
 };

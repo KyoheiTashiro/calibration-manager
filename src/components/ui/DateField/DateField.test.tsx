@@ -121,7 +121,9 @@ describe('DateField', () => {
     const user = userEvent.setup();
     render(<DateField label='次回期限' />);
 
-    const toggleButton = screen.getByRole('button', { name: 'カレンダーを開く' });
+    const toggleButton = screen.getByRole('button', {
+      name: 'カレンダーを開く',
+    });
     expect(toggleButton).toHaveAttribute('aria-expanded', 'false');
 
     await user.click(toggleButton);
@@ -138,7 +140,9 @@ describe('DateField', () => {
     const handleChange = vi.fn<() => void>();
     render(<DateField label='次回期限' defaultValue='2026-07-03' onChange={handleChange} />);
 
-    const toggleButton = screen.getByRole('button', { name: 'カレンダーを開く' });
+    const toggleButton = screen.getByRole('button', {
+      name: 'カレンダーを開く',
+    });
     await user.click(toggleButton);
     await user.click(screen.getByRole('button', { name: '2026年7月10日' }));
 
@@ -174,10 +178,31 @@ describe('DateField', () => {
     expect(screen.getByText('2026年6月')).toBeInTheDocument();
   });
 
+  it('閉じてから入力値を変えて再度開くと、開いた時点の値の月から始まる', async () => {
+    const user = userEvent.setup();
+    render(<DateField label='次回期限' defaultValue='2026-07-03' />);
+    const toggleButton = screen.getByRole('button', {
+      name: 'カレンダーを開く',
+    });
+
+    await user.click(toggleButton);
+    expect(screen.getByText('2026年7月')).toBeInTheDocument();
+    await user.click(toggleButton);
+
+    const input = screen.getByLabelText('次回期限');
+    await user.clear(input);
+    await user.type(input, '2025-02-10');
+
+    await user.click(toggleButton);
+    expect(screen.getByText('2025年2月')).toBeInTheDocument();
+  });
+
   it('グリッド上で Escape を押すと閉じてカレンダーボタンへフォーカスが戻る', async () => {
     const user = userEvent.setup();
     render(<DateField label='次回期限' defaultValue='2026-07-03' />);
-    const toggleButton = screen.getByRole('button', { name: 'カレンダーを開く' });
+    const toggleButton = screen.getByRole('button', {
+      name: 'カレンダーを開く',
+    });
     await user.click(toggleButton);
 
     expect(screen.getByRole('grid')).toHaveFocus();

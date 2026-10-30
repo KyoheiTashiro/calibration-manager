@@ -1,9 +1,7 @@
 import { useState } from 'react';
 
-export type EntityModalState<Entity> = {
-  open: boolean;
-  entity?: Entity;
-};
+/** entity は open 時のみ持てる(undefined = 新規追加)。閉じている間に entity が残る状態を型で禁止する */
+export type EntityModalState<Entity> = { open: false } | { open: true; entity?: Entity };
 
 export type UseEntityModalResult<Entity> = {
   modalState: EntityModalState<Entity>;
@@ -13,7 +11,9 @@ export type UseEntityModalResult<Entity> = {
 };
 
 export const useEntityModal = <Entity>(): UseEntityModalResult<Entity> => {
-  const [modalState, setModalState] = useState<EntityModalState<Entity>>({ open: false });
+  const [modalState, setModalState] = useState<EntityModalState<Entity>>({
+    open: false,
+  });
 
   return {
     modalState,
@@ -24,7 +24,7 @@ export const useEntityModal = <Entity>(): UseEntityModalResult<Entity> => {
       setModalState({ open: true, entity });
     },
     handleModalClose: (): void => {
-      setModalState({ open: false, entity: undefined });
+      setModalState({ open: false });
     },
   };
 };

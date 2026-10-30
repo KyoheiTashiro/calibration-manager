@@ -14,7 +14,7 @@ import {
 import { SERVICE_ORDER_STATUS_LABELS } from '@/features/serviceOrder/constants';
 import type { CsvEntityKind } from '@/features/settings/components/csv/entityCsv';
 
-export const COLUMN_REQUIREMENT = {
+const COLUMN_REQUIREMENT = {
   REQUIRED: 'required',
   OPTIONAL: 'optional',
   CONDITIONAL: 'conditional',

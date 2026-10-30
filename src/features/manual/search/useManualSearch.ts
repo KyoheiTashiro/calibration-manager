@@ -1,10 +1,11 @@
-import { useEffect, useState, type RefObject } from 'react';
+import { useEffect, useReducer, type RefObject } from 'react';
 
 import { dispatchSearchReveal } from './revealEvent';
+import { INITIAL_SEARCH_STATE, SEARCH_ACTION, searchReducer } from './searchReducer';
 import { collectMatchRanges } from './textSearch';
 
 /* CSS Custom Highlight API の ::highlight() 名。src/styles/index.css の定義と一致させること。 */
-export const MANUAL_SEARCH_HIGHLIGHT = {
+const MANUAL_SEARCH_HIGHLIGHT = {
   MATCH: 'manual-search-match',
   CURRENT: 'manual-search-current',
 } as const;
@@ -84,22 +85,20 @@ const useHighlightRegistration = (matches: Range[], currentIndex: number): void 
  * (D-073)、タブ切替で Range は失効しない。
  */
 export const useManualSearch = (contentRef: RefObject<HTMLElement | null>): ManualSearchState => {
-  const [query, setQuery] = useState('');
-  const [matches, setMatches] = useState<Range[]>([]);
-  const [currentIndex, setCurrentIndex] = useState(-1);
+  const [state, dispatch] = useReducer(searchReducer, INITIAL_SEARCH_STATE);
+  const { query, matches, currentIndex } = state;
 
   useHighlightRegistration(matches, currentIndex);
 
   const handleQueryChange = (nextQuery: string): void => {
-    setQuery(nextQuery);
-
     const contentElement = contentRef.current;
     const nextMatches =
       contentElement === null ? [] : collectMatchRanges(contentElement, nextQuery);
-    setMatches(nextMatches);
-
-    const nextIndex = nextMatches.length > 0 ? 0 : -1;
-    setCurrentIndex(nextIndex);
+    dispatch({
+      type: SEARCH_ACTION.SET_RESULTS,
+      query: nextQuery,
+      matches: nextMatches,
+    });
 
     const firstMatch = nextMatches.at(0);
     if (firstMatch !== undefined) {
@@ -111,20 +110,15 @@ export const useManualSearch = (contentRef: RefObject<HTMLElement | null>): Manu
     if (matches.length === 0) {
       return;
     }
+    const action = { type: SEARCH_ACTION.MOVE, step } as const;
+    dispatch(action);
 
-    const nextIndex = (currentIndex + step + matches.length) % matches.length;
-    setCurrentIndex(nextIndex);
-
-    const nextRange = matches.at(nextIndex);
+    // なぜ reducer を直接呼ぶか: dispatch 後の state は同期では読めないため、
+    // 同じ純関数で移動先を求めてスクロールする(循環計算の二重実装を避ける)
+    const nextRange = matches.at(searchReducer(state, action).currentIndex);
     if (nextRange !== undefined) {
       scrollToRange(nextRange);
     }
-  };
-
-  const clearSearch = (): void => {
-    setQuery('');
-    setMatches([]);
-    setCurrentIndex(-1);
   };
 
   return {
@@ -138,6 +132,8 @@ export const useManualSearch = (contentRef: RefObject<HTMLElement | null>): Manu
     moveToPreviousMatch: (): void => {
       moveToMatch(-1);
     },
-    clearSearch,
+    clearSearch: (): void => {
+      dispatch({ type: SEARCH_ACTION.CLEAR });
+    },
   };
 };

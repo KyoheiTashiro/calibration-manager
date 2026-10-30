@@ -10,7 +10,7 @@ import { renderWithStore, seedStore, setupStoreIsolation } from '@/test/renderWi
 import { CSV_BOM } from '@/utils/csv';
 import { todayIsoDate } from '@/utils/time';
 import '@testing-library/jest-dom/vitest';
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -171,7 +171,11 @@ describe('インポート(§11、D-029 / D-030)', () => {
   });
 
   it('確定 → 確認 → 取り込みで対象Recordを全置換する', async () => {
-    seedStore({ equipment: { old: { ...sampleEquipment, id: 'old', managementNo: 'M-OLD' } } });
+    seedStore({
+      equipment: {
+        old: { ...sampleEquipment, id: 'old', managementNo: 'M-OLD' },
+      },
+    });
     renderWithStore(<Settings />);
     await selectEquipmentKind();
     await userEvent.upload(screen.getByLabelText('ファイル'), equipmentCsvFile(sampleEquipment));
@@ -212,7 +216,10 @@ describe('インポート(§11、D-029 / D-030)', () => {
 
 describe('データ全削除(§11、D-031)', () => {
   it('同意チェックまで[削除]は非活性で、実行するとストアが空になる', async () => {
-    seedStore({ equipment: { e1: sampleEquipment }, vendors: { v1: sampleVendor } });
+    seedStore({
+      equipment: { e1: sampleEquipment },
+      vendors: { v1: sampleVendor },
+    });
     renderWithStore(<Settings />);
 
     await userEvent.click(screen.getByRole('button', { name: 'データを全削除' }));
@@ -224,5 +231,20 @@ describe('データ全削除(§11、D-031)', () => {
     await userEvent.click(screen.getByRole('button', { name: '削除' }));
     expect(useAppStore.getState().equipment).toEqual({});
     expect(useAppStore.getState().vendors).toEqual({});
+  });
+
+  it('チェック後にキャンセルして再度開くと、チェックは外れ[削除]は非活性に戻る', async () => {
+    renderWithStore(<Settings />);
+
+    await userEvent.click(screen.getByRole('button', { name: 'データを全削除' }));
+    await userEvent.click(screen.getByLabelText('全データを削除することを理解しました'));
+    expect(screen.getByRole('button', { name: '削除' })).toBeEnabled();
+
+    // なぜ within か: CSVインポート側にも「キャンセル」ボタンがあるためダイアログ内に限定する
+    const dialog = screen.getByRole('dialog', { name: 'データを全削除' });
+    await userEvent.click(within(dialog).getByRole('button', { name: 'キャンセル' }));
+    await userEvent.click(screen.getByRole('button', { name: 'データを全削除' }));
+    expect(screen.getByLabelText('全データを削除することを理解しました')).not.toBeChecked();
+    expect(screen.getByRole('button', { name: '削除' })).toBeDisabled();
   });
 });
