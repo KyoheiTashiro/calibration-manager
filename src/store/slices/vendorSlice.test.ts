@@ -29,6 +29,8 @@ const serviceOrder: ServiceOrder = {
   serviceItemId: 'item-1',
   vendorId: 'vendor-1',
   status: 'returned',
+  orderedDate: '2026-06-01',
+  returnedDate: '2026-06-20',
 };
 
 beforeEach(setupStoreIsolation);

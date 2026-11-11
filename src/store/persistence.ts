@@ -14,7 +14,12 @@ import {
   personSchema,
   vendorSchema,
 } from '@/store/schema';
-import { type AppState, NOTIFICATION_TARGET_TYPE } from '@/store/types';
+import {
+  type AppState,
+  EXECUTION,
+  NOTIFICATION_TARGET_TYPE,
+  SERVICE_ORDER_STATUS,
+} from '@/store/types';
 import { isRecord, recordValue } from '@/utils/record';
 import type { z } from 'zod';
 
@@ -129,6 +134,58 @@ export const migrateV4ToV5: MigrationStep = (persisted) => {
   };
 };
 
+/** 条件に合うエントリから指定フィールドを取り除く。非オブジェクトはそのまま残し merge のサルベージに委ねる */
+const omitFieldsInRecord = (
+  value: unknown,
+  shouldOmit: (entry: Record<string, unknown>) => boolean,
+  fields: readonly string[],
+): unknown => {
+  if (!isRecord(value)) return value;
+  return Object.fromEntries(
+    Object.entries(value).map(([key, entry]) => {
+      if (!isRecord(entry) || !shouldOmit(entry)) return [key, entry];
+      return [
+        key,
+        Object.fromEntries(Object.entries(entry).filter(([field]) => !fields.includes(field))),
+      ];
+    }),
+  );
+};
+
+/**
+ * v5→v6: 判別 union 化（D-106）で持てなくなった属性を取り除く。
+ * - 内部実施の項目の vendorId / leadTimeDays
+ * - 返却前（planned / ordered / inCalibration）の案件の returnedDate、planned の案件の orderedDate
+ * 取り除くのは「その状態では意味を持たない値」だけで、利用者が入力した有効な情報は失わない。
+ * 逆に必須の日付が欠けた案件（発注済なのに発注日なし等）は補えないため、merge のサルベージで脱落する。
+ */
+export const migrateV5ToV6: MigrationStep = (persisted) => {
+  if (!isRecord(persisted)) return persisted;
+  const beforeReturn = new Set<unknown>([
+    SERVICE_ORDER_STATUS.PLANNED,
+    SERVICE_ORDER_STATUS.ORDERED,
+    SERVICE_ORDER_STATUS.IN_CALIBRATION,
+  ]);
+  const withoutReturnedDate = omitFieldsInRecord(
+    persisted.serviceOrders,
+    (serviceOrder) => beforeReturn.has(serviceOrder.status),
+    ['returnedDate'],
+  );
+  return {
+    ...persisted,
+    serviceItems: omitFieldsInRecord(
+      persisted.serviceItems,
+      (serviceItem) => serviceItem.execution === EXECUTION.INTERNAL,
+      ['vendorId', 'leadTimeDays'],
+    ),
+    serviceOrders: omitFieldsInRecord(
+      withoutReturnedDate,
+      (serviceOrder) => serviceOrder.status === SERVICE_ORDER_STATUS.PLANNED,
+      ['orderedDate'],
+    ),
+  };
+};
+
 /**
  * 将来のスキーマ変更時は migrateVNToVN+1 を追加してここへ登録し、
  * STORAGE_VERSION をインクリメントする。
@@ -138,6 +195,7 @@ export const MIGRATIONS: Record<number, MigrationStep> = {
   2: migrateV2ToV3,
   3: migrateV3ToV4,
   4: migrateV4ToV5,
+  5: migrateV5ToV6,
 };
 
 /**

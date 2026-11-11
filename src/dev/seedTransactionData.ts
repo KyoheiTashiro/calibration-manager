@@ -1,5 +1,6 @@
 import { DEFAULT_BUFFER_DAYS, DEFAULT_NOTICE_DAYS_BEFORE } from '@/domain/constants';
 import {
+  type DistributiveOmit,
   type ServiceOrder,
   CYCLE,
   EXECUTION,
@@ -14,7 +15,7 @@ import { addDays } from '@/utils/time';
 
 /** 項目シードの共通既定値（発注余裕日・通知開始日数は既定値、有効）。個別値は overrides で上書きする */
 const seedItem = (
-  overrides: Omit<ServiceItem, 'bufferDays' | 'noticeDaysBefore' | 'isActive'> &
+  overrides: DistributiveOmit<ServiceItem, 'bufferDays' | 'noticeDaysBefore' | 'isActive'> &
     Partial<Pick<ServiceItem, 'isActive'>>,
 ): ServiceItem => ({
   bufferDays: DEFAULT_BUFFER_DAYS,

@@ -33,7 +33,7 @@ useAppStore = create<StoreState>()(
 | `equipmentSlice`        | `equipment: Record<string, Equipment>`        | `addEquipment` / `updateEquipment`                        | `slices/equipmentSlice.ts`        |
 | `serviceItemSlice`   | `serviceItems: Record<string, ServiceItem>`       | `addServiceItem` / `updateServiceItem`                | `slices/serviceItemSlice.ts`   |
 | `serviceRecordSlice` | `serviceRecords: Record<string, ServiceRecord>` | `addServiceRecord`                                   | `slices/serviceRecordSlice.ts` |
-| `serviceOrderSlice` | `serviceOrders: Record<string, ServiceOrder>`    | `addServiceOrder` / `updateServiceOrder` / `updateServiceOrderStatus`          | `slices/serviceOrderSlice.ts` |
+| `serviceOrderSlice` | `serviceOrders: Record<string, ServiceOrder>`    | `addServiceOrder` / `orderServiceOrder` / `startServiceOrderCalibration` / `returnServiceOrder` / `cancelServiceOrder`          | `slices/serviceOrderSlice.ts` |
 | `notificationSlice`     | `notifications: Record<string, Notification>` | `generateNotifications` / `markAsRead` / `markAllAsRead`  | `slices/notificationSlice.ts`     |
 
 - スライスは互いの状態へ `StoreState` 経由で到達可能（`set` は全ストアのドラフト、`get()` は全状態を参照できる）。カスケード処理（後述）はこの前提で成立する。
@@ -47,24 +47,32 @@ useAppStore = create<StoreState>()(
 - Person の無効化（`updatePerson(id, { isActive })`）: Personは物理削除しない（domain-model.md §3.2）。無効化はscreen-design §0.6の確認ダイアログ対象。
 - 機器の状態変更（`updateEquipment(id, { status })`）: 機器は論理削除のみ（`retired`）。`retired`への変更は確認ダイアログ対象（screen-design §0.6）。`suspended`/`retired`は期限計算・通知の対象外（domain-model.md §3.3）。休止からの再稼働時の期限リセットは据え置き（リセットしない）で確定（D-002）。
 - 項目の無効化（`updateServiceItem(id, { isActive })`）: 他エンティティと整合を取り、物理削除は行わずisActiveで無効化する（実装判断）。
+- 実施区分の切替（`updateServiceItem(id, { execution })`）: `internal` へ切り替えると `vendorId` / `leadTimeDays` を除去する（内部項目はこれらを持てない。domain-model.md §3.4、D-106）。
 - `addServiceRecord(serviceItemId, doneDate, doneBy, result, serviceOrderId?, note?)`: ServiceRecordを追加した上で、
-  - `serviceItem.lastDoneDate = doneDate` は `result` に関わらず無条件で更新する（D-015）。
+  - `doneDate` が項目の既存 `lastDoneDate` より前の場合は、記録を追加するだけで項目の `lastDoneDate` / `nextDueDate` を更新しない（同日は更新する。D-107）。以下2項目はそれ以外の場合の挙動。
+  - `serviceItem.lastDoneDate = doneDate` は `result` に関わらず更新する（D-015）。
   - `result !== 'fail'` の場合のみ `serviceItem.nextDueDate = addCycle(doneDate, serviceItem.cycle)`（暦月ベース加算。domain-model.md §4.1）に更新する。`result === 'fail'` の場合は次回期限のみ据え置く（domain-model.md §3.5、D-015）。
-  - `serviceOrderId` が指定されている場合: 対象の `ServiceOrder.status` を `completed` に更新する（domain-model.md §3.6）。
-- `updateServiceOrderStatus(id, nextStatus)`: 状態遷移はdomain-model.md §3.6の状態遷移図に従い、`domain/serviceOrderStatus.ts` の許可テーブルで検証する（許可されない遷移はno-op）。`completed`への遷移は上記`addServiceRecord`のカスケード経由のみとし、本アクションから直接指定はしない。
-- `generateNotifications(today)`: 全ての有効な項目（`serviceItem.isActive` かつ 紐づくEquipmentが `active`）・案件をスキャンし、domain-model.md §3.7の5種別の発生条件を判定する。判定は `domain/notificationRules.ts`（純粋関数。ストアに依存しない）が担い、本アクションは判定結果と現在の `notifications` を突き合わせて、同一 `(targetType, targetId, type)` の**未読**通知が既に存在する場合は生成をスキップする（domain-model.md §3.7「同一対象・同一種別の未読通知は重複生成しない」）。ServiceOrder起点の通知（`deliveryDueSoon`/`deliveryOverdue`）はServiceOrderにpersonId属性がないため、`serviceOrder.serviceItemId` からServiceItemを辿って `serviceItem.personId` を宛先とする。
+  - `serviceOrderId` が指定されている場合: 対象の `ServiceOrder.status` が `returned` のときに限り `completed` に更新する（domain-model.md §3.6、D-107）。
+- 案件の状態遷移（D-106）: 遷移ごとに専用アクションを持ち、状態と日付を1回の `set` で同時に書く。状態だけ・日付だけを書き換えるアクション（旧 `updateServiceOrder` / `updateServiceOrderStatus`）は廃止した。
+  - `orderServiceOrder(id, { orderedDate, dueDate?, cost? })`: `planned`→`ordered`。`dueDate` / `cost` が未入力なら既存値を保持する。
+  - `startServiceOrderCalibration(id)`: `ordered`→`inCalibration`。
+  - `returnServiceOrder(id, returnedDate)`: `inCalibration`→`returned`。
+  - `cancelServiceOrder(id)`: `planned`〜`returned`→`cancelled`。日付は中止時点の値を保持する。
+  - いずれも `domain/serviceOrderStatus.ts` の許可テーブルで検証し、成否を真偽値で返す。許可されない遷移・対象不在は no-op で `false`。UIは `false` を受けてエラー表示する（screen-design §8）。
+  - `completed` への遷移は上記 `addServiceRecord` のカスケード経由のみ。
+- `generateNotifications(today)`: 全ての有効な項目（`serviceItem.isActive` かつ 紐づくEquipmentが `active`）・案件をスキャンし、domain-model.md §3.7の5種別の発生条件を判定する。判定は `domain/notificationRules.ts`（純粋関数。ストアに依存しない）が担い、本アクションは判定結果と現在の `notifications` を突き合わせて、同一 `(targetType, targetId, type)` の**未読**通知が既に存在する場合は生成をスキップする（domain-model.md §3.7「同一対象・同一種別の未読通知は重複生成しない」）。ServiceOrder起点の通知（`deliveryDueSoon`/`deliveryOverdue`）はServiceOrderにpersonId属性がないため、`serviceOrder.serviceItemId` からServiceItemを辿って `serviceItem.personId` を宛先とする。あわせて、発生条件を満たさなくなった**未読**通知（判定結果に同一 `(targetType, targetId, type)` が無いもの）を削除する。既読通知は残す（domain-model.md §3.7、D-108）。
 - `markAsRead(id)` / `markAllAsRead()`: 対象が無ければno-opとする。
 
 ## 永続化（zustand persist）
 
 - ストアキー（`name`）: `calibration-manager:v1`（キー文字列中の `v1` は歴史的な識別子でありスキーマ `version` とは独立。リネームしない）
-- スキーマ `version`: `5`。v1→v2 は `migrateV1ToV2`（item→inspectionItem 全域リネーム、D-036）、v2→v3 は `migrateV2ToV3`（inspectionItem→serviceItem 全域リネーム、D-045）、v3→v4 は `migrateV3ToV4`（order→serviceOrder 全域リネーム、D-046）、v4→v5 は `migrateV4ToV5`（record→serviceRecord 全域リネーム、D-050）が無損失変換し、いずれも `MIGRATIONS`（`persistence.ts`）に登録済み。`migrations: Record<number, Migration>` によるバージョン間ステップ変換の仕組みを用意しており、将来のスキーマ変更でも同じ仕組みで対応する。
+- スキーマ `version`: `6`。v1→v2 は `migrateV1ToV2`（item→inspectionItem 全域リネーム、D-036）、v2→v3 は `migrateV2ToV3`（inspectionItem→serviceItem 全域リネーム、D-045）、v3→v4 は `migrateV3ToV4`（order→serviceOrder 全域リネーム、D-046）、v4→v5 は `migrateV4ToV5`（record→serviceRecord 全域リネーム、D-050）が無損失変換する。v5→v6 は `migrateV5ToV6`（判別 union 化、D-106）で、状態・実施区分に対して持てなくなった属性（内部項目の `vendorId` / `leadTimeDays`、`planned` 案件の `orderedDate`、返却前案件の `returnedDate`）を除去する。必須の日付を欠く案件（`orderedDate` のない `ordered` 以降など）と、`targetType` と種別が対応しない通知は補完できないため、後段の merge（サルベージ）で脱落する。いずれも `MIGRATIONS`（`persistence.ts`）に登録済み。`migrations: Record<number, Migration>` によるバージョン間ステップ変換の仕組みを用意しており、将来のスキーマ変更でも同じ仕組みで対応する。
 - `partialize`: 永続化対象は7エンティティの `Record`（vendors / persons / equipment / serviceItems / serviceRecords / serviceOrders / notifications）のみ。アクション関数・派生値は保存しない。
 - 読込パイプライン: LocalStorage → `migrate`（バージョン変換）→ `merge`（検証・サニタイズ・結合）→ ストア、という流れを採用する。
 
 ### migrate
 
-`migratePersistedState(persisted, fromVersion)`（`persistence.ts`）は「version N→N+1」のステップ変換テーブル `MIGRATIONS` を順に適用する。現状 `MIGRATIONS = { 1: migrateV1ToV2, 2: migrateV2ToV3, 3: migrateV3ToV4, 4: migrateV4ToV5 }`（v1→v2 = D-036 の item→inspectionItem リネーム、v2→v3 = D-045 の inspectionItem→serviceItem リネーム、v3→v4 = D-046 の order→serviceOrder リネーム、v4→v5 = D-050 の record→serviceRecord リネーム）。各ステップは「変換先バージョン当時の形式」を出力し、最終形式への変換は後続ステップの積み重ねで行う。将来のスキーマ変更時には `migrateVNToVN+1` を追加してテーブルへ登録し、`STORAGE_VERSION` をインクリメントする運用。
+`migratePersistedState(persisted, fromVersion)`（`persistence.ts`）は「version N→N+1」のステップ変換テーブル `MIGRATIONS` を順に適用する。現状 `MIGRATIONS = { 1: migrateV1ToV2, 2: migrateV2ToV3, 3: migrateV3ToV4, 4: migrateV4ToV5, 5: migrateV5ToV6 }`（v1→v2 = D-036 の item→inspectionItem リネーム、v2→v3 = D-045 の inspectionItem→serviceItem リネーム、v3→v4 = D-046 の order→serviceOrder リネーム、v4→v5 = D-050 の record→serviceRecord リネーム、v5→v6 = D-106 の判別 union 化に伴う属性除去）。各ステップは「変換先バージョン当時の形式」を出力し、最終形式への変換は後続ステップの積み重ねで行う。将来のスキーマ変更時には `migrateVNToVN+1` を追加してテーブルへ登録し、`STORAGE_VERSION` をインクリメントする運用。
 
 ### merge（サルベージ戦略）
 

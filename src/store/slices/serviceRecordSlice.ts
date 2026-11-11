@@ -3,7 +3,6 @@
  */
 
 import { addCycle } from '@/domain/dateCycle';
-import { canTransitionServiceOrderStatus } from '@/domain/serviceOrderStatus';
 import type { AppSliceCreator } from '@/store/storeState';
 import { type ServiceRecord, SERVICE_ORDER_STATUS, SERVICE_RECORD_RESULT } from '@/store/types';
 import { createId } from '@/utils/id';
@@ -15,9 +14,11 @@ export type ServiceRecordSlice = {
   serviceRecords: Record<string, ServiceRecord>;
   /**
    * 実施記録を追加し、以下をカスケードする:
-   * - 常に serviceItem.lastDoneDate = doneDate
+   * - serviceItem.lastDoneDate = doneDate
    * - result !== 'fail': nextDueDate = addCycle(doneDate, cycle)
    * - result === 'fail': 次回期限のみ据え置き
+   * - doneDate が既存の lastDoneDate より前（過去分の後追い登録）なら、記録だけ追加して
+   *   項目の lastDoneDate / nextDueDate には触れない（D-107。同日は通常どおり更新）
    * - serviceOrderId 指定時: 対象 ServiceOrder を completed に遷移
    *
    * 原子性優先で、以下は記録追加ごと no-op:
@@ -41,29 +42,33 @@ export const createServiceRecordSlice: AppSliceCreator<ServiceRecordSlice> = (se
     const nextDueDate = shouldAdvanceDueDate ? addCycle(input.doneDate, serviceItem.cycle) : null;
     if (shouldAdvanceDueDate && nextDueDate === null) return null;
 
-    if (input.serviceOrderId !== undefined) {
-      const serviceOrder = recordValue(serviceOrders, input.serviceOrderId);
-      if (
-        !serviceOrder ||
-        !canTransitionServiceOrderStatus(serviceOrder.status, SERVICE_ORDER_STATUS.COMPLETED)
-      ) {
-        return null;
-      }
+    // completed へ入れるのは returned だけ（許可テーブルと同じ判定。ナローで発注日・実返却日の存在を確定させる）
+    const serviceOrder =
+      input.serviceOrderId === undefined
+        ? undefined
+        : recordValue(serviceOrders, input.serviceOrderId);
+    if (
+      input.serviceOrderId !== undefined &&
+      serviceOrder?.status !== SERVICE_ORDER_STATUS.RETURNED
+    ) {
+      return null;
     }
+    const isBackfill =
+      serviceItem.lastDoneDate !== undefined && input.doneDate < serviceItem.lastDoneDate;
 
     const id = createId();
     set((state) => {
       state.serviceRecords[id] = { ...input, id };
       const draftServiceItem = recordValue(state.serviceItems, input.serviceItemId);
-      if (draftServiceItem !== undefined) {
+      if (draftServiceItem !== undefined && !isBackfill) {
         draftServiceItem.lastDoneDate = input.doneDate;
         if (nextDueDate !== null) draftServiceItem.nextDueDate = nextDueDate;
       }
-      if (input.serviceOrderId !== undefined) {
-        const draftServiceOrder = recordValue(state.serviceOrders, input.serviceOrderId);
-        if (draftServiceOrder !== undefined) {
-          draftServiceOrder.status = SERVICE_ORDER_STATUS.COMPLETED;
-        }
+      if (serviceOrder?.status === SERVICE_ORDER_STATUS.RETURNED) {
+        state.serviceOrders[serviceOrder.id] = {
+          ...serviceOrder,
+          status: SERVICE_ORDER_STATUS.COMPLETED,
+        };
       }
     });
     return id;

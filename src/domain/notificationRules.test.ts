@@ -11,6 +11,7 @@ import {
   SERVICE_ORDER_STATUS,
   type ServiceOrderStatus,
 } from '@/store/types';
+import { serviceOrderDatesFor, toServiceItem, toServiceOrder } from '@/test/entityBuilders';
 import { describe, expect, it } from 'vitest';
 
 /**
@@ -18,22 +19,23 @@ import { describe, expect, it } from 'vitest';
  * nextDueDate 2026-07-31 / noticeDaysBefore 30 → dueSoon 開始日 2026-07-01
  * leadTimeDays 10 + bufferDays 14 → 発注推奨日 2026-07-07
  */
-const buildServiceItem = (overrides: Partial<ServiceItem> = {}): ServiceItem => ({
-  id: 'item-1',
-  equipmentId: 'equipment-1',
-  type: SERVICE_ITEM_TYPE.CALIBRATION,
-  name: '年次校正',
-  cycle: '1Y',
-  execution: EXECUTION.EXTERNAL,
-  vendorId: 'vendor-1',
-  leadTimeDays: 10,
-  bufferDays: 14,
-  personId: 'person-1',
-  noticeDaysBefore: 30,
-  nextDueDate: '2026-07-31',
-  isActive: true,
-  ...overrides,
-});
+const buildServiceItem = (overrides: Partial<ServiceItem> = {}): ServiceItem =>
+  toServiceItem({
+    id: 'item-1',
+    equipmentId: 'equipment-1',
+    type: SERVICE_ITEM_TYPE.CALIBRATION,
+    name: '年次校正',
+    cycle: '1Y',
+    execution: EXECUTION.EXTERNAL,
+    vendorId: 'vendor-1',
+    leadTimeDays: 10,
+    bufferDays: 14,
+    personId: 'person-1',
+    noticeDaysBefore: 30,
+    nextDueDate: '2026-07-31',
+    isActive: true,
+    ...overrides,
+  });
 
 const equipmentRecord: Record<string, Equipment> = {
   'equipment-1': {
@@ -47,13 +49,15 @@ const equipmentRecord: Record<string, Equipment> = {
 const buildServiceOrder = (
   status: ServiceOrderStatus,
   overrides: Partial<ServiceOrder> = {},
-): ServiceOrder => ({
-  id: 'serviceOrder-1',
-  serviceItemId: 'item-1',
-  vendorId: 'vendor-1',
-  status,
-  ...overrides,
-});
+): ServiceOrder =>
+  toServiceOrder({
+    id: 'serviceOrder-1',
+    serviceItemId: 'item-1',
+    vendorId: 'vendor-1',
+    status,
+    ...serviceOrderDatesFor(status),
+    ...overrides,
+  });
 
 /** 引数省略時は案件・vendor なしで判定する */
 const compute = (
@@ -110,6 +114,7 @@ describe('computeExpectedNotifications: dueSoon / overdue', () => {
     const internalServiceItem = buildServiceItem({
       execution: EXECUTION.INTERNAL,
       vendorId: undefined,
+      leadTimeDays: undefined,
     });
     expect(compute([internalServiceItem], [], '2026-08-01').map((seed) => seed.type)).toEqual([
       NOTIFICATION_TYPE.OVERDUE,
@@ -164,6 +169,7 @@ describe('computeExpectedNotifications: orderRecommended', () => {
     const internalServiceItem = buildServiceItem({
       execution: EXECUTION.INTERNAL,
       vendorId: undefined,
+      leadTimeDays: undefined,
     });
     const types = compute([internalServiceItem], [], '2026-07-07').map((seed) => seed.type);
     expect(types).not.toContain(NOTIFICATION_TYPE.ORDER_RECOMMENDED);
@@ -190,8 +196,9 @@ describe('computeExpectedNotifications: orderRecommended', () => {
     expect(seeds.map((seed) => seed.type)).toContain(NOTIFICATION_TYPE.ORDER_RECOMMENDED);
   });
 
-  it('vendorId 未設定でも serviceItem 側の納期があれば生成できる（依頼先未定の外部項目）', () => {
-    const serviceItem = buildServiceItem({ vendorId: undefined });
+  it('依頼先が参照切れでも serviceItem 側の納期があれば生成できる', () => {
+    // 外部項目は依頼先必須（D-106）のため「未設定」は作れない。vendors を渡さず参照切れで同じ経路を通す
+    const serviceItem = buildServiceItem({ vendorId: 'vendor-missing' });
     const types = compute([serviceItem], [], '2026-07-07').map((seed) => seed.type);
     expect(types).toContain(NOTIFICATION_TYPE.ORDER_RECOMMENDED);
   });

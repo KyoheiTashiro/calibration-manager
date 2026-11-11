@@ -2,10 +2,11 @@
  * 点検校正外部案件ボードのカード（screen-design/08-service-orders.md）。
  */
 
-import { Button } from '@/components/ui';
+import { Badge, Button } from '@/components/ui';
 import { UNSET_LABEL } from '@/constants/labels';
 import { isActiveServiceOrderStatus } from '@/domain/serviceOrderStatus';
 import { CARD_ACTION, type CardAction } from '@/features/serviceOrder/constants';
+import { isServiceItemInScope } from '@/store/selectors';
 import {
   SERVICE_ORDER_STATUS,
   type ServiceOrder,
@@ -36,16 +37,30 @@ const STATUS_ACTIONS: Record<ServiceOrderStatus, readonly CardActionSpec[]> = {
     { label: '返却する', action: CARD_ACTION.RETURN },
     { label: '中止', action: CARD_ACTION.CANCEL, variant: 'danger' },
   ],
-  [SERVICE_ORDER_STATUS.RETURNED]: [{ label: '記録登録', action: CARD_ACTION.SERVICE_RECORD }],
+  [SERVICE_ORDER_STATUS.RETURNED]: [
+    { label: '記録登録', action: CARD_ACTION.SERVICE_RECORD },
+    { label: '中止', action: CARD_ACTION.CANCEL, variant: 'danger' },
+  ],
   [SERVICE_ORDER_STATUS.COMPLETED]: [],
   [SERVICE_ORDER_STATUS.CANCELLED]: [],
 };
+
+/** 注意が必要な案件の目印（D-109）。どちらも該当しなければ何も描かない */
+const renderBadges = (isOutOfScope: boolean, isDuplicated: boolean): ReactNode =>
+  isOutOfScope || isDuplicated ? (
+    <div className='mb-1 flex flex-wrap gap-1'>
+      {isOutOfScope ? <Badge className='bg-slate-200 text-slate-700'>期限管理対象外</Badge> : null}
+      {isDuplicated ? <Badge className='bg-red-100 text-red-800'>案件重複</Badge> : null}
+    </div>
+  ) : null;
 
 type Props = {
   serviceOrder: ServiceOrder;
   serviceItems: Record<string, ServiceItem>;
   equipment: Record<string, Equipment>;
   vendors: Record<string, Vendor>;
+  /** 同じ項目に有効な案件が他にもある（1項目1有効案件の違反） */
+  isDuplicated: boolean;
   onAction: (action: CardAction, serviceOrder: ServiceOrder) => void;
 };
 
@@ -54,6 +69,7 @@ export const ServiceOrderCard = ({
   serviceItems,
   equipment,
   vendors,
+  isDuplicated,
   onAction,
 }: Props): ReactElement => {
   const serviceItem = recordValue(serviceItems, serviceOrder.serviceItemId);
@@ -66,6 +82,9 @@ export const ServiceOrderCard = ({
   const vendorName = vendor?.name ?? NO_REFERENCE_LABEL;
 
   const isClosed = !isActiveServiceOrderStatus(serviceOrder.status);
+  // 機器が休止・廃棄、項目が無効、参照切れのいずれかで、納期通知が出ない案件（D-109）
+  const isOutOfScope =
+    !isClosed && (serviceItem === undefined || !isServiceItemInScope(serviceItem, equipmentEntry));
 
   const renderActions = (): ReactNode =>
     STATUS_ACTIONS[serviceOrder.status].map(({ label, action, variant }) => (
@@ -87,6 +106,7 @@ export const ServiceOrderCard = ({
         isClosed ? 'border-slate-200 bg-slate-100 text-slate-500' : 'border-slate-300 bg-white'
       }`}
     >
+      {renderBadges(isOutOfScope, isDuplicated && !isClosed)}
       <p className='font-semibold'>{managementNo}</p>
       <p>{equipmentName}</p>
       <p className='text-slate-600'>{serviceItemName}</p>

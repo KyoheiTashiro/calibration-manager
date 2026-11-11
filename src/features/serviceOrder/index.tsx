@@ -1,8 +1,8 @@
 /**
  * 点検校正外部案件（ボード、screen-design/08-service-orders.md）。
  * 状態別の4列（発注準備/発注済/校正中/返却済）でカードを表示し、隣接遷移のみをアクションで提供する。
- * 案件作成の導線は本画面には持たず、起動元は項目一覧（Phase 8）。状態遷移・属性更新はストア
- * （updateServiceOrderStatus / updateServiceOrder）が最終検証する。
+ * 案件作成の導線は本画面には持たず、起動元は項目一覧（Phase 8）。状態遷移はストアの遷移アクション
+ * （serviceOrderSlice）が最終検証し、拒否された場合は画面にその旨を表示する。
  */
 
 import { ServiceRecordModal } from '@/components/domain';
@@ -40,6 +40,8 @@ export const ServiceOrderList = (): ReactElement => {
     displayedColumns,
     serviceOrdersByStatus,
     totalServiceOrderCount,
+    duplicatedServiceItemIds,
+    transitionError,
     dialog,
     closeDialog,
     handleCardAction,
@@ -58,6 +60,23 @@ export const ServiceOrderList = (): ReactElement => {
           }}
         />
       </div>
+
+      {transitionError === null ? null : (
+        <p
+          role='alert'
+          className='rounded border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-700'
+        >
+          {transitionError}
+        </p>
+      )}
+      {duplicatedServiceItemIds.size === 0 ? null : (
+        <p
+          role='alert'
+          className='rounded border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-700'
+        >
+          同じ点検校正項目に進行中の案件が複数あります。「案件重複」の付いた案件を確認し、不要なものを中止してください
+        </p>
+      )}
 
       {totalServiceOrderCount === 0 ? (
         <EmptyState
@@ -97,6 +116,7 @@ export const ServiceOrderList = (): ReactElement => {
                         serviceItems={serviceItems}
                         equipment={equipment}
                         vendors={vendors}
+                        isDuplicated={duplicatedServiceItemIds.has(serviceOrder.serviceItemId)}
                         onAction={handleCardAction}
                       />
                     ))

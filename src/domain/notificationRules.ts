@@ -9,6 +9,7 @@ import { DELIVERY_DUE_SOON_NOTICE_DAYS } from '@/domain/constants';
 import { isDueSoon, isOrderDue } from '@/domain/serviceItemStatus';
 import { isAwaitingReturnStatus } from '@/domain/serviceOrderStatus';
 import {
+  type DistributiveOmit,
   type ServiceOrder,
   type Equipment,
   EXECUTION,
@@ -26,7 +27,7 @@ import { addDays } from '@/utils/time';
  * 生成すべき通知の判定結果。id・createdDate・isRead はストア側が付与する
  * （純粋関数はID生成・現在時刻という副作用に触れないため）。
  */
-export type NotificationSeed = Omit<Notification, 'id' | 'createdDate' | 'isRead'>;
+export type NotificationSeed = DistributiveOmit<Notification, 'id' | 'createdDate' | 'isRead'>;
 
 /**
  * 通知文の先頭に付ける機器の管理番号プレフィックス（screen-design/10-notifications.md の文例準拠）。
@@ -68,10 +69,7 @@ const serviceItemNotificationSeeds = (
   }
 
   if (serviceItem.execution === EXECUTION.EXTERNAL) {
-    const vendor =
-      serviceItem.vendorId === undefined
-        ? null
-        : (recordValue(vendors, serviceItem.vendorId) ?? null);
+    const vendor = recordValue(vendors, serviceItem.vendorId) ?? null;
     if (isOrderDue(serviceItem, vendor, serviceOrders, today)) {
       seeds.push({
         ...baseSeed,

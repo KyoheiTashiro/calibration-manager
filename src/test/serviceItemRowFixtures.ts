@@ -16,6 +16,7 @@ import {
   type Person,
   type Vendor,
 } from '@/store/types';
+import { toServiceItem } from '@/test/entityBuilders';
 
 export const TODAY = '2026-07-03';
 
@@ -41,19 +42,20 @@ export const calibrator: Vendor = {
 
 export const makeServiceItem = (
   over: Partial<ServiceItem> & Pick<ServiceItem, 'id'>,
-): ServiceItem => ({
-  equipmentId: eqActive.id,
-  type: SERVICE_ITEM_TYPE.INSPECTION,
-  name: '点検',
-  cycle: '1Y',
-  execution: EXECUTION.INTERNAL,
-  bufferDays: 14,
-  personId: activePerson.id,
-  noticeDaysBefore: 30,
-  nextDueDate: '2099-01-01',
-  isActive: true,
-  ...over,
-});
+): ServiceItem =>
+  toServiceItem({
+    equipmentId: eqActive.id,
+    type: SERVICE_ITEM_TYPE.INSPECTION,
+    name: '点検',
+    cycle: '1Y',
+    execution: EXECUTION.INTERNAL,
+    bufferDays: 14,
+    personId: activePerson.id,
+    noticeDaysBefore: 30,
+    nextDueDate: '2099-01-01',
+    isActive: true,
+    ...over,
+  });
 
 /** store の正規化形へ整形する */
 export const toRecord = <Entry extends { id: string }>(

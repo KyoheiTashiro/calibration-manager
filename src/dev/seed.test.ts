@@ -37,7 +37,7 @@ describe('buildSeedState', () => {
     for (const serviceItem of Object.values(state.serviceItems)) {
       if (serviceItem.execution !== EXECUTION.EXTERNAL) continue;
       expect(serviceItem.vendorId).toBeDefined();
-      expect(state.vendors[serviceItem.vendorId ?? '']).toBeDefined();
+      expect(state.vendors[serviceItem.vendorId]).toBeDefined();
     }
   });
 

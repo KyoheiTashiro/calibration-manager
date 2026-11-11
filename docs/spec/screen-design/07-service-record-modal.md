@@ -39,7 +39,7 @@
 登録時の副作用を以下に明記する(ドメインモデル §3.5 / §4.1):
 
 1. ServiceRecord を新規作成。
-2. `serviceItem.lastDoneDate = doneDate`。
+2. `serviceItem.lastDoneDate = doneDate`。ただし `doneDate` が既存の `lastDoneDate` より前(過去分の後追い登録)の場合は、記録の作成だけを行い、項目の `lastDoneDate` / `nextDueDate` は更新しない(同日は更新する。D-107)。
 3. **`result` が `pass` または `adjusted` のとき**: `serviceItem.nextDueDate = doneDate + cycle`(暦月ベース [§0.4](./README.md#04-日付表示形式))。
 4. **`result` が `fail` のとき**: `nextDueDate` を更新せず、項目は要対応状態(再実施が必要)として扱う。※期限が過ぎていれば `overdue` のまま表示。
 5. **点検校正外部案件(status=`returned`)から起動した場合**: `serviceOrderId` を記録に紐付け、当該 ServiceOrder を `completed` へ遷移(§3.6)。

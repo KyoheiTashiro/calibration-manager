@@ -9,10 +9,11 @@ import {
   type ServiceItem,
   type Vendor,
 } from '@/store/types';
+import { toServiceItem } from '@/test/entityBuilders';
 import { renderWithStore, seedStore, setupStoreIsolation } from '@/test/renderWithStore';
 import { screen, within } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom/vitest';
+import userEvent from '@testing-library/user-event';
 import type { ReactElement } from 'react';
 import { Route, Routes, useParams } from 'react-router-dom';
 import { beforeEach, describe, expect, it } from 'vitest';
@@ -70,18 +71,19 @@ const retiredEquipment: Equipment = {
 
 const makeServiceItem = (
   overrides: Partial<ServiceItem> & Pick<ServiceItem, 'id' | 'equipmentId'>,
-): ServiceItem => ({
-  type: SERVICE_ITEM_TYPE.INSPECTION,
-  name: '定期点検',
-  cycle: CYCLE.Y1,
-  execution: EXECUTION.INTERNAL,
-  bufferDays: 14,
-  personId: 'person-1',
-  noticeDaysBefore: 30,
-  nextDueDate: '2026-08-20',
-  isActive: true,
-  ...overrides,
-});
+): ServiceItem =>
+  toServiceItem({
+    type: SERVICE_ITEM_TYPE.INSPECTION,
+    name: '定期点検',
+    cycle: CYCLE.Y1,
+    execution: EXECUTION.INTERNAL,
+    bufferDays: 14,
+    personId: 'person-1',
+    noticeDaysBefore: 30,
+    nextDueDate: '2026-08-20',
+    isActive: true,
+    ...overrides,
+  });
 
 const renderEquipmentListWithRoutes = (): ReactElement => (
   <Routes>

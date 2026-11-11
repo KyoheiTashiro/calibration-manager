@@ -1,4 +1,4 @@
-import { Button, ConfirmModal } from '@/components/ui';
+import { Button, Checkbox, ConfirmModal } from '@/components/ui';
 import { ROUTES } from '@/constants/routes';
 import { useEditEquipmentForm } from '@/features/equipment/form/edit/hooks';
 import { EquipmentFormFields } from '@/features/equipment/form/shared/FormFields';
@@ -15,6 +15,9 @@ export const EquipmentEditForm = (): ReactElement => {
     onFormSubmit,
     manufacturerOptions,
     retireConfirmOpen,
+    retireActiveServiceOrderCount,
+    cancelServiceOrdersOnRetire,
+    setCancelServiceOrdersOnRetire,
     closeRetireConfirm,
     handleRetireConfirm,
     handleCancel,
@@ -54,11 +57,25 @@ export const EquipmentEditForm = (): ReactElement => {
       <ConfirmModal
         open={retireConfirmOpen}
         title='機器の廃棄'
-        message='この機器を廃棄にして保存しますか?'
+        message={
+          retireActiveServiceOrderCount === 0
+            ? 'この機器を廃棄にして保存しますか?'
+            : `この機器を廃棄にして保存しますか? 進行中の点検校正外部案件が${retireActiveServiceOrderCount}件あります。残した案件は廃棄後もボードに表示されますが、納期の通知は出ません。`
+        }
         confirmLabel='廃棄'
         onConfirm={handleRetireConfirm}
         onCancel={closeRetireConfirm}
-      />
+      >
+        {retireActiveServiceOrderCount === 0 ? null : (
+          <Checkbox
+            label='進行中の案件も中止する'
+            checked={cancelServiceOrdersOnRetire}
+            onChange={(event) => {
+              setCancelServiceOrdersOnRetire(event.target.checked);
+            }}
+          />
+        )}
+      </ConfirmModal>
     </div>
   );
 };

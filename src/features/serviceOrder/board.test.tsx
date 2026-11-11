@@ -124,6 +124,8 @@ describe('完了/中止も表示 トグル', () => {
         serviceItemId: 'item-1',
         vendorId: 'vendor-1',
         status: SERVICE_ORDER_STATUS.COMPLETED,
+        orderedDate: '2026-06-01',
+        returnedDate: '2026-06-20',
       },
     });
     renderWithStore(<ServiceOrderList />);
@@ -208,6 +210,8 @@ describe('空状態', () => {
         serviceItemId: 'item-1',
         vendorId: 'vendor-1',
         status: SERVICE_ORDER_STATUS.COMPLETED,
+        orderedDate: '2026-06-01',
+        returnedDate: '2026-06-20',
       },
     });
     renderWithStore(<ServiceOrderList />);

@@ -79,6 +79,7 @@ describe('serviceOrdersOf', () => {
         serviceItemId: 'item-2',
         vendorId: 'vendor-1',
         status: 'ordered',
+        orderedDate: '2026-06-01',
       },
     };
 
@@ -270,6 +271,7 @@ describe('serviceItemRowsOf: canCreateServiceOrder', () => {
       serviceItemId: externalServiceItem.id,
       vendorId: calibrator.id,
       status: SERVICE_ORDER_STATUS.ORDERED,
+      orderedDate: '2026-06-01',
     };
     const [row] = serviceItemRowsOf(makeState([externalServiceItem], [serviceOrder]), TODAY);
     expect(row.canCreateServiceOrder).toBe(false);

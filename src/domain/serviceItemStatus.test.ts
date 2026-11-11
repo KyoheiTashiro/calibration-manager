@@ -7,6 +7,7 @@ import {
   SERVICE_ORDER_STATUS,
   type ServiceOrderStatus,
 } from '@/store/types';
+import { serviceOrderDatesFor, toServiceItem, toServiceOrder } from '@/test/entityBuilders';
 import { describe, expect, it } from 'vitest';
 
 /**
@@ -14,29 +15,32 @@ import { describe, expect, it } from 'vitest';
  * nextDueDate 2026-07-31 / noticeDaysBefore 30 → dueSoon 開始日 2026-07-01
  * leadTimeDays 10 + bufferDays 14 → 発注推奨日 2026-07-07
  */
-const buildServiceItem = (overrides: Partial<ServiceItem> = {}): ServiceItem => ({
-  id: 'item-1',
-  equipmentId: 'equipment-1',
-  type: SERVICE_ITEM_TYPE.CALIBRATION,
-  name: '年次校正',
-  cycle: '1Y',
-  execution: EXECUTION.EXTERNAL,
-  vendorId: 'vendor-1',
-  leadTimeDays: 10,
-  bufferDays: 14,
-  personId: 'person-1',
-  noticeDaysBefore: 30,
-  nextDueDate: '2026-07-31',
-  isActive: true,
-  ...overrides,
-});
+const buildServiceItem = (overrides: Partial<ServiceItem> = {}): ServiceItem =>
+  toServiceItem({
+    id: 'item-1',
+    equipmentId: 'equipment-1',
+    type: SERVICE_ITEM_TYPE.CALIBRATION,
+    name: '年次校正',
+    cycle: '1Y',
+    execution: EXECUTION.EXTERNAL,
+    vendorId: 'vendor-1',
+    leadTimeDays: 10,
+    bufferDays: 14,
+    personId: 'person-1',
+    noticeDaysBefore: 30,
+    nextDueDate: '2026-07-31',
+    isActive: true,
+    ...overrides,
+  });
 
-const buildServiceOrder = (status: ServiceOrderStatus, serviceItemId = 'item-1'): ServiceOrder => ({
-  id: `serviceOrder-${status}`,
-  serviceItemId,
-  vendorId: 'vendor-1',
-  status,
-});
+const buildServiceOrder = (status: ServiceOrderStatus, serviceItemId = 'item-1'): ServiceOrder =>
+  toServiceOrder({
+    id: `serviceOrder-${status}`,
+    serviceItemId,
+    vendorId: 'vendor-1',
+    status,
+    ...serviceOrderDatesFor(status),
+  });
 
 describe('deriveServiceItemStatus（優先度: overdue > orderNow > inProgress > dueSoon > ok）', () => {
   it('今日 > nextDueDate なら overdue', () => {
@@ -114,6 +118,7 @@ describe('deriveServiceItemStatus（優先度: overdue > orderNow > inProgress >
     const internalServiceItem = buildServiceItem({
       execution: EXECUTION.INTERNAL,
       vendorId: undefined,
+      leadTimeDays: undefined,
     });
     expect(deriveServiceItemStatus(internalServiceItem, [], null, '2026-07-01')).toBe(
       SERVICE_ITEM_STATUS.DUE_SOON,
@@ -124,6 +129,7 @@ describe('deriveServiceItemStatus（優先度: overdue > orderNow > inProgress >
     const internalServiceItem = buildServiceItem({
       execution: EXECUTION.INTERNAL,
       vendorId: undefined,
+      leadTimeDays: undefined,
     });
     expect(deriveServiceItemStatus(internalServiceItem, [], null, '2026-07-31')).toBe(
       SERVICE_ITEM_STATUS.DUE_SOON,
@@ -134,6 +140,7 @@ describe('deriveServiceItemStatus（優先度: overdue > orderNow > inProgress >
     const internalServiceItem = buildServiceItem({
       execution: EXECUTION.INTERNAL,
       vendorId: undefined,
+      leadTimeDays: undefined,
     });
     expect(deriveServiceItemStatus(internalServiceItem, [], null, '2026-06-30')).toBe(
       SERVICE_ITEM_STATUS.OK,
@@ -144,6 +151,7 @@ describe('deriveServiceItemStatus（優先度: overdue > orderNow > inProgress >
     const internalServiceItem = buildServiceItem({
       execution: EXECUTION.INTERNAL,
       vendorId: undefined,
+      leadTimeDays: undefined,
     });
     const serviceOrders = [buildServiceOrder(SERVICE_ORDER_STATUS.ORDERED)];
     expect(deriveServiceItemStatus(internalServiceItem, serviceOrders, null, '2026-07-07')).toBe(

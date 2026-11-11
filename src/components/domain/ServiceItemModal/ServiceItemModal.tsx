@@ -19,7 +19,7 @@ import {
   EXECUTION_OPTIONS,
   SERVICE_ITEM_TYPE_OPTIONS,
 } from '@/features/serviceItems/constants';
-import { EXECUTION, type ServiceItem } from '@/store/types';
+import { EXECUTION, type ServiceItem, type ServiceItemExecution } from '@/store/types';
 import { useAppStore } from '@/store/useAppStore';
 import { createFormSubmitHandler, emptyToUndefined } from '@/utils/form';
 import { recordValue } from '@/utils/record';
@@ -100,26 +100,28 @@ export const ServiceItemModal = ({
     : '(機器情報が見つかりません)';
 
   const onSubmit = (values: FormType): void => {
-    const isExternal = values.execution === EXECUTION.EXTERNAL;
-    const vendorIdInput = emptyToUndefined(values.vendorId);
-    const leadTimeDaysInput = emptyToUndefined(values.leadTimeDays);
-    const vendorId = isExternal ? vendorIdInput : undefined;
-    const leadTimeDays =
-      isExternal && leadTimeDaysInput !== undefined ? Number(leadTimeDaysInput) : undefined;
-    const bufferDays = Number(values.bufferDays);
-    const noticeDaysBefore = Number(values.noticeDaysBefore);
+    const vendorId = emptyToUndefined(values.vendorId);
+    const leadTimeDays = emptyToUndefined(values.leadTimeDays);
+    // 外部実施で依頼先なしはフォームスキーマが弾くため、ここへは来ない（型のナロー用）
+    if (values.execution === EXECUTION.EXTERNAL && vendorId === undefined) return;
+    const executionPart: ServiceItemExecution =
+      vendorId === undefined || values.execution === EXECUTION.INTERNAL
+        ? { execution: EXECUTION.INTERNAL, vendorId: undefined, leadTimeDays: undefined }
+        : {
+            execution: EXECUTION.EXTERNAL,
+            vendorId,
+            leadTimeDays: leadTimeDays === undefined ? undefined : Number(leadTimeDays),
+          };
 
     const payload = {
       equipmentId,
       type: values.type,
       name: values.name,
       cycle: values.cycle,
-      execution: values.execution,
-      vendorId,
-      leadTimeDays,
-      bufferDays,
+      ...executionPart,
+      bufferDays: Number(values.bufferDays),
       personId: values.personId,
-      noticeDaysBefore,
+      noticeDaysBefore: Number(values.noticeDaysBefore),
       nextDueDate: values.nextDueDate,
       isActive: values.isActive,
     };

@@ -1,9 +1,13 @@
 import { PHONE_PATTERN, TEXT_LIMIT } from '@/constants/textLimits';
+import { isActiveServiceOrderStatus } from '@/domain/serviceOrderStatus';
 import {
   equipmentSchema,
+  notificationFieldsSchema,
   notificationSchema,
   personSchema,
+  serviceItemFieldsSchema,
   serviceItemSchema,
+  serviceOrderFieldsSchema,
   serviceOrderSchema,
   serviceRecordSchema,
   vendorSchema,
@@ -53,12 +57,27 @@ export type CsvFieldRule = {
   pattern?: { regex: RegExp; message: string };
 };
 
+/**
+ * 複数属性から導く一意制約(D-110)。keyOf が同じ値を返す行がファイル内に2つあればエラー。
+ * undefined を返した行は制約の対象外。
+ */
+export type CsvDerivedUniqueKey<Entity> = {
+  /** エラーを付ける列名 */
+  column: keyof Entity & string;
+  message: string;
+  keyOf: (entity: Entity) => string | undefined;
+};
+
 export type EntityCsvSpec<Entity> = {
   label: string;
   schema: z.ZodType<Entity>;
-  /** schema の shape(キー順 = 列順 = 宣言順) */
+  /**
+   * 列定義(キー順 = 列順 = 宣言順)。判別 union のエンティティは schema から shape を取れないため、
+   * store/schema.ts のフラットな属性定義(xxxFieldsSchema)の shape を渡す。
+   */
   shape: Record<string, z.ZodType>;
   uniqueKeys: readonly (keyof Entity & string)[];
+  derivedUniqueKeys: readonly CsvDerivedUniqueKey<Entity>[];
   /** 外向き参照(FK)の一覧。突合先の存在チェックは importValidation.ts が行う(D-029) */
   references: readonly CsvReference<Entity>[];
   /**
@@ -69,15 +88,6 @@ export type EntityCsvSpec<Entity> = {
    */
   fieldRules: Readonly<Record<string, CsvFieldRule>>;
 };
-
-/**
- * ZodObject の shape を取り出す。EntityCsvSpec.schema の型は z.ZodType<Entity> だが、
- * 実体は必ず store/schema.ts の z.object(...)(必要なら .superRefine 付き、this を返すため shape は保持される)。
- * 型 z.ZodType には shape が無いため取り出しにアサーションを要する。
- */
-const shapeOf = (schema: z.ZodType): Record<string, z.ZodType> =>
-  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- 上記コメントの理由により実体は必ず ZodObject
-  (schema as unknown as { shape: Record<string, z.ZodType> }).shape;
 
 /**
  * Entity のキーに限定された fieldRules を string キーの Record へ広げる。
@@ -93,18 +103,24 @@ const widenFieldRules = <Entity>(
     ),
   );
 
-const defineSpec = <Entity>(
-  label: string,
-  schema: z.ZodType<Entity>,
-  uniqueKeys: readonly (keyof Entity & string)[],
-  references: readonly CsvReference<Entity>[],
-  fieldRules: Partial<Record<keyof Entity & string, CsvFieldRule>>,
-): EntityCsvSpec<Entity> => ({
-  label,
-  schema,
-  shape: shapeOf(schema),
+type EntityCsvSpecInput<Entity> = Omit<
+  EntityCsvSpec<Entity>,
+  'uniqueKeys' | 'derivedUniqueKeys' | 'fieldRules'
+> & {
+  uniqueKeys?: EntityCsvSpec<Entity>['uniqueKeys'];
+  derivedUniqueKeys?: EntityCsvSpec<Entity>['derivedUniqueKeys'];
+  fieldRules?: Partial<Record<keyof Entity & string, CsvFieldRule>>;
+};
+
+const defineSpec = <Entity>({
+  uniqueKeys = [],
+  derivedUniqueKeys = [],
+  fieldRules = {},
+  ...rest
+}: EntityCsvSpecInput<Entity>): EntityCsvSpec<Entity> => ({
+  ...rest,
   uniqueKeys,
-  references,
+  derivedUniqueKeys,
   fieldRules: widenFieldRules(fieldRules),
 });
 
@@ -114,12 +130,13 @@ const PHONE_RULE: CsvFieldRule = {
 };
 
 export const ENTITY_CSV_SPECS: { [Kind in CsvEntityKind]: EntityCsvSpec<EntityOf<Kind>> } = {
-  equipment: defineSpec(
-    '機器',
-    equipmentSchema,
-    ['managementNo'],
-    [{ key: 'manufacturerId', target: 'vendors' }],
-    {
+  equipment: defineSpec({
+    label: '機器',
+    schema: equipmentSchema,
+    shape: equipmentSchema.shape,
+    uniqueKeys: ['managementNo'],
+    references: [{ key: 'manufacturerId', target: 'vendors' }],
+    fieldRules: {
       managementNo: { maxLength: TEXT_LIMIT.code },
       name: { maxLength: TEXT_LIMIT.name },
       model: { maxLength: TEXT_LIMIT.name },
@@ -127,58 +144,85 @@ export const ENTITY_CSV_SPECS: { [Kind in CsvEntityKind]: EntityCsvSpec<EntityOf
       location: { maxLength: TEXT_LIMIT.name },
       note: { maxLength: TEXT_LIMIT.note },
     },
-  ),
-  serviceItems: defineSpec(
-    '点検校正項目',
-    serviceItemSchema,
-    [],
-    [
+  }),
+  serviceItems: defineSpec({
+    label: '点検校正項目',
+    schema: serviceItemSchema,
+    shape: serviceItemFieldsSchema.shape,
+    references: [
       { key: 'equipmentId', target: 'equipment' },
       { key: 'vendorId', target: 'vendors' },
       { key: 'personId', target: 'persons' },
     ],
-    { name: { maxLength: TEXT_LIMIT.name } },
-  ),
-  serviceRecords: defineSpec(
-    '実施記録',
-    serviceRecordSchema,
-    [],
-    [
+    fieldRules: { name: { maxLength: TEXT_LIMIT.name } },
+  }),
+  serviceRecords: defineSpec({
+    label: '実施記録',
+    schema: serviceRecordSchema,
+    shape: serviceRecordSchema.shape,
+    references: [
       { key: 'serviceItemId', target: 'serviceItems' },
       { key: 'serviceOrderId', target: 'serviceOrders' },
     ],
-    {
+    fieldRules: {
       doneBy: { maxLength: TEXT_LIMIT.name },
       note: { maxLength: TEXT_LIMIT.note },
     },
-  ),
-  serviceOrders: defineSpec(
-    '点検校正外部案件',
-    serviceOrderSchema,
-    [],
-    [
+    derivedUniqueKeys: [
+      {
+        column: 'serviceOrderId',
+        message: '同じ案件に紐づく実施記録は1件までです',
+        keyOf: (serviceRecord) => serviceRecord.serviceOrderId,
+      },
+    ],
+  }),
+  serviceOrders: defineSpec({
+    label: '点検校正外部案件',
+    schema: serviceOrderSchema,
+    shape: serviceOrderFieldsSchema.shape,
+    references: [
       { key: 'serviceItemId', target: 'serviceItems' },
       { key: 'vendorId', target: 'vendors' },
     ],
-    { note: { maxLength: TEXT_LIMIT.note } },
-  ),
-  vendors: defineSpec('メーカー/取引先', vendorSchema, [], [], {
-    name: { maxLength: TEXT_LIMIT.name },
-    contactPerson: { maxLength: TEXT_LIMIT.name },
-    email: { maxLength: TEXT_LIMIT.email },
-    phone: PHONE_RULE,
-    note: { maxLength: TEXT_LIMIT.note },
+    fieldRules: { note: { maxLength: TEXT_LIMIT.note } },
+    derivedUniqueKeys: [
+      {
+        column: 'serviceItemId',
+        message: '有効な案件(発注準備〜返却済)は点検校正項目ごとに1件までです',
+        keyOf: (serviceOrder) =>
+          isActiveServiceOrderStatus(serviceOrder.status) ? serviceOrder.serviceItemId : undefined,
+      },
+    ],
   }),
-  persons: defineSpec('担当者', personSchema, [], [], {
-    name: { maxLength: TEXT_LIMIT.name },
-    department: { maxLength: TEXT_LIMIT.name },
-    email: { maxLength: TEXT_LIMIT.email },
+  vendors: defineSpec({
+    label: 'メーカー/取引先',
+    schema: vendorSchema,
+    shape: vendorSchema.shape,
+    references: [],
+    fieldRules: {
+      name: { maxLength: TEXT_LIMIT.name },
+      contactPerson: { maxLength: TEXT_LIMIT.name },
+      email: { maxLength: TEXT_LIMIT.email },
+      phone: PHONE_RULE,
+      note: { maxLength: TEXT_LIMIT.note },
+    },
   }),
-  notifications: defineSpec(
-    '通知',
-    notificationSchema,
-    [],
-    [
+  persons: defineSpec({
+    label: '担当者',
+    schema: personSchema,
+    shape: personSchema.shape,
+    references: [],
+    fieldRules: {
+      name: { maxLength: TEXT_LIMIT.name },
+      department: { maxLength: TEXT_LIMIT.name },
+      email: { maxLength: TEXT_LIMIT.email },
+    },
+  }),
+  notifications: defineSpec({
+    label: '通知',
+    schema: notificationSchema,
+    shape: notificationFieldsSchema.shape,
+    references: [
       {
         key: 'targetId',
         target: (entity) =>
@@ -188,8 +232,7 @@ export const ENTITY_CSV_SPECS: { [Kind in CsvEntityKind]: EntityCsvSpec<EntityOf
       },
       { key: 'personId', target: 'persons' },
     ],
-    {},
-  ),
+  }),
 };
 
 /** エクスポートファイル名。設定画面のダウンロードとマニュアルのファイル名表が共有する(D-065) */

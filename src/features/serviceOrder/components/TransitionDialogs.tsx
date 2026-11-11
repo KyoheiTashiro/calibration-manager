@@ -1,14 +1,16 @@
 /**
  * ボードの入力付き遷移ダイアログ（screen-design/08-service-orders.md、README §0.5）。RHF + zodResolver。
- * updateServiceOrderStatus が true のときのみ属性を updateServiceOrder で patch する。false（遷移不可・競合）なら
- * patch せず閉じる（silent no-op）。日付整合の不一致は警告表示のみでブロックしない（D-019）。
+ * 遷移と日付の書込はストアの1アクション（orderServiceOrder / returnServiceOrder）で行う（D-106）。
+ * false（遷移不可・競合）ならダイアログを閉じず、その旨を表示する。
+ * 日付整合の不一致は警告表示のみでブロックしない（D-019）。
  */
 
 // oxlint-disable react/no-multi-comp -- ServiceOrderDialog/ReturnDialog はボードの入力付き遷移ダイアログを
-// 対で扱う密結合コンポーネント（同一スキーマ設計・同一 updateServiceOrderStatus→updateServiceOrder パターン）であり、
+// 対で扱う密結合コンポーネント（同一スキーマ設計・同一の遷移アクション呼び出しパターン）であり、
 // coding-standards.md §2「サブコンポーネントが複数なら…」の範囲内でこの1ファイルに集約する設計判断のため緩和する。
 
 import { Button, DateField, Modal, TextField } from '@/components/ui';
+import { TRANSITION_REJECTED_MESSAGE } from '@/features/serviceOrder/constants';
 import {
   Schema as orderDialogSchema,
   type FormType as OrderDialogFormType,
@@ -17,12 +19,12 @@ import {
   Schema as returnDialogSchema,
   type FormType as ReturnDialogFormType,
 } from '@/features/serviceOrder/returnDialog/schema';
-import { SERVICE_ORDER_STATUS, type ServiceOrder } from '@/store/types';
+import type { ServiceOrder } from '@/store/types';
 import { useAppStore } from '@/store/useAppStore';
 import { createFormSubmitHandler, emptyToUndefined } from '@/utils/form';
 import { isIsoDateString, todayIsoDate } from '@/utils/time';
 import { zodResolver } from '@hookform/resolvers/zod';
-import type { ReactElement } from 'react';
+import { useState, type ReactElement } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 
 type Props = {
@@ -31,9 +33,15 @@ type Props = {
   onClose: () => void;
 };
 
+const RejectedMessage = (): ReactElement => (
+  <p role='alert' className='text-sm text-red-600'>
+    {TRANSITION_REJECTED_MESSAGE}
+  </p>
+);
+
 export const ServiceOrderDialog = ({ serviceOrder, onClose }: Props): ReactElement => {
-  const updateServiceOrderStatus = useAppStore((state) => state.updateServiceOrderStatus);
-  const updateServiceOrder = useAppStore((state) => state.updateServiceOrder);
+  const orderServiceOrder = useAppStore((state) => state.orderServiceOrder);
+  const [isRejected, setIsRejected] = useState(false);
 
   const {
     register,
@@ -55,16 +63,14 @@ export const ServiceOrderDialog = ({ serviceOrder, onClose }: Props): ReactEleme
     isIsoDateString(orderedDate) && isIsoDateString(dueDate) && orderedDate > dueDate;
 
   const onSubmit = (values: OrderDialogFormType): void => {
-    const transitioned = updateServiceOrderStatus(serviceOrder.id, SERVICE_ORDER_STATUS.ORDERED);
-    if (transitioned) {
-      const cost = emptyToUndefined(values.cost);
-      updateServiceOrder(serviceOrder.id, {
-        orderedDate: values.orderedDate,
-        dueDate: emptyToUndefined(values.dueDate),
-        cost: cost === undefined ? undefined : Number(cost),
-      });
-    }
-    onClose();
+    const cost = emptyToUndefined(values.cost);
+    const transitioned = orderServiceOrder(serviceOrder.id, {
+      orderedDate: values.orderedDate,
+      dueDate: emptyToUndefined(values.dueDate),
+      cost: cost === undefined ? undefined : Number(cost),
+    });
+    if (transitioned) onClose();
+    else setIsRejected(true);
   };
 
   const handleSave = createFormSubmitHandler(handleSubmit(onSubmit));
@@ -93,14 +99,15 @@ export const ServiceOrderDialog = ({ serviceOrder, onClose }: Props): ReactEleme
           <p className='text-xs text-amber-600'>発注日が返却予定日より後になっています</p>
         ) : null}
         <TextField label='費用' type='number' error={errors.cost?.message} {...register('cost')} />
+        {isRejected ? <RejectedMessage /> : null}
       </div>
     </Modal>
   );
 };
 
 export const ReturnDialog = ({ serviceOrder, onClose }: Props): ReactElement => {
-  const updateServiceOrderStatus = useAppStore((state) => state.updateServiceOrderStatus);
-  const updateServiceOrder = useAppStore((state) => state.updateServiceOrder);
+  const returnServiceOrder = useAppStore((state) => state.returnServiceOrder);
+  const [isRejected, setIsRejected] = useState(false);
 
   const {
     register,
@@ -120,11 +127,8 @@ export const ReturnDialog = ({ serviceOrder, onClose }: Props): ReactElement => 
     serviceOrder.orderedDate > returnedDate;
 
   const onSubmit = (values: ReturnDialogFormType): void => {
-    const transitioned = updateServiceOrderStatus(serviceOrder.id, SERVICE_ORDER_STATUS.RETURNED);
-    if (transitioned) {
-      updateServiceOrder(serviceOrder.id, { returnedDate: values.returnedDate });
-    }
-    onClose();
+    if (returnServiceOrder(serviceOrder.id, values.returnedDate)) onClose();
+    else setIsRejected(true);
   };
 
   const handleSave = createFormSubmitHandler(handleSubmit(onSubmit));
@@ -151,6 +155,7 @@ export const ReturnDialog = ({ serviceOrder, onClose }: Props): ReactElement => 
         {showReturnWarning ? (
           <p className='text-xs text-amber-600'>発注日が実返却日より後になっています</p>
         ) : null}
+        {isRejected ? <RejectedMessage /> : null}
       </div>
     </Modal>
   );

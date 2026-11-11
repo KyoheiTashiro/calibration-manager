@@ -90,6 +90,8 @@ const serviceOrderReturned: ServiceOrder = {
   serviceItemId: serviceItemExternal.id,
   vendorId: serviceOrderVendor.id,
   status: SERVICE_ORDER_STATUS.RETURNED,
+  orderedDate: '2026-06-01',
+  returnedDate: '2026-06-20',
 };
 
 /** planned 案件（completed へ遷移不可）。addServiceRecord が null を返す異常系の検証用 */

@@ -149,6 +149,7 @@ describe('ServiceOrderModal', () => {
           serviceItemId: externalServiceItem.id,
           vendorId: calibratorVendor.id,
           status: SERVICE_ORDER_STATUS.ORDERED,
+          orderedDate: '2026-06-01',
         },
       },
     });
@@ -195,7 +196,8 @@ describe('ServiceOrderModal', () => {
         [manufacturerOnlyVendor.id]: manufacturerOnlyVendor,
       },
       serviceItems: {
-        [externalServiceItem.id]: { ...externalServiceItem, vendorId: undefined },
+        // 外部項目は依頼先必須（D-106）。校正業者でない依頼先を指すと既定選択が空になり、未選択と同じ初期表示になる
+        [externalServiceItem.id]: { ...externalServiceItem, vendorId: manufacturerOnlyVendor.id },
       },
     });
     const user = userEvent.setup();

@@ -3,10 +3,11 @@
 import { ROUTES } from '@/constants/routes';
 import { NotificationCenter } from '@/features/notifications';
 import { NOTIFICATION_TARGET_TYPE, NOTIFICATION_TYPE, type Notification } from '@/store/types';
+import { toNotification } from '@/test/entityBuilders';
 import { renderWithStore, seedStore, setupStoreIsolation } from '@/test/renderWithStore';
 import { screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom/vitest';
+import userEvent from '@testing-library/user-event';
 import { Route, Routes } from 'react-router-dom';
 import { beforeEach, describe, expect, it } from 'vitest';
 
@@ -16,17 +17,18 @@ const makeNotif = (
   idSuffix: string,
   dayOfMonth: number,
   overrides: Partial<Notification> = {},
-): Notification => ({
-  id: `notif-${idSuffix}`,
-  type: NOTIFICATION_TYPE.OVERDUE,
-  targetType: NOTIFICATION_TARGET_TYPE.SERVICE_ITEM,
-  targetId: 'item-missing',
-  personId: 'person-1',
-  message: `通知${idSuffix}`,
-  createdDate: `2026-06-${String(dayOfMonth).padStart(2, '0')}`,
-  isRead: false,
-  ...overrides,
-});
+): Notification =>
+  toNotification({
+    id: `notif-${idSuffix}`,
+    type: NOTIFICATION_TYPE.OVERDUE,
+    targetType: NOTIFICATION_TARGET_TYPE.SERVICE_ITEM,
+    targetId: 'item-missing',
+    personId: 'person-1',
+    message: `通知${idSuffix}`,
+    createdDate: `2026-06-${String(dayOfMonth).padStart(2, '0')}`,
+    isRead: false,
+    ...overrides,
+  });
 
 const buildNotifications = (
   count: number,

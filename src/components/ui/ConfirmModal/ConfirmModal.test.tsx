@@ -157,3 +157,25 @@ describe('ConfirmModal', () => {
     expect(screen.getByRole('button', { name: '既読にする' })).toHaveClass('bg-primary');
   });
 });
+
+describe('ConfirmModal: children', () => {
+  it('メッセージの下に追加の選択肢を描画する', () => {
+    render(
+      <ConfirmModal
+        open
+        title='機器の廃棄'
+        message='廃棄にしますか?'
+        confirmLabel='廃棄'
+        onConfirm={vi.fn<() => void>()}
+        onCancel={vi.fn<() => void>()}
+      >
+        <label>
+          <input type='checkbox' />
+          案件も中止する
+        </label>
+      </ConfirmModal>,
+    );
+
+    expect(screen.getByLabelText('案件も中止する')).toBeInTheDocument();
+  });
+});

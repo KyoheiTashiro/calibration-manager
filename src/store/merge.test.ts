@@ -10,6 +10,7 @@ import {
   migrateV2ToV3,
   migrateV3ToV4,
   migrateV4ToV5,
+  migrateV5ToV6,
   salvagePersistedState,
   sanitizeAppState,
 } from '@/store/persistence';
@@ -64,6 +65,7 @@ const serviceOrder: ServiceOrder = {
   serviceItemId: 'item-1',
   vendorId: 'vendor-1',
   status: 'ordered',
+  orderedDate: '2026-06-01',
 };
 const serviceItemNotification: Notification = {
   id: 'notification-1',
@@ -125,7 +127,13 @@ const v1State = (): Record<string, unknown> => ({
     },
   },
   orders: {
-    'order-1': { id: 'order-1', itemId: 'item-1', vendorId: 'vendor-1', status: 'ordered' },
+    'order-1': {
+      id: 'order-1',
+      itemId: 'item-1',
+      vendorId: 'vendor-1',
+      status: 'ordered',
+      orderedDate: '2026-06-01',
+    },
   },
   notifications: {
     [serviceItemNotification.id]: {
@@ -155,6 +163,7 @@ const v2State = (): Record<string, unknown> => ({
       inspectionItemId: 'item-1',
       vendorId: 'vendor-1',
       status: 'ordered',
+      orderedDate: '2026-06-01',
     },
   },
   notifications: {
@@ -217,7 +226,13 @@ const v3State = (): Record<string, unknown> => ({
     },
   },
   orders: {
-    'order-1': { id: 'order-1', serviceItemId: 'item-1', vendorId: 'vendor-1', status: 'ordered' },
+    'order-1': {
+      id: 'order-1',
+      serviceItemId: 'item-1',
+      vendorId: 'vendor-1',
+      status: 'ordered',
+      orderedDate: '2026-06-01',
+    },
   },
   notifications: {
     [serviceItemNotification.id]: serviceItemNotification,
@@ -402,6 +417,7 @@ describe('sanitizeAppState: 参照整合（D-003）', () => {
     const serviceOrderNotification: Notification = {
       ...serviceItemNotification,
       id: 'notification-2',
+      type: 'deliveryDueSoon',
       targetType: 'serviceOrder',
       targetId: 'order-gone',
     };
@@ -468,5 +484,74 @@ describe('persist 統合（LocalStorage → rehydrate）', () => {
       'serviceRecords',
       'vendors',
     ]);
+  });
+});
+
+const v5State = (): Record<string, unknown> => ({
+  ...validState(),
+  serviceItems: {
+    'item-1': serviceItem,
+    'item-internal': {
+      ...serviceItem,
+      id: 'item-internal',
+      execution: 'internal',
+      leadTimeDays: 10,
+    },
+  },
+  serviceOrders: {
+    'order-1': { ...serviceOrder, returnedDate: '2026-06-20' },
+    'order-planned': {
+      ...serviceOrder,
+      id: 'order-planned',
+      status: 'planned',
+      dueDate: '2026-07-01',
+    },
+    'order-returned': {
+      ...serviceOrder,
+      id: 'order-returned',
+      status: 'returned',
+      returnedDate: '2026-06-20',
+    },
+    'order-no-date': {
+      id: 'order-no-date',
+      serviceItemId: 'item-1',
+      vendorId: 'vendor-1',
+      status: 'ordered',
+    },
+  },
+});
+
+describe('migrateV5ToV6: 判別 union 化で持てなくなった属性の除去（D-106）', () => {
+  it('内部項目の依頼先・納期、返却前案件の実返却日、発注準備案件の発注日を落として読み込める', () => {
+    const salvaged = salvagePersistedState(migrateV5ToV6(v5State()));
+
+    expect(salvaged.serviceItems['item-internal']).toEqual({
+      ...serviceItem,
+      id: 'item-internal',
+      execution: 'internal',
+      vendorId: undefined,
+    });
+    expect(salvaged.serviceItems['item-1']).toEqual(serviceItem);
+    expect(salvaged.serviceOrders['order-1']).toEqual(serviceOrder);
+    expect(salvaged.serviceOrders['order-planned']).toEqual({
+      id: 'order-planned',
+      serviceItemId: 'item-1',
+      vendorId: 'vendor-1',
+      status: 'planned',
+      dueDate: '2026-07-01',
+    });
+    expect(salvaged.serviceOrders['order-returned']?.returnedDate).toBe('2026-06-20');
+  });
+
+  it('必須の発注日が欠けた発注済案件は補えないためサルベージで脱落する', () => {
+    const salvaged = salvagePersistedState(migrateV5ToV6(v5State()));
+    expect(salvaged.serviceOrders['order-no-date']).toBeUndefined();
+  });
+
+  it('非オブジェクトや欠損キーは例外を投げず通す（後段サルベージに委ねる）', () => {
+    expect(migrateV5ToV6(null)).toBeNull();
+    expect(
+      salvagePersistedState(migrateV5ToV6({ serviceItems: 42, serviceOrders: 'broken' })),
+    ).toEqual(emptyAppState());
   });
 });

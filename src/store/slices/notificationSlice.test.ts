@@ -40,6 +40,7 @@ const serviceOrder: ServiceOrder = {
   serviceItemId: 'item-1',
   vendorId: 'vendor-1',
   status: 'ordered',
+  orderedDate: '2026-06-01',
 };
 
 const seedBase = (overrides?: { serviceItems?: Record<string, ServiceItem> }): void => {
@@ -144,5 +145,46 @@ describe('markAsRead / markAllAsRead', () => {
     const state = useAppStore.getState();
     expect(state.notifications[(first as { id: string }).id]?.isRead).toBe(true);
     expect(state.notifications[(second as { id: string }).id]?.isRead).toBe(false);
+  });
+});
+
+describe('generateNotifications: 発生条件を満たさなくなった通知の取り下げ（D-108）', () => {
+  it('発生条件が解消されると未読の通知を削除し、既読は履歴として残す', () => {
+    seedBase();
+    useAppStore.getState().generateNotifications('2026-08-01');
+    const readIds = Object.keys(useAppStore.getState().notifications);
+    useAppStore.getState().markAllAsRead();
+    useAppStore.getState().generateNotifications('2026-08-02');
+    expect(Object.keys(useAppStore.getState().notifications).length).toBe(readIds.length * 2);
+
+    // 実施記録の登録などで次回期限が先へ進んだ状態
+    useAppStore.getState().updateServiceItem(serviceItem.id, { nextDueDate: '2099-01-01' });
+    useAppStore.getState().generateNotifications('2026-08-03');
+
+    const remaining = Object.values(useAppStore.getState().notifications);
+    expect(remaining.map(({ id }) => id).toSorted()).toEqual(readIds.toSorted());
+    expect(remaining.every(({ isRead }) => isRead)).toBe(true);
+  });
+
+  it('期限間近が期限超過へ進むと、未読の dueSoon は overdue に置き換わる', () => {
+    seedBase();
+    useAppStore.getState().generateNotifications('2026-07-01');
+    expect(Object.values(useAppStore.getState().notifications).map(({ type }) => type)).toContain(
+      'dueSoon',
+    );
+
+    useAppStore.getState().generateNotifications('2026-08-01');
+    const types = Object.values(useAppStore.getState().notifications).map(({ type }) => type);
+    expect(types).toContain('overdue');
+    expect(types).not.toContain('dueSoon');
+  });
+
+  it('機器が対象外になると、その項目の未読通知を取り下げる', () => {
+    seedBase();
+    useAppStore.getState().generateNotifications('2026-08-01');
+    seedStore({ equipment: { [equipment.id]: { ...equipment, status: 'retired' } } });
+
+    useAppStore.getState().generateNotifications('2026-08-02');
+    expect(useAppStore.getState().notifications).toEqual({});
   });
 });

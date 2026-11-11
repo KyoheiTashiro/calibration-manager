@@ -6,6 +6,7 @@ import {
   useRef,
   type MouseEvent,
   type ReactElement,
+  type ReactNode,
   type SyntheticEvent,
 } from 'react';
 
@@ -13,6 +14,8 @@ type Props = {
   open: boolean;
   title: string;
   message: string;
+  /** メッセージの下に置く追加の入力（確定時の選択肢など） */
+  children?: ReactNode;
   confirmLabel: string;
   // 破壊的操作(削除・中止)は danger、非破壊の確認は primary。
   variant?: 'danger' | 'primary';
@@ -24,6 +27,7 @@ export const ConfirmModal = ({
   open,
   title,
   message,
+  children,
   confirmLabel,
   variant = 'danger',
   onConfirm,
@@ -70,6 +74,7 @@ export const ConfirmModal = ({
           {title}
         </h2>
         <p className='text-sm text-slate-700'>{message}</p>
+        {children}
         <div className='flex justify-end gap-2'>
           <Button ref={cancelButtonRef} variant='secondary' onClick={onCancel}>
             キャンセル

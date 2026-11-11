@@ -33,6 +33,10 @@ export const SERVICE_ORDER_STATUS_LABELS = {
   [SERVICE_ORDER_STATUS.CANCELLED]: '中止',
 } as const satisfies Record<ServiceOrderStatus, string>;
 
+/** ストアが遷移を拒否したとき（別タブでの更新等で画面と実際の状態がずれた場合）の表示文言 */
+export const TRANSITION_REJECTED_MESSAGE =
+  '案件の状態が変わっているため操作できませんでした。最新の表示を確認してください';
+
 /** ボードの進行中4列(左→右の表示順。08-service-orders.md 準拠) */
 export const BOARD_ACTIVE_COLUMNS = [
   SERVICE_ORDER_STATUS.PLANNED,

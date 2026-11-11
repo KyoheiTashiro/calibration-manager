@@ -1,11 +1,12 @@
-import type { ServiceItem } from '@/store/types';
+import type { ServiceItemInput } from '@/store/slices/serviceItemSlice';
+import type { ServiceItemBase } from '@/store/types';
 import { useAppStore } from '@/store/useAppStore';
 import { setupStoreIsolation } from '@/test/renderWithStore';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 const buildServiceItemInput = (
-  overrides: Partial<Omit<ServiceItem, 'id'>> = {},
-): Omit<ServiceItem, 'id'> => ({
+  overrides: Partial<Omit<ServiceItemBase, 'id'>> = {},
+): ServiceItemInput => ({
   equipmentId: 'equipment-1',
   type: 'calibration',
   name: '年次校正',
@@ -66,5 +67,25 @@ describe('serviceItemSlice', () => {
       }).not.toThrow();
       expect(useAppStore.getState().serviceItems['no-such-id']).toBeUndefined();
     });
+  });
+});
+
+describe('updateServiceItem: 実施区分の切り替え（D-106）', () => {
+  beforeEach(setupStoreIsolation);
+
+  it('内部実施へ切り替えると、patch に含めなくても依頼先と納期を落とす', () => {
+    const id = useAppStore.getState().addServiceItem({
+      ...buildServiceItemInput(),
+      execution: 'external',
+      vendorId: 'vendor-1',
+      leadTimeDays: 10,
+    });
+
+    useAppStore.getState().updateServiceItem(id, { execution: 'internal' });
+
+    const updated = useAppStore.getState().serviceItems[id];
+    expect(updated.execution).toBe('internal');
+    expect(updated.vendorId).toBeUndefined();
+    expect(updated.leadTimeDays).toBeUndefined();
   });
 });

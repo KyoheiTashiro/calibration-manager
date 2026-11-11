@@ -68,31 +68,57 @@ export const personArb: fc.Arbitrary<Person> = fc.record({
   isActive: fc.boolean(),
 });
 
-export const serviceItemArb: fc.Arbitrary<ServiceItem> = fc.record({
+// 実施区分・案件状態ごとに持てる属性が違う（types.ts の判別 union）ため、組み合わせ単位で生成する
+const serviceItemBaseArb = {
   id: fc.uuid(),
   equipmentId: fc.uuid(),
   type: fc.constantFrom(...Object.values(SERVICE_ITEM_TYPE)),
   name: fc.string({ minLength: 1 }),
   cycle: cycleArb,
-  execution: fc.constantFrom(...Object.values(EXECUTION)),
-  vendorId: optionalArb(fc.uuid()),
-  leadTimeDays: optionalArb(dayCountArb),
   bufferDays: dayCountArb,
   personId: fc.uuid(),
   noticeDaysBefore: dayCountArb,
   lastDoneDate: optionalArb(isoDateArb),
   nextDueDate: isoDateArb,
   isActive: fc.boolean(),
-});
+};
 
-export const serviceOrderArb: fc.Arbitrary<ServiceOrder> = fc.record({
+export const serviceItemArb: fc.Arbitrary<ServiceItem> = fc.oneof(
+  fc.record({ ...serviceItemBaseArb, execution: fc.constant(EXECUTION.INTERNAL) }),
+  fc.record({
+    ...serviceItemBaseArb,
+    execution: fc.constant(EXECUTION.EXTERNAL),
+    vendorId: fc.uuid(),
+    leadTimeDays: optionalArb(dayCountArb),
+  }),
+);
+
+const serviceOrderBaseArb = {
   id: fc.uuid(),
   serviceItemId: fc.uuid(),
   vendorId: fc.uuid(),
-  status: fc.constantFrom(...Object.values(SERVICE_ORDER_STATUS)),
-  orderedDate: optionalArb(isoDateArb),
   dueDate: optionalArb(isoDateArb),
-  returnedDate: optionalArb(isoDateArb),
   cost: optionalArb(fc.integer({ min: 0, max: 10_000_000 })),
   note: optionalArb(fc.string()),
-});
+};
+
+export const serviceOrderArb: fc.Arbitrary<ServiceOrder> = fc.oneof(
+  fc.record({ ...serviceOrderBaseArb, status: fc.constant(SERVICE_ORDER_STATUS.PLANNED) }),
+  fc.record({
+    ...serviceOrderBaseArb,
+    status: fc.constantFrom(SERVICE_ORDER_STATUS.ORDERED, SERVICE_ORDER_STATUS.IN_CALIBRATION),
+    orderedDate: isoDateArb,
+  }),
+  fc.record({
+    ...serviceOrderBaseArb,
+    status: fc.constantFrom(SERVICE_ORDER_STATUS.RETURNED, SERVICE_ORDER_STATUS.COMPLETED),
+    orderedDate: isoDateArb,
+    returnedDate: isoDateArb,
+  }),
+  fc.record({
+    ...serviceOrderBaseArb,
+    status: fc.constant(SERVICE_ORDER_STATUS.CANCELLED),
+    orderedDate: optionalArb(isoDateArb),
+    returnedDate: optionalArb(isoDateArb),
+  }),
+);

@@ -12,6 +12,7 @@ import {
   type ServiceItem,
   type Notification,
 } from '@/store/types';
+import { toNotification } from '@/test/entityBuilders';
 import { describe, expect, it } from 'vitest';
 
 const makeEquipment = (id: string): Equipment => ({
@@ -47,16 +48,17 @@ const makeRow = (id: string, status: ServiceItemStatus, nextDueDate: string): Se
 
 const makeNotification = (
   overrides: Partial<Notification> & Pick<Notification, 'id'>,
-): Notification => ({
-  type: NOTIFICATION_TYPE.OVERDUE,
-  targetType: NOTIFICATION_TARGET_TYPE.SERVICE_ITEM,
-  targetId: 'item-1',
-  personId: 'person-1',
-  message: `通知${overrides.id}`,
-  createdDate: '2026-07-01',
-  isRead: false,
-  ...overrides,
-});
+): Notification =>
+  toNotification({
+    type: NOTIFICATION_TYPE.OVERDUE,
+    targetType: NOTIFICATION_TARGET_TYPE.SERVICE_ITEM,
+    targetId: 'item-1',
+    personId: 'person-1',
+    message: `通知${overrides.id}`,
+    createdDate: '2026-07-01',
+    isRead: false,
+    ...overrides,
+  });
 
 describe('countByStatus', () => {
   it('全ステータスを集計し、該当0のステータスも0で埋める', () => {

@@ -11,10 +11,11 @@ import {
   type ServiceItem,
   type Notification,
 } from '@/store/types';
+import { toNotification } from '@/test/entityBuilders';
 import { renderWithStore, seedStore, setupStoreIsolation } from '@/test/renderWithStore';
 import { screen, within } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom/vitest';
+import userEvent from '@testing-library/user-event';
 import type { ReactElement } from 'react';
 import { Route, Routes, useParams } from 'react-router-dom';
 import { beforeEach, describe, expect, it } from 'vitest';
@@ -45,16 +46,17 @@ const item1: ServiceItem = {
   isActive: true,
 };
 
-const makeNotif = (overrides: Partial<Notification> & Pick<Notification, 'id'>): Notification => ({
-  type: NOTIFICATION_TYPE.OVERDUE,
-  targetType: NOTIFICATION_TARGET_TYPE.SERVICE_ITEM,
-  targetId: 'item-1',
-  personId: 'person-1',
-  message: '通知メッセージ',
-  createdDate: '2026-07-01',
-  isRead: false,
-  ...overrides,
-});
+const makeNotif = (overrides: Partial<Notification> & Pick<Notification, 'id'>): Notification =>
+  toNotification({
+    type: NOTIFICATION_TYPE.OVERDUE,
+    targetType: NOTIFICATION_TARGET_TYPE.SERVICE_ITEM,
+    targetId: 'item-1',
+    personId: 'person-1',
+    message: '通知メッセージ',
+    createdDate: '2026-07-01',
+    isRead: false,
+    ...overrides,
+  });
 
 const renderCenter = (): void => {
   renderWithStore(
@@ -126,7 +128,12 @@ describe('NotificationCenter: 種別バッジ', () => {
   it('種別の日本語ラベルと色クラスを併記する', () => {
     seedStore({
       notifications: {
-        d1: makeNotif({ id: 'd1', type: NOTIFICATION_TYPE.DELIVERY_DUE_SOON }),
+        d1: makeNotif({
+          id: 'd1',
+          type: NOTIFICATION_TYPE.DELIVERY_DUE_SOON,
+          targetType: NOTIFICATION_TARGET_TYPE.SERVICE_ORDER,
+          targetId: 'order-1',
+        }),
       },
     });
     renderCenter();
@@ -139,7 +146,12 @@ describe('NotificationCenter: 種別バッジ', () => {
   it('SVGアイコンを aria-hidden 付きで描画し、ラベルはスクリーンリーダーから読める', () => {
     seedStore({
       notifications: {
-        d1: makeNotif({ id: 'd1', type: NOTIFICATION_TYPE.DELIVERY_DUE_SOON }),
+        d1: makeNotif({
+          id: 'd1',
+          type: NOTIFICATION_TYPE.DELIVERY_DUE_SOON,
+          targetType: NOTIFICATION_TARGET_TYPE.SERVICE_ORDER,
+          targetId: 'order-1',
+        }),
       },
     });
     renderCenter();

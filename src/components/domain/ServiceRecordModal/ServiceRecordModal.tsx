@@ -39,7 +39,7 @@ const resolvePrefillDoneBy = (
 ): string => {
   if (serviceOrder) return recordValue(vendors, serviceOrder.vendorId)?.name ?? '';
   // なぜ vendorId === '' を別判定しないか: recordValue は不在キー('' を含む)に undefined を返すため
-  if (serviceItem?.execution === EXECUTION.EXTERNAL && serviceItem.vendorId !== undefined) {
+  if (serviceItem?.execution === EXECUTION.EXTERNAL) {
     return recordValue(vendors, serviceItem.vendorId)?.name ?? '';
   }
   return '';

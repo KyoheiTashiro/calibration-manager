@@ -6,6 +6,7 @@ import {
   SERVICE_ORDER_STATUS_TRANSITIONS,
 } from '@/domain/serviceOrderStatus';
 import { type ServiceOrder, SERVICE_ORDER_STATUS, type ServiceOrderStatus } from '@/store/types';
+import { serviceOrderDatesFor, toServiceOrder } from '@/test/entityBuilders';
 import { describe, expect, it } from 'vitest';
 
 const ALL_STATUSES: ServiceOrderStatus[] = Object.values(SERVICE_ORDER_STATUS);
@@ -139,12 +140,14 @@ describe('isAwaitingReturnStatus', () => {
   });
 });
 
-const order = (serviceItemId: string, status: ServiceOrderStatus): ServiceOrder => ({
-  id: `${serviceItemId}-${status}`,
-  serviceItemId,
-  vendorId: 'vendor-1',
-  status,
-});
+const order = (serviceItemId: string, status: ServiceOrderStatus): ServiceOrder =>
+  toServiceOrder({
+    id: `${serviceItemId}-${status}`,
+    serviceItemId,
+    vendorId: 'vendor-1',
+    status,
+    ...serviceOrderDatesFor(status),
+  });
 
 describe('hasActiveServiceOrder', () => {
   it('対象項目に有効な案件があれば true', () => {

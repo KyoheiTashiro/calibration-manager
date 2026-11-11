@@ -32,7 +32,7 @@ export const SERVICE_ITEM_TYPE = {
 } as const;
 export type ServiceItemType = (typeof SERVICE_ITEM_TYPE)[keyof typeof SERVICE_ITEM_TYPE];
 
-/** 実施区分（domain-model.md §3.4）。external の場合のみ vendorId が必須 */
+/** 実施区分（domain-model.md §3.4）。external の場合のみ vendorId を持つ（必須） */
 export const EXECUTION = {
   INTERNAL: 'internal',
   EXTERNAL: 'external',
@@ -72,6 +72,19 @@ export const NOTIFICATION_TYPE = {
 } as const;
 export type NotificationType = (typeof NOTIFICATION_TYPE)[keyof typeof NOTIFICATION_TYPE];
 
+/** 項目(ServiceItem)を対象とする通知種別。対象種別との対応は Notification 型が強制する */
+export const SERVICE_ITEM_NOTIFICATION_TYPES = [
+  NOTIFICATION_TYPE.DUE_SOON,
+  NOTIFICATION_TYPE.OVERDUE,
+  NOTIFICATION_TYPE.ORDER_RECOMMENDED,
+] as const;
+
+/** 案件(ServiceOrder)を対象とする通知種別 */
+export const SERVICE_ORDER_NOTIFICATION_TYPES = [
+  NOTIFICATION_TYPE.DELIVERY_DUE_SOON,
+  NOTIFICATION_TYPE.DELIVERY_OVERDUE,
+] as const;
+
 /** 通知の対象種別（domain-model.md §3.7） */
 export const NOTIFICATION_TARGET_TYPE = {
   SERVICE_ITEM: 'serviceItem',
@@ -85,6 +98,11 @@ export type NotificationTargetType =
  * 時刻は扱わない。ISO形式の文字列は辞書順比較が日付順比較と一致する。
  */
 export type IsoDateString = string;
+
+/** 判別 union の各メンバーへ分配する Omit(素の Omit は union を共通キーだけの1型へ潰す) */
+export type DistributiveOmit<Target, Key extends PropertyKey> = Target extends unknown
+  ? Omit<Target, Key>
+  : never;
 
 /** メーカー/取引先（domain-model.md §3.1）。メーカーと校正業者を区分フラグで統合 */
 export type Vendor = {
@@ -123,18 +141,12 @@ export type Equipment = {
   note?: string;
 };
 
-/** 点検校正項目（domain-model.md §3.4）— 中核エンティティ。1機器に複数登録可能 */
-export type ServiceItem = {
+export type ServiceItemBase = {
   id: string;
   equipmentId: string;
   type: ServiceItemType;
   name: string;
   cycle: Cycle;
-  execution: Execution;
-  /** 校正依頼先（Vendor参照）。execution=external の場合必須（schema.ts で強制） */
-  vendorId?: string;
-  /** 納期（日数）。未設定なら Vendor.standardLeadTimeDays を使用（domain-model.md §4.2） */
-  leadTimeDays?: number;
   /** 発注余裕日数（デフォルト14 = domain/constants.ts の DEFAULT_BUFFER_DAYS） */
   bufferDays: number;
   personId: string;
@@ -145,6 +157,26 @@ export type ServiceItem = {
   nextDueDate: IsoDateString;
   isActive: boolean;
 };
+
+/**
+ * 点検校正項目（domain-model.md §3.4）— 中核エンティティ。1機器に複数登録可能。
+ * 実施区分の判別 union（D-106）: 内部実施は依頼先・納期を持てず、外部実施は依頼先が必須。
+ * 禁止側を `?: undefined` で表すのは、未ナローのまま `serviceItem.vendorId` を読めるようにするため。
+ */
+export type ServiceItemExecution =
+  | {
+      execution: typeof EXECUTION.INTERNAL;
+      vendorId?: undefined;
+      leadTimeDays?: undefined;
+    }
+  | {
+      execution: typeof EXECUTION.EXTERNAL;
+      /** 校正依頼先（Vendor参照） */
+      vendorId: string;
+      /** 納期（日数）。未設定なら Vendor.standardLeadTimeDays を使用（domain-model.md §4.2） */
+      leadTimeDays?: number;
+    };
+export type ServiceItem = ServiceItemBase & ServiceItemExecution;
 
 /** 実施記録（domain-model.md §3.5） */
 export type ServiceRecord = {
@@ -159,25 +191,47 @@ export type ServiceRecord = {
   note?: string;
 };
 
-/** 点検校正外部案件（domain-model.md §3.6）。発注1回分の進捗と納期を追跡する */
-export type ServiceOrder = {
+type ServiceOrderBase = {
   id: string;
   serviceItemId: string;
   vendorId: string;
-  status: ServiceOrderStatus;
-  orderedDate?: IsoDateString;
   /** 返却予定日（業者回答の個別納期） */
   dueDate?: IsoDateString;
-  returnedDate?: IsoDateString;
   cost?: number;
   note?: string;
 };
 
-/** アプリ内通知（domain-model.md §3.7）。メール実送信はしない */
-export type Notification = {
+/**
+ * 点検校正外部案件（domain-model.md §3.6）。発注1回分の進捗と納期を追跡する。
+ * status の判別 union（D-106）: 発注済以降は発注日、返却済以降は実返却日が必須で、
+ * それより前の段階は持てない。cancelled はどの段階からも入るため両方任意。
+ */
+export type ServiceOrder = ServiceOrderBase &
+  (
+    | {
+        status: typeof SERVICE_ORDER_STATUS.PLANNED;
+        orderedDate?: undefined;
+        returnedDate?: undefined;
+      }
+    | {
+        status: typeof SERVICE_ORDER_STATUS.ORDERED | typeof SERVICE_ORDER_STATUS.IN_CALIBRATION;
+        orderedDate: IsoDateString;
+        returnedDate?: undefined;
+      }
+    | {
+        status: typeof SERVICE_ORDER_STATUS.RETURNED | typeof SERVICE_ORDER_STATUS.COMPLETED;
+        orderedDate: IsoDateString;
+        returnedDate: IsoDateString;
+      }
+    | {
+        status: typeof SERVICE_ORDER_STATUS.CANCELLED;
+        orderedDate?: IsoDateString;
+        returnedDate?: IsoDateString;
+      }
+  );
+
+type NotificationBase = {
   id: string;
-  type: NotificationType;
-  targetType: NotificationTargetType;
   /** 対象のID（targetType=serviceItem なら ServiceItem、serviceOrder なら ServiceOrder） */
   targetId: string;
   personId: string;
@@ -185,6 +239,22 @@ export type Notification = {
   createdDate: IsoDateString;
   isRead: boolean;
 };
+
+/**
+ * アプリ内通知（domain-model.md §3.7）。メール実送信はしない。
+ * 対象種別の判別 union（D-106）: 項目宛ての通知が案件用の種別を持つ組を型で排除する。
+ */
+export type Notification = NotificationBase &
+  (
+    | {
+        targetType: typeof NOTIFICATION_TARGET_TYPE.SERVICE_ITEM;
+        type: (typeof SERVICE_ITEM_NOTIFICATION_TYPES)[number];
+      }
+    | {
+        targetType: typeof NOTIFICATION_TARGET_TYPE.SERVICE_ORDER;
+        type: (typeof SERVICE_ORDER_NOTIFICATION_TYPES)[number];
+      }
+  );
 
 /**
  * 永続化対象の全エンティティ（store.md「partialize」）。

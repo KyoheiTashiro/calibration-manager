@@ -47,6 +47,7 @@ const serviceOrder: ServiceOrder = {
   serviceItemId: 'item-1',
   vendorId: 'vendor-1',
   status: SERVICE_ORDER_STATUS.ORDERED,
+  orderedDate: '2026-06-01',
 };
 
 const stateWithReferences = (): AppState => ({
@@ -255,7 +256,7 @@ describe('validateEntityCsv: 参照整合(D-029: 現在ストアと突合)', () 
     // targetType=serviceOrder だが targetId は serviceItem の id → serviceOrders に存在しないためエラー
     const csv = joinCsv(
       NOTIFICATIONS_HEADER,
-      'nt-1,dueSoon,serviceOrder,item-1,person-1,期限接近,2026-07-01,false',
+      'nt-1,deliveryDueSoon,serviceOrder,item-1,person-1,納期接近,2026-07-01,false',
       'nt-2,dueSoon,serviceItem,item-1,person-1,期限接近,2026-07-01,true',
     );
     const result = validateEntityCsv('notifications', csv, stateWithReferences());
@@ -410,6 +411,51 @@ describe('validateEntityCsv: 数式インジェクション警告(D-053)', () =>
     expect(result.warnings).toEqual([
       { line: 2, message: 'location: 数式として解釈され得る値です(Excel等で開く際は注意)' },
       { line: 2, message: 'note: 数式として解釈され得る値です(Excel等で開く際は注意)' },
+    ]);
+  });
+});
+
+describe('validateEntityCsv: 複数属性から導く一意制約(D-110)', () => {
+  const ORDERS_HEADER =
+    'id,serviceItemId,vendorId,status,orderedDate,dueDate,returnedDate,cost,note';
+
+  it('同じ項目に有効な案件が2件あると2件目をエラーにする(完了・中止は数えない)', () => {
+    const csv = joinCsv(
+      ORDERS_HEADER,
+      'so-1,item-1,vendor-1,planned,,,,,',
+      'so-2,item-1,vendor-1,completed,2026-05-01,,2026-05-20,,',
+      'so-3,item-1,vendor-1,cancelled,,,,,',
+      'so-4,item-1,vendor-1,ordered,2026-06-01,,,,',
+    );
+    const result = validateEntityCsv('serviceOrders', csv, stateWithReferences());
+    expect(result.errors).toEqual([
+      {
+        line: 5,
+        message:
+          'serviceItemId: 有効な案件(発注準備〜返却済)は点検校正項目ごとに1件までです(行2と重複)',
+      },
+    ]);
+  });
+
+  it('status と日付が食い違う案件を行エラーにする', () => {
+    const csv = joinCsv(ORDERS_HEADER, 'so-1,item-1,vendor-1,ordered,,,,,');
+    const result = validateEntityCsv('serviceOrders', csv, stateWithReferences());
+    expect(result.errors).toEqual([
+      { line: 2, message: 'orderedDate: 発注済以降の案件には発注日が必要です' },
+    ]);
+  });
+
+  it('同じ案件に紐づく実施記録が2件あると2件目をエラーにする(案件なしの記録は対象外)', () => {
+    const csv = joinCsv(
+      'id,serviceItemId,doneDate,doneBy,result,serviceOrderId,note',
+      'rc-1,item-1,2026-07-01,校正社,pass,serviceOrder-1,',
+      'rc-2,item-1,2026-07-02,田中,pass,,',
+      'rc-3,item-1,2026-07-03,田中,pass,,',
+      'rc-4,item-1,2026-07-04,校正社,pass,serviceOrder-1,',
+    );
+    const result = validateEntityCsv('serviceRecords', csv, stateWithReferences());
+    expect(result.errors).toEqual([
+      { line: 5, message: 'serviceOrderId: 同じ案件に紐づく実施記録は1件までです(行2と重複)' },
     ]);
   });
 });

@@ -56,12 +56,14 @@ const buildGeneratedServiceItem = (
     id: generatedServiceItemId(equipment.id),
     equipmentId: equipment.id,
     type,
-    execution: isExternal ? EXECUTION.EXTERNAL : EXECUTION.INTERNAL,
     name: type === SERVICE_ITEM_TYPE.INSPECTION ? '定期点検' : '定期校正',
     cycle: cycleDef.cycle,
     ...(isExternal
-      ? { vendorId: GENERATED_CALIBRATORS[index % GENERATED_CALIBRATORS.length].id }
-      : {}),
+      ? {
+          execution: EXECUTION.EXTERNAL,
+          vendorId: GENERATED_CALIBRATORS[index % GENERATED_CALIBRATORS.length].id,
+        }
+      : { execution: EXECUTION.INTERNAL }),
     personId: GENERATED_ASSIGNEES[index % GENERATED_ASSIGNEES.length].id,
     bufferDays: DEFAULT_BUFFER_DAYS,
     noticeDaysBefore: DEFAULT_NOTICE_DAYS_BEFORE,

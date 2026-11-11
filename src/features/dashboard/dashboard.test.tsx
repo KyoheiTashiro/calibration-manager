@@ -12,10 +12,11 @@ import {
   type Notification,
   type Person,
 } from '@/store/types';
+import { toServiceItem } from '@/test/entityBuilders';
 import { renderWithStore, seedStore, setupStoreIsolation } from '@/test/renderWithStore';
 import { screen, within } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom/vitest';
+import userEvent from '@testing-library/user-event';
 import type { ReactElement } from 'react';
 import { Route, Routes, useParams, useSearchParams } from 'react-router-dom';
 import { beforeEach, describe, expect, it } from 'vitest';
@@ -58,18 +59,19 @@ const equipment1: Equipment = {
 
 const makeServiceItem = (
   overrides: Partial<ServiceItem> & Pick<ServiceItem, 'id' | 'nextDueDate'>,
-): ServiceItem => ({
-  equipmentId: equipment1.id,
-  type: SERVICE_ITEM_TYPE.CALIBRATION,
-  name: '年次校正',
-  cycle: CYCLE.Y1,
-  execution: EXECUTION.INTERNAL,
-  bufferDays: 14,
-  personId: tanaka.id,
-  noticeDaysBefore: 30,
-  isActive: true,
-  ...overrides,
-});
+): ServiceItem =>
+  toServiceItem({
+    equipmentId: equipment1.id,
+    type: SERVICE_ITEM_TYPE.CALIBRATION,
+    name: '年次校正',
+    cycle: CYCLE.Y1,
+    execution: EXECUTION.INTERNAL,
+    bufferDays: 14,
+    personId: tanaka.id,
+    noticeDaysBefore: 30,
+    isActive: true,
+    ...overrides,
+  });
 
 // 期限切れ(過去日)・正常(遠未来)で今日に依存せず導出ステータスを確定させる
 const overdueServiceItemA = makeServiceItem({

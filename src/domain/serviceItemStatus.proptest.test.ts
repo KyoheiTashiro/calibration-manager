@@ -49,7 +49,12 @@ describe('deriveServiceItemStatus（property）', () => {
         vendorOrNullArb,
         isoDateArb,
         (serviceItem, serviceOrders, vendor, today) => {
-          const internalServiceItem = { ...serviceItem, execution: EXECUTION.INTERNAL };
+          const internalServiceItem = {
+            ...serviceItem,
+            execution: EXECUTION.INTERNAL,
+            vendorId: undefined,
+            leadTimeDays: undefined,
+          };
           const status = deriveServiceItemStatus(internalServiceItem, serviceOrders, vendor, today);
           expect(status).not.toBe(SERVICE_ITEM_STATUS.ORDER_NOW);
           expect(status).not.toBe(SERVICE_ITEM_STATUS.IN_PROGRESS);
@@ -61,7 +66,12 @@ describe('deriveServiceItemStatus（property）', () => {
   it('内部・期限内・案件なしの項目は、通知窓の内なら dueSoon / 外なら ok に二分される', () => {
     fc.assert(
       fc.property(serviceItemArb, isoDateArb, (serviceItem, today) => {
-        const internalServiceItem = { ...serviceItem, execution: EXECUTION.INTERNAL };
+        const internalServiceItem = {
+          ...serviceItem,
+          execution: EXECUTION.INTERNAL,
+          vendorId: undefined,
+          leadTimeDays: undefined,
+        };
         fc.pre(today <= internalServiceItem.nextDueDate);
         const windowStart = addDays(
           internalServiceItem.nextDueDate,

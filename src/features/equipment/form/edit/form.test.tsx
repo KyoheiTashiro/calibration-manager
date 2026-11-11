@@ -1,8 +1,9 @@
 import { ROUTES, equipmentEditPath } from '@/constants/routes';
 import { EQUIPMENT_STATUS_LABELS } from '@/features/equipment/constants';
 import { EquipmentEditForm } from '@/features/equipment/form/edit';
-import { EQUIPMENT_STATUS, type Equipment, type Vendor } from '@/store/types';
+import { EQUIPMENT_STATUS, SERVICE_ORDER_STATUS, type Equipment, type Vendor } from '@/store/types';
 import { useAppStore } from '@/store/useAppStore';
+import { toServiceItem, toServiceOrder } from '@/test/entityBuilders';
 import { renderWithStore, seedStore, setupStoreIsolation } from '@/test/renderWithStore';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -205,5 +206,95 @@ describe('EquipmentEditForm: 編集モードで存在しないid', () => {
     );
 
     expect(screen.getByText('機器一覧（テスト用マーカー）')).toBeInTheDocument();
+  });
+});
+
+const seedWithActiveServiceOrder = (): void => {
+  seedStore({
+    equipment: { [existingEquipment.id]: existingEquipment },
+    vendors: { [mitutoyo.id]: mitutoyo },
+    serviceItems: {
+      'item-1': toServiceItem({
+        id: 'item-1',
+        equipmentId: existingEquipment.id,
+        type: 'calibration',
+        name: '年次校正',
+        cycle: '1Y',
+        execution: 'external',
+        vendorId: mitutoyo.id,
+        bufferDays: 14,
+        personId: 'person-1',
+        noticeDaysBefore: 30,
+        nextDueDate: '2026-07-31',
+        isActive: true,
+      }),
+    },
+    serviceOrders: {
+      'order-1': toServiceOrder({
+        id: 'order-1',
+        serviceItemId: 'item-1',
+        vendorId: mitutoyo.id,
+        status: SERVICE_ORDER_STATUS.ORDERED,
+        orderedDate: '2026-06-01',
+      }),
+      'order-done': toServiceOrder({
+        id: 'order-done',
+        serviceItemId: 'item-1',
+        vendorId: mitutoyo.id,
+        status: SERVICE_ORDER_STATUS.COMPLETED,
+        orderedDate: '2026-05-01',
+        returnedDate: '2026-05-20',
+      }),
+    },
+  });
+};
+
+const openRetireConfirm = async (
+  user: ReturnType<typeof userEvent.setup>,
+): Promise<HTMLElement> => {
+  renderEditForm(existingEquipment.id);
+  await user.click(screen.getByRole('combobox', { name: /^状態/u }));
+  await user.click(
+    screen.getByRole('option', { name: EQUIPMENT_STATUS_LABELS[EQUIPMENT_STATUS.RETIRED] }),
+  );
+  await user.click(screen.getByRole('button', { name: '保存' }));
+  return screen.getByRole('dialog');
+};
+
+describe('EquipmentEditForm: 廃棄時の進行中案件（D-109）', () => {
+  it('進行中の案件数を示し、既定では案件を残したまま廃棄する', async () => {
+    const user = userEvent.setup();
+    seedWithActiveServiceOrder();
+    const dialog = await openRetireConfirm(user);
+
+    expect(within(dialog).getByText(/進行中の点検校正外部案件が1件あります/u)).toBeInTheDocument();
+    expect(within(dialog).getByLabelText('進行中の案件も中止する')).not.toBeChecked();
+
+    await user.click(within(dialog).getByRole('button', { name: '廃棄' }));
+
+    expect(await screen.findByText(`機器詳細:${existingEquipment.id}`)).toBeInTheDocument();
+    expect(useAppStore.getState().equipment[existingEquipment.id]?.status).toBe(
+      EQUIPMENT_STATUS.RETIRED,
+    );
+    expect(useAppStore.getState().serviceOrders['order-1']?.status).toBe(
+      SERVICE_ORDER_STATUS.ORDERED,
+    );
+  });
+
+  it('「進行中の案件も中止する」を選ぶと進行中の案件だけ中止する', async () => {
+    const user = userEvent.setup();
+    seedWithActiveServiceOrder();
+    const dialog = await openRetireConfirm(user);
+
+    await user.click(within(dialog).getByLabelText('進行中の案件も中止する'));
+    await user.click(within(dialog).getByRole('button', { name: '廃棄' }));
+
+    expect(await screen.findByText(`機器詳細:${existingEquipment.id}`)).toBeInTheDocument();
+    expect(useAppStore.getState().serviceOrders['order-1']?.status).toBe(
+      SERVICE_ORDER_STATUS.CANCELLED,
+    );
+    expect(useAppStore.getState().serviceOrders['order-done']?.status).toBe(
+      SERVICE_ORDER_STATUS.COMPLETED,
+    );
   });
 });

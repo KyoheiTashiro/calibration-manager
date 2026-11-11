@@ -19,6 +19,7 @@ export type NotificationSlice = {
    * 有効な項目（serviceItem.isActive かつ 紐づく機器が active）と全案件をスキャンし、
    * 発生条件を満たす通知を生成する。同一（targetType, targetId, type）の未読通知が
    * 既に存在する場合は生成をスキップする。
+   * 発生条件を満たさなくなった未読通知は取り下げる（削除。D-108）。既読は履歴として残す。
    */
   generateNotifications: (today: IsoDateString) => void;
   markAsRead: (id: string) => void;
@@ -40,15 +41,20 @@ export const createNotificationSlice: AppSliceCreator<NotificationSlice> = (set,
       equipment,
       today,
     );
-    const unreadKeys = new Set(
-      Object.values(notifications)
-        .filter((notification) => !notification.isRead)
-        .map((notification) => duplicationKey(notification)),
-    );
+    const unread = Object.values(notifications).filter((notification) => !notification.isRead);
+    const expectedKeys = new Set(seeds.map((seed) => duplicationKey(seed)));
+    const unreadKeys = new Set(unread.map((notification) => duplicationKey(notification)));
+    const withdrawnIds = unread
+      .filter((notification) => !expectedKeys.has(duplicationKey(notification)))
+      .map((notification) => notification.id);
     const freshSeeds = seeds.filter((seed) => !unreadKeys.has(duplicationKey(seed)));
-    if (freshSeeds.length === 0) return;
+    if (freshSeeds.length === 0 && withdrawnIds.length === 0) return;
 
     set((state) => {
+      for (const id of withdrawnIds) {
+        // oxlint-disable-next-line typescript/no-dynamic-delete -- Record から取り下げ対象のキーを除去する
+        delete state.notifications[id];
+      }
       for (const seed of freshSeeds) {
         const id = createId();
         state.notifications[id] = { ...seed, id, createdDate: today, isRead: false };

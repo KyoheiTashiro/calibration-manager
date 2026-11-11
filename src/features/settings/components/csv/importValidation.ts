@@ -54,7 +54,7 @@ const zodIssueDetail = (issue: z.core.$ZodIssue): string => {
   if (issue.code === 'too_small') {
     return issue.origin === 'string' ? '必須です' : '0以上の値を指定してください';
   }
-  // custom(日付形式・external時vendorId必須)は schema.ts 側の日本語メッセージをそのまま使う
+  // custom(日付形式・実施区分や案件状態との組み合わせ違反)は schema.ts 側の日本語メッセージをそのまま使う
   return issue.message;
 };
 
@@ -104,6 +104,25 @@ const checkUniqueness = (
       return [];
     }
     return [`${key}: 重複しています(行${firstLine}と同じ値)`];
+  });
+
+/** 導出一意キー(1項目1有効案件など)の重複メッセージ。seen は checkUniqueness と共有し、接頭辞で名前空間を分ける */
+const derivedUniquenessMessages = <Entity>(
+  spec: EntityCsvSpec<Entity>,
+  entity: Entity,
+  seen: Map<string, number>,
+  line: number,
+): string[] =>
+  spec.derivedUniqueKeys.flatMap((rule, ruleIndex) => {
+    const key = rule.keyOf(entity);
+    if (key === undefined) return [];
+    const seenKey = `derived${ruleIndex}\u{0}${key}`;
+    const firstLine = seen.get(seenKey);
+    if (firstLine === undefined) {
+      seen.set(seenKey, line);
+      return [];
+    }
+    return [`${rule.column}: ${rule.message}(行${firstLine}と重複)`];
   });
 
 /** フィールド別の追加検証ルール(文字数上限・形式)違反メッセージ(D-086: store側スキーマは寛容なため入口で後付け) */
@@ -162,6 +181,7 @@ const validateRow = <Kind extends CsvEntityKind>(
   const messages = [
     ...ruleMessages,
     ...checkUniqueness(result.data, ['id', ...spec.uniqueKeys], seen, line),
+    ...derivedUniquenessMessages(spec, result.data, seen, line),
     ...referenceErrors(spec, result.data, state),
   ];
   return messages.length > 0 ? { messages } : { entity: result.data };

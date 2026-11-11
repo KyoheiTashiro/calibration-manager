@@ -101,8 +101,8 @@ erDiagram
 | name             | string        | ○       | 項目名(例:「月次点検」「年次校正」)                      |
 | cycle            | enum          | ○       | `1M` `3M` `6M` `1Y` `2Y` `3Y` `5Y` `10Y`                 |
 | execution        | enum          | ○       | `internal`(内部) / `external`(外部)                      |
-| vendorId         | string        | 外部時○ | 校正依頼先。Vendor参照                                   |
-| leadTimeDays     | number        |         | 納期(日数)。未設定ならVendorのstandardLeadTimeDaysを使用 |
+| vendorId         | string        | 外部時○ | 校正依頼先。Vendor参照。内部では持てない(D-106)          |
+| leadTimeDays     | number        |         | 納期(日数)。未設定ならVendorのstandardLeadTimeDaysを使用。外部のみ。内部では持てない(D-106) |
 | bufferDays       | number        | ○       | 発注余裕日数(デフォルト: 14)                             |
 | personId         | string        | ○       | 担当者。Person参照                                       |
 | noticeDaysBefore | number        | ○       | 通知開始日数(期限の何日前から通知。デフォルト: 30)       |
@@ -123,6 +123,7 @@ erDiagram
 | note     | string        |      | 備考(校正証明書番号など)                                 |
 
 - 記録登録時に `serviceItem.lastDoneDate = doneDate`、`serviceItem.nextDueDate = doneDate + cycle` を自動更新。
+- 実施日が項目の既存 `lastDoneDate` より前の記録(過去分の後追い登録)は、記録だけを追加し、項目の `lastDoneDate` / `nextDueDate` を更新しない。同日の記録は更新する(D-107)。
 - `fail` の場合は次回期限を更新せず、要対応状態として扱う。
 - 校正値・合格基準の数値記録はスコープ外。記録は `result`(pass/fail/adjusted)とメモ(`note`)のみで、数値入力・判定機能は持たない(D-004)。
 
@@ -136,9 +137,9 @@ erDiagram
 | serviceItemId       | string        | ○    | ServiceItem参照             |
 | vendorId     | string        | ○    | 依頼先                         |
 | status       | enum          | ○    | 下記の状態遷移参照             |
-| orderedDate  | date          |      | 発注日                         |
+| orderedDate  | date          | `ordered` 以降○ | 発注日。`planned` では持てない(D-106) |
 | dueDate      | date          |      | 返却予定日(業者回答の個別納期) |
-| returnedDate | date          |      | 実返却日                       |
+| returnedDate | date          | `returned` / `completed` で○ | 実返却日。返却前(`planned`〜`inCalibration`)は持てない(D-106) |
 | cost         | number        |      | 費用                           |
 | note         | string        |      | 備考                           |
 
@@ -149,8 +150,10 @@ planned(発注準備) → ordered(発注済) → inCalibration(校正中) → re
                                                               ↘ cancelled(中止)
 ```
 
-- `returned` 後、ServiceRecordを登録すると `completed` になり、項目の次回期限が更新される。
+- `returned` 後、ServiceRecordを登録すると `completed` になり、項目の次回期限が更新される。`completed` になるのは記録登録時点で `returned` の案件だけで、それ以外の状態の案件は記録を紐付けても状態を変えない(D-107)。
 - 遷移は上図の隣接遷移のみ(飛び越し不可)。加えて `planned`〜`returned` の各段階から `cancelled`(中止)へ遷移できる(図は代表経路のみ図示)。`completed` / `cancelled` からの再遷移は不可。
+- 状態と日付は1回の操作で同時に書く。発注(`planned`→`ordered`)は `orderedDate`、返却(`inCalibration`→`returned`)は `returnedDate` の入力を伴い、状態だけ・日付だけの更新はできない(D-106)。
+- `cancelled` の案件は `orderedDate` / `returnedDate` とも任意で、中止時点の値をそのまま保持する(D-106)。
 
 ### 3.7 Notification(通知)
 
@@ -161,7 +164,7 @@ planned(発注準備) → ordered(発注済) → inCalibration(校正中) → re
 | ----------- | ------------- | ---- | ------------------ |
 | id          | string (uuid) | ○    |                    |
 | type        | enum          | ○    | 下記の通知種別参照 |
-| targetType  | enum          | ○    | `serviceItem` / `serviceOrder`   |
+| targetType  | enum          | ○    | `serviceItem` / `serviceOrder`。種別との対応は下記(D-106) |
 | targetId    | string        | ○    | 対象のID           |
 | personId    | string        | ○    | 宛先担当者         |
 | message     | string        | ○    | 通知文             |
@@ -178,7 +181,9 @@ planned(発注準備) → ordered(発注済) → inCalibration(校正中) → re
 | `deliveryDueSoon`  | 発注済案件 | 今日 ≥ 返却予定日 − 7日 かつ 未返却 |
 | `deliveryOverdue`  | 発注済案件 | 今日 > 返却予定日 かつ 未返却       |
 
+- `targetType` と種別の組み合わせは固定。`serviceItem` は `dueSoon` / `overdue` / `orderRecommended`、`serviceOrder` は `deliveryDueSoon` / `deliveryOverdue` のみ(D-106)。
 - 同一対象・同一種別の未読通知は重複生成しない。
+- 発生条件を満たさなくなった未読通知は、次回スキャン時に取り下げる(削除)。実施記録の登録で期限が先へ進んだ場合、`dueSoon` が `overdue` へ進んだ場合、機器・項目が対象外になった場合が該当する。既読通知は履歴として残す(D-108)。
 - `overdue` と `dueSoon` の条件は重なるため、期限超過後はより深刻な `overdue` のみを生成し `dueSoon` は生成しない(`deliveryOverdue` / `deliveryDueSoon` も同様)。同一項目への二重通知はノイズになるため(D-041)。
 - `orderRecommended` の「未発注」は「有効な案件(`planned`〜`returned`)が1件もない」と解釈する。`planned` の案件があれば発注準備は着手済みであり再通知は不要なため(§4.3 orderNow の「有効な案件なし」と同じ判定。D-042)。
 - 担当者(Person)を無効化しても宛先はフォールバックせず元 personId のまま。無効化後も通知は生成・表示し続ける(D-001)。

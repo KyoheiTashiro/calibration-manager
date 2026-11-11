@@ -4,6 +4,7 @@
 
 import type { ServiceOrder, Equipment, ServiceItem, Person, Vendor } from '@/store/types';
 import { useAppStore } from '@/store/useAppStore';
+import { serviceOrderDatesFor, toServiceOrder } from '@/test/entityBuilders';
 import { seedStore, setupStoreIsolation } from '@/test/renderWithStore';
 import { beforeEach, describe, expect, it } from 'vitest';
 
@@ -49,7 +50,13 @@ const returnedServiceOrder: ServiceOrder = {
   serviceItemId: 'item-1',
   vendorId: 'vendor-1',
   status: 'returned',
+  orderedDate: '2026-06-01',
+  returnedDate: '2026-06-20',
 };
+
+/** returnedServiceOrder を指定 status（と、その status が持つべき日付）へ差し替えた案件 */
+const serviceOrderWith = (status: ServiceOrder['status']): ServiceOrder =>
+  toServiceOrder({ ...returnedServiceOrder, status, ...serviceOrderDatesFor(status) });
 
 const seedBase = (overrides?: { serviceItems?: Record<string, ServiceItem> }): void => {
   seedStore({
@@ -62,7 +69,7 @@ const seedBase = (overrides?: { serviceItems?: Record<string, ServiceItem> }): v
 
 const seedServiceOrderWith = (status: ServiceOrder['status']): void => {
   seedBase();
-  seedStore({ serviceOrders: { [returnedServiceOrder.id]: { ...returnedServiceOrder, status } } });
+  seedStore({ serviceOrders: { [returnedServiceOrder.id]: serviceOrderWith(status) } });
 };
 
 describe('replaceEntities: CSVインポートの全置換(D-029)', () => {
@@ -126,6 +133,36 @@ describe('addServiceRecord: 期限更新カスケード', () => {
     expect(updated.nextDueDate).toBe('2026-07-15');
   });
 
+  it('既存の lastDoneDate より前の実施日（過去分の後追い登録）は記録だけ追加し、項目の日付を変えない（D-107）', () => {
+    seedBase();
+    const id = useAppStore.getState().addServiceRecord({
+      serviceItemId: serviceItem.id,
+      doneDate: '2025-01-10',
+      doneBy: '田中',
+      result: 'pass',
+    });
+
+    expect(id).not.toBeNull();
+    const state = useAppStore.getState();
+    expect(Object.keys(state.serviceRecords)).toHaveLength(1);
+    expect(state.serviceItems[serviceItem.id].lastDoneDate).toBe('2025-07-15');
+    expect(state.serviceItems[serviceItem.id].nextDueDate).toBe('2026-07-15');
+  });
+
+  it('既存の lastDoneDate と同日の実施日は通常どおり期限を更新する（D-107 の境界）', () => {
+    seedBase();
+    useAppStore.getState().addServiceRecord({
+      serviceItemId: serviceItem.id,
+      doneDate: '2025-07-15',
+      doneBy: '田中',
+      result: 'pass',
+    });
+
+    const updated = useAppStore.getState().serviceItems[serviceItem.id];
+    expect(updated.lastDoneDate).toBe('2025-07-15');
+    expect(updated.nextDueDate).toBe('2026-07-15');
+  });
+
   it('存在しない項目には no-op（null）', () => {
     seedBase();
     const id = useAppStore.getState().addServiceRecord({
@@ -177,7 +214,7 @@ describe('addServiceRecord: 案件完了カスケード', () => {
     (status) => {
       seedBase();
       seedStore({
-        serviceOrders: { [returnedServiceOrder.id]: { ...returnedServiceOrder, status } },
+        serviceOrders: { [returnedServiceOrder.id]: serviceOrderWith(status) },
       });
 
       const id = useAppStore.getState().addServiceRecord({
@@ -229,7 +266,7 @@ describe('addServiceOrder: 1項目1有効案件（D-006）', () => {
     (status) => {
       seedBase();
       seedStore({
-        serviceOrders: { [returnedServiceOrder.id]: { ...returnedServiceOrder, status } },
+        serviceOrders: { [returnedServiceOrder.id]: serviceOrderWith(status) },
       });
       expect(
         useAppStore
@@ -245,7 +282,7 @@ describe('addServiceOrder: 1項目1有効案件（D-006）', () => {
     (status) => {
       seedBase();
       seedStore({
-        serviceOrders: { [returnedServiceOrder.id]: { ...returnedServiceOrder, status } },
+        serviceOrders: { [returnedServiceOrder.id]: serviceOrderWith(status) },
       });
       expect(
         useAppStore
@@ -263,47 +300,103 @@ describe('addServiceOrder: 1項目1有効案件（D-006）', () => {
   });
 });
 
-describe('updateServiceOrderStatus: 遷移テーブル検証', () => {
-  it.each([
-    ['planned', 'ordered'],
-    ['ordered', 'inCalibration'],
-    ['inCalibration', 'returned'],
-    ['planned', 'cancelled'],
-    ['ordered', 'cancelled'],
-    ['inCalibration', 'cancelled'],
-    ['returned', 'cancelled'],
-  ] as const)('隣接遷移 %s → %s を許可する', (from, to) => {
-    seedServiceOrderWith(from);
-    expect(useAppStore.getState().updateServiceOrderStatus(returnedServiceOrder.id, to)).toBe(true);
-    expect(useAppStore.getState().serviceOrders[returnedServiceOrder.id].status).toBe(to);
-  });
+describe('案件の遷移アクション: 遷移テーブル検証（D-106）', () => {
+  const ALL_STATUSES = [
+    'planned',
+    'ordered',
+    'inCalibration',
+    'returned',
+    'completed',
+    'cancelled',
+  ] as const;
+  const { id } = returnedServiceOrder;
+  /** 各アクションを、遷移元を問わず同じ引数で呼ぶ */
+  const ACTIONS = {
+    order: (): boolean =>
+      useAppStore.getState().orderServiceOrder(id, { orderedDate: '2026-07-01' }),
+    start: (): boolean => useAppStore.getState().startServiceOrderCalibration(id),
+    return: (): boolean => useAppStore.getState().returnServiceOrder(id, '2026-07-20'),
+    cancel: (): boolean => useAppStore.getState().cancelServiceOrder(id),
+  };
 
   it.each([
-    ['planned', 'inCalibration'], // 飛び越し
-    ['ordered', 'planned'], // 逆行
-    ['completed', 'cancelled'], // 終端から
-    ['cancelled', 'planned'], // 終端から
-  ] as const)('許可されない遷移 %s → %s は no-op（false）', (from, to) => {
+    ['order', 'planned', 'ordered'],
+    ['start', 'ordered', 'inCalibration'],
+    ['return', 'inCalibration', 'returned'],
+    ['cancel', 'planned', 'cancelled'],
+    ['cancel', 'ordered', 'cancelled'],
+    ['cancel', 'inCalibration', 'cancelled'],
+    ['cancel', 'returned', 'cancelled'],
+  ] as const)('%s: 隣接遷移 %s → %s を許可する', (action, from, to) => {
     seedServiceOrderWith(from);
-    expect(useAppStore.getState().updateServiceOrderStatus(returnedServiceOrder.id, to)).toBe(
-      false,
-    );
-    expect(useAppStore.getState().serviceOrders[returnedServiceOrder.id].status).toBe(from);
+    expect(ACTIONS[action]()).toBe(true);
+    expect(useAppStore.getState().serviceOrders[id].status).toBe(to);
   });
 
-  it('completed への直接遷移は returned からでも拒否する（addServiceRecord 経由のみ）', () => {
-    seedServiceOrderWith('returned');
-    expect(
-      useAppStore.getState().updateServiceOrderStatus(returnedServiceOrder.id, 'completed'),
-    ).toBe(false);
-    expect(useAppStore.getState().serviceOrders[returnedServiceOrder.id].status).toBe('returned');
+  // 許可する遷移元（上の表）以外は、飛び越し・逆行・終端からのいずれも拒否する
+  const ALLOWED_FROM = {
+    order: ['planned'],
+    start: ['ordered'],
+    return: ['inCalibration'],
+    cancel: ['planned', 'ordered', 'inCalibration', 'returned'],
+  } as const satisfies Record<keyof typeof ACTIONS, readonly string[]>;
+  const rejectedCases = (['order', 'start', 'return', 'cancel'] as const).flatMap((action) =>
+    ALL_STATUSES.filter((from) => !(ALLOWED_FROM[action] as readonly string[]).includes(from)).map(
+      (from) => [action, from] as const,
+    ),
+  );
+
+  it.each(rejectedCases)('%s: 遷移元 %s は no-op（false）で案件を変えない', (action, from) => {
+    seedServiceOrderWith(from);
+    const before = useAppStore.getState().serviceOrders[id];
+    expect(ACTIONS[action]()).toBe(false);
+    expect(useAppStore.getState().serviceOrders[id]).toEqual(before);
+  });
+
+  it('発注は発注日を書き込み、入力した返却予定日・費用を反映する', () => {
+    seedServiceOrderWith('planned');
+    useAppStore
+      .getState()
+      .orderServiceOrder(id, { orderedDate: '2026-07-01', dueDate: '2026-07-30', cost: 5000 });
+    expect(useAppStore.getState().serviceOrders[id]).toMatchObject({
+      status: 'ordered',
+      orderedDate: '2026-07-01',
+      dueDate: '2026-07-30',
+      cost: 5000,
+    });
+  });
+
+  it('発注で返却予定日・費用を省略すると、作成時に入力済みの値を保つ', () => {
+    seedBase();
+    seedStore({
+      serviceOrders: {
+        [id]: { id, serviceItemId: serviceItem.id, vendorId: vendor.id, status: 'planned', dueDate: '2026-08-10', cost: 3000 }, // prettier-ignore
+      },
+    });
+    useAppStore.getState().orderServiceOrder(id, { orderedDate: '2026-07-01' });
+    expect(useAppStore.getState().serviceOrders[id]).toMatchObject({
+      status: 'ordered',
+      dueDate: '2026-08-10',
+      cost: 3000,
+    });
+  });
+
+  it('返却は実返却日を書き込み、発注日を保つ', () => {
+    seedServiceOrderWith('inCalibration');
+    useAppStore.getState().returnServiceOrder(id, '2026-07-20');
+    expect(useAppStore.getState().serviceOrders[id]).toMatchObject({
+      status: 'returned',
+      orderedDate: '2026-06-01',
+      returnedDate: '2026-07-20',
+    });
   });
 
   it('存在しない案件は false', () => {
     seedBase();
-    expect(useAppStore.getState().updateServiceOrderStatus('serviceOrder-gone', 'ordered')).toBe(
-      false,
-    );
+    expect(
+      useAppStore.getState().orderServiceOrder('serviceOrder-gone', { orderedDate: '2026-07-01' }),
+    ).toBe(false);
+    expect(useAppStore.getState().cancelServiceOrder('serviceOrder-gone')).toBe(false);
   });
 });
 
