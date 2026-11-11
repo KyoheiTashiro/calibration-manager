@@ -12,5 +12,7 @@
   "jsxSingleQuote": true,
   // なぜ: Tailwind CSS 4採用のため、className内のユーティリティクラスの並び順を
   // prettier-plugin-tailwindcss互換のアルゴリズムで自動整列し、レビュー時の差分ノイズを減らす。
-  "sortTailwindcss": true
+  "sortTailwindcss": true,
+  // なぜ: tools/explainer-video は解説動画を作り直すための単発スクリプトで、1 行に図形を並べた書式を保つため対象外（D-102）
+  "ignorePatterns": ["tools/explainer-video"]
 }

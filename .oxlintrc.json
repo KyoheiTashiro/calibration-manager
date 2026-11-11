@@ -1,7 +1,8 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
   "plugins": ["eslint", "typescript", "unicorn", "oxc", "react", "jsx-a11y", "import"],
-  "ignorePatterns": ["dev-dist"],
+  // tools/explainer-video は解説動画を作り直すための単発スクリプトで、アプリ本体に含まれないため対象外(D-102)
+  "ignorePatterns": ["dev-dist", "tools/explainer-video"],
   "categories": {
     "correctness": "error",
     "suspicious": "error",
