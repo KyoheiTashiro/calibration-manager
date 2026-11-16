@@ -19,7 +19,7 @@
     "prepare": "husky"
   },
   "dependencies": {
-    "@hookform/resolvers": "6.0.0",
+    "@hookform/resolvers": "7.0.1",
     "immer": "11.2.9",
     "react": "19.3.1",
     "react-dom": "19.3.1",
